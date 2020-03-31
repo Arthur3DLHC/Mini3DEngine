@@ -1,0 +1,79 @@
+HTML5 WebGL 3d render engine?
+    or extends three.js?
+
+Features：
+    动态光照；动态和静态阴影；
+    环境反射贴图；
+    PBR？
+    次表面反射；
+    Irradiance Volume？
+    屏幕空间反射；
+    屏幕空间GI；
+    SSVO 和 Bent Normal；
+    贴花；
+    骨骼皮肤动画；
+    加载glTF模型和动画；
+    带光照的粒子系统；
+
+设计要点：
+    底层
+        使用一些较新的webgl2.0特性，比如constant uniform buffer, texture array等
+
+    渲染流程
+        每相机：
+        Depth pre-pass，生成深度缓冲，同时生成距离图和速度图；
+            骨骼皮肤物体的速度图怎么画
+        使用每帧生成渲染对象列表的机制；支持对对象列表排序；
+        支持静态，可变形网格；支持instancing；
+        billboard和粒子系统；
+            粒子系统光照；
+
+        Constant buffer 划分：
+            每帧数据：
+                帧时间；可能需要同时传入几种不同的时间？分别用于逻辑/特效等
+            每相机数据：
+                摄像机位置，视矩阵，投影矩阵，视口位置等
+            每物体数据：
+                物体变换矩阵，颜色等
+                实例列表物体的变换通过 Instance Vertex buffer 传进来？
+            每材质数据：
+                材质自定义的参数
+
+    光影
+        使用前置光照；
+        每帧对视口划分区域，查找区域内的光源；通过constant uniform buffer传入shader；绘制对象时每像素从该区域内的光源列表中遍历光源；
+        阴影图通过图集统一传入shader；光源的阴影图位置通过constant uniform buffer传入shader；
+        区分静态阴影和动态阴影
+            静态阴影只生成静态物体的阴影，在场景初始化时生成一次阴影图？
+            动态阴影：如果光源不动且内部无运动物体，则也可以继续使用上一帧生成的阴影图；
+            静态物体绘制阴影图时支持使用简化版本的模型；
+            动态阴影和静态阴影图集是否分开传入Shader？
+            静态阴影图集通过场景编辑工具预先生成？
+        需要注意的是前置光照可能会导致 Shader 中的 VGPR 性能压力较大；
+        Irradiance Volume 传入 shader 时是使用静态的 3D 纹理
+            需要 Bake Irradiance volume；how？在哪里 bake? 能否通过 blender 插件？
+                或者单写一个Web页面工具，可以导入由 Blender 导出的 glTF 文件和 irradiance volume 属性文件，然后 Bake
+            场景中可以有多个Irradiance volume；Irradiance volume 外的像素按照距离衰减或混合；
+            如果有重叠的Irradiance volume, 则体积小的优先混合；
+        粒子系统光照
+            如果对粒子纹理的每个像素做光照，由于粒子的重绘率很高，过于消耗性能；
+            为避免这种情况，降低计算粒子光照时的分辨率；
+            先把所有粒子的光照用低分辨率绘制到一个图集中？
+                通过小分辨率的四边形绘制；
+                    根据粒子位置、光源和粒子法线等属性计算光照；
+            然后再从图集中取出低分辨率光照，和高分辨率粒子纹理相乘，绘到屏幕上；
+
+    材质和Shader
+        支持几种不同的Shader类型：内置PBR Shader，自定义扩展Shader?
+        为每材质维护一个constant buffer;
+        每帧对视口划分区域，查找区域内的贴花，投射参数和子图位置通过constant uniform buffer传入shader，贴图通过图集传入shader；
+        Same to 环境反射贴图
+        贴花和环境反射贴图可以设置最远可见距离；
+
+    后期特效
+
+    资源加载
+        缓存机制；
+
+词汇表
+    VGPR：Vector General-Purpose Registers

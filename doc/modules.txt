@@ -1,0 +1,39 @@
+模块划分：
+    资源管理
+        文件缓存
+        GL硬件资源缓存？
+        怎样缓存结构最简单？
+    场景管理
+        可渲染对象
+            摄像机
+                后期特效
+            光源
+            LightProbe
+            EnvmapProbe
+            网格
+                静态网格实例Batch
+                动态网格
+            材质
+            粒子系统
+            Decal
+    渲染器
+        图元
+            顶点格式
+            图元类型
+            VBO
+            IBO
+            实例个数
+            实例VBO
+            RenderStates
+            Shader
+                UniformBuffer
+            UniformBuffers
+        Renderer
+            ClusteredForwardPlusRenderer
+            ShadowmapRenderer
+        RenderTarget
+            多摄像机时，每个相机向自己的 RT 绘制，然后再叠加？使 Shader 中不用考虑 Viewport
+        阴影图集管理
+        Decal图集管理
+        Cubemap图集管理
+
