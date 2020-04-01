@@ -1,8 +1,12 @@
+词汇表
+    VGPR：Vector General-Purpose Registers
+
 HTML5 WebGL 3d render engine?
     or extends three.js?
 
 Features：
     动态光照；动态和静态阴影；
+    SkyBox;
     环境反射贴图；
     PBR？
     次表面反射；
@@ -75,5 +79,3 @@ Features：
     资源加载
         缓存机制；
 
-词汇表
-    VGPR：Vector General-Purpose Registers

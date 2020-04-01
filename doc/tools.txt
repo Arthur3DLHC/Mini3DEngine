@@ -1,0 +1,25 @@
+模型制作：Blender
+    导出模型为 glTF 文件
+
+场景编辑：Blender
+    放置静态网格模型；
+    放置 Entity
+        用一个代理对象；用自定义属性记录一下 Entity 的 Prefab 和属性；
+    导出工具（python 脚本）
+        导出Entity
+        导出光源（或者包含在 glTF 里？）
+        导出 Irradiance volume 位置和属性；如果能导出 blender 烘焙的 Irradiance volume 数据更好；
+
+场景预处理：单独的 JS GUI 工具；需要依赖渲染引擎
+    功能：
+        优化场景？静态模型打包？
+        生成、打包静态光源的 Shadowmap 图集；
+        生成Cubemap图集；
+        生成贴花图集；
+        Bake Irradiance Volumes （如果不能从 Blender 导出的话）
+            可以有一个面板调整 Irradiance volume 烘焙过程的参数；
+
+    界面：
+        通常视口操作；
+        第一人称模式；
+        不具备编辑功能，只用于预览场景；
