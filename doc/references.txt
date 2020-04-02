@@ -1,0 +1,7 @@
+js 物理引擎
+    cannon.js
+        完全开源；纯 js 代码
+    ammo.js
+        通过 emscripten 将 C++ 的 Bullet 引擎转为 js；源代码不可读。
+
+emscripten: 一个可以将 c++ 代码转换成 js 代码的工具
