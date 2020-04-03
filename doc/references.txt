@@ -8,7 +8,7 @@ js 物理引擎
 
 emscripten: 一个可以将 c++ 代码转换成 js 代码的工具
 
-js 模型加载机制
+minimal-gltf-loader js 模型加载机制
     模型异步加载，通过回调知道加载完毕
     在加载完毕的回调函数中再将模型对象添加到场景
     怎样知道模型依赖的所有文件（shader, 贴图）都加载完毕了：计数。
@@ -18,3 +18,17 @@ js 模型加载机制
         已加载网格个数
         已加载Shader个数
         已加载贴图个数
+
+Three.js 的顶点缓冲创建
+    WebGLAttributes.js
+        createBuffer 函数
+        updateBuffer 和 update 函数
+
+Three.js 的渲染上下文
+    WebGLRenderer
+        states: 各种渲染状态，如半透明混合等
+        renderStates: 光源，阴影等
+        renderList: 要画的各种图元
+            生成 renderList: 在WebGLRenderer.Render 函数，projectObject() 调用
+            projectObject() 是一个递归调用；会递归遍历场景中的 object 树，区分 object 类型，分别向 RenderList, Lights, Shadows 集合中添加；
+
