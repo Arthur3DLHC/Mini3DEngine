@@ -19,6 +19,11 @@ minimal-gltf-loader js 模型加载机制
         已加载Shader个数
         已加载贴图个数
 
+Three.js 缓存
+    文件缓存
+    Geometry 缓存
+        缓存的 key 是怎么生成的？
+
 Three.js 的顶点缓冲创建
     WebGLAttributes.js
         createBuffer 函数
@@ -32,3 +37,7 @@ Three.js 的渲染上下文
             生成 renderList: 在WebGLRenderer.Render 函数，projectObject() 调用
             projectObject() 是一个递归调用；会递归遍历场景中的 object 树，区分 object 类型，分别向 RenderList, Lights, Shadows 集合中添加；
 
+Three.js Shader 预处理
+    使用正则表达式替换所有 #include 字符串：WebGLProgram.js
+    Shader 源代码直接用字符串的形式写在 js 文件中；
+    ShaderChunks.js 中引入了所有的 Shader 源码字符串；
