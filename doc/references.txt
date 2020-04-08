@@ -28,6 +28,11 @@ Three.js 的顶点缓冲创建
     WebGLAttributes.js
         createBuffer 函数
         updateBuffer 和 update 函数
+        采用的是 Attribute 定义对象引用数据缓冲对象的形式。
+
+Three.js 的顶点格式设置
+    WebGLRenderer.setupVertexAttributes
+        函数中会区分一下是否是交错格式的 Buffer
 
 Three.js 的渲染上下文
     WebGLRenderer
