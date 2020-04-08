@@ -1,0 +1,6 @@
+/node_modules/
+/build/js/
+/build/js/contentLoaders/
+/build/js/geometry/
+/build/js/resourceWebGL/
+/build/js/scene
