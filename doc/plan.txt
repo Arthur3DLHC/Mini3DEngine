@@ -1,0 +1,17 @@
+TODO:       主要类结构
+            场景管理
+            图元绘制
+            Shader架构
+            简单材质、Shader
+            简单Geometry生成、添加、绘制测试
+            FileLoader
+            GLTFLoader
+            image based lighting, 生成 SH
+            生成 envmap cube
+            生成 irradiance volume
+            Clustered 光源、envmap、irradiance volume
+            Shadowmap 阴影
+
+LOG：
+
+
