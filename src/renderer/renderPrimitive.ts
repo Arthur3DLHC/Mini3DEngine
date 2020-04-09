@@ -9,7 +9,7 @@ export class RenderPrimitive {
     }
     // geometry
     
-    public geometry : BufferGeometry;
+    public geometry : BufferGeometry | null;
     
     // material
     // program, whether from material or renderer specific
