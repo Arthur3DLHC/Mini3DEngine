@@ -46,3 +46,7 @@ Three.js Shader 预处理
     使用正则表达式替换所有 #include 字符串：WebGLProgram.js
     Shader 源代码直接用字符串的形式写在 js 文件中；
     ShaderChunks.js 中引入了所有的 Shader 源码字符串；
+
+Babylon.js
+    是用 typescript 开发的，太有参考价值了！
+        学习名称空间怎么用；Rollup的使用；typescript 的异步加载机制怎么实现；
