@@ -6,6 +6,7 @@ TODO:       主要类结构
             简单Geometry生成、添加、绘制测试
             FileLoader
             GLTFLoader
+                先直接引用 minimal gltf loader?
             image based lighting, 生成 SH
             生成 envmap cube
             生成 irradiance volume

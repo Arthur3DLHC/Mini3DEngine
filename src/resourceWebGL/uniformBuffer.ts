@@ -6,5 +6,5 @@ export class UniformBuffer {
     public bufferData: Float32Array;
     public bufferGL: WebGLBuffer;
 
-    // todo: define buffer layout by subclasses
+    // todo: method for add/set/remove named uniform variables
 }
