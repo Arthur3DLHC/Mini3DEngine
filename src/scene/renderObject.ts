@@ -1,10 +1,14 @@
+import { mat4 } from "gl-matrix";
+
 export class RenderObject {
     // base class of all render objects
     public constructor() {
         this._children = [];
+        this.transformMatrix = mat4.create();
     }
 
     // todo: transform matrix?
+    public transformMatrix : mat4;
 
     // todo: children management
     
