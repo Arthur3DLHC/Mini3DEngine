@@ -44,8 +44,12 @@ Three.js 的渲染上下文
 
 Three.js Shader 预处理
     使用正则表达式替换所有 #include 字符串：WebGLProgram.js
-    Shader 源代码直接用字符串的形式写在 js 文件中；
-    ShaderChunks.js 中引入了所有的 Shader 源码字符串；
+    系统内置 Shader 源代码直接用字符串的形式写在 js 文件中；
+    ShaderChunks.js 中引入了所有的内置 Shader 源码字符串；
+
+Three.js 场景树
+    Scene 类也是 Object3D 类的子类；从 gltf 中加载得到的是一个 scene 对象；其中的各网格是其子节点；
+    可以考虑通过 minimal-gltf-loader 加载出 gltf 对象后，在 onLoad 回调函数中创建一个 scene 对象，根据 gltf 中的内容创建其子对象；然后将此 scene 对象添加到根场景对象中。
 
 Babylon.js
     是用 typescript 开发的，太有参考价值了！
