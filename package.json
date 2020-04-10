@@ -1,0 +1,28 @@
+{
+  "name": "mini3dengine",
+  "version": "1.0.0",
+  "description": "A practice for make a mini 3d engine",
+  "main": "miniEngine.js",
+  "dependencies": {
+    "gl-matrix": "^3.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arthur3DLHC/Mini3DEngine.git"
+  },
+  "keywords": [
+    "3d",
+    "engine",
+    "tyepscript"
+  ],
+  "author": "Arthur3DLHC",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Arthur3DLHC/Mini3DEngine/issues"
+  },
+  "homepage": "https://github.com/Arthur3DLHC/Mini3DEngine#readme"
+}
