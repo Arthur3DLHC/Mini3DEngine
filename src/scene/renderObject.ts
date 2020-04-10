@@ -4,11 +4,13 @@ export class RenderObject {
     // base class of all render objects
     public constructor() {
         this._children = [];
-        this.transformMatrix = mat4.create();
+        this.localTransform = mat4.create();
+        this.worldTransform = mat4.create();
     }
 
     // todo: transform matrix?
-    public transformMatrix : mat4;
+    public localTransform : mat4;
+    public worldTransform : mat4;
 
     // todo: children management
     
