@@ -29,7 +29,17 @@ export class Object3D {
 
     public attachChild(child : Object3D) {
         // todo: update transform?
+        // todo: key children with their name? need to use Map
+        // check duplicate
+        // if (this._children.hasOwnProperty(child.name)) {
+        //     throw "Child with name " + child.name + " already exist.";
+        // }
+        // this._children[child.name] = child;
+        this._children.push(child);
+        child.parent = this;
     }
+
+    // todo: remove child?
 
     public updateWorldTransform(updateParents: boolean, updateChildren: boolean) {
         // todo: only update transforms when dirty
@@ -44,12 +54,15 @@ export class Object3D {
         }
 
         if( updateChildren ) {
-            for (const key in this._children) {
-                if (this._children.hasOwnProperty(key)) {
-                    const child = this._children[key];
-                    child.updateWorldTransform(false, true);
-                }
+            for (const child of this._children) {
+                child.updateWorldTransform(false, true);
             }
+            // for (const key in this._children) {
+            //     if (this._children.hasOwnProperty(key)) {
+            //         const child = this._children[key];
+            //         child.updateWorldTransform(false, true);
+            //     }
+            // }
         }
     }
 }
