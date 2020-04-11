@@ -1,17 +1,49 @@
 TODO:       主要类结构
             场景管理
-            图元绘制
+                场景树
+                各种渲染对象属性；
+                    摄像机
+                    网格
+                    光源
+                    Decal
+                    Cubemap
+
+                对象更新；
+            图元分发
+                摄像机列表
+                渲染图元对象定义；
+                图元列表；
+                    depth prepass
+                    opaque
+                    transparent
+                    sprite? particle system?
+                光源列表
+                Decal 列表
+                Cubemap 列表
+                Irradiance volume 列表
+                场景遍历，对象和图元分发
+                初始化GL
             Shader架构
+                Shader 输入、输出
+                Uniform buffer对象封装
+                Uniform buffer 定义：每帧，每Pass，每物体，每材质
+                Shader 预处理，加载，编译；
+                Vertex Attribute 解析
             简单材质、Shader
+                材质对象定义
             简单Geometry生成、添加、绘制测试
+                顶点缓冲；Vertex Attribute；Index buffer;
+                遍历图元列表，绘制
+            
             FileLoader
             GLTFLoader
                 先直接引用 minimal gltf loader?
-            image based lighting, 生成 SH
-            生成 envmap cube
-            生成 irradiance volume
+            生成 Shadowmap 阴影
+            间接光照
+                image based lighting, 生成 SH
+                生成 envmap cube
+                生成 irradiance volume
             Clustered 光源、envmap、irradiance volume
-            Shadowmap 阴影
 
 LOG：
 

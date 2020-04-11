@@ -54,3 +54,7 @@ Three.js 场景树
 Babylon.js
     是用 typescript 开发的，太有参考价值了！
         学习名称空间怎么用；Rollup的使用；typescript 的异步加载机制怎么实现；
+    Depth prepass 的处理
+        无需使用特殊 Shader，只要关闭 ColorWrite 就可以！
+        只要不输出 gl_Depth，不使用discard，驱动程序就不会执行 Fragment Shader，只输出深度到 Depth Buffer
+        但是这样应该无法处理材质中有 alpha 镂空纹理的情况；
