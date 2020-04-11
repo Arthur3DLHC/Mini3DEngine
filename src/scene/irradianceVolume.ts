@@ -1,5 +1,5 @@
-import { RenderObject } from "./renderObject.js";
+import { Object3D } from "./object3D.js";
 
-export class IrradianceVolume extends RenderObject {
+export class IrradianceVolume extends Object3D {
 
 }
