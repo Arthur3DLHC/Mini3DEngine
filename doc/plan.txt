@@ -34,11 +34,14 @@ TODO:       主要类结构
             简单Geometry生成、添加、绘制测试
                 顶点缓冲；Vertex Attribute；Index buffer;
                 遍历图元列表，绘制
-            
+                    * 如何在 depth prepass 时使用特殊的 shader？
+                    是否仍然需要为某些材质生成 depth prepass 的特殊 shader？
             FileLoader
             GLTFLoader
                 先直接引用 minimal gltf loader?
             生成 Shadowmap 阴影
+                是否直接使用深度缓冲作为 depth map
+                如何处理带有镂空纹理的材质
             间接光照
                 image based lighting, 生成 SH
                 生成 envmap cube
