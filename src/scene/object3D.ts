@@ -27,7 +27,7 @@ export class Object3D {
         return this._children;
     }
 
-    public attachChild(child : Object3D) {
+    public attachChild(object : Object3D) {
         // todo: update transform?
         // todo: key children with their name? need to use Map
         // check duplicate
@@ -35,11 +35,32 @@ export class Object3D {
         //     throw "Child with name " + child.name + " already exist.";
         // }
         // this._children[child.name] = child;
-        this._children.push(child);
-        child.parent = this;
+        if (object === this) {
+            throw "Can not add object itself as child";
+        }
+        if (object.parent) {
+            object.parent.removeChild(object);
+        }
+        this._children.push(object);
+        object.parent = this;
     }
 
-    // todo: remove child?
+    public removeChild(object : Object3D) {
+        const index = this._children.indexOf(object);
+        if (index !== -1) {
+            object.parent = null;
+            this._children.splice(index, 1);
+        }
+    }
+
+    public getChildByName(name: string): Object3D | null {
+        for (const child of this._children) {
+            if (child.name === name) {
+                return child;
+            }
+        }
+        return null;
+    }
 
     public updateWorldTransform(updateParents: boolean, updateChildren: boolean) {
         // todo: only update transforms when dirty
