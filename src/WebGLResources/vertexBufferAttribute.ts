@@ -12,6 +12,9 @@ export class VertexBufferAttribute {
     public buffer: VertexBuffer;
     
     // attribute name?
+    /**
+     * attribute name, for look up in shader;
+     */
     public name: string;
 
     // size and offset
