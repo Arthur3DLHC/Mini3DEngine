@@ -1,3 +1,37 @@
+import { RenderItem } from "./renderItem.js";
+import { Object3D } from "../scene/object3D.js";
+import { BufferGeometry } from "../geometry/bufferGeometry.js";
+import { Material } from "../scene/materials/material.js";
+
 export class RenderList {
-    // list of renderprimitives
+    private items: RenderItem[];
+    private curItemIndex: number;
+
+    public constructor() {
+        this.items = [];
+        this.curItemIndex = 0;
+    }
+
+    // list of renderItems
+    public addRenderItem(object: Object3D, geometry: BufferGeometry, startIdx: number, count: number, material: Material | null) {
+        let item: RenderItem | null = null;
+        // reuse exist renderItem object; don't always new objects
+        if (this.curItemIndex < this.items.length) {
+            item = this.items[this.curItemIndex];
+        } else {
+            item = new RenderItem();
+            this.items.push(item);
+        }
+        this.curItemIndex++;
+
+        item.object = object;
+        item.geometry = geometry;
+        item.startIndex = startIdx;
+        item.count = count;
+        item.material = material;
+    }
+
+    public clear() {
+        this.curItemIndex = 0;
+    }
 }

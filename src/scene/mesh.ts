@@ -2,6 +2,7 @@ import { Object3D } from "./object3D.js";
 import { RenderItem } from "../renderer/renderItem.js";
 import { Material } from "./materials/material.js";
 import { BufferGeometry } from "../geometry/bufferGeometry.js";
+import { RenderList } from "../renderer/renderList.js";
 
 export class Mesh extends Object3D {
     public constructor() {
@@ -14,27 +15,22 @@ export class Mesh extends Object3D {
     // todo: material list
     public materials: Material[];
 
-    public provideRenderItem(itemList: RenderItem[]) {
+    public provideRenderItem(renderList: RenderList) {
         if (this.geometry) {
             if (this.geometry.groups) {
                 for (const grp of this.geometry.groups) {
-                    const newItem = new RenderItem();
-                    newItem.geometry = this.geometry;
-                    newItem.startIndex = grp.start;
-                    newItem.count = grp.count;
-                    newItem.material = this.materials[Math.min(this.materials.length - 1, grp.materialId)];
-                    // todo: other properties: draw order, layer, ...
-                    itemList.push(newItem);
+                renderList.addRenderItem(this, this.geometry, grp.start, grp.count, this.getMaterial(grp.materialId));
                 }
             } else {
-                const newItem = new RenderItem();
-                newItem.geometry = this.geometry;
-                if (this.materials.length > 0) {
-                    newItem.material = this.materials[0];
-                }
-                // todo: other properties: draw order, layer, ...
-                itemList.push(newItem);
+                renderList.addRenderItem(this, this.geometry, 0, Infinity, this.getMaterial(0));
             }
         }
+    }
+
+    public getMaterial(index: number): Material|null {
+        if (this.materials.length > 0) {
+            return this.materials[Math.min(this.materials.length - 1, index)];
+        }
+        return null;
     }
 }

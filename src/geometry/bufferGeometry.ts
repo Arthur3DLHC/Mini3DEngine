@@ -20,4 +20,6 @@ export class BufferGeometry {
 
     // groups
     public groups: PrimitiveGroup[];
+
+    // todo: instanced?
 }
