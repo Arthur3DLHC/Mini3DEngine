@@ -13,8 +13,14 @@ export class VertexBuffer {
      */
     public stride: number;
 
+    /**
+     * WebGL buffer object
+     */
     public buffer: WebGLBuffer | null;
 
-    // todo: vertex data?
+    /**
+     * 为简单起见，只支持浮点数数据？
+     * 如果是从 glTF 加载的，则暂时不使用此属性？
+     */
     public data: Float32Array | null;
 }
