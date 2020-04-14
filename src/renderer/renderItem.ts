@@ -4,7 +4,7 @@ import { Material } from "../scene/materials/material.js";
 /**
  * The smallest unit for render.
  */
-export class RenderPrimitive {
+export class RenderItem {
     public constructor() {
         this.geometry = null;
         this.material = null;

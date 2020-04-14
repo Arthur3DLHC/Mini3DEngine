@@ -1,5 +1,5 @@
 import { mat4 } from "gl-matrix";
-import { RenderPrimitive } from "../renderer/renderPrimitive.js";
+import { RenderItem } from "../renderer/renderItem.js";
 
 export class Object3D {
     // base class of all render objects
@@ -88,7 +88,7 @@ export class Object3D {
         }
     }
 
-    public providePrimitive(primitiveList: RenderPrimitive[]) {
+    public provideRenderItem(primitiveList: RenderItem[]) {
         // todo: subclasses add primitive to list
     }
 }

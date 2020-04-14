@@ -1,5 +1,5 @@
 import { Object3D } from "./object3D.js";
-import { RenderPrimitive } from "../renderer/renderPrimitive.js";
+import { RenderItem } from "../renderer/renderItem.js";
 import { Material } from "./materials/material.js";
 
 export class Mesh extends Object3D {
@@ -11,7 +11,7 @@ export class Mesh extends Object3D {
     // todo: material list
     public materials: Material[];
 
-    public providePrimitive(primitiveList: RenderPrimitive[]) {
+    public provideRenderItem(primitiveList: RenderItem[]) {
         // todo: add my primitives to list
     }
 }

@@ -1,4 +1,4 @@
-import { TriangleGroup } from "./triangleGroup";
+import { PrimitiveGroup } from "./primitiveGroup";
 
 export class BufferGeometry {
     public constructor() {
@@ -12,5 +12,5 @@ export class BufferGeometry {
     // ibo
 
     // groups
-    public groups: TriangleGroup[];
+    public groups: PrimitiveGroup[];
 }
