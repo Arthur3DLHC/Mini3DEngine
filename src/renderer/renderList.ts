@@ -20,7 +20,9 @@ export class RenderList {
             item = this.items[this.curItemIndex];
         } else {
             item = new RenderItem();
-            this.items.push(item);
+            // javascript 似乎可以自动根据索引分配空间，所以不用调 push
+            // this.items.push(item);
+            this.items[this.curItemIndex] = item;
         }
         this.curItemIndex++;
 
