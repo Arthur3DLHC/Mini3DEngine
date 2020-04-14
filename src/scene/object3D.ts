@@ -88,7 +88,7 @@ export class Object3D {
         }
     }
 
-    public provideRenderItem(primitiveList: RenderItem[]) {
+    public provideRenderItem(itemList: RenderItem[]) {
         // todo: subclasses add primitive to list
     }
 }
