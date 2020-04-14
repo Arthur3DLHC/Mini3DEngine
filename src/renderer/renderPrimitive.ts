@@ -8,11 +8,17 @@ export class RenderPrimitive {
     public constructor() {
         this.geometry = null;
         this.material = null;
+        this.startIndex = 0;
+        this.count = Infinity;
     }
     // geometry
     
     public geometry : BufferGeometry | null;
-    
+
+    // draw range?
+    public startIndex: number;
+    public count: number;
+
     // material
     public material : Material | null;
     // program, whether from material or renderer specific

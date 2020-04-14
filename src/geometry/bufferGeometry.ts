@@ -1,10 +1,16 @@
+import { TriangleGroup } from "./triangleGroup";
 
 export class BufferGeometry {
-    // vertex attributes (shared)
+    public constructor() {
+        this.groups = [];
+    }
 
-    // vbo, ibo (shared)
+    // vertex attributes
 
-    // draw range
+    // vbo
+    
+    // ibo
 
-    // material index
+    // groups
+    public groups: TriangleGroup[];
 }
