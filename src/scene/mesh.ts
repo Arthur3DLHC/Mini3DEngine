@@ -15,7 +15,6 @@ export class Mesh extends Object3D {
     public materials: Material[];
 
     public provideRenderItem(itemList: RenderItem[]) {
-        // todo: add my primitives to list
         if (this.geometry) {
             if (this.geometry.groups) {
                 for (const grp of this.geometry.groups) {
@@ -24,6 +23,7 @@ export class Mesh extends Object3D {
                     newItem.startIndex = grp.start;
                     newItem.count = grp.count;
                     newItem.material = this.materials[Math.min(this.materials.length - 1, grp.materialId)];
+                    // todo: other properties: draw order, layer, ...
                     itemList.push(newItem);
                 }
             } else {
@@ -32,6 +32,7 @@ export class Mesh extends Object3D {
                 if (this.materials.length > 0) {
                     newItem.material = this.materials[0];
                 }
+                // todo: other properties: draw order, layer, ...
                 itemList.push(newItem);
             }
         }
