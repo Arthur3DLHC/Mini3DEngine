@@ -2,7 +2,7 @@ import { Camera } from "../scene/cameras/camera.js";
 import { BaseLight } from "../scene/lights/baseLight.js";
 import { Decal } from "../scene/decal.js";
 import { IrradianceVolume } from "../scene/irradianceVolume.js";
-import { EnvironmentCube } from "../scene/environmentCube.js";
+import { EnvironmentProbe } from "../scene/environmentProbe.js";
 
 /**
  * current rendering context, including cameras, visible lights, decals, cubemaps...
@@ -12,7 +12,7 @@ export class RenderContext {
         this.cameras = [];
         this.lights = [];
         this.decals = [];
-        this.envMaps = [];
+        this.envProbes = [];
         this.irradianceVolumes = [];
 
         this.curCameraIndex = 0;
@@ -24,7 +24,7 @@ export class RenderContext {
     public cameras: Camera[];
     public lights: BaseLight[];
     public decals: Decal[];
-    public envMaps: EnvironmentCube[];
+    public envProbes: EnvironmentProbe[];
     public irradianceVolumes: IrradianceVolume[];
 
     public clear() {
@@ -50,8 +50,8 @@ export class RenderContext {
         this.curDecalIndex++;
     }
 
-    public addEnvironmentCube(envMap: EnvironmentCube) {
-        this.envMaps[this.curEnvMapIndex] = envMap;
+    public addEnvironmentCube(envProbe: EnvironmentProbe) {
+        this.envProbes[this.curEnvMapIndex] = envProbe;
         this.curEnvMapIndex++;
     }
 
