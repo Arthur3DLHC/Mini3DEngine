@@ -10,6 +10,8 @@ export class Object3D {
         this._children = [];
         this.localTransform = mat4.create();
         this.worldTransform = mat4.create();
+        this.castShadow = false;
+        this.receiveShadow = false;
     }
 
     // todo: need an id?
@@ -21,6 +23,9 @@ export class Object3D {
     // 可渲染的对象用从此类派生的形式组织；其他类型的对象如变换，物理，声音，逻辑等用组件机制，附加到此类对象上；
     public localTransform : mat4;
     public worldTransform : mat4;
+
+    public castShadow: boolean;
+    public receiveShadow: boolean;
 
     public parent: Object3D | null;
     
