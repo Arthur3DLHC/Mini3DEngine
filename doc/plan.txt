@@ -7,7 +7,7 @@ TODO:       主要类结构
                     光源
                         frustum, shadow;
                     Decal
-                    Cubemap
+                    envprobe
 
                 对象更新；
             图元分发
@@ -35,8 +35,13 @@ TODO:       主要类结构
             简单Geometry生成、添加、绘制测试
                 顶点缓冲；Vertex Attribute；Index buffer;
                 遍历图元列表，绘制
+                    Fustum culling
                     * 如何在 depth prepass 时使用特殊的 shader？
-                    是否仍然需要为某些材质生成 depth prepass 的特殊 shader？
+                        不修改使用的shader；如果关闭了 color write，且 shader 中不使用 discard，则不会执行 shader，opengl 底层会使用一个默认的简单 shader 绘制
+                        或者使用一组统一的 shader 来绘制；有镂空纹理的物体不绘制 depth prepass；
+                        或者单独写一个带镂空纹理的 depth prepass shader，遇到有 alphaclip = true 的 PBR 材质，则使用这个 shader;
+                            PBR 材质的贴图参数统一命名；材质中不带 shader, 使用统一的PBR 标准 shader 绘制；
+                            自定义材质的某些贴图参数名称是否也要求统一命名？例如 opacity texture
             FileLoader
             GLTFLoader
                 先直接引用 minimal gltf loader?
@@ -44,8 +49,12 @@ TODO:       主要类结构
                 读取light, decal, envprobe, irradiance volume;
 
             生成 Shadowmap 阴影
+                light view frustum culling
                 是否直接使用深度缓冲作为 depth map
                 如何处理带有镂空纹理的材质
+                    * 也按照和 depth prepass 类似的方法处理
+                cube shadow map for point light;
+
             间接光照
                 image based lighting, 生成 SH
                 生成 envmap cube
