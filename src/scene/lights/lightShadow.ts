@@ -35,5 +35,6 @@ export class LightShadow {
 
     public updateShadowMatrices() {
         // todo: update shadow matrices according to light pose and properties
+        throw new Error("Not implemented.");
     }
 }
