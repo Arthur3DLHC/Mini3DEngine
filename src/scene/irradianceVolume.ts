@@ -4,7 +4,7 @@ import { Texture3D } from "../WebGLResources/textures/texture3D.js";
 export class IrradianceVolume extends Object3D {
     public constructor() {
         super();
-        this.texture = null;
+        this.shTextures = [];
     }
 
     // pose, position and range are defined by transform matrix.
@@ -19,7 +19,6 @@ export class IrradianceVolume extends Object3D {
     // look into sourcecode of blender and learn how to storage.
 
     // use a 3d texture atlas? or 2d texture atlas?
-    public texture: Texture3D | null;
-
     // use 3D Bin packing algorisms?
+    public shTextures: Texture3D[];
 }
