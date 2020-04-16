@@ -8,4 +8,6 @@ export class Camera extends Object3D {
      * if null. use full window.
      */
     public viewport: vec4 | null = null;
+
+    // render target? every camera has one?
 }
