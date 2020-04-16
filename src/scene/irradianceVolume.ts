@@ -26,4 +26,13 @@ export class IrradianceVolume extends Object3D {
     public shTextures: Texture3D[];
 
     public atlasLocation: BoundingBox;
+
+    /**
+     * get the volume, for compare irradiance volume blend priority
+     * calculate by the scale transform of this object? how to get the pure scale transform fast?
+     * or decompose the matrix when read from gltf?
+     */
+    public getVolume(): number {
+        throw new Error("Not implemented.");
+    }
 }

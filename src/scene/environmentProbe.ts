@@ -4,10 +4,15 @@ import { Texture2DArray } from "../WebGLResources/textures/texture2DArray.js";
 export class EnvironmentProbe extends Object3D {
     public constructor() {
         super();
+        this.visibleDistance = 20;
         this.texture = null;
         this.textureIndex = 0;
     }
     // the pose and location is defined by transform matrix.
+    /**
+     * the max visible distance of decal
+     */
+    public visibleDistance: number;
 
     // 在blender中用sphere定义EnvironmentProbe的位置和影响范围？
     // 使用统一的cubemap size？

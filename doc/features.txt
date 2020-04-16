@@ -73,8 +73,10 @@ Features：
         每帧对视口划分区域，查找区域内的贴花，投射参数和子图位置通过constant uniform buffer传入shader，贴图通过图集传入shader；
         Same to 环境反射贴图
         贴花和环境反射贴图可以设置最远可见距离；
+        Subsurface scattering
 
     后期特效
+        SSAO, bent normal, SSGI, subsurface scattering, ss reflection
 
     资源加载
         缓存机制；

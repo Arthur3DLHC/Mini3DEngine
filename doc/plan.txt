@@ -26,6 +26,7 @@ TODO:       主要类结构
                 初始化GL
             Shader架构
                 Shader 输入、输出
+                    thin g-buffer, subsurface scattering
                 Uniform buffer对象封装
                 Uniform buffer 定义：每帧，每Pass，每物体，每材质
                 Shader 预处理，加载，编译；
@@ -60,7 +61,7 @@ TODO:       主要类结构
                 生成 envmap cube
                 生成 irradiance volume
 
-            SSAO，屏幕空间反射；
+            SSAO，屏幕空间反射；subsurface scattering
 
             Clustered 光源、envmap、irradiance volume
 
