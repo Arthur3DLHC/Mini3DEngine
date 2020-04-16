@@ -1,6 +1,5 @@
 import { Object3D } from "./object3D.js";
-import { Texture } from "../WebGLResources/texture.js";
-import { vec4 } from "gl-matrix";
+import { Texture2DArray } from "../WebGLResources/textures/texture2DArray.js";
 
 export class EnvironmentProbe extends Object3D {
     public constructor() {
@@ -16,7 +15,7 @@ export class EnvironmentProbe extends Object3D {
     /**
      * multiple cubemaps passed in shader by texture 2d array; cube texture array is not supported now by WebGL2.0
      */
-    public texture: Texture | null;
+    public texture: Texture2DArray | null;
     /**
      * start index of cube face texture in 2d texture array.
      */

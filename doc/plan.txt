@@ -8,7 +8,7 @@ TODO:       主要类结构
                         frustum, shadow;
                     Decal
                     envprobe
-
+                    irradiance volume
                 对象更新；
             图元分发
                 摄像机列表
@@ -59,7 +59,12 @@ TODO:       主要类结构
                 image based lighting, 生成 SH
                 生成 envmap cube
                 生成 irradiance volume
+
+            SSAO，屏幕空间反射；
+
             Clustered 光源、envmap、irradiance volume
+
+            particle system; sprite;
 
             从GLTF加载组件信息？
                     读取object的自定义属性：组件列表和组件属性？或者prefab文件名？

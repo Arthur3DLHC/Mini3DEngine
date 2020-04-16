@@ -1,6 +1,6 @@
 import { Object3D } from "./object3D.js";
-import { Texture } from "../WebGLResources/texture.js";
 import { vec4 } from "gl-matrix";
+import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 
 export class Decal extends Object3D {
     public constructor() {
@@ -16,7 +16,7 @@ export class Decal extends Object3D {
     /**
      * multiple decals may be packed into one texture atlas.
      */
-    public texture: Texture | null;
+    public texture: Texture2D | null;
     public atlasRect: vec4;
 
     // todo: blend mode?

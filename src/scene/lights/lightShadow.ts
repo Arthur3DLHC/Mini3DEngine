@@ -1,6 +1,6 @@
 import { vec2, vec4 } from "gl-matrix";
-import { Texture } from "../../WebGLResources/texture";
-import { BaseLight } from "./baseLight";
+import { BaseLight } from "./baseLight.js";
+import { Texture2D } from "../../WebGLResources/textures/texture2D.js";
 
 /**
  * base class for shadows
@@ -27,7 +27,7 @@ export class LightShadow {
     /**
      * texture. multiple lights share one texture.
      */
-    public shadowMap: Texture | null;
+    public shadowMap: Texture2D | null;
 
     private _light: BaseLight;
 

@@ -1,5 +1,5 @@
 import { vec4 } from "gl-matrix";
-import { LightShadow } from "./lightShadow";
+import { LightShadow } from "./lightShadow.js";
 
 export class BaseLight {
     public constructor() {
