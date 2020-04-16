@@ -1,10 +1,13 @@
 import { Object3D } from "./object3D.js";
 import { Texture3D } from "../WebGLResources/textures/texture3D.js";
+import { BoundingBox } from "../math/boundingBox.js";
+import { vec3 } from "gl-matrix";
 
 export class IrradianceVolume extends Object3D {
     public constructor() {
         super();
         this.shTextures = [];
+        this.atlasLocation = new BoundingBox(vec3.fromValues(0, 0, 0), vec3.fromValues(8, 8, 8));
     }
 
     // pose, position and range are defined by transform matrix.
@@ -21,4 +24,6 @@ export class IrradianceVolume extends Object3D {
     // use a 3d texture atlas? or 2d texture atlas?
     // use 3D Bin packing algorisms?
     public shTextures: Texture3D[];
+
+    public atlasLocation: BoundingBox;
 }
