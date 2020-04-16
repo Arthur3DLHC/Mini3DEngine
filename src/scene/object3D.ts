@@ -6,6 +6,7 @@ export class Object3D {
     // base class of all render objects
     public constructor() {
         this.name = "";
+        this.visible = true;
         this.parent = null;
         this._children = [];
         this.localTransform = mat4.create();
@@ -17,6 +18,8 @@ export class Object3D {
     // todo: need an id?
 
     public name : string;
+
+    public visible: boolean;
 
     // 在对象这里，只存变换矩阵；由附加的变换组件来计算这些矩阵？
     // 组件机制之后再实现？

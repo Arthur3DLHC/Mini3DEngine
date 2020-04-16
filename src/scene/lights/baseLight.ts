@@ -3,10 +3,15 @@ import { LightShadow } from "./lightShadow";
 
 export class BaseLight {
     public constructor() {
+        this.on = true;
         this.color = vec4.fromValues(1,1,1,1);
         this.intensity = 1;
         this.shadow = null;
     }
+    /**
+     * the light is switched on
+     */
+    public on: boolean;
     public color: vec4;
     public intensity: number;
     /**

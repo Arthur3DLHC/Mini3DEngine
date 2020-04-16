@@ -5,7 +5,7 @@ export class PointLight extends BaseLight {
     public constructor() {
         super();
         this.distance = 0;
-        this.shadow = new PointLightShadow();
+        this.shadow = new PointLightShadow(this);
     }
 
     /**
