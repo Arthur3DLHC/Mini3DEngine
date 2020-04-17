@@ -11,7 +11,11 @@ import { EnvironmentProbe } from "../scene/environmentProbe.js";
 
 export class ClusteredForwardRenderer {
     public constructor() {
-        this.renderList = new RenderList();
+        this.renderListDepthPrepass = new RenderList();
+        this.renderListOpaque = new RenderList();
+        this.renderListTransparent = new RenderList();
+        this.renderListSprites = new RenderList();
+        this.tmpRenderList = new RenderList();
         this.renderContext = new RenderContext();
     }
 
@@ -19,11 +23,19 @@ export class ClusteredForwardRenderer {
         this.dispatchObjects(scene);
     }
 
-    private renderList: RenderList;
+    private renderListDepthPrepass: RenderList;
+    private renderListOpaque: RenderList;
+    private renderListTransparent: RenderList;
+    private renderListSprites: RenderList;
+    private tmpRenderList: RenderList;
+
     private renderContext: RenderContext;
 
     private dispatchObjects(scene: Scene) {
-        this.renderList.clear();
+        this.renderListDepthPrepass.clear();
+        this.renderListOpaque.clear();
+        this.renderListTransparent.clear();
+        this.renderListSprites.clear();
         this.renderContext.clear();
 
         this.dispatchObject(scene);
@@ -33,14 +45,22 @@ export class ClusteredForwardRenderer {
 
         // check visible
         if (object.visible) {
-            // todo: according to object's type;
             if (object instanceof Camera) {
                 this.renderContext.addCamera(object as Camera);
             } else if (object instanceof BaseLight) {
                 this.renderContext.addLight(object as BaseLight);
             } else if (object instanceof Mesh) {
                 const mesh = object as Mesh;
-                mesh.provideRenderItem(this.renderList);
+                this.tmpRenderList.clear();
+                mesh.provideRenderItem(this.tmpRenderList);
+                // 需要遍历tmpRenderList，根据材质区分最终放到哪个 renderList 里
+                // DepthPrepass: 材质没有开启半透明混合和半透明Clip
+                // Opaque: 材质没有开启半透明混合
+                // Transparent: 材质开启了半透明混合
+                for (let index = 0; index < this.tmpRenderList.ItemCount; index++) {
+                    const item = this.tmpRenderList.getItemAt(index);
+                    
+                }
             } else if (object instanceof Decal) {
                 this.renderContext.addDecal(object as Decal);
             } else if (object instanceof IrradianceVolume) {
@@ -48,12 +68,6 @@ export class ClusteredForwardRenderer {
             } else if (object instanceof EnvironmentProbe) {
                 this.renderContext.addEnvironmentProbe(object as EnvironmentProbe);
             }
-
-            // check culling? fix me: no camera list now.
-
-            // should generate one renderlist per camera?
-
-            // or use single renderlist, then check cull for every camera?
         }
 
         // iterate children
