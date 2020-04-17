@@ -59,7 +59,13 @@ export class ClusteredForwardRenderer {
                 // Transparent: 材质开启了半透明混合
                 for (let index = 0; index < this.tmpRenderList.ItemCount; index++) {
                     const item = this.tmpRenderList.getItemAt(index);
-                    
+                    if (item) {
+                        if (item.material) {
+                            if (item.material.blendState) {
+                                
+                            }
+                        }
+                    }
                 }
             } else if (object instanceof Decal) {
                 this.renderContext.addDecal(object as Decal);
