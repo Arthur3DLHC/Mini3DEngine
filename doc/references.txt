@@ -58,3 +58,5 @@ Babylon.js
         无需使用特殊 Shader，只要关闭 ColorWrite 就可以！
         只要不输出 gl_Depth，不使用discard，驱动程序就不会执行 Fragment Shader，只输出深度到 Depth Buffer
         但是这样应该无法处理材质中有 alpha 镂空纹理的情况；
+    节点控制逻辑
+        每个节点可以添加一系列 Behavior 对象，类似于实体中的组件对象

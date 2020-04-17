@@ -7,6 +7,7 @@ export class Object3D {
     public constructor() {
         this.name = "";
         this.visible = true;
+        this._active = true;
         this.parent = null;
         this._children = [];
         this.localTransform = mat4.create();
@@ -20,6 +21,11 @@ export class Object3D {
     public name : string;
 
     public visible: boolean;
+
+    private _active: boolean;
+    public get active(): boolean {
+        return this._active;
+    }
 
     // 在对象这里，只存变换矩阵；由附加的变换组件来计算这些矩阵？
     // 组件机制之后再实现？
@@ -72,8 +78,36 @@ export class Object3D {
         return null;
     }
 
+    public activate(activateParents: boolean, activateChildren: boolean) {
+        if (activateParents && this.parent) {
+            this.parent.activate(true, false);
+        }
+        this._active = true;
+        if (activateChildren) {
+            for (const child of this._children) {
+                child.activate(false, true);
+            }
+        }
+    }
+
+    public deactivate(deactivateParents: boolean, deactivateChildren: boolean) {
+        if (deactivateParents && this.parent) {
+            this.parent.deactivate(true, false);
+        }
+        this._active = true;
+        if (deactivateChildren) {
+            for (const child of this._children) {
+                child.deactivate(false, true);
+            }
+        }
+    }
+
     public updateWorldTransform(updateParents: boolean, updateChildren: boolean) {
-        // todo: only update transforms when dirty
+        // todo: only update transforms when dirty?
+        if (this._active === false) {
+            return;
+        }
+
         if( updateParents && this.parent) {
             this.parent.updateWorldTransform(true, false);
         }

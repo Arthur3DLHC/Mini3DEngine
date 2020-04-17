@@ -50,7 +50,7 @@ export class RenderContext {
         this.curDecalIndex++;
     }
 
-    public addEnvironmentCube(envProbe: EnvironmentProbe) {
+    public addEnvironmentProbe(envProbe: EnvironmentProbe) {
         this.envProbes[this.curEnvMapIndex] = envProbe;
         this.curEnvMapIndex++;
     }
