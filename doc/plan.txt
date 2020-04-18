@@ -29,6 +29,10 @@ TODO:       主要类结构
                     RenderState Cache
                     标准 PBR 材质属性
                 标准 PBR Shader;
+                Fix me: Fog 是在材质 Shader 中实现，还是用后期特效实现？
+                    不透明物体，可用后期特效
+                    半透明物体用材质 shader？
+                    或者统一用材质 shader；
             贴图
                 sampler state
                 贴图的属性
