@@ -1,13 +1,20 @@
 import { GLDevice } from "../glDevice.js";
 
 export class CullState {
-    public constructor() {
-        this.enable = true;
-        this.mode = GLDevice.gl.BACK;
+    public constructor(enable: boolean = true, mode:GLenum = GLDevice.gl.BACK) {
+        this._enable = enable;
+        this._mode = mode;
     }
 
-    public enable: boolean;
-    public mode: GLenum;
+    private _enable: boolean;
+    public get enable(): boolean {
+        return this._enable;
+    }
+
+    private _mode: GLenum;
+    public get mode(): GLenum {
+        return this._mode;
+    }
 
     public equals(other: CullState): boolean {
         return this.enable === other.enable && this.mode === other.mode;
