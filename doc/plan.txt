@@ -36,10 +36,11 @@ TODO:       主要类结构
                     预置函数，预置变量定义和实现；
             简单材质、Shader
                 材质对象定义
+                    RenderState Cache
                     标准 PBR 材质；
                 标准 PBR Shader;
             简单Geometry生成、添加、绘制测试
-                顶点缓冲；Vertex Attribute；Index buffer;
+                创建顶点缓冲；Vertex Attribute；Index buffer;
                 Box，Sphere，用于测试绘制；
                 遍历图元列表，绘制
                     Fustum culling

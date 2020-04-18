@@ -10,22 +10,13 @@ import { IrradianceVolume } from "../scene/irradianceVolume.js";
 import { EnvironmentProbe } from "../scene/environmentProbe.js";
 
 export class ClusteredForwardRenderer {
-    public constructor(canvas: HTMLCanvasElement) {
+    public constructor() {
         this.renderListDepthPrepass = new RenderList();
         this.renderListOpaque = new RenderList();
         this.renderListTransparent = new RenderList();
         this.renderListSprites = new RenderList();
         this.tmpRenderList = new RenderList();
         this.renderContext = new RenderContext();
-
-        // initialize WebGL 2.0
-        const gl2 = canvas.getContext('webgl2', {antialias: false});
-        if (gl2) {
-            this.gl = gl2;
-        } else {
-            // no fall back render pipeline yet
-            throw new Error("WebGL 2 is not available");
-        }
     }
 
     public render(scene: Scene) {
@@ -34,8 +25,6 @@ export class ClusteredForwardRenderer {
         // todo: walk through renderlists and render items in them.
         // todo: sort the renderlists first?
     }
-
-    private gl: WebGL2RenderingContext;
 
     private renderListDepthPrepass: RenderList;
     private renderListOpaque: RenderList;
@@ -78,11 +67,13 @@ export class ClusteredForwardRenderer {
                             if (item.material.blendState) {
                                 if (item.material.blendState.enable) {
                                     this.renderListTransparent.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
-                                } else {
-                                    this.renderListOpaque.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
-                                    if (item.material.forceDepthPrepass || !item.material.blendState.alphaClip) {
+                                    if (item.material.forceDepthPrepass) {
                                         this.renderListDepthPrepass.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
                                     }
+                                } else {
+                                    this.renderListOpaque.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
+                                    this.renderListDepthPrepass.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
+
                                 }
                             }
                         }
