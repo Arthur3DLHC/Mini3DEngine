@@ -4,6 +4,7 @@ Shader 和材质系统架构设计
             matWorld, matView, matProj
             time；可能分为几个不同用途的？
         可以将自定义的计算函数嵌入到顶点的下列处理阶段中：Local, View, Projection
+        或者可以提供一些系统默认的变量和函数，放在不同的shader文件中，供自定义shader引用；
         可以自定义顶点输出 output
     Fragment Shader
         预置uniforms:
@@ -37,8 +38,10 @@ Shader 和材质系统架构设计
         自定义Shader:
             自己定义输入uniforms；
             可以自定义顶点输入 input
+            可以调用各种系统提供的函数
             可以访问各种列表，自己计算最终着色输出颜色；
-
+    Shader 调试
+        如果Shader编译失败，在控制台输出编译log；
 材质
     主要是用于记录 RenderState 和 Shader 的 Uniforms
     加载 shader 时自动反射 uniforms 并赋予默认值；

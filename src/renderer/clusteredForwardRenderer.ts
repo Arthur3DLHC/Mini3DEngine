@@ -10,18 +10,32 @@ import { IrradianceVolume } from "../scene/irradianceVolume.js";
 import { EnvironmentProbe } from "../scene/environmentProbe.js";
 
 export class ClusteredForwardRenderer {
-    public constructor() {
+    public constructor(canvas: HTMLCanvasElement) {
         this.renderListDepthPrepass = new RenderList();
         this.renderListOpaque = new RenderList();
         this.renderListTransparent = new RenderList();
         this.renderListSprites = new RenderList();
         this.tmpRenderList = new RenderList();
         this.renderContext = new RenderContext();
+
+        // initialize WebGL 2.0
+        const gl2 = canvas.getContext('webgl2', {antialias: false});
+        if (gl2) {
+            this.gl = gl2;
+        } else {
+            // no fall back render pipeline yet
+            throw new Error("WebGL 2 is not available");
+        }
     }
 
     public render(scene: Scene) {
         this.dispatchObjects(scene);
+
+        // todo: walk through renderlists and render items in them.
+        // todo: sort the renderlists first?
     }
+
+    private gl: WebGL2RenderingContext;
 
     private renderListDepthPrepass: RenderList;
     private renderListOpaque: RenderList;

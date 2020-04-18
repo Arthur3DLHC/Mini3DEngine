@@ -25,14 +25,19 @@ TODO:       主要类结构
                 场景遍历，对象和图元分发
                 初始化GL
             Shader架构
+                命名规则
                 Shader 输入、输出
                     thin g-buffer, subsurface scattering
                 Uniform buffer对象封装
                 Uniform buffer 定义：每帧，每Pass，每物体，每材质
                 Shader 预处理，加载，编译；
                 Vertex Attribute 解析
+                Shader 代码结构
+                    预置函数，预置变量定义和实现；
             简单材质、Shader
                 材质对象定义
+                    标准 PBR 材质；
+                标准 PBR Shader;
             简单Geometry生成、添加、绘制测试
                 顶点缓冲；Vertex Attribute；Index buffer;
                 Box，Sphere，用于测试绘制；
