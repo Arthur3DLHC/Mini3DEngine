@@ -24,6 +24,11 @@ TODO:       主要类结构
                 Irradiance volume 列表
                 场景遍历，对象和图元分发
                 初始化GL
+            材质
+                材质对象定义
+                    RenderState Cache
+                    标准 PBR 材质；
+                标准 PBR Shader;
             Shader架构
                 命名规则
                 Shader 输入、输出
@@ -34,11 +39,7 @@ TODO:       主要类结构
                 Vertex Attribute 解析
                 Shader 代码结构
                     预置函数，预置变量定义和实现；
-            简单材质、Shader
-                材质对象定义
-                    RenderState Cache
-                    标准 PBR 材质；
-                标准 PBR Shader;
+                Shader 是否也用缓存？或者为了简单起见，不用缓存了？
             简单Geometry生成、添加、绘制测试
                 创建顶点缓冲；Vertex Attribute；Index buffer;
                 Box，Sphere，用于测试绘制；
