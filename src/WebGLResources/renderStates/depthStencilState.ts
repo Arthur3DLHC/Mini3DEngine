@@ -15,7 +15,7 @@ export class DepthStencilState {
     public get write(): boolean {return this._write;}
     private _compareFunction: GLenum;
     public get compareFunction(): GLenum {return this._compareFunction;}
-    // todo: depth offset?
+    // todo: polygon offset?
 
     public equals(other: DepthStencilState): boolean {
         return this.enable === other.enable && this.write === other.write

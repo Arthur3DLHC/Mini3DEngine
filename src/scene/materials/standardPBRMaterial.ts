@@ -5,4 +5,6 @@ export class StandardPBRMaterial extends Material {
         super();
     }
     // no shader, just PBR params and textures
+
+    // todo: load from json data?
 }

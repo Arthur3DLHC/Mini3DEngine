@@ -27,8 +27,11 @@ TODO:       主要类结构
             材质
                 材质对象定义
                     RenderState Cache
-                    标准 PBR 材质；
+                    标准 PBR 材质属性
                 标准 PBR Shader;
+            贴图
+                sampler state
+                贴图的属性
             Shader架构
                 命名规则
                 Shader 输入、输出

@@ -4,15 +4,13 @@ import { DepthStencilState } from "../../WebGLResources/renderStates/depthStenci
 
 export class Material {
     public constructor() {
-        //this.alphaBlend = false;
-        //this.alphaClip = false;
+        this.name = "";
         this.blendState = null;
         this.cullState = null;
         this.depthStencilState = null;
         this.forceDepthPrepass = false;
     }
-    // public alphaBlend: boolean;
-    // public alphaClip: boolean;
+    public name: string;
     public blendState: BlendState|null;
     public cullState: CullState|null;
     public depthStencilState: DepthStencilState|null;
