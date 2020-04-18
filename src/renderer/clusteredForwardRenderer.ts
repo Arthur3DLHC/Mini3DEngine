@@ -62,7 +62,14 @@ export class ClusteredForwardRenderer {
                     if (item) {
                         if (item.material) {
                             if (item.material.blendState) {
-                                
+                                if (item.material.blendState.enable) {
+                                    this.renderListTransparent.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
+                                } else {
+                                    this.renderListOpaque.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
+                                    if (item.material.forceDepthPrepass || !item.material.blendState.alphaClip) {
+                                        this.renderListDepthPrepass.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
+                                    }
+                                }
                             }
                         }
                     }

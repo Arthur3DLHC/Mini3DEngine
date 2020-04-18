@@ -24,24 +24,23 @@ export class RenderList {
     }
 
     // list of renderItems
-    public addRenderItem(object: Object3D, geometry: BufferGeometry, startIdx: number, count: number, material: Material | null) {
+    public addRenderItem(object: Object3D, geometry: BufferGeometry, startIdx: number, count: number, material: Material|null) {
         let item: RenderItem | null = null;
         // reuse exist renderItem object; don't always new objects
         if (this.curItemIndex < this.items.length) {
             item = this.items[this.curItemIndex];
+            item.object = object;
+            item.geometry = geometry;
+            item.startIndex = startIdx;
+            item.count = count;
+            item.material = material;
         } else {
-            item = new RenderItem();
+            item = new RenderItem(object, geometry, material, startIdx, count);
             // javascript 似乎可以自动根据索引分配空间，所以不用调 push
             // this.items.push(item);
             this.items[this.curItemIndex] = item;
         }
         this.curItemIndex++;
-
-        item.object = object;
-        item.geometry = geometry;
-        item.startIndex = startIdx;
-        item.count = count;
-        item.material = material;
     }
 
     public clear() {

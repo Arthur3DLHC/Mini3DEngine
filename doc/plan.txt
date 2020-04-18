@@ -35,6 +35,7 @@ TODO:       主要类结构
                 材质对象定义
             简单Geometry生成、添加、绘制测试
                 顶点缓冲；Vertex Attribute；Index buffer;
+                Box，Sphere，用于测试绘制；
                 遍历图元列表，绘制
                     Fustum culling
                     * 如何在 depth prepass 时使用特殊的 shader？
