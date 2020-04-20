@@ -1,6 +1,6 @@
 import { Material } from "./material.js";
 import { vec4 } from "gl-matrix";
-import { Texture } from "../../WebGLResources/texture.js";
+import { Texture } from "../../WebGLResources/textures/texture.js";
 
 export class StandardPBRMaterial extends Material {
     public constructor() {

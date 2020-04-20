@@ -28,14 +28,6 @@ TODO:       主要类结构
                 材质对象定义
                     RenderState Cache
                     标准 PBR 材质属性
-                标准 PBR Shader;
-                Fix me: Fog 是在材质 Shader 中实现，还是用后期特效实现？
-                    不透明物体，可用后期特效
-                    半透明物体用材质 shader？
-                    或者统一用材质 shader；
-            贴图
-                sampler state
-                贴图的属性
             Shader架构
                 命名规则
                 Shader 输入、输出
@@ -47,6 +39,11 @@ TODO:       主要类结构
                 Shader 代码结构
                     预置函数，预置变量定义和实现；
                 Shader 是否也用缓存？或者为了简单起见，不用缓存了？
+                标准 PBR Shader;
+                Fix me: Fog 是在材质 Shader 中实现，还是用后期特效实现？
+                    不透明物体，可用后期特效
+                    半透明物体用材质 shader？
+                    或者统一用材质 shader；
             简单Geometry生成、添加、绘制测试
                 创建顶点缓冲；Vertex Attribute；Index buffer;
                 Box，Sphere，用于测试绘制；
@@ -58,6 +55,10 @@ TODO:       主要类结构
                         或者单独写一个带镂空纹理的 depth prepass shader，遇到有 alphaclip = true 的 PBR 材质，则使用这个 shader;
                             PBR 材质的贴图参数统一命名；材质中不带 shader, 使用统一的PBR 标准 shader 绘制；
                             自定义材质的某些贴图参数名称是否也要求统一命名？例如 opacity texture
+            贴图
+                sampler state
+                贴图的属性
+                贴图的加载和绑定
             FileLoader
             GLTFLoader
                 先直接引用 minimal gltf loader?
