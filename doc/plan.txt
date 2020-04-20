@@ -30,8 +30,8 @@ TODO:       主要类结构
                     标准 PBR 材质属性
             Shader架构
                 命名规则
-                Shader 输入、输出
-                    thin g-buffer, subsurface scattering
+                Shader 输入、输出定义
+                    thin g-buffer, for subsurface scattering, local reflection
                 Uniform buffer对象封装
                 Uniform buffer 定义：每帧，每Pass，每物体，每材质
                 Shader 预处理，加载，编译；
