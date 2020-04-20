@@ -55,6 +55,14 @@ TODO:       主要类结构
                         或者单独写一个带镂空纹理的 depth prepass shader，遇到有 alphaclip = true 的 PBR 材质，则使用这个 shader;
                             PBR 材质的贴图参数统一命名；材质中不带 shader, 使用统一的PBR 标准 shader 绘制；
                             自定义材质的某些贴图参数名称是否也要求统一命名？例如 opacity texture
+
+            先实现简单的 forward shading
+            
+            间接光照
+                image based lighting, 生成 SH
+                生成 envmap cube
+                生成 irradiance volume
+
             贴图
                 sampler state
                 贴图的属性
@@ -72,10 +80,6 @@ TODO:       主要类结构
                     * 也按照和 depth prepass 类似的方法处理
                 cube shadow map for point light;
 
-            间接光照
-                image based lighting, 生成 SH
-                生成 envmap cube
-                生成 irradiance volume
 
             SSAO，屏幕空间反射；subsurface scattering
 
