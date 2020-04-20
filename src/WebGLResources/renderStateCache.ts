@@ -8,13 +8,14 @@ export class RenderStateCache {
     private blendStates: BlendState[];
     private cullStates: CullState[];
     private depthStates: DepthStencilState[];
-    private samplerStates: SamplerState[];
+    // sampler state 是绑定到每个纹理上的，不在这里缓存？
+    // private samplerStates: SamplerState[];
 
     private constructor() {
         this.blendStates = [];
         this.cullStates = [];
         this.depthStates = [];
-        this.samplerStates = [];
+        // this.samplerStates = [];
     }
 
     public static get instance(): RenderStateCache {
