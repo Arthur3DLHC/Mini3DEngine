@@ -35,6 +35,9 @@ TODO:       主要类结构
                 Uniform buffer对象封装
                 Uniform buffer 定义：每帧，每Pass，每物体，每材质
                 Shader 预处理，加载，编译；
+                    先用js字符串形式的shader源码测试；
+                    实现 #include 机制；
+                    再实现加载远程 shader 文件？
                 Vertex Attribute 解析
                 Shader 代码结构
                     预置函数，预置变量定义和实现；
