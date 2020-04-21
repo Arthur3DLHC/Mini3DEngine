@@ -107,43 +107,77 @@ export class UniformBuffer {
         this.addUniform(name, 16, data);
     }
 
+    // TODO: Add array
+
     public setUniform(name: string, data: Float32Array, size: number) {
-        
+        if (!this._bufferData) {
+            throw new Error("Can not set uniform before ubo build");
+        }
+        const uniform = this._uniforms[name];
+        if (!uniform) {
+            throw new Error("Uniform not exist: " + name);
+        }
+
+        for(let i = 0; i < size; i++) {
+            this._bufferData[uniform.start + i] = data[i];
+        }
     }
 
     public setFloat(name: string, val: number) {
-        throw new Error("Not implemented");
+        UniformBuffer._tmpBuffer[0] = val;
+        this.setUniform(name, UniformBuffer._tmpBuffer, 1);
     }
 
     public setVec2(name: string, val: vec2) {
-        throw new Error("Not implemented");
+        // UniformBuffer._tmpBuffer[0] = val[0];
+        // UniformBuffer._tmpBuffer[1] = val[1];
+        this.setUniform(name, val, 2);
     }
 
     public setVec3(name: string, val: vec3) {
-        throw new Error("Not implemented");
+        // UniformBuffer._tmpBuffer[0] = val[0];
+        // UniformBuffer._tmpBuffer[1] = val[1];
+        // UniformBuffer._tmpBuffer[2] = val[2];
+        this.setUniform(name, val, 3);
     }
 
     public setVec4(name: string, val: vec4) {
-        throw new Error("Not implemented");
+        // UniformBuffer._tmpBuffer[0] = val[0];
+        // UniformBuffer._tmpBuffer[1] = val[1];
+        // UniformBuffer._tmpBuffer[2] = val[2];
+        // UniformBuffer._tmpBuffer[3] = val[3];
+        this.setUniform(name, val, 4);
     }
 
     public setMat2(name: string, val: mat2) {
-        throw new Error("Not implemented");
+        // 需要按照对齐规则转换一下
+        for (let i = 0; i < 2; i++) {
+            UniformBuffer._tmpBuffer[i * 4 + 0] = val[i * 2 + 0];
+            UniformBuffer._tmpBuffer[i * 4 + 1] = val[i * 2 + 1];
+            UniformBuffer._tmpBuffer[i * 4 + 2] = 0;
+            UniformBuffer._tmpBuffer[i * 4 + 3] = 0;
+        }
+        this.setUniform(name, UniformBuffer._tmpBuffer, 8);
     }
 
     public setMat3(name: string, val: mat3) {
-        throw new Error("Not implemented");
+        // 需要按照对齐规则转换一下
+        for (let i = 0; i < 3; i++) {
+            UniformBuffer._tmpBuffer[i * 4 + 0] = val[i * 2 + 0];
+            UniformBuffer._tmpBuffer[i * 4 + 1] = val[i * 2 + 1];
+            UniformBuffer._tmpBuffer[i * 4 + 2] = val[i * 2 + 2];
+            UniformBuffer._tmpBuffer[i * 4 + 3] = 0;
+        }
+        this.setUniform(name, UniformBuffer._tmpBuffer, 12);
     }
 
     public setMat4(name: string, val: mat4) {
-        throw new Error("Not implemented");
+        this.setUniform(name, val, 16);
     }
 
-    public build() {
-        if (!this._bufferData) {
-            return;
-        }
+    // TODO: set array
 
+    public build() {
         // 用当前 buffer 数据创建glUniformBuffer对象
         this._bufferData = new Float32Array(this._data);
         this.bufferGL = GLDevice.gl.createBuffer();
