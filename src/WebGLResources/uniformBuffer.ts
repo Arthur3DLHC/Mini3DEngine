@@ -18,9 +18,29 @@ export class UniformBuffer {
     private _currStartIdx: number;
     private _bufferData: Float32Array | null;
     private _data: number[];
+    private static _tmpBuffer: Float32Array = new Float32Array(256);    // 每次拷贝数据时不用重新 new 了
+    
+    private alignUniform(size: number) {
+        let alignment = 0;
+        if (size <= 2) {
+            alignment = size;
+        } else {
+            alignment = 4;
+        }
+
+        if ((this._currStartIdx % alignment) !== 0) {
+            var oldPointer = this._currStartIdx;
+            this._currStartIdx += alignment - (this._currStartIdx % alignment);
+            var diff = this._currStartIdx - oldPointer;
+
+            for (let i = 0; i < diff; i++) {
+                this._data.push(0);
+            }
+        }
+    }
 
     // todo: method for add/set/remove named uniform variables
-    public addUniform(name: string, numFloats: number) {
+    public addUniform(name: string, numFloats: number, data?: number[]) {
         if (this._uniforms[name] !== undefined) {
             throw new Error("Uniform" + name + "already exist.");
         }
@@ -38,37 +58,57 @@ export class UniformBuffer {
         unifom.count = numFloats;
         this._uniforms[name] = unifom;
         this._currStartIdx += numFloats;
-        for (let i = 0; i < numFloats; i++) {
-            this._data.push(0);            
+        if (data) {
+            for (let i = 0; i< numFloats && i < data.length; i++) {
+                this._data.push(data[i]);
+            }
+        } else {
+            for (let i = 0; i < numFloats; i++) {
+                this._data.push(0);            
+            } 
         }
     }
 
     public addFloat(name: string, val: number) {
-        throw new Error("Not implemented");
+        const data = [val];
+        this.addUniform(name, 1, data);
     }
 
     public addVec2(name: string, val: vec2) {
-        throw new Error("Not implemented");
+        const data = [val[0], val[1]];
+        this.addUniform(name, 2, data);
     }
 
     public addVec3(name: string, val: vec3) {
-        throw new Error("Not implemented");
+        const data = [val[0], val[1], val[2]];
+        this.addUniform(name, 3, data);
     }
 
     public addVec4(name: string, val: vec4) {
-        throw new Error("Not implemented");
+        const data = [val[0], val[1], val[2], val[3]];
+        this.addUniform(name, 4, data);
     }
 
     public addMat2(name: string, val: mat2) {
-        throw new Error("Not implemented");
+        // need 2 vec4
+        this.addUniform(name, 8);
     }
 
     public addMat3(name: string, val: mat3) {
-        throw new Error("Not implemented");
+        // need 3 vec4
+        this.addUniform(name,12);
     }
 
     public addMat4(name: string, val: mat4) {
-        throw new Error("Not implemented");
+        const data = [];
+        for (const e of val) {
+            data.push(e);
+        }
+        this.addUniform(name, 16, data);
+    }
+
+    public setUniform(name: string, data: Float32Array, size: number) {
+        
     }
 
     public setFloat(name: string, val: number) {
@@ -105,6 +145,7 @@ export class UniformBuffer {
         }
 
         // 用当前 buffer 数据创建glUniformBuffer对象
+        this._bufferData = new Float32Array(this._data);
         this.bufferGL = GLDevice.gl.createBuffer();
         GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, this.bufferGL);
         if (this._dynamic) {
@@ -119,22 +160,4 @@ export class UniformBuffer {
         throw new Error("Not implemented");
     }
 
-    private alignUniform(size: number) {
-        let alignment = 0;
-        if (size <= 2) {
-            alignment = size;
-        } else {
-            alignment = 4;
-        }
-
-        if ((this._currStartIdx % alignment) !== 0) {
-            var oldPointer = this._currStartIdx;
-            this._currStartIdx += alignment - (this._currStartIdx % alignment);
-            var diff = this._currStartIdx - oldPointer;
-
-            for (let i = 0; i < diff; i++) {
-                this._data.push(0);
-            }
-        }
-    }
 }
