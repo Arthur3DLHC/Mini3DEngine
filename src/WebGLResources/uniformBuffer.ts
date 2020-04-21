@@ -191,7 +191,13 @@ export class UniformBuffer {
     }
 
     public update() {
-        throw new Error("Not implemented");
+        if (!this.bufferGL || !this._bufferData) {
+            throw new Error("Can not update ubo before build");
+        }
+
+        GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, this.bufferGL);
+        GLDevice.gl.bufferSubData(GLDevice.gl.UNIFORM_BUFFER, 0, this._bufferData);
+        GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, null);
     }
 
 }
