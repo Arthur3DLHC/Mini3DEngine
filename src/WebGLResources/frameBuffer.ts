@@ -1,14 +1,69 @@
-import { GLDevice } from "./glDevice";
+import { GLDevice } from "./glDevice.js";
+import { Texture } from "./textures/texture.js";
+import { RenderBuffer } from "./renderBuffer.js";
 
 export class FrameBuffer {
-    public constructor() {
+    public constructor(width: number, height: number) {
         this.glFrameBuffer = null;
+        this._needUpdate = true;
+        this._textures = [];
+        this._depthStencilBuffer = null;
+        this._depthStencilTexture = null;
     }
     public glFrameBuffer: WebGLFramebuffer | null;
 
+    // 下列成员使用弱引用，使得可以多个 FrameBuffer 共享
     // todo: mrt textures
+    public setTexture(index: number, texture: Texture | null) {
+        if (this._textures[index] !== texture) {
+            this._textures[index] = texture;            
+            this._needUpdate = true;
+        }
+    }
+    public getTexture(index: number): Texture | null {
+        if (this._textures[index] !== undefined) {
+            return this._textures[index];
+        }
+        return null;
+    }
     // todo: depthstencil renderbuffer
     // todo: depthstencil texture?
+    public get depthStencilBuffer(): RenderBuffer | null {
+        return this._depthStencilBuffer;
+    }
+    public set depthStencilBuffer(buffer: RenderBuffer | null) {
+        if (this._depthStencilBuffer !== buffer) {
+            this._depthStencilBuffer = buffer;
+            this._needUpdate = true;            
+        }
+    }
+
+    public get depthStencilTexture() : Texture | null {
+        return this._depthStencilTexture;
+    }
+    public set depthStencilTexture(texture: Texture | null) {
+        if (this._depthStencilTexture !== texture) {
+            this._depthStencilTexture = texture;
+            this._needUpdate = true;
+        }
+    }
+
+    private _textures: (Texture|null)[];
+    private _depthStencilBuffer: RenderBuffer | null;
+    private _depthStencilTexture: Texture | null;
+    private _needUpdate: boolean;
+
+    public prepare() {
+        if (!this.glFrameBuffer) {
+            this.glFrameBuffer = GLDevice.gl.createFramebuffer();
+        }
+        if (this._needUpdate) {
+            // TODO: attach textures and depth stencil buffers
+            // 如果同时设置了 depthstencilbuffer 和 depthstenciltexture，优先使用 depthstenciltexture？或者报错
+            // update drawbuffers
+            this._needUpdate = false;
+        }
+    }
 
     public release() {
         if (this.glFrameBuffer) {

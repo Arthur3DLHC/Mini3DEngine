@@ -111,11 +111,7 @@ export class ClusteredForwardRenderer {
     private setRenderTarget(renderTarget: FrameBuffer | null) {
         // if gl fbo not created, create it
         if (renderTarget) {
-            if (!renderTarget.glFrameBuffer) {
-                renderTarget.glFrameBuffer = GLDevice.gl.createFramebuffer();
-                // attach textures and depth stencil buffers
-                // update drawbuffers
-            }
+            renderTarget.prepare();
             GLDevice.gl.bindFramebuffer(GLDevice.gl.FRAMEBUFFER, renderTarget.glFrameBuffer);
         } else {
             GLDevice.gl.bindFramebuffer(GLDevice.gl.FRAMEBUFFER, null);
