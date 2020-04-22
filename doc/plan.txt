@@ -29,7 +29,7 @@ TODO:       主要类结构
                     RenderState Cache
                     标准 PBR 材质属性
             RenderTarget
-                
+                创建纹理和 RenderBuffer；注意创建的纹理和读取的纹理的关系；
             Shader架构
                 Shader 预处理，加载，编译；
                     先用js字符串形式的shader源码测试；
