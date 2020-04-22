@@ -63,6 +63,8 @@ TODO:       主要类结构
                     加一个显式的 destory 接口？
 
             先实现简单的 forward shading
+
+            RenderTarget
             
             间接光照
                 image based lighting, 生成 SH

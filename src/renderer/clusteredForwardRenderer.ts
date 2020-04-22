@@ -11,6 +11,8 @@ import { EnvironmentProbe } from "../scene/environmentProbe.js";
 import { BlendState } from "../WebGLResources/renderStates/blendState.js";
 import { CullState } from "../WebGLResources/renderStates/cullState.js";
 import { DepthStencilState } from "../WebGLResources/renderStates/depthStencilState.js";
+import { FrameBuffer } from "../WebGLResources/frameBuffer.js";
+import { GLDevice } from "../WebGLResources/glDevice.js";
 
 export class ClusteredForwardRenderer {
     public constructor() {
@@ -20,6 +22,7 @@ export class ClusteredForwardRenderer {
         this.renderListSprites = new RenderList();
         this.tmpRenderList = new RenderList();
         this.renderContext = new RenderContext();
+        this.renderTarget = null;
     }
 
     public render(scene: Scene) {
@@ -36,8 +39,7 @@ export class ClusteredForwardRenderer {
     private tmpRenderList: RenderList;
 
     private renderContext: RenderContext;
-
-    
+    private renderTarget: FrameBuffer | null;    
 
     private dispatchObjects(scene: Scene) {
         this.renderListDepthPrepass.clear();
@@ -100,5 +102,24 @@ export class ClusteredForwardRenderer {
                 this.dispatchObject(child);
             }
         }
+    }
+
+    /**
+     * set current render target
+     * @param renderTarget null for render to window
+     */
+    private setRenderTarget(renderTarget: FrameBuffer | null) {
+        // if gl fbo not created, create it
+        if (renderTarget) {
+            if (!renderTarget.glFrameBuffer) {
+                renderTarget.glFrameBuffer = GLDevice.gl.createFramebuffer();
+                // attach textures and depth stencil buffers
+                // update drawbuffers
+            }
+            GLDevice.gl.bindFramebuffer(GLDevice.gl.FRAMEBUFFER, renderTarget.glFrameBuffer);
+        } else {
+            GLDevice.gl.bindFramebuffer(GLDevice.gl.FRAMEBUFFER, null);
+        }
+        this.renderTarget = renderTarget;
     }
 }
