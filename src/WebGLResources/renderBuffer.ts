@@ -6,12 +6,24 @@ import { GLDevice } from "./glDevice.js";
 export class RenderBuffer {
     public constructor() {
         this.glBuffer = null;
+        this.width = 0;
+        this.height = 0;
+        this.format = GLDevice.gl.DEPTH24_STENCIL8;
     }
 
     public glBuffer: WebGLRenderbuffer | null;
+    public width: number;
+    public height: number;
+    public format: GLenum;
 
     public create() {
-        throw new Error("Not implemented");
+        if (this.glBuffer) {
+            throw new Error("Already created.");
+        }
+        this.glBuffer = GLDevice.gl.createRenderbuffer();
+        GLDevice.gl.bindRenderbuffer(GLDevice.gl.RENDERBUFFER, this.glBuffer);
+        GLDevice.gl.renderbufferStorage(GLDevice.gl.RENDERBUFFER, this.format, this.width, this.height);
+        GLDevice.gl.bindRenderbuffer(GLDevice.gl.RENDERBUFFER, null);
     }
 
     public release() {

@@ -58,6 +58,7 @@ export class FrameBuffer {
             this.glFrameBuffer = GLDevice.gl.createFramebuffer();
         }
         if (this._needUpdate) {
+            GLDevice.gl.bindFramebuffer(GLDevice.gl.FRAMEBUFFER, this.glFrameBuffer);
             const attachments: GLenum[] = [];
             // TODO: attach textures and depth stencil buffers
             for(let i = 0; i < this._textures.length && i < 4; i++) {
@@ -93,6 +94,7 @@ export class FrameBuffer {
             // drawbuffers 设置会保存在 GL 的 frame buffer object 中
             GLDevice.gl.drawBuffers(attachments);
             this._needUpdate = false;
+            GLDevice.gl.bindFramebuffer(GLDevice.gl.FRAMEBUFFER, null);
         }
     }
 
