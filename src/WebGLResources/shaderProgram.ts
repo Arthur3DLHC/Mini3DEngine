@@ -4,4 +4,8 @@ export class ShaderProgram {
     }
 
     public program: WebGLProgram | null;
+
+    public release() {
+        throw new Error("Not implemented.");
+    }
 }

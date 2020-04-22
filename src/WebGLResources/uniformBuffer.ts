@@ -199,5 +199,8 @@ export class UniformBuffer {
         GLDevice.gl.bufferSubData(GLDevice.gl.UNIFORM_BUFFER, 0, this._bufferData);
         GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, null);
     }
-
+    
+    public release() {
+        throw new Error("Not implemented.");
+    }
 }

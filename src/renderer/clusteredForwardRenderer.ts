@@ -58,38 +58,39 @@ export class ClusteredForwardRenderer {
             } else if (object instanceof BaseLight) {
                 this.renderContext.addLight(object as BaseLight);
             } else if (object instanceof Mesh) {
-                const mesh = object as Mesh;
-                this.tmpRenderList.clear();
-                mesh.provideRenderItem(this.tmpRenderList);
-                // 需要遍历tmpRenderList，根据材质区分最终放到哪个 renderList 里
-                // DepthPrepass: 材质没有开启半透明混合和半透明Clip
-                // Opaque: 材质没有开启半透明混合
-                // Transparent: 材质开启了半透明混合
-                for (let index = 0; index < this.tmpRenderList.ItemCount; index++) {
-                    const item = this.tmpRenderList.getItemAt(index);
-                    if (item) {
-                        if (item.material) {
-                            if (item.material.blendState) {
-                                if (item.material.blendState.enable) {
-                                    this.renderListTransparent.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
-                                    if (item.material.forceDepthPrepass) {
-                                        this.renderListDepthPrepass.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
-                                    }
-                                } else {
-                                    this.renderListOpaque.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
-                                    this.renderListDepthPrepass.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
-
-                                }
-                            }
-                        }
-                    }
-                }
+                // nothing to do yet.                
             } else if (object instanceof Decal) {
                 this.renderContext.addDecal(object as Decal);
             } else if (object instanceof IrradianceVolume) {
                 this.renderContext.addIrradianceVolume(object as IrradianceVolume);
             } else if (object instanceof EnvironmentProbe) {
                 this.renderContext.addEnvironmentProbe(object as EnvironmentProbe);
+            }
+            this.tmpRenderList.clear();
+            // 光源等也可能提供 debug 或编辑时用的显示图元
+            object.provideRenderItem(this.tmpRenderList);
+            // 需要遍历tmpRenderList，根据材质区分最终放到哪个 renderList 里
+            // DepthPrepass: 材质没有开启半透明混合和半透明Clip
+            // Opaque: 材质没有开启半透明混合
+            // Transparent: 材质开启了半透明混合
+            for (let index = 0; index < this.tmpRenderList.ItemCount; index++) {
+                const item = this.tmpRenderList.getItemAt(index);
+                if (item) {
+                    if (item.material) {
+                        if (item.material.blendState) {
+                            if (item.material.blendState.enable) {
+                                this.renderListTransparent.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
+                                if (item.material.forceDepthPrepass) {
+                                    this.renderListDepthPrepass.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
+                                }
+                            } else {
+                                this.renderListOpaque.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
+                                this.renderListDepthPrepass.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
+
+                            }
+                        }
+                    }
+                }
             }
         }
 

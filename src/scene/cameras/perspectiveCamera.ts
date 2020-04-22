@@ -1,4 +1,6 @@
 import { Camera } from "./camera.js";
+import { RenderList } from "../../renderer/renderList.js";
+import { BufferGeometry } from "../../geometry/bufferGeometry.js";
 
 export class PerspectiveCamera extends Camera {
     public constructor() {
@@ -8,6 +10,10 @@ export class PerspectiveCamera extends Camera {
         this.far = 2000;
         this.focus = 10;
         this.aspect = 1;
+
+        this.debugDraw = false;
+
+        this._frustumGeometry = null;
     }
     /**
      * vertical fov, in degrees.
@@ -18,4 +24,11 @@ export class PerspectiveCamera extends Camera {
     public focus: number;
     public aspect: number;
 
+    public debugDraw: boolean;
+
+    private _frustumGeometry: BufferGeometry | null;
+
+    public provideRenderItem(renderList: RenderList) {
+        // todo: 如果开启了调试绘制模式，则输出一个视锥图元；
+    }
 }

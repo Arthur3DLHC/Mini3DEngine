@@ -37,4 +37,8 @@ export class Texture {
 
         // generate mipmaps now?
     }
+
+    public release() {
+        // subclass release webgl resources
+    }
 }

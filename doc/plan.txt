@@ -51,6 +51,7 @@ TODO:       主要类结构
                 创建顶点缓冲；Vertex Attribute；Index buffer;
                 Box，Sphere，用于测试绘制；
                 遍历图元列表，绘制
+                    光源等非网格对象的 providePrimitive 也得调用，绘制调试图形；
                     Fustum culling
                     * 如何在 depth prepass 时使用特殊的 shader？
                         不修改使用的shader；如果关闭了 color write，且 shader 中不使用 discard，则不会执行 shader，opengl 底层会使用一个默认的简单 shader 绘制
@@ -58,6 +59,8 @@ TODO:       主要类结构
                         或者单独写一个带镂空纹理的 depth prepass shader，遇到有 alphaclip = true 的 PBR 材质，则使用这个 shader;
                             PBR 材质的贴图参数统一命名；材质中不带 shader, 使用统一的PBR 标准 shader 绘制；
                             自定义材质的某些贴图参数名称是否也要求统一命名？例如 opacity texture
+                当对象从场景移除时，释放显存资源；
+                    加一个显式的 destory 接口？
 
             先实现简单的 forward shading
             

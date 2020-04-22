@@ -1,5 +1,7 @@
 import { Object3D } from "./object3D.js";
 import { Texture2DArray } from "../WebGLResources/textures/texture2DArray.js";
+import { BufferGeometry } from "../geometry/bufferGeometry.js";
+import { RenderList } from "../renderer/renderList.js";
 
 export class EnvironmentProbe extends Object3D {
     public constructor() {
@@ -7,6 +9,9 @@ export class EnvironmentProbe extends Object3D {
         this.visibleDistance = 20;
         this.texture = null;
         this.textureIndex = 0;
+
+        this.debugDraw = false;
+        this._debugGeometry = null;
     }
     // the pose and location is defined by transform matrix.
     /**
@@ -25,4 +30,11 @@ export class EnvironmentProbe extends Object3D {
      * start index of cube face texture in 2d texture array.
      */
     public textureIndex: number;
+
+    public debugDraw: boolean;
+    private _debugGeometry: BufferGeometry | null;
+
+    public provideRenderItem(renderList: RenderList) {
+        // todo: 如果开启了调试绘制模式，则输出调试图元；
+    }
 }

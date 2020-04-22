@@ -2,12 +2,17 @@ import { Object3D } from "./object3D.js";
 import { Texture3D } from "../WebGLResources/textures/texture3D.js";
 import { BoundingBox } from "../math/boundingBox.js";
 import { vec3 } from "gl-matrix";
+import { BufferGeometry } from "../geometry/bufferGeometry.js";
+import { RenderList } from "../renderer/renderList.js";
 
 export class IrradianceVolume extends Object3D {
     public constructor() {
         super();
         this.shTextures = [];
         this.atlasLocation = new BoundingBox(vec3.fromValues(0, 0, 0), vec3.fromValues(8, 8, 8));
+
+        this.debugDraw = false;
+        this._debugGeometry = null;
     }
 
     // pose, position and range are defined by transform matrix.
@@ -34,5 +39,12 @@ export class IrradianceVolume extends Object3D {
      */
     public getVolume(): number {
         throw new Error("Not implemented.");
+    }
+
+    public debugDraw: boolean;
+    private _debugGeometry: BufferGeometry | null;
+
+    public provideRenderItem(renderList: RenderList) {
+        // todo: 如果开启了调试绘制模式，则输出调试图元；
     }
 }

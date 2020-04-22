@@ -17,4 +17,5 @@ export class GLPrograms {
     public static buildProgramFromSourceCode(vsCode: string, fsCode: string): ShaderProgram {
         throw new Error("Not implemented.");
     }
+
 }
