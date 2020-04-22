@@ -6,12 +6,12 @@ export class UniformBuffer {
     public constructor(dynamic: boolean = true) {
         this._data = [];
         this._bufferData = null;
-        this.bufferGL = null;
+        this.glBuffer = null;
         this._uniforms = {};
         this._dynamic = dynamic;
         this._currStartIdx = 0;
     }
-    public bufferGL: WebGLBuffer | null;
+    public glBuffer: WebGLBuffer | null;
 
     private _dynamic: boolean;
     private _uniforms: {[key: string]: BufferSegment};
@@ -178,10 +178,13 @@ export class UniformBuffer {
     // TODO: set array
 
     public build() {
+        if (this.glBuffer) {
+            throw new Error("Already built.")
+        }
         // 用当前 buffer 数据创建glUniformBuffer对象
         this._bufferData = new Float32Array(this._data);
-        this.bufferGL = GLDevice.gl.createBuffer();
-        GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, this.bufferGL);
+        this.glBuffer = GLDevice.gl.createBuffer();
+        GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, this.glBuffer);
         if (this._dynamic) {
             GLDevice.gl.bufferData(GLDevice.gl.UNIFORM_BUFFER, this._bufferData, GLDevice.gl.DYNAMIC_DRAW);
         } else {
@@ -191,16 +194,19 @@ export class UniformBuffer {
     }
 
     public update() {
-        if (!this.bufferGL || !this._bufferData) {
+        if (!this.glBuffer || !this._bufferData) {
             throw new Error("Can not update ubo before build");
         }
 
-        GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, this.bufferGL);
+        GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, this.glBuffer);
         GLDevice.gl.bufferSubData(GLDevice.gl.UNIFORM_BUFFER, 0, this._bufferData);
         GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, null);
     }
     
     public release() {
-        throw new Error("Not implemented.");
+        if (this.glBuffer) {
+            GLDevice.gl.deleteBuffer(this.glBuffer);
+            this.glBuffer = null;
+        }
     }
 }

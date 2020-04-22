@@ -1,11 +1,16 @@
+import { GLDevice } from "./glDevice.js";
+
 export class ShaderProgram {
     public constructor() {
-        this.program = null;
+        this.glProgram = null;
     }
 
-    public program: WebGLProgram | null;
+    public glProgram: WebGLProgram | null;
 
     public release() {
-        throw new Error("Not implemented.");
+        if (this.glProgram) {
+            GLDevice.gl.deleteProgram(this.glProgram);
+            this.glProgram = null;
+        }
     }
 }

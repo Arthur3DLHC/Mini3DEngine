@@ -1,10 +1,12 @@
+import { GLDevice } from "./glDevice";
+
 /**
  * Interleaved vertex buffer
  */
 export class VertexBuffer {
     public constructor() {
         this.stride = 0;
-        this.buffer = null;
+        this.glBuffer = null;
         this.data = null;
     }
 
@@ -16,7 +18,7 @@ export class VertexBuffer {
     /**
      * WebGL buffer object
      */
-    public buffer: WebGLBuffer | null;
+    public glBuffer: WebGLBuffer | null;
 
     /**
      * 为简单起见，只支持浮点数数据？
@@ -25,6 +27,9 @@ export class VertexBuffer {
     public data: Float32Array | null;
         
     public release() {
-        throw new Error("Not implemented.");
+        if (this.glBuffer) {
+            GLDevice.gl.deleteBuffer(this.glBuffer);
+            this.glBuffer = null;
+        }
     }
 }

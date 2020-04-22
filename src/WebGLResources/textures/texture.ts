@@ -39,6 +39,9 @@ export class Texture {
     }
 
     public release() {
-        // subclass release webgl resources
+        if (this.glTexture) {
+            GLDevice.gl.deleteTexture(this.glTexture);
+            this.glTexture = null;
+        }
     }
 }
