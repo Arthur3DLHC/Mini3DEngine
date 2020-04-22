@@ -10,4 +10,6 @@ export class Camera extends Object3D {
     public viewport: vec4 | null = null;
 
     // render target? every camera has one?
+
+    // clear mode?
 }

@@ -31,4 +31,12 @@ export class PerspectiveCamera extends Camera {
     public provideRenderItem(renderList: RenderList) {
         // todo: 如果开启了调试绘制模式，则输出一个视锥图元；
     }
+
+    public destroy() {
+        // subclass release WebGL resources.
+        if (this._frustumGeometry) {
+            this._frustumGeometry.destroy();
+            this._frustumGeometry = null;
+        }
+    }
 }

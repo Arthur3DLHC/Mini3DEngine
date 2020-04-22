@@ -1,5 +1,7 @@
 import { PrimitiveGroup } from "./primitiveGroup";
 import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute";
+import { VertexBuffer } from "../WebGLResources/vertexBuffer";
+import { IndexBuffer } from "../WebGLResources/indexBuffer";
 
 export class BufferGeometry {
     public constructor() {
@@ -13,13 +15,23 @@ export class BufferGeometry {
     public attributes: VertexBufferAttribute[];
 
     // vbo
-    public vertexBuffer: WebGLBuffer | null;
+    public vertexBuffer: VertexBuffer | null;
     
     // ibo
-    public indexBuffer: WebGLBuffer | null;
+    public indexBuffer: IndexBuffer | null;
 
     // groups
     public groups: PrimitiveGroup[];
 
     // todo: instanced?
+    public destroy() {
+        if (this.vertexBuffer) {
+            this.vertexBuffer.release();
+            this.vertexBuffer = null;
+        }
+        if (this.indexBuffer) {
+            this.indexBuffer.release();
+            this.indexBuffer = null;
+        }
+    }
 }
