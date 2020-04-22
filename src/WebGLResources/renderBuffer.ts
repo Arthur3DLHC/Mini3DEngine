@@ -20,6 +20,9 @@ export class RenderBuffer {
         if (this.glBuffer) {
             throw new Error("Already created.");
         }
+        if (this.width <= 0 || this.height <= 0) {
+            throw new Error("width and height must > 0.");
+        }
         this.glBuffer = GLDevice.gl.createRenderbuffer();
         GLDevice.gl.bindRenderbuffer(GLDevice.gl.RENDERBUFFER, this.glBuffer);
         GLDevice.gl.renderbufferStorage(GLDevice.gl.RENDERBUFFER, this.format, this.width, this.height);
