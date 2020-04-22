@@ -9,6 +9,11 @@ export class Texture3D extends Texture {
     // 如果是程序中生成的，则需要提供设置每个像素颜色的接口？
     // 用于生成 Irradiance volume 时；
     // 或者支持作为渲染目标？
+    public create() {
+        // create gl texture
+        // initialize tex by gl.TexImage3D
+        throw new Error("Not implemented.");
+    }
 
     public upload() {
         throw new Error("Not implemented.");

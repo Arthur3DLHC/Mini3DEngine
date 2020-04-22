@@ -7,8 +7,11 @@ export class Texture3D extends Texture {
 
     // todo: source，长图的形式？
 
-    // todo: 设为渲染目标
-
+    public create() {
+        // create gl texture
+        // initialize tex by gl.TexImageCube
+        throw new Error("Not implemented.");
+    }
     public upload() {
         throw new Error("Not implemented.");
     }

@@ -58,9 +58,40 @@ export class FrameBuffer {
             this.glFrameBuffer = GLDevice.gl.createFramebuffer();
         }
         if (this._needUpdate) {
+            const attachments: GLenum[] = [];
             // TODO: attach textures and depth stencil buffers
+            for(let i = 0; i < this._textures.length && i < 4; i++) {
+                // if texture not created, create it
+                let texture: Texture|null = this._textures[i];                 
+                if (texture !== null) {
+                    if (!texture.glTexture) {
+                        texture.create();                        
+                    }
+                    GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.COLOR_ATTACHMENT0 + i, GLDevice.gl.TEXTURE_2D, texture.glTexture, 0);
+                    attachments.push(GLDevice.gl.COLOR_ATTACHMENT0 + i);
+                } else {
+                    GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.COLOR_ATTACHMENT0 + i, GLDevice.gl.TEXTURE_2D, null, 0);
+                }
+            }
+
             // 如果同时设置了 depthstencilbuffer 和 depthstenciltexture，优先使用 depthstenciltexture？或者报错
-            // update drawbuffers
+            if (this._depthStencilTexture) {
+                if (!this._depthStencilTexture.glTexture) {
+                    this._depthStencilTexture.create();
+                }
+                GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_STENCIL_ATTACHMENT, GLDevice.gl.TEXTURE_2D, this._depthStencilTexture.glTexture, 0);
+            } else{
+                GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_STENCIL_ATTACHMENT, GLDevice.gl.TEXTURE_2D, null, 0);
+                if (this._depthStencilBuffer) {
+                    if (!this._depthStencilBuffer.glBuffer) {
+                        this._depthStencilBuffer.create();
+                    }
+                    GLDevice.gl.framebufferRenderbuffer(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_STENCIL_ATTACHMENT, GLDevice.gl.RENDERBUFFER, this._depthStencilBuffer.glBuffer);
+                }
+            } 
+
+            // drawbuffers 设置会保存在 GL 的 frame buffer object 中
+            GLDevice.gl.drawBuffers(attachments);
             this._needUpdate = false;
         }
     }

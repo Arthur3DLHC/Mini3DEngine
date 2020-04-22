@@ -10,6 +10,10 @@ export class RenderBuffer {
 
     public glBuffer: WebGLRenderbuffer | null;
 
+    public create() {
+        throw new Error("Not implemented");
+    }
+
     public release() {
         if (this.glBuffer) {
             GLDevice.gl.deleteRenderbuffer(this.glBuffer);

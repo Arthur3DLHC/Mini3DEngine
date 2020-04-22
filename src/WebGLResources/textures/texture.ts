@@ -31,6 +31,11 @@ export class Texture {
 
     public samplerState: SamplerState;
 
+    public create() {
+        // create gl texture
+        // initialize tex by gl.TexImage2D
+    }
+
     public upload() {
         // base class do nothing.
         // subclass upload texture data to gl texture according to their types.
