@@ -9,14 +9,44 @@ export class GLPrograms {
 
     }
 
+    /**
+     * 所有可用的 shader 代码段集合
+     * 系统启动时，需要将自己要使用的所有 shader 代码段添加到此集合中
+     * 每个 shader 代码段需要用唯一名称字符串Key
+     * 在 shader 代码中 #include 其他文件时，需要使用该文件的Key，形式如下：
+     * #include <shader代码key>
+     */
+    public static shaderCodes: Map<string, string> = new Map<string, string>();
+
+    private static includePattern = /^[ \t]*#include +<([\w\d./]+)>/gm;
+
     public static processSourceCode(code: string): string {
-        // resolve includes recursively
-        throw new Error("Not implemented.");
+        // #include
+        let result = GLPrograms.resolveInclude(code);
+        
+        // 其他还需要那些预处理？
+        return result;
     }
 
-    // fix me: put build method here, or put it in shaderprogram class?
-    public static buildProgramFromSourceCode(vsCode: string, fsCode: string): ShaderProgram {
-        throw new Error("Not implemented.");
+    /**
+     * 处理代码中的 include
+     * @param code 代码内容字符串
+     * @param includedCodes 已经引用过的代码段key的列表
+     */
+    private static resolveInclude(code: string): string {
+        // 用正则表达式查找 #include，并解析出要引用的代码段key
+        // 根据 key 获得代码段，递归调用 resolveInclude
+        // 用递归得到的字符串替换 #include 行；
+        // 注意处理重复引用的情况；记录一下已经引用过的代码段key？
+        // 或者不允许重复引用？在被引用代码段里不能再加 #include
+
+        return code.replace(GLPrograms.includePattern, (match: string, shaderKey: string): string => {
+            let code = GLPrograms.shaderCodes.get(shaderKey);
+            if (!code) {
+                throw new Error("Can not resolve #include <" + shaderKey + ">");
+            }
+            return this.resolveInclude(code);
+        });
     }
 
     public static useProgram(program: ShaderProgram) {

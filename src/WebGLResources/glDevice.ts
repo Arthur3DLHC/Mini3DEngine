@@ -1,6 +1,7 @@
 import { BlendState } from "./renderStates/blendState.js";
 import { CullState } from "./renderStates/cullState.js";
 import { DepthStencilState } from "./renderStates/depthStencilState.js";
+import { FrameBuffer } from "./frameBuffer.js";
 
 export class GLDevice {
     public static gl: WebGL2RenderingContext;
@@ -15,29 +16,20 @@ export class GLDevice {
         }
     }
 
-    private static curBlendState: BlendState | null = null;
-    private static curCullState: CullState | null = null;
-    private static curDepthStencilState: DepthStencilState | null = null;
-    // todo: sampler states for every texture stage?
-
-    public static setBlendState(state:BlendState) {
-        if (this.curBlendState !== state) {
-            this.curBlendState = state;
-            this.curBlendState.apply();
+    private static _renderTarget: FrameBuffer | null;    
+    
+    /**
+     * set current render target
+     * @param renderTarget null for render to window
+     */
+    public static setRenderTarget(renderTarget: FrameBuffer | null) {
+        // if gl fbo not created, create it
+        if (renderTarget) {
+            renderTarget.prepare();
+            GLDevice.gl.bindFramebuffer(GLDevice.gl.FRAMEBUFFER, renderTarget.glFrameBuffer);
+        } else {
+            GLDevice.gl.bindFramebuffer(GLDevice.gl.FRAMEBUFFER, null);
         }
-    }
-
-    public static setCullState(state:CullState) {
-        if (this.curCullState !== state) {
-            this.curCullState = state;
-            this.curCullState.apply();
-        }
-    }
-
-    public static setDepthStencilState(state: DepthStencilState) {
-        if (this.curDepthStencilState !== state) {
-            this.curDepthStencilState = state;
-            this.curDepthStencilState.apply();
-        }
+        this._renderTarget = renderTarget;
     }
 }
