@@ -65,8 +65,11 @@ export class FrameBuffer {
                 // if texture not created, create it
                 let texture: Texture|null = this._textures[i];                 
                 if (texture !== null) {
+                    if (texture.samplerState.minFilter !== GLDevice.gl.NEAREST || texture.samplerState.magFilter !== GLDevice.gl.NEAREST) {
+                        throw new Error("Texture as rendertarget muse has nearest filter");
+                    }
                     if (!texture.glTexture) {
-                        texture.create();                        
+                        texture.create();
                     }
                     GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.COLOR_ATTACHMENT0 + i, GLDevice.gl.TEXTURE_2D, texture.glTexture, 0);
                     attachments.push(GLDevice.gl.COLOR_ATTACHMENT0 + i);
