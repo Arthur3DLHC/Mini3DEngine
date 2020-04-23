@@ -6,6 +6,7 @@ export class ShaderProgram {
         this.glProgram = null;
         this.vertexShaderCode = "";
         this.fragmentShaderCode = "";
+        this._attributes = null;
     }
 
     public name: string;
@@ -14,6 +15,8 @@ export class ShaderProgram {
 
     public vertexShaderCode: string;
     public fragmentShaderCode: string;
+
+    private _attributes: Map<string, number>|null;
 
     public build() {
         if (this.vertexShaderCode === "" || this.fragmentShaderCode === "") {
@@ -55,7 +58,23 @@ export class ShaderProgram {
         }
     }
 
-    // todo: get attributes
+    public get attributes(): Map<string, number> {
+        if (!this.glProgram) {
+            throw new Error("program not build yet.");
+        }
+        if (!this._attributes) {
+            this._attributes = new Map<string, number>();
+            const numAttrs = GLDevice.gl.getProgramParameter(this.glProgram, GLDevice.gl.ACTIVE_ATTRIBUTES);
+            for(let i = 0; i < numAttrs; i++) {
+                const info = GLDevice.gl.getActiveAttrib(this.glProgram, i);
+                if (info) {
+                    const name = info.name;
+                    this._attributes.set(name, GLDevice.gl.getAttribLocation(this.glProgram, name));
+                }
+            }
+        }
+        return this._attributes;
+    }
 
     private compile(code: string, type: GLenum): WebGLShader | null {
         const shader = GLDevice.gl.createShader(type);
