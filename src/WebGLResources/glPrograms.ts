@@ -1,4 +1,5 @@
 import { ShaderProgram } from "./shaderProgram.js";
+import { GLDevice } from "./glDevice.js";
 
 /**
  * GL program manager and helper
@@ -18,4 +19,12 @@ export class GLPrograms {
         throw new Error("Not implemented.");
     }
 
+    public static useProgram(program: ShaderProgram) {
+        if (!program.glProgram) {
+            program.build();
+        }
+        if (program.glProgram) {
+            GLDevice.gl.useProgram(program.glProgram);
+        }
+    }
 }
