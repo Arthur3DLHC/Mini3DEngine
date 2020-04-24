@@ -12,8 +12,9 @@ export class Material {
         this.forceDepthPrepass = false;
 
         // fix me: 材质的 ubo，用动态还是用静态？
-        // 使用同一个 shader 的材质，是共用同一个动态 ubo，在每次绘制时将参数拷贝进去，
-        // 还是每个材质实例创建一个静态 ubo，在每次绘制时绑定？
+        // A: 是所有材质共用同一个动态 ubo，在每次绘制时将参数拷贝进去，
+        // B: 还是每个材质实例创建一个静态 ubo，在每次绘制时绑定？
+        // 似乎 Babylon.js 中使用的是 B 方案；在切换材质前判断一下是否和现有的材质是同一个材质；
         this._uniformBuffer = new UniformBuffer();
     }
     public name: string;

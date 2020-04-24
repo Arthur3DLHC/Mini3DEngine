@@ -37,4 +37,6 @@ export class GLTextures {
 
         return internalFormat;
     }
+
+    // TODO: 设置绘制使用的纹理
 }
