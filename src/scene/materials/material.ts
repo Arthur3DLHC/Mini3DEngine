@@ -12,6 +12,8 @@ export class Material {
         this.forceDepthPrepass = false;
 
         // fix me: 材质的 ubo，用动态还是用静态？
+        // 使用同一个 shader 的材质，是共用同一个动态 ubo，在每次绘制时将参数拷贝进去，
+        // 还是每个材质实例创建一个静态 ubo，在每次绘制时绑定？
         this._uniformBuffer = new UniformBuffer();
     }
     public name: string;
