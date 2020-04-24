@@ -51,6 +51,7 @@ export class GLPrograms {
 
     public static useProgram(program: ShaderProgram) {
         if (!program.glProgram) {
+            // program 的代码应该在加载时就已经处理好
             program.build();
         }
         if (program.glProgram) {

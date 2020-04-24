@@ -45,4 +45,4 @@ Shader 和材质系统架构设计
 材质
     主要是用于记录 RenderState 和 Shader 的 Uniforms
     加载 shader 时自动反射 uniforms 并赋予默认值；
-        TODO: 调查 uniforms buffer 怎么使用；
+    每材质的 uniform buffer object 放在哪？

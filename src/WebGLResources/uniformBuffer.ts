@@ -3,6 +3,10 @@ import { BufferSegment } from "./bufferSegment.js";
 import { GLDevice } from "./glDevice.js";
 
 export class UniformBuffer {
+    /**
+     * 构造函数
+     * @param dynamic 是否是动态 uniformbuffer。默认值 true
+     */
     public constructor(dynamic: boolean = true) {
         this._data = [];
         this._bufferData = null;
