@@ -1,0 +1,117 @@
+Shader 和材质系统架构设计
+    Vertex Shader
+        预置uniforms：
+            matWorld, matView, matProj
+            time；可能分为几个不同用途的？
+        可以将自定义的计算函数嵌入到顶点的下列处理阶段中：Local, View, Projection
+        或者可以提供一些系统默认的变量和函数，放在不同的shader文件中，供自定义shader引用；
+        可以自定义顶点输出 output
+    Fragment Shader
+        预置uniforms:
+            time
+            列表：
+                总光源列表
+                    光源类型、位置、方向、范围、颜色、Shadowmap图块位置；
+                总Decal列表
+                    Decal的变换矩阵、图块位置
+                总Cubemap列表
+                    位置、CubemapArray索引
+                总Irradiance volume列表
+                    变换矩阵、纹理列表索引
+            Fix me: 上述列表是传入整个场景的，还是当前视野范围内的？
+
+            Shadowmap图集纹理
+            Decal图集纹理
+            Cubemap Array纹理
+            Irradiance volume纹理列表
+
+            Cluster-光源列表、Decal、Cubemap array、Irraniance volume索引？
+
+        默认Shader:
+            预定义的uniforms和真实感光影着色算法；
+            支持次表面反射；
+        表面属性Shader:
+            计算表面属性；
+            自己定义输入uniforms；
+            可以自定义顶点输入 input
+            无需访问各种列表，光照通过表面属性自动计算；和默认Shader算法一致；
+        自定义Shader:
+            自己定义输入uniforms；
+            可以自定义顶点输入 input
+            可以调用各种系统提供的函数
+            可以访问各种列表，自己计算最终着色输出颜色；
+    Shader 调试
+        如果Shader编译失败，在控制台输出编译log；
+材质
+    主要是用于记录 RenderState 和 Shader 的 Uniforms
+    加载 shader 时自动反射 uniforms 并赋予默认值；
+    每材质的 uniform buffer object 放在哪？
+
+Uniform buffer objects
+每场景：
+uniform Lights {
+    // 光源类型，光源属性的结构列表；注意怎样对齐；
+} u_lights;
+uniform Decals {
+    // 每个decal的矩阵和纹理在图集中的位置
+} u_decals;
+uniform EnvProbes {
+    // 每个envmap的位置，影响范围和纹理在texture array中的起始索引；（每个cubmap用6张纹理）
+} u_envProbes;
+uniform IrradianceVolumes {
+    // 每个irradianceVolume的变换矩阵和在volume texture图集中的三维box位置
+} u_irrVolumes;
+放在渲染器对象中；场景加载完成时创建并绑定一次，将场景中所有光源、Decal、envProbe和irradiance volume的属性数据拷入
+Fix me: 如果动态的光源的位置变化了怎么办？用 bufferSubData 的方式更新？
+可以考虑数组中将静态光源放在一起，动态光源放在一起
+
+uniform 
+每帧:
+uniform Frame {
+    float time;
+} u_frame;
+放在渲染器对象中；初始化时绑定一次；每帧更新数据；
+
+每View:     u_view
+uniform View {
+    mat4 matView;
+    mat4 matViewPrev;
+    mat4 matProj;
+    mat4 matProjPrev;
+    vec3 position;
+    vec4 viewport;      // x, y, width, height
+    vec2 zRange;        // near, far
+} u_view;
+
+uniform ItemIndices {         // 本视图内所有可见的光源、decal、envProbe和irradiance volume在u_Lights,u_decals,u_envProbes和u_irrVolume中的索引，按照每个cluster划分
+    uint indices[MAX_NUM_ITEMS];     // 一个int数组，其中按每个cluster顺序保存了其中所有光源索引，decal索引，envProbe索引，irradiance volume索引
+} u_itemIndices;
+
+uniform Clusters {       // 用于记录每个cluster对应到各索引列表中的位置
+    // 每个cluster中的
+    //  光源索引起始位置，数量
+    //  decal索引起始位置，数量
+    //  envprobe索引起始位置，数量
+    //  irradiance volume索引起始位置，数量
+    ivec2 lightIdxStartCount[NUM_CLUSTERS];
+    ivec2 decalIdxStartCount[NUM_CLUSTERS];
+    ivec2 envProbeIdxStartCount[NUM_CLUSTERS];
+    ivec2 irrVolIdxStartCount[NUM_CLUSTERS];
+    // 或者把每个cluster的四种封成一个结构体？使用一个结构体数组？
+} u_clusters;
+
+放在渲染器对象中；初始化时绑定一次；遍历每摄像机时更新数据；
+
+每物体：
+uniform Object {
+    mat4 matWorld;
+    mat4 matPrevWorld;
+    vec4 color;
+    float id;           // 用于鼠标拾取？
+} u_object;
+uniform ObjectSkin {
+    mat4x3 matBones[MAX_NUM_BONES];
+    mat4x3 matPrevBones[MAX_NUM_BONES];
+} u_objectSkin
+渲染器对象中；初始化时绑定一次，遍历每物体时设置；
+每材质：     u_material    材质对象中
