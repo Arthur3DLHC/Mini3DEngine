@@ -65,7 +65,6 @@ uniform IrradianceVolumes {
 Fix me: 如果动态的光源的位置变化了怎么办？用 bufferSubData 的方式更新？
 可以考虑数组中将静态光源放在一起，动态光源放在一起
 
-uniform 
 每帧:
 uniform Frame {
     float time;
@@ -109,9 +108,29 @@ uniform Object {
     vec4 color;
     float id;           // 用于鼠标拾取？
 } u_object;
+
 uniform ObjectSkin {
     mat4x3 matBones[MAX_NUM_BONES];
     mat4x3 matPrevBones[MAX_NUM_BONES];
 } u_objectSkin
-渲染器对象中；初始化时绑定一次，遍历每物体时设置；
-每材质：     u_material    材质对象中
+放在渲染器对象中；初始化时绑定一次，遍历每物体时更新；
+
+每材质：
+uniform Material {
+    // 各种不同的材质的 shader，其中的布局不同
+    // 这里列举的是基本 PBR 材质的uniforms
+    vec4 baseColor;
+    vec4 emissive;
+    float metallic;
+    float roughness;
+    float colorMapAmount;
+    float metallicMapAmount;
+    float roughnessMapAmount;
+    float normalMapAmount;
+    float occlusionMapAmount;
+    float emissiveMapAmount;
+    // 注意: sampler 不能放在uniform block里
+    vec3 subsurfaceColor;
+    float subsurface;
+} u_material    
+放在材质对象中；创建材质时绑定一次，更新一次数据；尽量使用静态 Buffer？
