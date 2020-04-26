@@ -102,7 +102,7 @@ export class ClusteredForwardRenderer {
         this._ubEnvProbes.addUniform("probes", MAX_ENVPROBES * 4);
         this._ubIrrVolumes.addUniform("volumes", MAX_IRRVOLUMES * 20);
 
-        
+        // todo: per frame, per view, per obj, per mtl
     }
 
     private dispatchObjects(scene: Scene) {
