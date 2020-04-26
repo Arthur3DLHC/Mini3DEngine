@@ -13,6 +13,8 @@ import { CullState } from "../WebGLResources/renderStates/cullState.js";
 import { DepthStencilState } from "../WebGLResources/renderStates/depthStencilState.js";
 import { FrameBuffer } from "../WebGLResources/frameBuffer.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
+import { UniformBuffer } from "../WebGLResources/uniformBuffer.js";
+import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
 
 export class ClusteredForwardRenderer {
     public constructor() {
@@ -22,6 +24,19 @@ export class ClusteredForwardRenderer {
         this._renderListSprites = new RenderList();
         this._tmpRenderList = new RenderList();
         this._renderContext = new RenderContext();
+
+        this._ubScene = new UniformBuffer();
+        this._ubFrame = new UniformBuffer();
+        this._ubView = new UniformBuffer();
+        this._ubObject = new UniformBuffer();
+        this._ubMaterialPBR = new UniformBuffer();
+
+        // todo: bind to binding points?
+        // or just add block name and binding point to glUniformBuffers?
+
+        // todo: import default shader code strings and create shader objects
+        this._stdPBRProgram = new ShaderProgram();
+        this._colorProgram = new ShaderProgram();
     }
 
     public render(scene: Scene) {
@@ -38,6 +53,18 @@ export class ClusteredForwardRenderer {
     private _tmpRenderList: RenderList;
 
     private _renderContext: RenderContext;
+
+    // uniform buffers
+    private _ubScene: UniformBuffer;
+    private _ubFrame: UniformBuffer;
+    private _ubView: UniformBuffer;
+    private _ubObject: UniformBuffer;
+    private _ubMaterialPBR: UniformBuffer;
+    
+    // default shader programs
+    private _stdPBRProgram: ShaderProgram;
+    private _colorProgram: ShaderProgram;
+    // todo: other programs: depth prepass, shadowmap, occlusion query...
 
     private dispatchObjects(scene: Scene) {
         this._renderListDepthPrepass.clear();
