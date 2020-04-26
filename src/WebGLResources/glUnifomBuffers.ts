@@ -4,7 +4,7 @@ import { ShaderProgram } from "./shaderProgram.js";
 
 export class GLUniformBuffers {
     // TODO: 给 shaderProgram 中的 uniformBlock 分配绑定索引的方法
-    private static _uniformBlockNames: {[key:string]: number} = {};
+    public static uniformBlockNames: {[key:string]: number} = {};
 
     /**
      * 
@@ -12,17 +12,23 @@ export class GLUniformBuffers {
      * @param unifomBlockName 
      */
     public static bindUniformBuffer(buffer: UniformBuffer | null, unifomBlockName: string) {
-        GLDevice.gl.bindBufferBase(GLDevice.gl.UNIFORM_BUFFER, GLUniformBuffers._uniformBlockNames[unifomBlockName], buffer);
+        if (!GLUniformBuffers.uniformBlockNames[unifomBlockName]) {
+            throw new Error("Uniform block binding point not assigned: " + unifomBlockName);
+        }
+        GLDevice.gl.bindBufferBase(GLDevice.gl.UNIFORM_BUFFER, GLUniformBuffers.uniformBlockNames[unifomBlockName], buffer);
     }
 
-    public static bindUniformBlock(program: ShaderProgram, blockName: string, index: number) {
+    public static bindUniformBlock(program: ShaderProgram, blockName: string) {
+        if (!GLUniformBuffers.uniformBlockNames[blockName]) {
+            throw new Error("Uniform block binding point not assigned: " + blockName);
+        }
         if (!program.glProgram) {
             program.build();
         }
         if (program.glProgram) {
             const location = GLDevice.gl.getUniformBlockIndex(program.glProgram, blockName);
-            GLDevice.gl.uniformBlockBinding(program.glProgram, location, index);
-            GLUniformBuffers._uniformBlockNames[blockName] = index;
+            GLDevice.gl.uniformBlockBinding(program.glProgram, location, GLUniformBuffers.uniformBlockNames[blockName]);
+            // GLUniformBuffers._uniformBlockNames[blockName] = index;
         }
     }
 }

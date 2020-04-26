@@ -15,6 +15,7 @@ import { FrameBuffer } from "../WebGLResources/frameBuffer.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { UniformBuffer } from "../WebGLResources/uniformBuffer.js";
 import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
+import { GLUniformBuffers } from "../WebGLResources/glUnifomBuffers.js";
 
 export class ClusteredForwardRenderer {
     public constructor() {
@@ -25,14 +26,29 @@ export class ClusteredForwardRenderer {
         this._tmpRenderList = new RenderList();
         this._renderContext = new RenderContext();
 
-        this._ubScene = new UniformBuffer();
+        this._ubLights = new UniformBuffer();
+        this._ubDecals = new UniformBuffer();
+        this._ubEnvProbes = new UniformBuffer();
+        this._ubIrrVolumes = new UniformBuffer();
         this._ubFrame = new UniformBuffer();
         this._ubView = new UniformBuffer();
+        this._ubItemIndices = new UniformBuffer();
+        this._ubClusters = new UniformBuffer();
         this._ubObject = new UniformBuffer();
         this._ubMaterialPBR = new UniformBuffer();
 
         // todo: bind to binding points?
         // or just add block name and binding point to glUniformBuffers?
+        GLUniformBuffers.uniformBlockNames["Lights"] = 0;
+        GLUniformBuffers.uniformBlockNames["Decals"] = 1;
+        GLUniformBuffers.uniformBlockNames["EnvProbes"] = 2;
+        GLUniformBuffers.uniformBlockNames["IrrVolumes"] = 3
+        GLUniformBuffers.uniformBlockNames["Frame"] = 4;
+        GLUniformBuffers.uniformBlockNames["View"] = 5;
+        GLUniformBuffers.uniformBlockNames["ItemIndices"] = 6;
+        GLUniformBuffers.uniformBlockNames["Clusters"] = 7;
+        GLUniformBuffers.uniformBlockNames["Object"] = 8;
+        GLUniformBuffers.uniformBlockNames["Material"] = 9;
 
         // todo: import default shader code strings and create shader objects
         this._stdPBRProgram = new ShaderProgram();
@@ -55,9 +71,14 @@ export class ClusteredForwardRenderer {
     private _renderContext: RenderContext;
 
     // uniform buffers
-    private _ubScene: UniformBuffer;
+    private _ubLights: UniformBuffer;
+    private _ubDecals: UniformBuffer;
+    private _ubEnvProbes: UniformBuffer;
+    private _ubIrrVolumes: UniformBuffer;
     private _ubFrame: UniformBuffer;
     private _ubView: UniformBuffer;
+    private _ubItemIndices: UniformBuffer;
+    private _ubClusters: UniformBuffer;
     private _ubObject: UniformBuffer;
     private _ubMaterialPBR: UniformBuffer;
     
