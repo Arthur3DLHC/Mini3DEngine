@@ -1,4 +1,5 @@
 import { GLDevice } from "./glDevice.js";
+import { Texture } from "./textures/texture.js";
 
 export class GLTextures {
     /**
@@ -39,4 +40,7 @@ export class GLTextures {
     }
 
     // TODO: 设置绘制使用的纹理
+    public static setTextureAt(unit: number, texture: Texture | null) {
+        
+    }
 }

@@ -8,6 +8,8 @@ export default /** glsl */`
         // 这里列举的是基本 PBR 材质的uniforms
         vec4 baseColor;
         vec4 emissive;
+        vec3 subsurfaceColor;
+        float subsurface;
         float metallic;
         float roughness;
         float colorMapAmount;
@@ -17,7 +19,6 @@ export default /** glsl */`
         float occlusionMapAmount;
         float emissiveMapAmount;
         // 注意: sampler 不能放在uniform block里
-        vec3 subsurfaceColor;
-        float subsurface;
+
     } u_material;
 `;
