@@ -134,3 +134,4 @@ uniform Material {
     float subsurface;
 } u_material    
 放在材质对象中；创建材质时绑定一次，更新一次数据；尽量使用静态 Buffer？
+每帧绘制时需要重新和 program 里的 uniform block 绑定到同一个index？
