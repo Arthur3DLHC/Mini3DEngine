@@ -41,7 +41,7 @@ TODO:       主要类结构
                 Uniform buffer对象封装
                 Uniform buffer 定义：每帧，每View，每物体，每材质
                 Uniform buffer 对象放在哪？shaderProgram 对象里？材质对象里？渲染器对象里？
-
+                Uniform buffer 绑定
                 Vertex Attribute 解析
                 Shader 代码结构
                     预置函数，预置变量定义和实现；
@@ -56,7 +56,7 @@ TODO:       主要类结构
                 Box，Sphere，用于测试绘制；
                 遍历图元列表，绘制
                     光源等非网格对象的 providePrimitive 也得调用，绘制调试图形；
-                    Fustum culling; Occlusion query?
+                    Fustum culling; 
                     设置顶点Attribute pointer
                     * 如何在 depth prepass 时使用特殊的 shader？
                         不修改使用的shader；如果关闭了 color write，且 shader 中不使用 discard，则不会执行 shader，opengl 底层会使用一个默认的简单 shader 绘制
@@ -64,6 +64,11 @@ TODO:       主要类结构
                         或者单独写一个带镂空纹理的 depth prepass shader，遇到有 alphaclip = true 的 PBR 材质，则使用这个 shader;
                             PBR 材质的贴图参数统一命名；材质中不带 shader, 使用统一的PBR 标准 shader 绘制；
                             自定义材质的某些贴图参数名称是否也要求统一命名？例如 opacity texture
+                    Occlusion query?
+                        在RenderItem上加一个是否需要Occlustion query的标志
+                        将需要Occlusion query 的RenderItem 挑出来单放一个列表里
+                        每帧先绘制不需要 quary 的（例如墙壁、地板、屋顶等），再绘制 query 的（房间中的细节物体）RenderItem 的包围盒
+                        本帧 query，下帧才能拿结果，所以每帧都是根据上一帧包围盒的 query 结果绘制细节物体；
                 当对象从场景移除时，释放显存资源；
                     加一个显式的 destory 接口？
 
@@ -91,7 +96,6 @@ TODO:       主要类结构
                 如何处理带有镂空纹理的材质
                     * 也按照和 depth prepass 类似的方法处理
                 cube shadow map for point light;
-
 
             SSAO，屏幕空间反射；subsurface scattering
 
