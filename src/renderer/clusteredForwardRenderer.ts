@@ -37,6 +37,9 @@ export class ClusteredForwardRenderer {
         this._ubObject = new UniformBuffer();
         this._ubMaterialPBR = new UniformBuffer();
 
+        // todo: define uniform buffer layouts
+        this.setUniformBufferLayouts();
+
         // todo: bind to binding points?
         // or just add block name and binding point to glUniformBuffers?
         GLUniformBuffers.uniformBlockNames["Lights"] = 0;
@@ -86,6 +89,21 @@ export class ClusteredForwardRenderer {
     private _stdPBRProgram: ShaderProgram;
     private _colorProgram: ShaderProgram;
     // todo: other programs: depth prepass, shadowmap, occlusion query...
+
+    private setUniformBufferLayouts() {
+        const MAX_LIGHTS = 512;
+        const MAX_DECALS = 1024;
+        const MAX_ENVPROBES = 1024;
+        const MAX_IRRVOLUMES = 1024;
+        // TODO: 带结构和数组的 uniform buffer 怎么初始化和更新值？
+        // 数组长度 * 对齐后的结构浮点数个数
+        this._ubLights.addUniform("lights", MAX_LIGHTS * 24);
+        this._ubDecals.addUniform("decals", MAX_DECALS * 16);
+        this._ubEnvProbes.addUniform("probes", MAX_ENVPROBES * 4);
+        this._ubIrrVolumes.addUniform("volumes", MAX_IRRVOLUMES * 20);
+
+        
+    }
 
     private dispatchObjects(scene: Scene) {
         this._renderListDepthPrepass.clear();

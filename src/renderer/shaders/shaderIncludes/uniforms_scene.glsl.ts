@@ -14,6 +14,7 @@ export default /** glsl */`
         float radius;       // point/dir/spot
         float angle;        // spot
         float penumbra;     // spot
+        float unused;       // alignment
         vec4 shadowMapRect; // dir/spot
     };
     layout (std140) uniform Lights
@@ -42,8 +43,8 @@ export default /** glsl */`
 
     struct IrradianceVolume {
         mat4x3 transform;
-        vec3 boxMin;         // irradiance volume 三维图集中的盒子最小角
-        vec3 boxMax;         // irradiance volume 三维图集中的盒子最小角
+        vec4 boxMin;         // irradiance volume 三维图集中的盒子最小角
+        vec4 boxMax;         // irradiance volume 三维图集中的盒子最小角
     };
     layout (std140) uniform IrrVolumes
     {

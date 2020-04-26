@@ -15,7 +15,15 @@ export class GLUniformBuffers {
         if (!GLUniformBuffers.uniformBlockNames[unifomBlockName]) {
             throw new Error("Uniform block binding point not assigned: " + unifomBlockName);
         }
-        GLDevice.gl.bindBufferBase(GLDevice.gl.UNIFORM_BUFFER, GLUniformBuffers.uniformBlockNames[unifomBlockName], buffer);
+
+        if (buffer) {
+            if (!buffer.glBuffer) {
+                buffer.build();
+            }
+            GLDevice.gl.bindBufferBase(GLDevice.gl.UNIFORM_BUFFER, GLUniformBuffers.uniformBlockNames[unifomBlockName], buffer.glBuffer);
+        } else {
+            GLDevice.gl.bindBufferBase(GLDevice.gl.UNIFORM_BUFFER, GLUniformBuffers.uniformBlockNames[unifomBlockName], null);
+        }
     }
 
     public static bindUniformBlock(program: ShaderProgram, blockName: string) {
