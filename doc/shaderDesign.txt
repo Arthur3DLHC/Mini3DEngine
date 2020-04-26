@@ -43,9 +43,13 @@ Shader 和材质系统架构设计
     Shader 调试
         如果Shader编译失败，在控制台输出编译log；
 材质
-    主要是用于记录 RenderState 和 Shader 的 Uniforms
-    加载 shader 时自动反射 uniforms 并赋予默认值；
-    每材质的 uniform buffer object 放在哪？
+    主要是用于记录 RenderState 和 Shader 的 UBO
+    如果是默认 PBR 材质，其中没有 shader，使用统一的默认pbr shader
+        该统一 shader 的 uniform blocks 由渲染器负责指定binding point；
+        在使用材质时，向统一的 PBR 参数 UBO 中更新数据即可
+    如果是自定义 shader 材质，其中有 shader 的弱引用，由 program cache维护programs，
+        加载 shader 时绑定其中的所有 uniform block 到 binding point
+        在使用材质时，需要绑定当前 UBO 为材质中记录的 UBO？
 
 Uniform buffer objects
 每场景：
@@ -135,3 +139,4 @@ uniform Material {
 } u_material    
 放在材质对象中；创建材质时绑定一次，更新一次数据；尽量使用静态 Buffer？
 每帧绘制时需要重新和 program 里的 uniform block 绑定到同一个index？
+还是说 uniform block 在材质创建时绑定一次就行了，会记录在glprogram对象里？
