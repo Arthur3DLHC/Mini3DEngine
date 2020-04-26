@@ -42,6 +42,7 @@ TODO:       主要类结构
                 Uniform buffer 定义：每帧，每View，每物体，每材质
                 Uniform buffer 对象放在哪？shaderProgram 对象里？材质对象里？渲染器对象里？
                 Uniform buffer 绑定
+                渲染器中定义uniform buffer布局
                 Vertex Attribute 解析
                 Shader 代码结构
                     预置函数，预置变量定义和实现；
