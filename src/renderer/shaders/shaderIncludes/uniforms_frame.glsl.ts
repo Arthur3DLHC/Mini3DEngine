@@ -1,5 +1,5 @@
 /**
- * todo: define uniform buffer layout
+ * uniform block per frame
  */
 export default /** glsl */`
     layout (std140) uniform Frame

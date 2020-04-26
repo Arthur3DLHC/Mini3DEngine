@@ -22,6 +22,7 @@ export class GLUniformBuffers {
         if (program.glProgram) {
             const location = GLDevice.gl.getUniformBlockIndex(program.glProgram, blockName);
             GLDevice.gl.uniformBlockBinding(program.glProgram, location, index);
+            GLUniformBuffers._uniformBlockNames[blockName] = index;
         }
     }
 }
