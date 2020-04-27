@@ -13,12 +13,16 @@ import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
 import { GLUniformBuffers } from "../WebGLResources/glUnifomBuffers.js";
 import { mat4, vec4, vec3, vec2 } from "gl-matrix";
 import { GLPrograms } from "../WebGLResources/glPrograms.js";
-// shader codes
+// shader includes
 import uniforms_frame from "./shaders/shaderIncludes/uniforms_frame.glsl.js"
 import uniforms_mtl_pbr from "./shaders/shaderIncludes/uniforms_mtl_pbr.glsl.js"
 import uniforms_object from "./shaders/shaderIncludes/uniforms_object.glsl.js"
 import uniforms_scene from "./shaders/shaderIncludes/uniforms_scene.glsl.js"
 import uniforms_view from "./shaders/shaderIncludes/uniforms_view.glsl.js"
+import function_transforms from "./shaders/shaderIncludes/function_transforms.glsl.js"
+import output_pbr from "./shaders/shaderIncludes/output_pbr.glsl.js"
+import output_final from "./shaders/shaderIncludes/output_final.glsl.js"
+// shader codes
 import single_color_vs from "./shaders/single_color_vs.glsl.js"
 import single_color_fs from "./shaders/single_color_fs.glsl.js"
 import default_pbr_vs from "./shaders/default_pbr_vs.glsl.js"
@@ -169,6 +173,9 @@ export class ClusteredForwardRenderer {
         GLPrograms.shaderCodes["uniforms_object"] = uniforms_object;
         GLPrograms.shaderCodes["uniforms_scene"] = uniforms_scene;
         GLPrograms.shaderCodes["uniforms_view"] = uniforms_view;
+        GLPrograms.shaderCodes["function_transforms"] = function_transforms;
+        GLPrograms.shaderCodes["output_pbr"] = output_pbr;
+        GLPrograms.shaderCodes["output_final"] = output_final;
 
         // shaders
         GLPrograms.shaderCodes["single_color_vs"] = single_color_vs;

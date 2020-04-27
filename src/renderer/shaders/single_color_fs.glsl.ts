@@ -2,11 +2,12 @@
  * todo: implement default single color shader
  */
 export default /** glsl */`
-#include <uniforms_perframe.vs>
-#include <uniforms_percamera.vs>
-// todo: funcitons?
-// todo: lights, decals, envmaps...
-// todo: cluster indices
-// todo: vertex input
-// todo: fragment output
+#include <output_final>
+in vec4 ex_color;
+void main(void)
+{
+    FinalOutput o = defaultFinalOutput();
+    o.color = ex_color;
+    outputFinal(o);
+}
 `;
