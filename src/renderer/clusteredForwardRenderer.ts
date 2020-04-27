@@ -8,15 +8,21 @@ import { Mesh } from "../scene/mesh.js";
 import { Decal } from "../scene/decal.js";
 import { IrradianceVolume } from "../scene/irradianceVolume.js";
 import { EnvironmentProbe } from "../scene/environmentProbe.js";
-import { BlendState } from "../WebGLResources/renderStates/blendState.js";
-import { CullState } from "../WebGLResources/renderStates/cullState.js";
-import { DepthStencilState } from "../WebGLResources/renderStates/depthStencilState.js";
-import { FrameBuffer } from "../WebGLResources/frameBuffer.js";
-import { GLDevice } from "../WebGLResources/glDevice.js";
 import { UniformBuffer } from "../WebGLResources/uniformBuffer.js";
 import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
 import { GLUniformBuffers } from "../WebGLResources/glUnifomBuffers.js";
 import { mat4, vec4, vec3, vec2 } from "gl-matrix";
+import { GLPrograms } from "../WebGLResources/glPrograms.js";
+// shader codes
+import uniforms_frame from "./shaders/shaderIncludes/uniforms_frame.glsl.js"
+import uniforms_mtl_pbr from "./shaders/shaderIncludes/uniforms_mtl_pbr.fs.js"
+import uniforms_object from "./shaders/shaderIncludes/uniforms_object.glsl.js"
+import uniforms_scene from "./shaders/shaderIncludes/uniforms_scene.glsl.js"
+import uniforms_view from "./shaders/shaderIncludes/uniforms_view.glsl.js"
+import single_color_vs from "./shaders/single_color.vs.js"
+import single_color_fs from "./shaders/single_color.fs.js"
+import default_pbr_vs from "./shaders/default_pbr.vs.js"
+import default_pbr_fs from "./shaders/default_pbr.fs.js"
 
 export class ClusteredForwardRenderer {
     public constructor() {
@@ -43,20 +49,26 @@ export class ClusteredForwardRenderer {
 
         // todo: bind to binding points?
         // or just add block name and binding point to glUniformBuffers?
+        this.setUniformBlockBindingPoints();
+
+        this.registerShaderCodes();
+
+        // todo: import default shader code strings and create shader objects
+        this._stdPBRProgram = new ShaderProgram();
+        this._colorProgram = new ShaderProgram();
+    }
+
+    private setUniformBlockBindingPoints() {
         GLUniformBuffers.uniformBlockNames["Lights"] = 0;
         GLUniformBuffers.uniformBlockNames["Decals"] = 1;
         GLUniformBuffers.uniformBlockNames["EnvProbes"] = 2;
-        GLUniformBuffers.uniformBlockNames["IrrVolumes"] = 3
+        GLUniformBuffers.uniformBlockNames["IrrVolumes"] = 3;
         GLUniformBuffers.uniformBlockNames["Frame"] = 4;
         GLUniformBuffers.uniformBlockNames["View"] = 5;
         GLUniformBuffers.uniformBlockNames["ItemIndices"] = 6;
         GLUniformBuffers.uniformBlockNames["Clusters"] = 7;
         GLUniformBuffers.uniformBlockNames["Object"] = 8;
         GLUniformBuffers.uniformBlockNames["Material"] = 9;
-
-        // todo: import default shader code strings and create shader objects
-        this._stdPBRProgram = new ShaderProgram();
-        this._colorProgram = new ShaderProgram();
     }
 
     public render(scene: Scene) {
@@ -148,6 +160,18 @@ export class ClusteredForwardRenderer {
         this._ubMaterialPBR.addFloat("normalMapAmount", 0);
         this._ubMaterialPBR.addFloat("occlusionMapAmount", 0);
         this._ubMaterialPBR.addFloat("emissiveMapAmount", 0);
+    }
+
+    private registerShaderCodes() {
+        GLPrograms.shaderCodes["uniforms_frame"] = uniforms_frame;
+        GLPrograms.shaderCodes["uniforms_mtl_pbr"] = uniforms_mtl_pbr;
+        GLPrograms.shaderCodes["uniforms_object"] = uniforms_object;
+        GLPrograms.shaderCodes["uniforms_scene"] = uniforms_scene;
+        GLPrograms.shaderCodes["uniforms_view"] = uniforms_view;
+        GLPrograms.shaderCodes["single_color_vs"] = single_color_vs;
+        GLPrograms.shaderCodes["single_color_fs"] = single_color_fs;
+        GLPrograms.shaderCodes["default_pbr_vs"] = default_pbr_vs;
+        GLPrograms.shaderCodes["default_pbr_fs"] = default_pbr_fs;
     }
 
     private dispatchObjects(scene: Scene) {

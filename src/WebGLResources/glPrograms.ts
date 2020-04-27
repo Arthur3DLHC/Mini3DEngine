@@ -16,7 +16,7 @@ export class GLPrograms {
      * 在 shader 代码中 #include 其他文件时，需要使用该文件的Key，形式如下：
      * #include <shader代码key>
      */
-    public static shaderCodes: Map<string, string> = new Map<string, string>();
+    public static shaderCodes: {[key:string]: string} = {};
 
     private static includePattern = /^[ \t]*#include +<([\w\d./]+)>/gm;
 
@@ -41,7 +41,7 @@ export class GLPrograms {
         // 或者不允许重复引用？在被引用代码段里不能再加 #include
 
         return code.replace(GLPrograms.includePattern, (match: string, shaderKey: string): string => {
-            let code = GLPrograms.shaderCodes.get(shaderKey);
+            let code = GLPrograms.shaderCodes[shaderKey];
             if (!code) {
                 throw new Error("Can not resolve #include <" + shaderKey + ">");
             }

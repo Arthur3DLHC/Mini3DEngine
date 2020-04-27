@@ -24,7 +24,7 @@ export class ShaderProgram {
         }
 
         if (this.glProgram) {
-            throw new Error("Already built.");
+            throw new Error("Already built. call release first.");
         }
 
         // Fix me: 在哪预处理shader代码？替换 #include 等
@@ -49,6 +49,9 @@ export class ShaderProgram {
                 throw linkLog;
             }
         }
+        // clean up
+        GLDevice.gl.deleteShader(vs);
+        GLDevice.gl.deleteShader(fs);
     }
 
     public release() {
@@ -56,6 +59,7 @@ export class ShaderProgram {
             GLDevice.gl.deleteProgram(this.glProgram);
             this.glProgram = null;
         }
+        this._attributes = null;
     }
 
     public get attributes(): Map<string, number> {
