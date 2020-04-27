@@ -1,5 +1,5 @@
 /**
- * todo: implement default single color shader
+ * a simplest shader output single color for object
  */
 export default /** glsl */`
 #include <output_final>

@@ -1,5 +1,5 @@
 /**
- * todo: define common pbr outputs
+ * common transform functions
  */
 export default /** glsl */`
     vec4 localToWorld(vec4 vLocal)

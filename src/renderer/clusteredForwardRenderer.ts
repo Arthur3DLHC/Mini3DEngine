@@ -20,6 +20,8 @@ import uniforms_object from "./shaders/shaderIncludes/uniforms_object.glsl.js"
 import uniforms_scene from "./shaders/shaderIncludes/uniforms_scene.glsl.js"
 import uniforms_view from "./shaders/shaderIncludes/uniforms_view.glsl.js"
 import function_transforms from "./shaders/shaderIncludes/function_transforms.glsl.js"
+import function_lights from "./shaders/shaderIncludes/function_lights.glsl.js"
+import function_shading_pbr from "./shaders/shaderIncludes/function_shading_pbr.glsl.js"
 import output_pbr from "./shaders/shaderIncludes/output_pbr.glsl.js"
 import output_final from "./shaders/shaderIncludes/output_final.glsl.js"
 // shader codes
@@ -59,7 +61,10 @@ export class ClusteredForwardRenderer {
 
         // todo: import default shader code strings and create shader objects
         this._stdPBRProgram = new ShaderProgram();
+        
         this._colorProgram = new ShaderProgram();
+        this._colorProgram.vertexShaderCode = GLPrograms.shaderCodes["single_color_vs"];
+        this._colorProgram.fragmentShaderCode = GLPrograms.shaderCodes["single_color_fs"];
     }
 
     private setUniformBlockBindingPoints() {
@@ -174,6 +179,8 @@ export class ClusteredForwardRenderer {
         GLPrograms.shaderCodes["uniforms_scene"] = uniforms_scene;
         GLPrograms.shaderCodes["uniforms_view"] = uniforms_view;
         GLPrograms.shaderCodes["function_transforms"] = function_transforms;
+        GLPrograms.shaderCodes["function_lights"] = function_lights;
+        GLPrograms.shaderCodes["function_shading_pbr"] = function_shading_pbr;
         GLPrograms.shaderCodes["output_pbr"] = output_pbr;
         GLPrograms.shaderCodes["output_final"] = output_final;
 
