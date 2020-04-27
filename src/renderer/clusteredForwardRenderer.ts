@@ -15,14 +15,14 @@ import { mat4, vec4, vec3, vec2 } from "gl-matrix";
 import { GLPrograms } from "../WebGLResources/glPrograms.js";
 // shader codes
 import uniforms_frame from "./shaders/shaderIncludes/uniforms_frame.glsl.js"
-import uniforms_mtl_pbr from "./shaders/shaderIncludes/uniforms_mtl_pbr.fs.js"
+import uniforms_mtl_pbr from "./shaders/shaderIncludes/uniforms_mtl_pbr.glsl.js"
 import uniforms_object from "./shaders/shaderIncludes/uniforms_object.glsl.js"
 import uniforms_scene from "./shaders/shaderIncludes/uniforms_scene.glsl.js"
 import uniforms_view from "./shaders/shaderIncludes/uniforms_view.glsl.js"
-import single_color_vs from "./shaders/single_color.vs.js"
-import single_color_fs from "./shaders/single_color.fs.js"
-import default_pbr_vs from "./shaders/default_pbr.vs.js"
-import default_pbr_fs from "./shaders/default_pbr.fs.js"
+import single_color_vs from "./shaders/single_color_vs.glsl.js"
+import single_color_fs from "./shaders/single_color_fs.glsl.js"
+import default_pbr_vs from "./shaders/default_pbr_vs.glsl.js"
+import default_pbr_fs from "./shaders/default_pbr_fs.glsl.js"
 
 export class ClusteredForwardRenderer {
     public constructor() {

@@ -48,6 +48,7 @@ TODO:       主要类结构
                     预置函数，预置变量定义和实现；
                 Shader 是否也用缓存？或者为了简单起见，不用缓存了？
                 渲染器中加载各种shader；
+                    Shader文件和代码段key的命名规则
                     实现 单色 shader, depth prepass shader, 标准 PBR Shader
                 Fix me: Fog 是在材质 Shader 中实现，还是用后期特效实现？
                     不透明物体，可用后期特效
