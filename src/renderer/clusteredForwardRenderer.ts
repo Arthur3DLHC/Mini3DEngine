@@ -163,11 +163,14 @@ export class ClusteredForwardRenderer {
     }
 
     private registerShaderCodes() {
+        // shader includes
         GLPrograms.shaderCodes["uniforms_frame"] = uniforms_frame;
         GLPrograms.shaderCodes["uniforms_mtl_pbr"] = uniforms_mtl_pbr;
         GLPrograms.shaderCodes["uniforms_object"] = uniforms_object;
         GLPrograms.shaderCodes["uniforms_scene"] = uniforms_scene;
         GLPrograms.shaderCodes["uniforms_view"] = uniforms_view;
+
+        // shaders
         GLPrograms.shaderCodes["single_color_vs"] = single_color_vs;
         GLPrograms.shaderCodes["single_color_fs"] = single_color_fs;
         GLPrograms.shaderCodes["default_pbr_vs"] = default_pbr_vs;
