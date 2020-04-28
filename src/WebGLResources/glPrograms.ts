@@ -20,6 +20,8 @@ export class GLPrograms {
 
     private static includePattern = /^[ \t]*#include +<([\w\d./]+)>/gm;
 
+    private static _currProgram: ShaderProgram|null = null;
+
     public static processSourceCode(code: string): string {
         // #include
         let result = GLPrograms.resolveInclude(code);
@@ -57,12 +59,15 @@ export class GLPrograms {
     }
 
     public static useProgram(program: ShaderProgram) {
-        if (!program.glProgram) {
-            // program 的代码应该在加载时就已经处理好
-            program.build();
-        }
-        if (program.glProgram) {
-            GLDevice.gl.useProgram(program.glProgram);
+        if (GLPrograms._currProgram !== program) {
+            if (!program.glProgram) {
+                // program 的代码应该在加载时就已经处理好
+                program.build();
+            }
+            if (program.glProgram) {
+                GLDevice.gl.useProgram(program.glProgram);
+            }
+            GLPrograms._currProgram = program;
         }
     }
 }

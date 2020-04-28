@@ -1,18 +1,3 @@
-import { Scene } from "../scene/scene.js";
-import { RenderList } from "./renderList.js";
-import { RenderContext } from "./renderContext.js";
-import { Object3D } from "../scene/object3D.js";
-import { Camera } from "../scene/cameras/camera.js";
-import { BaseLight } from "../scene/lights/baseLight.js";
-import { Mesh } from "../scene/mesh.js";
-import { Decal } from "../scene/decal.js";
-import { IrradianceVolume } from "../scene/irradianceVolume.js";
-import { EnvironmentProbe } from "../scene/environmentProbe.js";
-import { UniformBuffer } from "../WebGLResources/uniformBuffer.js";
-import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
-import { GLUniformBuffers } from "../WebGLResources/glUnifomBuffers.js";
-import { mat4, vec4, vec3, vec2 } from "gl-matrix";
-import { GLPrograms } from "../WebGLResources/glPrograms.js";
 // shader includes
 import uniforms_frame from "./shaders/shaderIncludes/uniforms_frame.glsl.js"
 import uniforms_mtl_pbr from "./shaders/shaderIncludes/uniforms_mtl_pbr.glsl.js"
@@ -29,12 +14,30 @@ import single_color_vs from "./shaders/single_color_vs.glsl.js"
 import single_color_fs from "./shaders/single_color_fs.glsl.js"
 import default_pbr_vs from "./shaders/default_pbr_vs.glsl.js"
 import default_pbr_fs from "./shaders/default_pbr_fs.glsl.js"
-import { BlendState } from "../WebGLResources/renderStates/blendState.js";
-import { CullState } from "../WebGLResources/renderStates/cullState.js";
-import { DepthStencilState } from "../WebGLResources/renderStates/depthStencilState.js";
+// modules
+import { Scene } from "../scene/scene.js";
+import { RenderList } from "./renderList.js";
+import { RenderContext } from "./renderContext.js";
+import { Object3D } from "../scene/object3D.js";
+import { Camera } from "../scene/cameras/camera.js";
+import { BaseLight } from "../scene/lights/baseLight.js";
+import { Mesh } from "../scene/mesh.js";
+import { Decal } from "../scene/decal.js";
+import { IrradianceVolume } from "../scene/irradianceVolume.js";
+import { EnvironmentProbe } from "../scene/environmentProbe.js";
+import { UniformBuffer } from "../WebGLResources/uniformBuffer.js";
+import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
+import { GLUniformBuffers } from "../WebGLResources/glUnifomBuffers.js";
+import { mat4, vec4, vec3, vec2 } from "gl-matrix";
+import { GLPrograms } from "../WebGLResources/glPrograms.js";
 import { RenderStateSet } from "./renderStateSet.js";
 import { RenderStateCache } from "../WebGLResources/renderStateCache.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
+import { RenderItem } from "./renderItem.js"
+import { Material } from "../scene/materials/material.js"
+import { GLRenderStates } from "../WebGLResources/glRenderStates.js"
+import { StandardPBRMaterial } from "../scene/materials/standardPBRMaterial.js"
+import { ShaderMaterial } from "../scene/materials/shaderMaterial.js"
 
 export class ClusteredForwardRenderer {
 
@@ -47,6 +50,7 @@ export class ClusteredForwardRenderer {
         this._renderListSprites = new RenderList();
         this._tmpRenderList = new RenderList();
         this._renderContext = new RenderContext();
+        this._currentScene = null;
 
         this._renderStatesDepthPrepass = new RenderStateSet();
         this._renderStatesOpaque = new RenderStateSet();
@@ -84,18 +88,38 @@ export class ClusteredForwardRenderer {
         this._colorProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_vs"]);
         this._colorProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_fs"]);
         this._colorProgram.build();
+
+        this._depthPrepassProgram = new ShaderProgram();
+
+        this._occlusionQueryProgram = new ShaderProgram();
     }
     
     public render(scene: Scene) {
         this.dispatchObjects(scene);
 
+        // todo: if scene changed, setup uniform buffers for scene.
+        if (this._currentScene !== scene) {
+            this.fillUniformBuffersPerScene();
+            this._currentScene = scene;
+        }
+
+        // todo: setup uniform buffers per frame, view;
+        this.fillUniformBuffersPerFrame();
+
+        // todo: iterate every camera
+        for (let icam = 0; icam < this._renderContext.cameras.length; icam++) {
+            const camera = this._renderContext.cameras[icam];
+            // fix me: occlusion query 需要区分相机？
+            this.fillUniformBuffersPerView(camera);
+            this.getOcclusionQueryResults();
+            this.renderDepthPrepass();
+            this.renderOpaque();
+            this.renderTransparent();
+        }
         // todo: walk through renderlists and render items in them.
         // todo: sort the renderlists first?
-        this.getOcclusionQueryResults();
-        this.renderDepthPrepass();
-        this.renderOpaque();
-        this.renderTransparent()
     }
+
 
     private setUniformBlockBindingPoints() {
         GLUniformBuffers.uniformBlockNames["Lights"] = 0;
@@ -141,6 +165,7 @@ export class ClusteredForwardRenderer {
     private _tmpRenderList: RenderList;
 
     private _renderContext: RenderContext;
+    private _currentScene: Scene|null;
 
     private _renderStatesDepthPrepass: RenderStateSet;
     private _renderStatesOpaque: RenderStateSet;
@@ -166,6 +191,8 @@ export class ClusteredForwardRenderer {
     // or put them into render phases?
     private _stdPBRProgram: ShaderProgram;
     private _colorProgram: ShaderProgram;
+    private _depthPrepassProgram: ShaderProgram;
+    private _occlusionQueryProgram: ShaderProgram;
     // todo: other programs: depth prepass, shadowmap, occlusion query...
 
     private setUniformBufferLayouts() {
@@ -250,7 +277,9 @@ export class ClusteredForwardRenderer {
     private dispatchObjects(scene: Scene) {
         this._renderListDepthPrepass.clear();
         this._renderListOpaque.clear();
+        this._renderListOpaqueOcclusionQuery.clear();
         this._renderListTransparent.clear();
+        this._renderListTransparentOcclusionQuery.clear();
         this._renderListSprites.clear();
         this._renderContext.clear();
 
@@ -318,25 +347,95 @@ export class ClusteredForwardRenderer {
             }
         }
     }
+    
+    private fillUniformBuffersPerFrame() {
+        throw new Error("Method not implemented.")
+    }
+    
+    private fillUniformBuffersPerScene() {
+        throw new Error("Method not implemented.")
+    }
+
+    private fillUniformBuffersPerView(camera: Camera) {
+        throw new Error("Method not implemented.")
+    }
+
+    private fillUniformBuffersPerMaterial(material: Material | null) {
+        // if pbr material, fill pbr uniform buffer
+        throw new Error("Method not implemented.")
+    }
+    private fillUniformBuffersPerObject(item: RenderItem | null) {
+        // todo: check only update when current object is not item.object
+        throw new Error("Method not implemented.")
+    }
 
     private getOcclusionQueryResults() {
-        // occlusion query objects, get last frame query results;
-        throw new Error("Method not implemented.");
+        // todo: iterate occlusion query objects, get last frame query results by their occlusionID;
+        // fix me: query id need to map to camera.
+        // throw new Error("Method not implemented.");
     }
-    private renderTransparent() {
-        // non occlusion query objects
-        // occlusion query objects, query for next frame;
-        // occlusion query objects, render according to last frame query result
+    private renderDepthPrepass() {
+        if (this._renderListDepthPrepass.ItemCount <= 0) {
+            return;
+        }
+        // set render state
+        this._renderStatesDepthPrepass.apply();
+        // use program
+        GLPrograms.useProgram(this._depthPrepassProgram);
+        this.renderItems(this._renderListDepthPrepass, true);
         throw new Error("Method not implemented.");
     }
     private renderOpaque() {
         // non occlusion query objects
+        if (this._renderListOpaque.ItemCount > 0) {
+            this._renderStatesOpaque.apply();
+            this.renderItems(this._renderListOpaque, false);
+        }
+
         // occlusion query objects, query for next frame;
-        // occlusion query objects, render according to last frame query result
-        // 
+        if (this._renderListOpaqueOcclusionQuery.ItemCount > 0) {
+            this._renderStatesOpaqueOcclusion.apply();
+            GLPrograms.useProgram(this._occlusionQueryProgram);
+            // todo: need to render bounding boxes, not geometry
+            this.renderItemBoundingBoxes(this._renderListOpaqueOcclusionQuery);
+
+            // occlusion query objects, render according to last frame query result
+            this._renderStatesOpaque.apply();
+            // only draw occlustion test passed objects
+        }
         throw new Error("Method not implemented.");
     }
-    private renderDepthPrepass() {
+    private renderTransparent() {
+        // non occlusion query objects
+        this._renderStatesTransparent.apply();
+        // occlusion query objects, query for next frame;
+        this._renderStatesTransparentOcclusion.apply();
+        // occlusion query objects, render according to last frame query result
+        this._renderStatesTransparent.apply();
+        throw new Error("Method not implemented.");
+    }
+    private renderItems(renderList: RenderList, ignoreMaterial: boolean = false) {
+        for (let i = 0; i < renderList.ItemCount; i++) {
+            const item = renderList.getItemAt(i);
+            if (item) {
+                this.fillUniformBuffersPerObject(item);
+                if (!ignoreMaterial) {
+                    this.fillUniformBuffersPerMaterial(item.material);
+                    // todo: set material render states?
+                    // todo: use program of ShaderMaterial?
+                    if (item.material instanceof StandardPBRMaterial) {
+                        GLPrograms.useProgram(this._stdPBRProgram);
+                    } else if (item.material instanceof ShaderMaterial) {
+                        if (item.material.program) {
+                            GLPrograms.useProgram(item.material.program);
+                        }
+                    }
+                }
+                // todo: draw item geometry
+            }
+        }
+    }
+    private renderItemBoundingBoxes(renderList: RenderList) {
         throw new Error("Method not implemented.");
     }
 }

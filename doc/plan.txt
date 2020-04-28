@@ -92,6 +92,12 @@ TODO:       主要类结构
             GLTFLoader
                 先直接引用 minimal gltf loader?
                 读取mesh, material, texture
+                File Cache
+                Geometry Cache
+                    所有从 gltf 文件加载的 geometry，统一用文件名 + 网格名生成一个key，放在 cache 中；多个 mesh 共享之；
+                        注意这种 geometry 要标一下 incache，在对象 release 时避免释放它；由cache统一释放；
+                Texture cache
+                    用纹理文件 url 作为 key
                 读取light, decal, envprobe, irradiance volume;
 
             生成 Shadowmap 阴影
