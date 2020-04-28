@@ -14,6 +14,7 @@ export class Object3D {
         this.worldTransform = mat4.create();
         this.castShadow = false;
         this.receiveShadow = false;
+        this.occlusionQuery = false;
     }
 
     // todo: need an id?
@@ -35,6 +36,9 @@ export class Object3D {
 
     public castShadow: boolean;
     public receiveShadow: boolean;
+
+    // todo: occlusion query? need bounding box?
+    public occlusionQuery: boolean;
 
     public parent: Object3D | null;
     

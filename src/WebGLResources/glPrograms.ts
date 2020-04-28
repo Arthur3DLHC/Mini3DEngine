@@ -25,6 +25,13 @@ export class GLPrograms {
         let result = GLPrograms.resolveInclude(code);
         
         // 其他还需要那些预处理？
+        // version and precision
+        const header = `
+        #version 300 es
+        precision highp float;
+        precision highp int;
+        `;
+        result = header + result;
         return result;
     }
 

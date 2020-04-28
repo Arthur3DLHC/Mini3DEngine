@@ -34,7 +34,9 @@ export class ClusteredForwardRenderer {
     public constructor() {
         this._renderListDepthPrepass = new RenderList();
         this._renderListOpaque = new RenderList();
+        this._renderListOpaqueOcclusionQuery = new RenderList();
         this._renderListTransparent = new RenderList();
+        this._renderListTransparentOcclusionQuery = new RenderList();
         this._renderListSprites = new RenderList();
         this._tmpRenderList = new RenderList();
         this._renderContext = new RenderContext();
@@ -63,8 +65,9 @@ export class ClusteredForwardRenderer {
         this._stdPBRProgram = new ShaderProgram();
         
         this._colorProgram = new ShaderProgram();
-        this._colorProgram.vertexShaderCode = GLPrograms.shaderCodes["single_color_vs"];
-        this._colorProgram.fragmentShaderCode = GLPrograms.shaderCodes["single_color_fs"];
+        this._colorProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_vs"]);
+        this._colorProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_fs"]);
+        this._colorProgram.build();
     }
 
     private setUniformBlockBindingPoints() {
@@ -89,11 +92,15 @@ export class ClusteredForwardRenderer {
 
     private _renderListDepthPrepass: RenderList;
     private _renderListOpaque: RenderList;
+    private _renderListOpaqueOcclusionQuery: RenderList;
     private _renderListTransparent: RenderList;
+    private _renderListTransparentOcclusionQuery: RenderList;
     private _renderListSprites: RenderList;
     private _tmpRenderList: RenderList;
 
     private _renderContext: RenderContext;
+
+    // todo: a unit box geometry for draw bounding boxes; used by occlusion query pass
 
     // uniform buffers
     private _ubLights: UniformBuffer;
@@ -231,13 +238,22 @@ export class ClusteredForwardRenderer {
                     if (item.material) {
                         if (item.material.blendState) {
                             if (item.material.blendState.enable) {
-                                this._renderListTransparent.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
+                                if (item.object.occlusionQuery) {
+                                    this._renderListTransparentOcclusionQuery.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
+                                } else {
+                                    this._renderListTransparent.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
+                                }
                                 if (item.material.forceDepthPrepass) {
                                     this._renderListDepthPrepass.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
                                 }
                             } else {
-                                this._renderListOpaque.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
-                                this._renderListDepthPrepass.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
+                                if (item.object.occlusionQuery) {
+                                    // 如果开了 occlusion query，就不绘制 depth prepass 了？
+                                    this._renderListOpaqueOcclusionQuery.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
+                                } else {
+                                    this._renderListOpaque.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
+                                    this._renderListDepthPrepass.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
+                                }
 
                             }
                         }
