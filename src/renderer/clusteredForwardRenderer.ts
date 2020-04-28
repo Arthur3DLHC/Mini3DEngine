@@ -85,6 +85,17 @@ export class ClusteredForwardRenderer {
         this._colorProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_fs"]);
         this._colorProgram.build();
     }
+    
+    public render(scene: Scene) {
+        this.dispatchObjects(scene);
+
+        // todo: walk through renderlists and render items in them.
+        // todo: sort the renderlists first?
+        this.getOcclusionQueryResults();
+        this.renderDepthPrepass();
+        this.renderOpaque();
+        this.renderTransparent()
+    }
 
     private setUniformBlockBindingPoints() {
         GLUniformBuffers.uniformBlockNames["Lights"] = 0;
@@ -98,7 +109,8 @@ export class ClusteredForwardRenderer {
         GLUniformBuffers.uniformBlockNames["Object"] = 8;
         GLUniformBuffers.uniformBlockNames["Material"] = 9;
     }
-    createRenderStates() {
+
+    private createRenderStates() {
         this._renderPhaseDepthPrepass.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.LEQUAL);
         this._renderPhaseDepthPrepass.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
         this._renderPhaseDepthPrepass.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
@@ -118,37 +130,6 @@ export class ClusteredForwardRenderer {
         this._renderPhaseTransparentOcclusion.depthState = RenderStateCache.instance.getDepthStencilState(true, false, GLDevice.gl.LESS);
         this._renderPhaseTransparentOcclusion.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
         this._renderPhaseTransparentOcclusion.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
-    }
-
-    public render(scene: Scene) {
-        this.dispatchObjects(scene);
-
-        // todo: walk through renderlists and render items in them.
-        // todo: sort the renderlists first?
-        this.getOcclusionQueryResults();
-        this.renderDepthPrepass();
-        this.renderOpaque();
-        this.renderTransparent()
-    }
-    getOcclusionQueryResults() {
-        // occlusion query objects, get last frame query results;
-        throw new Error("Method not implemented.");
-    }
-    renderTransparent() {
-        // non occlusion query objects
-        // occlusion query objects, query for next frame;
-        // occlusion query objects, render according to last frame query result
-        throw new Error("Method not implemented.");
-    }
-    renderOpaque() {
-        // non occlusion query objects
-        // occlusion query objects, query for next frame;
-        // occlusion query objects, render according to last frame query result
-        // 
-        throw new Error("Method not implemented.");
-    }
-    renderDepthPrepass() {
-        throw new Error("Method not implemented.");
     }
 
     private _renderListDepthPrepass: RenderList;
@@ -338,4 +319,24 @@ export class ClusteredForwardRenderer {
         }
     }
 
+    private getOcclusionQueryResults() {
+        // occlusion query objects, get last frame query results;
+        throw new Error("Method not implemented.");
+    }
+    private renderTransparent() {
+        // non occlusion query objects
+        // occlusion query objects, query for next frame;
+        // occlusion query objects, render according to last frame query result
+        throw new Error("Method not implemented.");
+    }
+    private renderOpaque() {
+        // non occlusion query objects
+        // occlusion query objects, query for next frame;
+        // occlusion query objects, render according to last frame query result
+        // 
+        throw new Error("Method not implemented.");
+    }
+    private renderDepthPrepass() {
+        throw new Error("Method not implemented.");
+    }
 }
