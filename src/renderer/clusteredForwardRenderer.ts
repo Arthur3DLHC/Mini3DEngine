@@ -106,6 +106,11 @@ export class ClusteredForwardRenderer {
         // todo: setup uniform buffers per frame, view;
         this.fillUniformBuffersPerFrame();
 
+        // todo: generate light shadowmaps;
+        // if light is static, use static shadow or there are no moving dynamic objects in range,
+        // use shadow map of last frame;
+        // render to texture atlas; if scene changed, need to repack texture atlas.
+
         // todo: iterate every camera
         for (let icam = 0; icam < this._renderContext.cameras.length; icam++) {
             const camera = this._renderContext.cameras[icam];
@@ -138,22 +143,27 @@ export class ClusteredForwardRenderer {
         this._renderStatesDepthPrepass.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.LEQUAL);
         this._renderStatesDepthPrepass.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
         this._renderStatesDepthPrepass.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+        this._renderStatesDepthPrepass.colorWriteState = RenderStateCache.instance.getColorWriteState(false, false, false, false);
 
         this._renderStatesOpaque.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.EQUAL);
         this._renderStatesOpaque.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
         this._renderStatesOpaque.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+        this._renderStatesOpaque.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
 
         this._renderStatesOpaqueOcclusion.depthState = RenderStateCache.instance.getDepthStencilState(true, false, GLDevice.gl.LESS);
         this._renderStatesOpaqueOcclusion.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
         this._renderStatesOpaqueOcclusion.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+        this._renderStatesOpaqueOcclusion.colorWriteState = RenderStateCache.instance.getColorWriteState(false, false, false, false);
 
         this._renderStatesTransparent.depthState = RenderStateCache.instance.getDepthStencilState(true, false, GLDevice.gl.LESS);
         this._renderStatesTransparent.blendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
         this._renderStatesTransparent.cullState = RenderStateCache.instance.getCullState(false, GLDevice.gl.BACK);
+        this._renderStatesTransparent.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
 
         this._renderStatesTransparentOcclusion.depthState = RenderStateCache.instance.getDepthStencilState(true, false, GLDevice.gl.LESS);
         this._renderStatesTransparentOcclusion.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
         this._renderStatesTransparentOcclusion.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+        this._renderStatesTransparentOcclusion.colorWriteState = RenderStateCache.instance.getColorWriteState(false, false, false, false);
     }
 
     private _renderListDepthPrepass: RenderList;
@@ -383,7 +393,6 @@ export class ClusteredForwardRenderer {
         // use program
         GLPrograms.useProgram(this._depthPrepassProgram);
         this.renderItems(this._renderListDepthPrepass, true);
-        throw new Error("Method not implemented.");
     }
     private renderOpaque() {
         // non occlusion query objects
@@ -395,29 +404,42 @@ export class ClusteredForwardRenderer {
         // occlusion query objects, query for next frame;
         if (this._renderListOpaqueOcclusionQuery.ItemCount > 0) {
             this._renderStatesOpaqueOcclusion.apply();
+            // todo: disable color write
             GLPrograms.useProgram(this._occlusionQueryProgram);
             // todo: need to render bounding boxes, not geometry
-            this.renderItemBoundingBoxes(this._renderListOpaqueOcclusionQuery);
+            this.renderItemBoundingBoxes(this._renderListOpaqueOcclusionQuery, true);
 
             // occlusion query objects, render according to last frame query result
             this._renderStatesOpaque.apply();
             // only draw occlustion test passed objects
+            this.renderItems(this._renderListOpaqueOcclusionQuery, false, true);
         }
-        throw new Error("Method not implemented.");
     }
     private renderTransparent() {
         // non occlusion query objects
-        this._renderStatesTransparent.apply();
+        if (this._renderListTransparent.ItemCount > 0) {
+            this._renderStatesTransparent.apply();
+            // 半透明物体和不透明物体使用的 Shader 是统一的！
+            this.renderItems(this._renderListTransparent);
+        }
+
         // occlusion query objects, query for next frame;
-        this._renderStatesTransparentOcclusion.apply();
-        // occlusion query objects, render according to last frame query result
-        this._renderStatesTransparent.apply();
-        throw new Error("Method not implemented.");
+        if (this._renderListTransparentOcclusionQuery.ItemCount > 0) {
+            this._renderStatesTransparentOcclusion.apply();
+            this.renderItemBoundingBoxes(this._renderListTransparentOcclusionQuery, true);
+
+            // occlusion query objects, render according to last frame query result
+            this._renderStatesTransparent.apply();
+            this.renderItems(this._renderListTransparentOcclusionQuery, false, true);
+        }
     }
-    private renderItems(renderList: RenderList, ignoreMaterial: boolean = false) {
+    private renderItems(renderList: RenderList, ignoreMaterial: boolean = false, checkOcclusionResults: boolean = false) {
         for (let i = 0; i < renderList.ItemCount; i++) {
             const item = renderList.getItemAt(i);
             if (item) {
+                if (checkOcclusionResults && !item.object.occlusionQueryResult) {
+                    continue;
+                }
                 this.fillUniformBuffersPerObject(item);
                 if (!ignoreMaterial) {
                     this.fillUniformBuffersPerMaterial(item.material);
@@ -434,8 +456,34 @@ export class ClusteredForwardRenderer {
                 // todo: draw item geometry
             }
         }
+        throw new Error("Method not implemented.");
     }
-    private renderItemBoundingBoxes(renderList: RenderList) {
+    private renderItemBoundingBoxes(renderList: RenderList, occlusionQuery: boolean = false) {
+        // render bounding boxes only, ignore all materials
+        // 是每个 object 一个 boundingbox，还是每个 renderitem 一个？
+        // 如果 occlusionQuery === true，需要检查对象是否有 queryID，如果没有就创建一个。
+        for (let i = 0; i < renderList.ItemCount; i++) {
+            const item = renderList.getItemAt(i);
+            if (item) {
+                if (occlusionQuery) {
+                    if (!item.object.occlusionQueryID) {
+                        item.object.occlusionQueryID = GLDevice.gl.createQuery();
+                    }
+                    if (item.object.occlusionQueryID) {
+                        GLDevice.gl.beginQuery(GLDevice.gl.ANY_SAMPLES_PASSED, item.object.occlusionQueryID);
+                    }
+                }
+                // todo: draw bounding box
+                // 是否应该在 object 上记录一个 occlusion query 帧号，如果本帧已经 query 过，就不用再 query 了
+                // 因为一个 object 可能会提供多个 renderItem
+                if (occlusionQuery) {
+                    if (item.object.occlusionQueryID) {
+                        GLDevice.gl.endQuery(GLDevice.gl.ANY_SAMPLES_PASSED);
+                    }
+                }
+            }
+        }
+
         throw new Error("Method not implemented.");
     }
 }

@@ -37,13 +37,13 @@ export class BlendState {
     }
     // todo: saparate alpa channel blend function?
 
-    public equals(other: BlendState):boolean {
-        return this.enable === other.enable
+    public equals(enable: boolean, equation: GLenum, srcFactor: GLenum, destFactor: GLenum):boolean {
+        return this.enable === enable
         // && this.alphaClip === other.alphaClip
         // && this.clipRef === other.clipRef
-        && this.equation === other.equation
-        && this.srcFactor === other.srcFactor
-        && this.destFactor === other.destFactor;
+        && this.equation === equation
+        && this.srcFactor === srcFactor
+        && this.destFactor === destFactor;
     }
 
     public apply() {

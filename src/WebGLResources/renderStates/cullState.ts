@@ -16,8 +16,8 @@ export class CullState {
         return this._mode;
     }
 
-    public equals(other: CullState): boolean {
-        return this.enable === other.enable && this.mode === other.mode;
+    public equals(enable: boolean, mode: GLenum): boolean {
+        return this.enable === enable && this.mode === mode;
     }
 
     public apply() {

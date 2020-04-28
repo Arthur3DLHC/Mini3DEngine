@@ -1,6 +1,7 @@
 import { mat4 } from "gl-matrix";
 import { RenderItem } from "../renderer/renderItem.js";
 import { RenderList } from "../renderer/renderList.js";
+import { GLDevice } from "../WebGLResources/glDevice.js";
 
 export class Object3D {
     // base class of all render objects
@@ -15,7 +16,7 @@ export class Object3D {
         this.castShadow = false;
         this.receiveShadow = false;
         this.occlusionQuery = false;
-        this.occlusionID = 0;
+        this.occlusionQueryID = null;
         this.occlusionQueryResult = true;
     }
 
@@ -41,7 +42,7 @@ export class Object3D {
 
     // todo: occlusion query? need bounding box?
     public occlusionQuery: boolean;
-    public occlusionID: number;
+    public occlusionQueryID: WebGLQuery|null;
     public occlusionQueryResult: boolean;
 
     public parent: Object3D | null;
@@ -145,5 +146,9 @@ export class Object3D {
 
     public destroy() {
         // subclass release WebGL resources.
+        if (this.occlusionQueryID) {
+            GLDevice.gl.deleteQuery(this.occlusionQueryID);
+            this.occlusionQueryID = null;
+        }
     }
 }
