@@ -15,6 +15,7 @@ export class Object3D {
         this.castShadow = false;
         this.receiveShadow = false;
         this.occlusionQuery = false;
+        this.occlusionID = 0;
     }
 
     // todo: need an id?
@@ -39,6 +40,7 @@ export class Object3D {
 
     // todo: occlusion query? need bounding box?
     public occlusionQuery: boolean;
+    public occlusionID: number;
 
     public parent: Object3D | null;
     

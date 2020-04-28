@@ -29,8 +29,15 @@ import single_color_vs from "./shaders/single_color_vs.glsl.js"
 import single_color_fs from "./shaders/single_color_fs.glsl.js"
 import default_pbr_vs from "./shaders/default_pbr_vs.glsl.js"
 import default_pbr_fs from "./shaders/default_pbr_fs.glsl.js"
+import { BlendState } from "../WebGLResources/renderStates/blendState.js";
+import { CullState } from "../WebGLResources/renderStates/cullState.js";
+import { DepthStencilState } from "../WebGLResources/renderStates/depthStencilState.js";
+import { RenderStateSet } from "./renderStateSet.js";
+import { RenderStateCache } from "../WebGLResources/renderStateCache.js";
+import { GLDevice } from "../WebGLResources/glDevice.js";
 
 export class ClusteredForwardRenderer {
+
     public constructor() {
         this._renderListDepthPrepass = new RenderList();
         this._renderListOpaque = new RenderList();
@@ -40,6 +47,15 @@ export class ClusteredForwardRenderer {
         this._renderListSprites = new RenderList();
         this._tmpRenderList = new RenderList();
         this._renderContext = new RenderContext();
+
+        this._renderPhaseDepthPrepass = new RenderStateSet();
+        this._renderPhaseOpaque = new RenderStateSet();
+        this._renderPhaseOpaqueOcclusion = new RenderStateSet();
+        this._renderPhaseTransparent = new RenderStateSet();
+        this._renderPhaseTransparentOcclusion = new RenderStateSet();
+
+        // todo: prepare default renderstates for every phase
+        this.createRenderStates();
 
         this._ubLights = new UniformBuffer();
         this._ubDecals = new UniformBuffer();
@@ -82,12 +98,57 @@ export class ClusteredForwardRenderer {
         GLUniformBuffers.uniformBlockNames["Object"] = 8;
         GLUniformBuffers.uniformBlockNames["Material"] = 9;
     }
+    createRenderStates() {
+        this._renderPhaseDepthPrepass.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.LEQUAL);
+        this._renderPhaseDepthPrepass.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+        this._renderPhaseDepthPrepass.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+
+        this._renderPhaseOpaque.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.EQUAL);
+        this._renderPhaseOpaque.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+        this._renderPhaseOpaque.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+
+        this._renderPhaseOpaqueOcclusion.depthState = RenderStateCache.instance.getDepthStencilState(true, false, GLDevice.gl.LESS);
+        this._renderPhaseOpaqueOcclusion.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+        this._renderPhaseOpaqueOcclusion.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+
+        this._renderPhaseTransparent.depthState = RenderStateCache.instance.getDepthStencilState(true, false, GLDevice.gl.LESS);
+        this._renderPhaseTransparent.blendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+        this._renderPhaseTransparent.cullState = RenderStateCache.instance.getCullState(false, GLDevice.gl.BACK);
+
+        this._renderPhaseTransparentOcclusion.depthState = RenderStateCache.instance.getDepthStencilState(true, false, GLDevice.gl.LESS);
+        this._renderPhaseTransparentOcclusion.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+        this._renderPhaseTransparentOcclusion.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+    }
 
     public render(scene: Scene) {
         this.dispatchObjects(scene);
 
         // todo: walk through renderlists and render items in them.
         // todo: sort the renderlists first?
+        this.getOcclusionQueryResults();
+        this.renderDepthPrepass();
+        this.renderOpaque();
+        this.renderTransparent()
+    }
+    getOcclusionQueryResults() {
+        // occlusion query objects, get last frame query results;
+        throw new Error("Method not implemented.");
+    }
+    renderTransparent() {
+        // non occlusion query objects
+        // occlusion query objects, query for next frame;
+        // occlusion query objects, render according to last frame query result
+        throw new Error("Method not implemented.");
+    }
+    renderOpaque() {
+        // non occlusion query objects
+        // occlusion query objects, query for next frame;
+        // occlusion query objects, render according to last frame query result
+        // 
+        throw new Error("Method not implemented.");
+    }
+    renderDepthPrepass() {
+        throw new Error("Method not implemented.");
     }
 
     private _renderListDepthPrepass: RenderList;
@@ -99,6 +160,12 @@ export class ClusteredForwardRenderer {
     private _tmpRenderList: RenderList;
 
     private _renderContext: RenderContext;
+
+    private _renderPhaseDepthPrepass: RenderStateSet;
+    private _renderPhaseOpaque: RenderStateSet;
+    private _renderPhaseOpaqueOcclusion: RenderStateSet;
+    private _renderPhaseTransparent: RenderStateSet;
+    private _renderPhaseTransparentOcclusion: RenderStateSet;
 
     // todo: a unit box geometry for draw bounding boxes; used by occlusion query pass
 
@@ -115,6 +182,7 @@ export class ClusteredForwardRenderer {
     private _ubMaterialPBR: UniformBuffer;
     
     // default shader programs
+    // or put them into render phases?
     private _stdPBRProgram: ShaderProgram;
     private _colorProgram: ShaderProgram;
     // todo: other programs: depth prepass, shadowmap, occlusion query...
