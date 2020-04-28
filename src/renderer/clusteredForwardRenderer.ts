@@ -48,11 +48,11 @@ export class ClusteredForwardRenderer {
         this._tmpRenderList = new RenderList();
         this._renderContext = new RenderContext();
 
-        this._renderPhaseDepthPrepass = new RenderStateSet();
-        this._renderPhaseOpaque = new RenderStateSet();
-        this._renderPhaseOpaqueOcclusion = new RenderStateSet();
-        this._renderPhaseTransparent = new RenderStateSet();
-        this._renderPhaseTransparentOcclusion = new RenderStateSet();
+        this._renderStatesDepthPrepass = new RenderStateSet();
+        this._renderStatesOpaque = new RenderStateSet();
+        this._renderStatesOpaqueOcclusion = new RenderStateSet();
+        this._renderStatesTransparent = new RenderStateSet();
+        this._renderStatesTransparentOcclusion = new RenderStateSet();
 
         // todo: prepare default renderstates for every phase
         this.createRenderStates();
@@ -111,25 +111,25 @@ export class ClusteredForwardRenderer {
     }
 
     private createRenderStates() {
-        this._renderPhaseDepthPrepass.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.LEQUAL);
-        this._renderPhaseDepthPrepass.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
-        this._renderPhaseDepthPrepass.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+        this._renderStatesDepthPrepass.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.LEQUAL);
+        this._renderStatesDepthPrepass.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+        this._renderStatesDepthPrepass.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
 
-        this._renderPhaseOpaque.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.EQUAL);
-        this._renderPhaseOpaque.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
-        this._renderPhaseOpaque.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+        this._renderStatesOpaque.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.EQUAL);
+        this._renderStatesOpaque.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+        this._renderStatesOpaque.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
 
-        this._renderPhaseOpaqueOcclusion.depthState = RenderStateCache.instance.getDepthStencilState(true, false, GLDevice.gl.LESS);
-        this._renderPhaseOpaqueOcclusion.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
-        this._renderPhaseOpaqueOcclusion.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+        this._renderStatesOpaqueOcclusion.depthState = RenderStateCache.instance.getDepthStencilState(true, false, GLDevice.gl.LESS);
+        this._renderStatesOpaqueOcclusion.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+        this._renderStatesOpaqueOcclusion.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
 
-        this._renderPhaseTransparent.depthState = RenderStateCache.instance.getDepthStencilState(true, false, GLDevice.gl.LESS);
-        this._renderPhaseTransparent.blendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
-        this._renderPhaseTransparent.cullState = RenderStateCache.instance.getCullState(false, GLDevice.gl.BACK);
+        this._renderStatesTransparent.depthState = RenderStateCache.instance.getDepthStencilState(true, false, GLDevice.gl.LESS);
+        this._renderStatesTransparent.blendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+        this._renderStatesTransparent.cullState = RenderStateCache.instance.getCullState(false, GLDevice.gl.BACK);
 
-        this._renderPhaseTransparentOcclusion.depthState = RenderStateCache.instance.getDepthStencilState(true, false, GLDevice.gl.LESS);
-        this._renderPhaseTransparentOcclusion.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
-        this._renderPhaseTransparentOcclusion.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+        this._renderStatesTransparentOcclusion.depthState = RenderStateCache.instance.getDepthStencilState(true, false, GLDevice.gl.LESS);
+        this._renderStatesTransparentOcclusion.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+        this._renderStatesTransparentOcclusion.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
     }
 
     private _renderListDepthPrepass: RenderList;
@@ -142,11 +142,11 @@ export class ClusteredForwardRenderer {
 
     private _renderContext: RenderContext;
 
-    private _renderPhaseDepthPrepass: RenderStateSet;
-    private _renderPhaseOpaque: RenderStateSet;
-    private _renderPhaseOpaqueOcclusion: RenderStateSet;
-    private _renderPhaseTransparent: RenderStateSet;
-    private _renderPhaseTransparentOcclusion: RenderStateSet;
+    private _renderStatesDepthPrepass: RenderStateSet;
+    private _renderStatesOpaque: RenderStateSet;
+    private _renderStatesOpaqueOcclusion: RenderStateSet;
+    private _renderStatesTransparent: RenderStateSet;
+    private _renderStatesTransparentOcclusion: RenderStateSet;
 
     // todo: a unit box geometry for draw bounding boxes; used by occlusion query pass
 
