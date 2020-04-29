@@ -16,7 +16,7 @@ export class RenderItem {
     // object, for getting transform matrix
     public object: Object3D;
 
-    // todo: define primitive type?
+    // todo: define primitive type? or define it in geometry?
 
     // geometry
     public geometry : BufferGeometry;

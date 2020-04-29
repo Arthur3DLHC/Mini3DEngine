@@ -112,18 +112,20 @@ export class ClusteredForwardRenderer {
         // use shadow map of last frame;
         // render to texture atlas; if scene changed, need to repack texture atlas.
 
-        // todo: iterate every camera
+        // for simplicity, use only one camera; or occlusion query can not work.
         for (let icam = 0; icam < this._renderContext.cameras.length; icam++) {
             const camera = this._renderContext.cameras[icam];
-            // fix me: occlusion query 需要区分相机？
             this.fillUniformBuffersPerView(camera);
             this.getOcclusionQueryResults();
+
+            // todo: sort the renderlists first?
+
             this.renderDepthPrepass();
             this.renderOpaque();
             this.renderTransparent();
+
+            // todo: render sprites
         }
-        // todo: walk through renderlists and render items in them.
-        // todo: sort the renderlists first?
     }
 
 
@@ -360,11 +362,11 @@ export class ClusteredForwardRenderer {
         }
     }
     
-    private fillUniformBuffersPerFrame() {
+    private fillUniformBuffersPerScene() {
         throw new Error("Method not implemented.")
     }
     
-    private fillUniformBuffersPerScene() {
+    private fillUniformBuffersPerFrame() {
         throw new Error("Method not implemented.")
     }
 
@@ -372,12 +374,13 @@ export class ClusteredForwardRenderer {
         throw new Error("Method not implemented.")
     }
 
-    private fillUniformBuffersPerMaterial(material: Material | null) {
-        // if pbr material, fill pbr uniform buffer
-        throw new Error("Method not implemented.")
-    }
     private fillUniformBuffersPerObject(item: RenderItem | null) {
         // todo: check only update when current object is not item.object
+        throw new Error("Method not implemented.")
+    }
+
+    private fillUniformBuffersPerMaterial(material: Material | null) {
+        // if pbr material, fill pbr uniform buffer
         throw new Error("Method not implemented.")
     }
 
@@ -461,6 +464,7 @@ export class ClusteredForwardRenderer {
                     }
                 }
                 // todo: draw item geometry
+                item.geometry.draw(item.startIndex, item.count);
                 // restore default renderstates for next item.
                 this._curDefaultRenderStates.apply();
             }
@@ -483,6 +487,8 @@ export class ClusteredForwardRenderer {
                     }
                 }
                 // todo: draw bounding box
+                // get local bouding box of object, then calculate the transform, fill it to the object world transform uniform.
+                
                 // 是否应该在 object 上记录一个 occlusion query 帧号，如果本帧已经 query 过，就不用再 query 了
                 // 因为一个 object 可能会提供多个 renderItem
                 if (occlusionQuery) {
