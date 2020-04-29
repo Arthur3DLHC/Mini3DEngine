@@ -10,29 +10,41 @@ import { EnvironmentProbe } from "../scene/environmentProbe.js";
 export class RenderContext {
     public constructor() {
         this.cameras = [];
-        this.lights = [];
-        this.decals = [];
+        this.staticLights = [];
+        this.staticDecals = [];
+        this.dynamicLights = [];
+        this.dynamicDecals = [];
         this.envProbes = [];
         this.irradianceVolumes = [];
 
         this.curCameraIndex = 0;
-        this.curLightIndex = 0;
-        this.curDecalIndex = 0;
+        this.curStaticLightIndex = 0;
+        this.curStaticDecalIndex = 0;
+        this.curDynamicLightIndex = 0;
+        this.curDynamicDecalIndex = 0;
         this.curEnvMapIndex = 0;
         this.curIrradianceVolumeIndex = 0;
     }
     public cameras: Camera[];
-    public lights: BaseLight[];
-    public decals: Decal[];
+    public staticLights: BaseLight[];
+    public staticDecals: Decal[];
+    public dynamicLights: BaseLight[];
+    public dynamicDecals: Decal[];
     public envProbes: EnvironmentProbe[];
     public irradianceVolumes: IrradianceVolume[];
 
-    public clear() {
+    public clear(statics: boolean, dynamics: boolean) {
         this.curCameraIndex = 0;
-        this.curLightIndex = 0;
-        this.curDecalIndex = 0;
-        this.curEnvMapIndex = 0;
-        this.curIrradianceVolumeIndex = 0;
+        if (statics) {
+            this.curStaticLightIndex = 0;
+            this.curStaticDecalIndex = 0;
+            this.curEnvMapIndex = 0;
+            this.curIrradianceVolumeIndex = 0;
+        }
+        if (dynamics) {
+            this.curDynamicLightIndex = 0;
+            this.curDynamicDecalIndex = 0;
+        }
     }
 
     public addCamera(camera: Camera) {
@@ -41,13 +53,23 @@ export class RenderContext {
     }
 
     public addLight(light: BaseLight) {
-        this.lights[this.curLightIndex] = light;
-        this.curLightIndex++;
+        if (light.isStatic) {
+            this.staticLights[this.curStaticLightIndex] = light;
+            this.curStaticLightIndex++;
+        } else {
+            this.dynamicLights[this.curDynamicLightIndex] = light;
+            this.curDynamicLightIndex++;     
+        }
     }
 
     public addDecal(decal: Decal) {
-        this.decals[this.curDecalIndex] = decal;
-        this.curDecalIndex++;
+        if (decal.isStatic) {
+            this.staticDecals[this.curStaticDecalIndex] = decal;
+            this.curStaticDecalIndex++;
+        } else {
+            this.dynamicDecals[this.curDynamicDecalIndex] = decal;
+            this.curDynamicDecalIndex++;
+        }
     }
 
     public addEnvironmentProbe(envProbe: EnvironmentProbe) {
@@ -61,8 +83,10 @@ export class RenderContext {
     }
 
     private curCameraIndex: number;
-    private curLightIndex: number;
-    private curDecalIndex: number;
+    private curDynamicLightIndex: number;
+    private curDynamicDecalIndex: number;
     private curEnvMapIndex: number;
     private curIrradianceVolumeIndex: number;
+    private curStaticLightIndex: number;
+    private curStaticDecalIndex: number;
 }

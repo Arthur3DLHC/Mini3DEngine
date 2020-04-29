@@ -129,10 +129,11 @@ export class ClusteredForwardRenderer {
     }
     
     public render(scene: Scene) {
-        this.dispatchObjects(scene);
 
         // if scene changed, setup uniform buffers for scene.
         if (this._currentScene !== scene) {
+            this.dispatchObjects(scene, true);
+
             this.fillUniformBuffersPerScene();
             this.bindTexturesPerScene();
             // todo: bind texture samplers
@@ -144,6 +145,8 @@ export class ClusteredForwardRenderer {
             // GLTextures.setTextureAt(0, )
             this._currentScene = scene;
         }
+
+        this.dispatchObjects(scene, false);
 
         // todo: setup uniform buffers per frame, view;
         this.fillUniformBuffersPerFrame();
@@ -345,34 +348,46 @@ export class ClusteredForwardRenderer {
         GLPrograms.shaderCodes["default_pbr_fs"] = default_pbr_fs;
     }
 
-    private dispatchObjects(scene: Scene) {
+    private dispatchObjects(scene: Scene, statics: boolean) {
         this._renderListDepthPrepass.clear();
         this._renderListOpaque.clear();
         this._renderListOpaqueOcclusionQuery.clear();
         this._renderListTransparent.clear();
         this._renderListTransparentOcclusionQuery.clear();
         this._renderListSprites.clear();
-        this._renderContext.clear();
+        this._renderContext.clear(statics, true);
 
-        this.dispatchObject(scene);
+        this.dispatchObject(scene, statics);
     }
 
-    private dispatchObject(object: Object3D) {
+    private dispatchObject(object: Object3D, statics: boolean) {
 
         // check visible
         if (object.visible) {
             if (object instanceof Camera) {
                 this._renderContext.addCamera(object as Camera);
             } else if (object instanceof BaseLight) {
-                this._renderContext.addLight(object as BaseLight);
+                const light = object as BaseLight;
+                if (light.isStatic === statics) {
+                    this._renderContext.addLight(light);
+                }
             } else if (object instanceof Mesh) {
                 // nothing to do yet.                
             } else if (object instanceof Decal) {
-                this._renderContext.addDecal(object as Decal);
+                const decal = object as Decal;
+                if (decal.isStatic === statics) {
+                    this._renderContext.addDecal(decal);
+                }
             } else if (object instanceof IrradianceVolume) {
-                this._renderContext.addIrradianceVolume(object as IrradianceVolume);
+                if (statics) {
+                    // irradiance volumes are always static
+                    this._renderContext.addIrradianceVolume(object as IrradianceVolume);
+                }
             } else if (object instanceof EnvironmentProbe) {
-                this._renderContext.addEnvironmentProbe(object as EnvironmentProbe);
+                if (statics) {
+                    // environment probes are always static
+                    this._renderContext.addEnvironmentProbe(object as EnvironmentProbe);
+                }
             }
             this._tmpRenderList.clear();
             // 光源等也可能提供 debug 或编辑时用的显示图元
@@ -414,7 +429,7 @@ export class ClusteredForwardRenderer {
         // iterate children
         for (const child of object.Children) {
             if (child !== null) {
-                this.dispatchObject(child);
+                this.dispatchObject(child, statics);
             }
         }
     }
@@ -427,6 +442,7 @@ export class ClusteredForwardRenderer {
         // 动态创建的光源和 Decal 怎么办？追加到静态列表的末尾？
         // 每帧只更新列表中动态的部分？
         // 动态创建的光源如何申请shadowmap？
+        //      将一张用于动态光源的shadowmap分为几个区域，分别用于不同分辨率的shadowmap？
         // all decals
         // all envprobes
         // all irradiance volumes

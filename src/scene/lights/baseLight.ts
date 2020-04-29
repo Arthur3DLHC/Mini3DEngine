@@ -9,6 +9,7 @@ export class BaseLight {
         this.color = vec4.fromValues(1,1,1,1);
         this.intensity = 1;
         this.shadow = null;
+        this.isStatic = false;
 
         this.debugDraw = false;
     }
@@ -23,6 +24,11 @@ export class BaseLight {
      * fix me: where to put the 'drop shadow' property? on object3D? or on material?
      */
     public shadow: LightShadow | null;
+
+    /**
+     * light do not move
+     */
+    public isStatic: boolean;
 
     public debugDraw: boolean;
 
