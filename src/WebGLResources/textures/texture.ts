@@ -23,6 +23,10 @@ export class Texture {
 
     public glTexture: WebGLTexture | null;
 
+    public get target(): GLenum {
+        return GLDevice.gl.TEXTURE_2D;
+    }
+
     public width: number;
     public height: number;
     public depth: number;

@@ -8,6 +8,10 @@ export class Texture2D extends Texture {
 
     }
 
+    public get target(): GLenum {
+        return GLDevice.gl.TEXTURE_2D;
+    }
+
     // todo: image source, culd be html image element
     // todo: 可以作为渲染目标；
     public create() {

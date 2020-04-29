@@ -1,5 +1,6 @@
 import { GLDevice } from "./glDevice.js";
 import { Texture } from "./textures/texture.js";
+import { Texture2D } from "./textures/texture2D.js";
 
 export class GLTextures {
     /**
@@ -48,8 +49,13 @@ export class GLTextures {
     }
 
     // TODO: 设置绘制使用的纹理
-    public static setTextureAt(unit: number, texture: Texture | null) {
+    public static setTextureAt(unit: number, texture: Texture | null, target: GLenum = GLDevice.gl.TEXTURE_2D) {
         GLDevice.gl.activeTexture(unit);
-        throw new Error("Not implemented");
+        if (texture) {
+            // todo: 2d or 3d or cube or array
+            GLDevice.gl.bindTexture(texture.target, texture.glTexture);
+        } else {
+            GLDevice.gl.bindTexture(target, null);
+        }
     }
 }

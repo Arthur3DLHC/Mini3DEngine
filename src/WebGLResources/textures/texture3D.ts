@@ -1,8 +1,13 @@
 import { Texture } from "./texture.js";
+import { GLDevice } from "../glDevice.js";
 
 export class Texture3D extends Texture {
     public constructor() {
         super();
+    }
+
+    public get target(): GLenum {
+        return GLDevice.gl.TEXTURE_3D;
     }
 
     // TODO: source，用一个长图的形式？
