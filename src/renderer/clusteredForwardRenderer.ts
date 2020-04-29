@@ -38,6 +38,7 @@ import { Material } from "../scene/materials/material.js"
 import { GLRenderStates } from "../WebGLResources/glRenderStates.js"
 import { StandardPBRMaterial } from "../scene/materials/standardPBRMaterial.js"
 import { ShaderMaterial } from "../scene/materials/shaderMaterial.js"
+import { GLTextures } from "../WebGLResources/glTextures.js"
 
 export class ClusteredForwardRenderer {
 
@@ -51,6 +52,7 @@ export class ClusteredForwardRenderer {
         this._tmpRenderList = new RenderList();
         this._renderContext = new RenderContext();
         this._currentScene = null;
+        this._currentObject = null;
 
         this._renderStatesDepthPrepass = new RenderStateSet();
         this._renderStatesOpaque = new RenderStateSet();
@@ -98,9 +100,16 @@ export class ClusteredForwardRenderer {
     public render(scene: Scene) {
         this.dispatchObjects(scene);
 
-        // todo: if scene changed, setup uniform buffers for scene.
+        // if scene changed, setup uniform buffers for scene.
         if (this._currentScene !== scene) {
             this.fillUniformBuffersPerScene();
+            // todo: bind texture samplers
+            // use some reserved texture units for system textures?
+            // shadowmap atlas;
+            // decal atlas;
+            // envProbes;
+            // irradiance volumes;
+            // GLTextures.setTextureAt(0, )
             this._currentScene = scene;
         }
 
@@ -179,6 +188,10 @@ export class ClusteredForwardRenderer {
 
     private _renderContext: RenderContext;
     private _currentScene: Scene|null;
+    /**
+     * current object rendering
+     */
+    private _currentObject: Object3D|null;
 
     private _renderStatesDepthPrepass: RenderStateSet;
     private _renderStatesOpaque: RenderStateSet;
@@ -363,6 +376,9 @@ export class ClusteredForwardRenderer {
     }
     
     private fillUniformBuffersPerScene() {
+        // todo: fill all lights
+        // all envprobes
+        // all 
         throw new Error("Method not implemented.")
     }
     
@@ -375,7 +391,11 @@ export class ClusteredForwardRenderer {
     }
 
     private fillUniformBuffersPerObject(item: RenderItem | null) {
-        // todo: check only update when current object is not item.object
+        // object world transform
+
+        // object skin transforms, if skinmesh
+
+        // object color
         throw new Error("Method not implemented.")
     }
 
@@ -432,6 +452,7 @@ export class ClusteredForwardRenderer {
         // occlusion query objects, query for next frame;
         if (this._renderListTransparentOcclusionQuery.ItemCount > 0) {
             this.setRenderStateSet(this._renderStatesTransparentOcclusion);
+            GLPrograms.useProgram(this._occlusionQueryProgram);
             this.renderItemBoundingBoxes(this._renderListTransparentOcclusionQuery, true);
 
             // occlusion query objects, render according to last frame query result
@@ -446,7 +467,9 @@ export class ClusteredForwardRenderer {
                 if (checkOcclusionResults && !item.object.occlusionQueryResult) {
                     continue;
                 }
-                this.fillUniformBuffersPerObject(item);
+                if (this._currentObject !== item.object) {
+                    this.fillUniformBuffersPerObject(item);
+                }
                 if (!ignoreMaterial && item.material) {
                     // todo: set material render states?
                     if(item.material.blendState)GLRenderStates.setBlendState(item.material.blendState);
@@ -463,13 +486,13 @@ export class ClusteredForwardRenderer {
                         }
                     }
                 }
-                // todo: draw item geometry
+                // draw item geometry
                 item.geometry.draw(item.startIndex, item.count);
                 // restore default renderstates for next item.
                 this._curDefaultRenderStates.apply();
+                this._currentObject = item.object;
             }
         }
-        throw new Error("Method not implemented.");
     }
     private renderItemBoundingBoxes(renderList: RenderList, occlusionQuery: boolean = false) {
         // render bounding boxes only, ignore all materials

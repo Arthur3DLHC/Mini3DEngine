@@ -41,6 +41,7 @@ export class GLTextures {
 
     // TODO: 设置绘制使用的纹理
     public static setTextureAt(unit: number, texture: Texture | null) {
-        
+        GLDevice.gl.activeTexture(unit);
+        throw new Error("Not implemented");
     }
 }

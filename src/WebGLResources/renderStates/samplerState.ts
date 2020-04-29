@@ -7,6 +7,7 @@ export class SamplerState {
         this.minFilter = minFilter;
         this.magFilter = magfilter;
         this.anisotropy = anisotropy;
+        this._glSampler = null;
     }
 
     public wrapS: GLenum;
@@ -14,4 +15,9 @@ export class SamplerState {
     public minFilter: GLenum;
     public magFilter: GLenum;
     public anisotropy: number;
+
+    /**
+     * we can create sampler state objects and bind them in WebGL 2.0
+     */
+    private _glSampler: WebGLSampler|null;
 }
