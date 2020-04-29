@@ -101,7 +101,14 @@ export class ClusteredForwardRenderer {
         this._envMapArrayUnit = GLDevice.gl.TEXTURE2;
         this._irradianceVolumeAtlasUnit = GLDevice.gl.TEXTURE3;
 
-        this._shadowmapAtlas = new TextureAtlas2D();
+        // todo: 静态shadowmap和动态shadowmap需要分开
+        // 在位置不变的光源中，对于场景中的静态部分，起始绘制一张静态shadowmap；
+        // 如果它设为可以给动态物体产生阴影，则单将动态物体绘制到另一张动态shadowmap中；
+        // 绘制对象时需要同时从这两张 shadowmap 中查询
+        // 能否用同一张纹理的两个通道呢？用 colorwritemask 实现分别绘制？
+        this._shadowmapAtlasStatic = new TextureAtlas2D();
+        this._shadowmapAtlasDynamic = new TextureAtlas2D();
+
         this._decalAtlas = new TextureAtlas2D();
         this._envMapArray = null;
         this._irradianceVolumeAtlas = new TextureAtlas3D();
@@ -245,7 +252,8 @@ export class ClusteredForwardRenderer {
     private _envMapArrayUnit: GLenum;
     private _irradianceVolumeAtlasUnit: GLenum;
 
-    private _shadowmapAtlas: TextureAtlas2D;
+    private _shadowmapAtlasStatic: TextureAtlas2D;
+    private _shadowmapAtlasDynamic: TextureAtlas2D;
     private _decalAtlas: TextureAtlas2D;
     private _envMapArray: Texture2DArray|null;
     private _irradianceVolumeAtlas: TextureAtlas3D;
@@ -414,6 +422,11 @@ export class ClusteredForwardRenderer {
     private fillUniformBuffersPerScene() {
         // todo: fill all lights in scene
         // fix me: 这时还没有dispatch objects
+        // 是否应该改为在切换场景时先将所有静态的光源等全部get出来到列表里
+        // 然后每帧做 Frustum 剔除时从这些静态列表遍历，结果用索引；
+        // 动态创建的光源和 Decal 怎么办？追加到静态列表的末尾？
+        // 每帧只更新列表中动态的部分？
+        // 动态创建的光源如何申请shadowmap？
         // all decals
         // all envprobes
         // all irradiance volumes
