@@ -57,6 +57,7 @@ export class ClusteredForwardRenderer {
         this._renderStatesOpaqueOcclusion = new RenderStateSet();
         this._renderStatesTransparent = new RenderStateSet();
         this._renderStatesTransparentOcclusion = new RenderStateSet();
+        this._curDefaultRenderStates = this._renderStatesDepthPrepass;
 
         // todo: prepare default renderstates for every phase
         this.createRenderStates();
@@ -182,6 +183,7 @@ export class ClusteredForwardRenderer {
     private _renderStatesOpaqueOcclusion: RenderStateSet;
     private _renderStatesTransparent: RenderStateSet;
     private _renderStatesTransparentOcclusion: RenderStateSet;
+    private _curDefaultRenderStates: RenderStateSet;
 
     // todo: a unit box geometry for draw bounding boxes; used by occlusion query pass
 
@@ -384,12 +386,16 @@ export class ClusteredForwardRenderer {
         // fix me: query id need to map to camera.
         // throw new Error("Method not implemented.");
     }
+    private setRenderStateSet(states: RenderStateSet) {
+        this._curDefaultRenderStates = states;
+        states.apply();
+    }
     private renderDepthPrepass() {
         if (this._renderListDepthPrepass.ItemCount <= 0) {
             return;
         }
         // set render state
-        this._renderStatesDepthPrepass.apply();
+        this.setRenderStateSet(this._renderStatesDepthPrepass);
         // use program
         GLPrograms.useProgram(this._depthPrepassProgram);
         this.renderItems(this._renderListDepthPrepass, true);
@@ -397,39 +403,36 @@ export class ClusteredForwardRenderer {
     private renderOpaque() {
         // non occlusion query objects
         if (this._renderListOpaque.ItemCount > 0) {
-            this._renderStatesOpaque.apply();
+            this.setRenderStateSet(this._renderStatesOpaque);
             this.renderItems(this._renderListOpaque, false);
         }
 
         // occlusion query objects, query for next frame;
         if (this._renderListOpaqueOcclusionQuery.ItemCount > 0) {
-            this._renderStatesOpaqueOcclusion.apply();
-            // todo: disable color write
+            this.setRenderStateSet(this._renderStatesOpaqueOcclusion);
             GLPrograms.useProgram(this._occlusionQueryProgram);
-            // todo: need to render bounding boxes, not geometry
             this.renderItemBoundingBoxes(this._renderListOpaqueOcclusionQuery, true);
 
             // occlusion query objects, render according to last frame query result
-            this._renderStatesOpaque.apply();
-            // only draw occlustion test passed objects
+            this.setRenderStateSet(this._renderStatesOpaque);
             this.renderItems(this._renderListOpaqueOcclusionQuery, false, true);
         }
     }
     private renderTransparent() {
         // non occlusion query objects
         if (this._renderListTransparent.ItemCount > 0) {
-            this._renderStatesTransparent.apply();
+            this.setRenderStateSet(this._renderStatesTransparent);
             // 半透明物体和不透明物体使用的 Shader 是统一的！
             this.renderItems(this._renderListTransparent);
         }
 
         // occlusion query objects, query for next frame;
         if (this._renderListTransparentOcclusionQuery.ItemCount > 0) {
-            this._renderStatesTransparentOcclusion.apply();
+            this.setRenderStateSet(this._renderStatesTransparentOcclusion);
             this.renderItemBoundingBoxes(this._renderListTransparentOcclusionQuery, true);
 
             // occlusion query objects, render according to last frame query result
-            this._renderStatesTransparent.apply();
+            this.setRenderStateSet(this._renderStatesTransparent);
             this.renderItems(this._renderListTransparentOcclusionQuery, false, true);
         }
     }
@@ -441,9 +444,13 @@ export class ClusteredForwardRenderer {
                     continue;
                 }
                 this.fillUniformBuffersPerObject(item);
-                if (!ignoreMaterial) {
-                    this.fillUniformBuffersPerMaterial(item.material);
+                if (!ignoreMaterial && item.material) {
                     // todo: set material render states?
+                    if(item.material.blendState)GLRenderStates.setBlendState(item.material.blendState);
+                    if(item.material.cullState) GLRenderStates.setCullState(item.material.cullState);
+                    if(item.material.depthStencilState) GLRenderStates.setDepthStencilState(item.material.depthStencilState);
+
+                    this.fillUniformBuffersPerMaterial(item.material);
                     // todo: use program of ShaderMaterial?
                     if (item.material instanceof StandardPBRMaterial) {
                         GLPrograms.useProgram(this._stdPBRProgram);
@@ -454,6 +461,8 @@ export class ClusteredForwardRenderer {
                     }
                 }
                 // todo: draw item geometry
+                // restore default renderstates for next item.
+                this._curDefaultRenderStates.apply();
             }
         }
         throw new Error("Method not implemented.");
