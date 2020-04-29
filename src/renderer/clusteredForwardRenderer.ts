@@ -79,8 +79,18 @@ export class ClusteredForwardRenderer {
         this._ubObject = new UniformBuffer();
         this._ubMaterialPBR = new UniformBuffer();
 
-        // todo: define uniform buffer layouts
         this.setUniformBufferLayouts();
+
+        this._ubLights.build();
+        this._ubDecals.build();
+        this._ubEnvProbes.build();
+        this._ubIrrVolumes.build();
+        this._ubFrame.build();
+        this._ubView.build();
+        this._ubItemIndices.build();
+        this._ubClusters.build();
+        this._ubObject.build();
+        this._ubMaterialPBR.build();
 
         // todo: bind to binding points?
         // or just add block name and binding point to glUniformBuffers?
@@ -402,17 +412,26 @@ export class ClusteredForwardRenderer {
     }
     
     private fillUniformBuffersPerScene() {
-        // todo: fill all lights
+        // todo: fill all lights in scene
+        // fix me: 这时还没有dispatch objects
+        // all decals
         // all envprobes
-        // all 
+        // all irradiance volumes
         throw new Error("Method not implemented.")
     }
     
     private fillUniformBuffersPerFrame() {
-        throw new Error("Method not implemented.")
+        // todo: set frame time
+        // where to get time?
+        const time = 0;
+        this._ubFrame.setFloat("time", time);
+        this._ubFrame.update();
     }
 
     private fillUniformBuffersPerView(camera: Camera) {
+        // todo: fill visible item indices
+
+        // todo: fill item indices start and count
         throw new Error("Method not implemented.")
     }
 
