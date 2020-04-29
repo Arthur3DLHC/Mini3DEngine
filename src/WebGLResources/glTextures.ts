@@ -39,6 +39,14 @@ export class GLTextures {
         return internalFormat;
     }
 
+    /**
+     * get unit number used by gl.uniform1i(samplerLocation, unitNumber)
+     * @param unit gl.Texture*
+     */
+    public static unitNumberFrom(unit: GLenum): number {
+        return unit - GLDevice.gl.TEXTURE0;
+    }
+
     // TODO: 设置绘制使用的纹理
     public static setTextureAt(unit: number, texture: Texture | null) {
         GLDevice.gl.activeTexture(unit);

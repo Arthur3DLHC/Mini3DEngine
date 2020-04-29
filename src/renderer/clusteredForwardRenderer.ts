@@ -39,6 +39,10 @@ import { GLRenderStates } from "../WebGLResources/glRenderStates.js"
 import { StandardPBRMaterial } from "../scene/materials/standardPBRMaterial.js"
 import { ShaderMaterial } from "../scene/materials/shaderMaterial.js"
 import { GLTextures } from "../WebGLResources/glTextures.js"
+import { Texture } from "../WebGLResources/textures/texture.js"
+import { TextureAtlas2D } from "../WebGLResources/textures/textureAtlas2D.js"
+import { Texture2DArray } from "../WebGLResources/textures/texture2DArray.js"
+import { TextureAtlas3D } from "../WebGLResources/textures/textureAtlas3D.js"
 
 export class ClusteredForwardRenderer {
 
@@ -82,6 +86,16 @@ export class ClusteredForwardRenderer {
         // or just add block name and binding point to glUniformBuffers?
         this.setUniformBlockBindingPoints();
 
+        this._shadowmapAtlasUnit = GLDevice.gl.TEXTURE0;
+        this._decalAtlasUnit = GLDevice.gl.TEXTURE1;
+        this._envMapArrayUnit = GLDevice.gl.TEXTURE2;
+        this._irradianceVolumeAtlasUnit = GLDevice.gl.TEXTURE3;
+
+        this._shadowmapAtlas = new TextureAtlas2D();
+        this._decalAtlas = new TextureAtlas2D();
+        this._envMapArray = null;
+        this._irradianceVolumeAtlas = new TextureAtlas3D();
+
         this.registerShaderCodes();
 
         // todo: import default shader code strings and create shader objects
@@ -103,6 +117,7 @@ export class ClusteredForwardRenderer {
         // if scene changed, setup uniform buffers for scene.
         if (this._currentScene !== scene) {
             this.fillUniformBuffersPerScene();
+            this.bindTexturesPerScene();
             // todo: bind texture samplers
             // use some reserved texture units for system textures?
             // shadowmap atlas;
@@ -136,7 +151,6 @@ export class ClusteredForwardRenderer {
             // todo: render sprites
         }
     }
-
 
     private setUniformBlockBindingPoints() {
         GLUniformBuffers.uniformBlockNames["Lights"] = 0;
@@ -213,6 +227,18 @@ export class ClusteredForwardRenderer {
     private _ubClusters: UniformBuffer;
     private _ubObject: UniformBuffer;
     private _ubMaterialPBR: UniformBuffer;
+
+    // todo: system textures: shadowmap atlas, decal atlas, envMap array, irradiance volumes
+    // todo: system texture unit numbers
+    private _shadowmapAtlasUnit: GLenum;
+    private _decalAtlasUnit: GLenum;
+    private _envMapArrayUnit: GLenum;
+    private _irradianceVolumeAtlasUnit: GLenum;
+
+    private _shadowmapAtlas: TextureAtlas2D;
+    private _decalAtlas: TextureAtlas2D;
+    private _envMapArray: Texture2DArray|null;
+    private _irradianceVolumeAtlas: TextureAtlas3D;
     
     // default shader programs
     // or put them into render phases?
@@ -401,6 +427,10 @@ export class ClusteredForwardRenderer {
 
     private fillUniformBuffersPerMaterial(material: Material | null) {
         // if pbr material, fill pbr uniform buffer
+        throw new Error("Method not implemented.")
+    }
+    
+    private bindTexturesPerScene() {
         throw new Error("Method not implemented.")
     }
 
