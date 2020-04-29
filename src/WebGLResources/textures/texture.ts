@@ -15,6 +15,7 @@ export class Texture {
         this.format = GLDevice.gl.RGBA;
         this.componentType = GLDevice.gl.UNSIGNED_BYTE;
         this.samplerState = new SamplerState();
+        this.cached = false;
     }
     // todo: 源图片或数据？是否放在基类中？
     // 是否使用一个多类型成员？
@@ -29,7 +30,15 @@ export class Texture {
     public format: GLenum;
     public componentType: GLenum;
 
+    /**
+     * default sampler state? or put sampler state to material?
+     */
     public samplerState: SamplerState;
+
+    /**
+     * if texture is in cache, must set to true
+     */
+    public cached: boolean;
 
     public create() {
         // create gl texture
@@ -44,6 +53,9 @@ export class Texture {
     }
 
     public release() {
+        if (this.cached) {
+            return;
+        }
         if (this.glTexture) {
             GLDevice.gl.deleteTexture(this.glTexture);
             this.glTexture = null;

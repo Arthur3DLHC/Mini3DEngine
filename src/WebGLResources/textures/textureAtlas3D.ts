@@ -20,6 +20,13 @@ export class TextureAtlas3D {
     }
 
     public release() {
-        throw new Error("Not implemented");
+        for (const s of this.sourceTextures) {
+            s.release();
+        }
+        this.sourceTextures.length = 0;
+        if (this.texture) {
+            this.texture.release();
+            this.texture = null;
+        }
     }
 }
