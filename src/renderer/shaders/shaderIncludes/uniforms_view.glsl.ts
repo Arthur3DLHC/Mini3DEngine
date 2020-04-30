@@ -11,8 +11,8 @@ export default /** glsl */`
         vec4 viewport;          // x, y, width, height
         vec3 position;
         vec2 zRange;            // near, far
-        vec2 rtSize;            // render target size, in pixels
-        vec4 farRect;           // far plane ltrb
+        vec2 rtSize;            // render target full size, in pixels
+        vec4 farRect;           // far plane left, bottom, right, top
     } u_view;
 
     #define MAX_ITEMS_PERVIEW   4096

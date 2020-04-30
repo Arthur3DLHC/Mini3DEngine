@@ -1,13 +1,13 @@
 import { Camera } from "./camera.js";
 import { RenderList } from "../../renderer/renderList.js";
 import { BufferGeometry } from "../../geometry/bufferGeometry.js";
+import { mat4 } from "gl-matrix";
 
 export class PerspectiveCamera extends Camera {
     public constructor() {
         super();
         this.fov = 60;
-        this.near = 0.1;
-        this.far = 2000;
+
         this.focus = 10;
         this.aspect = 1;
 
@@ -19,14 +19,19 @@ export class PerspectiveCamera extends Camera {
      * vertical fov, in degrees.
      */
     public fov: number;
-    public near: number;
-    public far: number;
+
     public focus: number;
     public aspect: number;
 
     public debugDraw: boolean;
 
     private _frustumGeometry: BufferGeometry | null;
+
+    public updateViewProjTransform() {
+        super.updateViewProjTransform();
+        mat4.perspective(this.projTransform, this.fov * Math.PI / 180.0, this.aspect, this.near, this.far); 
+        // todo: 在这里更新视锥？
+    }
 
     public provideRenderItem(renderList: RenderList) {
         // todo: 如果开启了调试绘制模式，则输出一个视锥图元；

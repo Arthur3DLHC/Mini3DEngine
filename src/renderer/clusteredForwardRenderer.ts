@@ -43,6 +43,7 @@ import { Texture } from "../WebGLResources/textures/texture.js"
 import { TextureAtlas2D } from "../WebGLResources/textures/textureAtlas2D.js"
 import { Texture2DArray } from "../WebGLResources/textures/texture2DArray.js"
 import { TextureAtlas3D } from "../WebGLResources/textures/textureAtlas3D.js"
+import { Texture2D } from "../WebGLResources/textures/texture2D.js"
 
 export class ClusteredForwardRenderer {
 
@@ -135,10 +136,15 @@ export class ClusteredForwardRenderer {
             this.dispatchObjects(scene, true);
 
             this.fillUniformBuffersPerScene();
+            // todo: generate static light shadowmaps;
+            // if light is static, use static shadow or there are no moving dynamic objects in range,
+            // use shadow map of last frame;
+            // render to texture atlas; if scene changed, need to repack texture atlas.
+
             this.bindTexturesPerScene();
             // todo: bind texture samplers
             // use some reserved texture units for system textures?
-            // shadowmap atlas;
+            // shadowmap atlas (static);
             // decal atlas;
             // envProbes;
             // irradiance volumes;
@@ -151,14 +157,17 @@ export class ClusteredForwardRenderer {
         // todo: setup uniform buffers per frame, view;
         this.fillUniformBuffersPerFrame();
 
-        // todo: generate light shadowmaps;
-        // if light is static, use static shadow or there are no moving dynamic objects in range,
-        // use shadow map of last frame;
-        // render to texture atlas; if scene changed, need to repack texture atlas.
+
 
         // for simplicity, use only one camera; or occlusion query can not work.
         for (let icam = 0; icam < this._renderContext.cameras.length; icam++) {
             const camera = this._renderContext.cameras[icam];
+            // set viewport
+            if (camera.viewport) {
+                GLDevice.gl.viewport(camera.viewport[0], camera.viewport[1], camera.viewport[2], camera.viewport[3]);                
+            } else {
+                GLDevice.gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+            }
             this.fillUniformBuffersPerView(camera);
             this.getOcclusionQueryResults();
 
@@ -365,7 +374,9 @@ export class ClusteredForwardRenderer {
         // check visible
         if (object.visible) {
             if (object instanceof Camera) {
-                this._renderContext.addCamera(object as Camera);
+                const camera = object as Camera;
+                camera.updateViewProjTransform();
+                this._renderContext.addCamera(camera);
             } else if (object instanceof BaseLight) {
                 const light = object as BaseLight;
                 if (light.isStatic === statics) {
@@ -427,7 +438,7 @@ export class ClusteredForwardRenderer {
         }
 
         // iterate children
-        for (const child of object.Children) {
+        for (const child of object.children) {
             if (child !== null) {
                 this.dispatchObject(child, statics);
             }
@@ -458,7 +469,60 @@ export class ClusteredForwardRenderer {
     }
 
     private fillUniformBuffersPerView(camera: Camera) {
+        const tmpMat = mat4.create();
+        // todo: fill view and proj matrix
+        this._ubView.setMat4("matView", camera.viewTransform);
+        // todo: prev view matrix
+        this._ubView.setMat4("matViewPrev", camera.viewTransformPrev);
+
+        this._ubView.setMat4("matProj", camera.projTransform);
+        this._ubView.setMat4("matProjPrev", camera.projTransformPrev);
+
+        const viewport: Int32Array = GLDevice.gl.getParameter(GLDevice.gl.VIEWPORT);
+        const vpVec = vec4.fromValues(viewport[0], viewport[1], viewport[2], viewport[3]);
+        this._ubView.setVec4("viewport", vpVec);
+
+        let camPosition = vec3.create();
+        mat4.getTranslation(camPosition, camera.worldTransform);
+        this._ubView.setVec3("position", camPosition);
+
+        const zRange = vec2.fromValues(camera.near, camera.far);
+        this._ubView.setVec2("zRange", zRange);
+
+        // todo: how to get full rendertarget size?
+        // for post processes, the scene will be rendered to an off-screen FBO default.
+        let rtSize = vec2.fromValues(vpVec[2], vpVec[3]);
+        if (GLDevice.renderTarget) {
+            const texture = GLDevice.renderTarget.getTexture(0) as Texture2D;
+            if (texture) {
+                rtSize[0] = texture.width;
+                rtSize[1] = texture.height;
+            }
+        }
+        this._ubView.setVec2("rtSize", rtSize);
+
+        // todo: calculate far plane rect
+        // use inverse projection transform?
+        let invProj = mat4.create();
+        mat4.invert(invProj, camera.projTransform);
+
+        // NDC space corners
+        const leftBottom = vec4.fromValues(-1, -1, 1, 1);
+        const rightTop = vec4.fromValues(1, 1, 1, 1);
+
+        let farLeftBottom = vec4.create();
+        let farRightTop = vec4.create();
+        vec4.transformMat4(farLeftBottom, leftBottom, invProj);
+        vec4.transformMat4(farRightTop, rightTop, invProj);
+
+        // don't forget divide by w
+        const farRect = vec4.fromValues(farLeftBottom[0]/farLeftBottom[3], farLeftBottom[1]/farLeftBottom[3], farRightTop[0]/farRightTop[3], farRightTop[1]/farRightTop[3]);
+        this._ubView.setVec4("farRect", farRect);
+
+        this._ubView.update();
+
         // todo: fill visible item indices
+        // need to cull by clusters
 
         // todo: fill item indices start and count
         throw new Error("Method not implemented.")

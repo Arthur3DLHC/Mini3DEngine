@@ -83,10 +83,10 @@ export class RenderContext {
     }
 
     private curCameraIndex: number;
+    private curStaticLightIndex: number;
+    private curStaticDecalIndex: number;
     private curDynamicLightIndex: number;
     private curDynamicDecalIndex: number;
     private curEnvMapIndex: number;
     private curIrradianceVolumeIndex: number;
-    private curStaticLightIndex: number;
-    private curStaticDecalIndex: number;
 }

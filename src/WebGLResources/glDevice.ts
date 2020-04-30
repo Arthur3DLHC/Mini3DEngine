@@ -14,9 +14,15 @@ export class GLDevice {
             // no fall back render pipeline yet
             throw new Error("WebGL 2 is not available");
         }
+        this._canvas = canvas;
     }
 
-    private static _renderTarget: FrameBuffer | null;    
+    private static _canvas: HTMLCanvasElement;
+    private static _renderTarget: FrameBuffer | null;
+    
+    public static get canvas(): HTMLCanvasElement {
+        return GLDevice._canvas;
+    }
     
     /**
      * set current render target
@@ -31,5 +37,9 @@ export class GLDevice {
             GLDevice.gl.bindFramebuffer(GLDevice.gl.FRAMEBUFFER, null);
         }
         this._renderTarget = renderTarget;
+    }
+
+    public static get renderTarget(): FrameBuffer | null {
+        return GLDevice._renderTarget;
     }
 }

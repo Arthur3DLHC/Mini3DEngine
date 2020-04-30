@@ -13,11 +13,13 @@ export class Object3D {
         this._children = [];
         this.localTransform = mat4.create();
         this.worldTransform = mat4.create();
+        this.worldTransformPrev = mat4.create();
         this.castShadow = false;
         this.receiveShadow = false;
         this.occlusionQuery = false;
         this.occlusionQueryID = null;
         this.occlusionQueryResult = true;
+        // this._curFrameNumber = -1;
     }
 
     // todo: need an id?
@@ -36,6 +38,8 @@ export class Object3D {
     // 可渲染的对象用从此类派生的形式组织；其他类型的对象如变换，物理，声音，逻辑等用组件机制，附加到此类对象上；
     public localTransform : mat4;
     public worldTransform : mat4;
+    // todo: prev frame world transform? for temporal effects?
+    public worldTransformPrev: mat4;
 
     public castShadow: boolean;
     public receiveShadow: boolean;
@@ -48,9 +52,11 @@ export class Object3D {
     public parent: Object3D | null;
     
     private _children : Object3D[];
-    public get Children() : Object3D[] {
+    public get children() : Object3D[] {
         return this._children;
     }
+
+    // private _curFrameNumber: number;
 
     public attachChild(object : Object3D) {
         // todo: update transform?
@@ -111,6 +117,18 @@ export class Object3D {
         }
     }
 
+    // 每次更新应该先更新 behavior，再更新 transform，最后更新 visual
+    // Fix me: 是应该分三次递归调用，还是一次递归调用中每对象分别调用？
+    public updateBehavior() {
+        // update behavior list of this
+        // physics is a behavior?
+
+        // update children?
+        for (const child of this._children) {
+            child.updateBehavior();
+        }
+    }
+
     public updateWorldTransform(updateParents: boolean, updateChildren: boolean) {
         // todo: only update transforms when dirty?
         if (this._active === false) {
@@ -120,6 +138,8 @@ export class Object3D {
         if( updateParents && this.parent) {
             this.parent.updateWorldTransform(true, false);
         }
+
+        // 
 
         if (this.parent) {
             mat4.multiply(this.worldTransform, this.parent.worldTransform, this.localTransform);
