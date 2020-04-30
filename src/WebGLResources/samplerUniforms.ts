@@ -29,6 +29,7 @@ export class SamplerUniforms {
                             this._uniformLocations[info.name] = location;
                         }
                 }
+                // uniforms of other type will be in uniform blocks and updated using uniform buffer objects
             }
         }
     }

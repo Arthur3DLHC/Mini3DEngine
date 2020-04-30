@@ -44,6 +44,7 @@ import { TextureAtlas2D } from "../WebGLResources/textures/textureAtlas2D.js"
 import { Texture2DArray } from "../WebGLResources/textures/texture2DArray.js"
 import { TextureAtlas3D } from "../WebGLResources/textures/textureAtlas3D.js"
 import { Texture2D } from "../WebGLResources/textures/texture2D.js"
+import { SamplerUniforms } from "../WebGLResources/samplerUniforms.js"
 
 export class ClusteredForwardRenderer {
 
@@ -97,10 +98,13 @@ export class ClusteredForwardRenderer {
         // or just add block name and binding point to glUniformBuffers?
         this.setUniformBlockBindingPoints();
 
-        this._shadowmapAtlasUnit = GLDevice.gl.TEXTURE0;
-        this._decalAtlasUnit = GLDevice.gl.TEXTURE1;
-        this._envMapArrayUnit = GLDevice.gl.TEXTURE2;
-        this._irradianceVolumeAtlasUnit = GLDevice.gl.TEXTURE3;
+        this._shadowmapAtlasStaticUnit = GLDevice.gl.TEXTURE0;
+        this._shadowmapAtlasDynamicUnit = GLDevice.gl.TEXTURE1;
+        this._decalAtlasUnit = GLDevice.gl.TEXTURE2;
+        this._envMapArrayUnit = GLDevice.gl.TEXTURE3;
+        this._irradianceVolumeAtlasUnit = GLDevice.gl.TEXTURE4;
+
+        this._numReservedTextures = 5;
 
         // todo: 静态shadowmap和动态shadowmap需要分开
         // 在位置不变的光源中，对于场景中的静态部分，起始绘制一张静态shadowmap；
@@ -117,17 +121,92 @@ export class ClusteredForwardRenderer {
         this.registerShaderCodes();
 
         // todo: import default shader code strings and create shader objects
-        this._stdPBRProgram = new ShaderProgram();
-        
         this._colorProgram = new ShaderProgram();
         this._colorProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_vs"]);
         this._colorProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_fs"]);
         this._colorProgram.build();
 
+        this._stdPBRProgram = new ShaderProgram();
+        this._stdPBRProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["default_pbr_vs"]);
+        this._stdPBRProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["default_pbr_fs"]);
+        this._stdPBRProgram.build();
+
+        // all can use simple color program
         this._depthPrepassProgram = new ShaderProgram();
+        this._depthPrepassProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_vs"]);
+        this._depthPrepassProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_fs"]);
+        this._depthPrepassProgram.build();
 
         this._occlusionQueryProgram = new ShaderProgram();
+        this._occlusionQueryProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_vs"]);
+        this._occlusionQueryProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_fs"]);
+        this._occlusionQueryProgram.build();
+
+        this._uniSamplersStdPBR = new SamplerUniforms(this._stdPBRProgram);
     }
+
+    private _renderListDepthPrepass: RenderList;
+    private _renderListOpaque: RenderList;
+    private _renderListOpaqueOcclusionQuery: RenderList;
+    private _renderListTransparent: RenderList;
+    private _renderListTransparentOcclusionQuery: RenderList;
+    private _renderListSprites: RenderList;
+    private _tmpRenderList: RenderList;
+
+    private _renderContext: RenderContext;
+    private _currentScene: Scene|null;
+    /**
+     * current object rendering
+     */
+    private _currentObject: Object3D|null;
+
+    private _renderStatesDepthPrepass: RenderStateSet;
+    private _renderStatesOpaque: RenderStateSet;
+    private _renderStatesOpaqueOcclusion: RenderStateSet;
+    private _renderStatesTransparent: RenderStateSet;
+    private _renderStatesTransparentOcclusion: RenderStateSet;
+    private _curDefaultRenderStates: RenderStateSet;
+
+    // todo: a unit box geometry for draw bounding boxes; used by occlusion query pass
+
+    // uniform buffers
+    private _ubLights: UniformBuffer;
+    private _ubDecals: UniformBuffer;
+    private _ubEnvProbes: UniformBuffer;
+    private _ubIrrVolumes: UniformBuffer;
+    private _ubFrame: UniformBuffer;
+    private _ubView: UniformBuffer;
+    private _ubItemIndices: UniformBuffer;
+    private _ubClusters: UniformBuffer;
+    private _ubObject: UniformBuffer;
+    private _ubMaterialPBR: UniformBuffer;
+
+    // todo: system textures: shadowmap atlas, decal atlas, envMap array, irradiance volumes
+    // todo: system texture unit numbers
+    private _shadowmapAtlasStaticUnit: GLenum;
+    private _shadowmapAtlasDynamicUnit: GLenum;
+    private _decalAtlasUnit: GLenum;
+    private _envMapArrayUnit: GLenum;
+    private _irradianceVolumeAtlasUnit: GLenum;
+
+    private _shadowmapAtlasStatic: TextureAtlas2D;
+    private _shadowmapAtlasDynamic: TextureAtlas2D;
+    private _decalAtlas: TextureAtlas2D;
+    private _envMapArray: Texture2DArray|null;
+    private _irradianceVolumeAtlas: TextureAtlas3D;
+
+    private _numReservedTextures: number;
+    
+    // default shader programs
+    // or put them into render phases?
+    private _stdPBRProgram: ShaderProgram;
+    private _colorProgram: ShaderProgram;
+    private _depthPrepassProgram: ShaderProgram;
+    private _occlusionQueryProgram: ShaderProgram;
+    // todo: other programs: depth prepass, shadowmap, occlusion query...
+
+    // sampler uniforms
+    private _uniSamplersStdPBR: SamplerUniforms | null;
     
     public render(scene: Scene) {
 
@@ -221,62 +300,7 @@ export class ClusteredForwardRenderer {
         this._renderStatesTransparentOcclusion.colorWriteState = RenderStateCache.instance.getColorWriteState(false, false, false, false);
     }
 
-    private _renderListDepthPrepass: RenderList;
-    private _renderListOpaque: RenderList;
-    private _renderListOpaqueOcclusionQuery: RenderList;
-    private _renderListTransparent: RenderList;
-    private _renderListTransparentOcclusionQuery: RenderList;
-    private _renderListSprites: RenderList;
-    private _tmpRenderList: RenderList;
-
-    private _renderContext: RenderContext;
-    private _currentScene: Scene|null;
-    /**
-     * current object rendering
-     */
-    private _currentObject: Object3D|null;
-
-    private _renderStatesDepthPrepass: RenderStateSet;
-    private _renderStatesOpaque: RenderStateSet;
-    private _renderStatesOpaqueOcclusion: RenderStateSet;
-    private _renderStatesTransparent: RenderStateSet;
-    private _renderStatesTransparentOcclusion: RenderStateSet;
-    private _curDefaultRenderStates: RenderStateSet;
-
-    // todo: a unit box geometry for draw bounding boxes; used by occlusion query pass
-
-    // uniform buffers
-    private _ubLights: UniformBuffer;
-    private _ubDecals: UniformBuffer;
-    private _ubEnvProbes: UniformBuffer;
-    private _ubIrrVolumes: UniformBuffer;
-    private _ubFrame: UniformBuffer;
-    private _ubView: UniformBuffer;
-    private _ubItemIndices: UniformBuffer;
-    private _ubClusters: UniformBuffer;
-    private _ubObject: UniformBuffer;
-    private _ubMaterialPBR: UniformBuffer;
-
-    // todo: system textures: shadowmap atlas, decal atlas, envMap array, irradiance volumes
-    // todo: system texture unit numbers
-    private _shadowmapAtlasUnit: GLenum;
-    private _decalAtlasUnit: GLenum;
-    private _envMapArrayUnit: GLenum;
-    private _irradianceVolumeAtlasUnit: GLenum;
-
-    private _shadowmapAtlasStatic: TextureAtlas2D;
-    private _shadowmapAtlasDynamic: TextureAtlas2D;
-    private _decalAtlas: TextureAtlas2D;
-    private _envMapArray: Texture2DArray|null;
-    private _irradianceVolumeAtlas: TextureAtlas3D;
     
-    // default shader programs
-    // or put them into render phases?
-    private _stdPBRProgram: ShaderProgram;
-    private _colorProgram: ShaderProgram;
-    private _depthPrepassProgram: ShaderProgram;
-    private _occlusionQueryProgram: ShaderProgram;
-    // todo: other programs: depth prepass, shadowmap, occlusion query...
 
     private setUniformBufferLayouts() {
         // per scene
@@ -537,10 +561,12 @@ export class ClusteredForwardRenderer {
     }
     
     private bindTexturesPerScene() {
+        
         throw new Error("Method not implemented.")
     }
 
     private bindTexturesPerMaterial(material: Material | null) {
+        GLTextures.setStartUnit(this._numReservedTextures);
         // if pbr mtl
 
         // else
