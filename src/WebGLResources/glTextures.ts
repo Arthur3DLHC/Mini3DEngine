@@ -44,13 +44,13 @@ export class GLTextures {
      * get unit number used by gl.uniform1i(samplerLocation, unitNumber)
      * @param unit gl.Texture*
      */
-    public static unitNumberFrom(unit: GLenum): number {
-        return unit - GLDevice.gl.TEXTURE0;
+    private static glUnitFrom(unit: number): GLenum {
+        return unit + GLDevice.gl.TEXTURE0;
     }
 
     // TODO: 设置绘制使用的纹理
     public static setTextureAt(unit: number, texture: Texture | null, target: GLenum = GLDevice.gl.TEXTURE_2D) {
-        GLDevice.gl.activeTexture(unit);
+        GLDevice.gl.activeTexture(GLTextures.glUnitFrom(unit));
         if (texture) {
             // todo: 2d or 3d or cube or array
             GLDevice.gl.bindTexture(texture.target, texture.glTexture);
@@ -58,4 +58,17 @@ export class GLTextures {
             GLDevice.gl.bindTexture(target, null);
         }
     }
+
+    public static setStartUnit(start: number) {
+        GLTextures._curUnitNumber = start;
+    }
+
+    public static queryUnit(): number {
+        const unit = GLTextures._curUnitNumber;
+        GLTextures._curUnitNumber++;
+        // todo: 判断是否大于 max texture units了
+        return unit;
+    }
+
+    private static _curUnitNumber: number = 0;
 }

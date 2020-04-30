@@ -540,7 +540,7 @@ export class ClusteredForwardRenderer {
         throw new Error("Method not implemented.")
     }
 
-    private bindTexturesPerMaterial(item: RenderItem) {
+    private bindTexturesPerMaterial(material: Material | null) {
         // if pbr mtl
 
         // else
@@ -620,6 +620,7 @@ export class ClusteredForwardRenderer {
                     if(item.material.depthStencilState) GLRenderStates.setDepthStencilState(item.material.depthStencilState);
 
                     this.fillUniformBuffersPerMaterial(item.material);
+                    this.bindTexturesPerMaterial(item.material);
                     // todo: use program of ShaderMaterial?
                     if (item.material instanceof StandardPBRMaterial) {
                         GLPrograms.useProgram(this._stdPBRProgram);
@@ -628,6 +629,7 @@ export class ClusteredForwardRenderer {
                             GLPrograms.useProgram(item.material.program);
                         }
                     }
+                    // todo: set sampler index for sampler uniform locations of program
                 }
                 // draw item geometry
                 item.geometry.draw(item.startIndex, item.count);
