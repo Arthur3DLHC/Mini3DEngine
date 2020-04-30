@@ -142,7 +142,7 @@ export class ClusteredForwardRenderer {
         this._occlusionQueryProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_fs"]);
         this._occlusionQueryProgram.build();
 
-        this._uniSamplersStdPBR = new SamplerUniforms(this._stdPBRProgram);
+        this._samplerUniformsStdPBR = new SamplerUniforms(this._stdPBRProgram);
     }
 
     private _renderListDepthPrepass: RenderList;
@@ -151,7 +151,7 @@ export class ClusteredForwardRenderer {
     private _renderListTransparent: RenderList;
     private _renderListTransparentOcclusionQuery: RenderList;
     private _renderListSprites: RenderList;
-    private _tmpRenderList: RenderList;
+    private _tmpRenderList: RenderList; // object will provide its items to this list first, then dispath to other lists.
 
     private _renderContext: RenderContext;
     private _currentScene: Scene|null;
@@ -206,12 +206,13 @@ export class ClusteredForwardRenderer {
     // todo: other programs: depth prepass, shadowmap, occlusion query...
 
     // sampler uniforms
-    private _uniSamplersStdPBR: SamplerUniforms | null;
+    private _samplerUniformsStdPBR: SamplerUniforms | null;
     
     public render(scene: Scene) {
 
         // if scene changed, setup uniform buffers for scene.
         if (this._currentScene !== scene) {
+            // dispatch static objects
             this.dispatchObjects(scene, true);
 
             this.fillUniformBuffersPerScene();
@@ -230,15 +231,13 @@ export class ClusteredForwardRenderer {
             // GLTextures.setTextureAt(0, )
             this._currentScene = scene;
         }
-
+        // dispatch dynamic objects
         this.dispatchObjects(scene, false);
 
         // todo: setup uniform buffers per frame, view;
         this.fillUniformBuffersPerFrame();
 
-
-
-        // for simplicity, use only one camera; or occlusion query can not work.
+        // fix me: for simplicity, use only one camera; or occlusion query can not work.
         for (let icam = 0; icam < this._renderContext.cameras.length; icam++) {
             const camera = this._renderContext.cameras[icam];
             // set viewport
@@ -299,8 +298,6 @@ export class ClusteredForwardRenderer {
         this._renderStatesTransparentOcclusion.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
         this._renderStatesTransparentOcclusion.colorWriteState = RenderStateCache.instance.getColorWriteState(false, false, false, false);
     }
-
-    
 
     private setUniformBufferLayouts() {
         // per scene
@@ -474,7 +471,18 @@ export class ClusteredForwardRenderer {
         // all static decals
         // all envprobes
         // all irradiance volumes
-        throw new Error("Method not implemented.")
+        for (const light of this._renderContext.staticLights) {
+            
+        }
+        for (const decal of this._renderContext.staticDecals) {
+            
+        }
+        for (const probe of this._renderContext.envProbes) {
+            
+        }
+        for (const vol of this._renderContext.irradianceVolumes) {
+            
+        }
     }
     
     private fillUniformBuffersPerFrame() {
@@ -572,20 +580,20 @@ export class ClusteredForwardRenderer {
         // if pbr mtl
         if (material instanceof StandardPBRMaterial) {
             // todo: need to bind per scene texture units to uniforms too?
-            if (this._uniSamplersStdPBR) {
-                this._uniSamplersStdPBR.setTextureUnit("s_shadowAtlasStatic", this._shadowmapAtlasStaticUnit);
-                this._uniSamplersStdPBR.setTextureUnit("s_shadowAtlasDynamic", this._shadowmapAtlasDynamicUnit);
-                this._uniSamplersStdPBR.setTextureUnit("s_decalAtlas", this._decalAtlasUnit);
-                this._uniSamplersStdPBR.setTextureUnit("s_envMapArray", this._envMapArrayUnit);
-                this._uniSamplersStdPBR.setTextureUnit("s_irrVolAtlas", this._irradianceVolumeAtlasUnit);
+            if (this._samplerUniformsStdPBR) {
+                this._samplerUniformsStdPBR.setTextureUnit("s_shadowAtlasStatic", this._shadowmapAtlasStaticUnit);
+                this._samplerUniformsStdPBR.setTextureUnit("s_shadowAtlasDynamic", this._shadowmapAtlasDynamicUnit);
+                this._samplerUniformsStdPBR.setTextureUnit("s_decalAtlas", this._decalAtlasUnit);
+                this._samplerUniformsStdPBR.setTextureUnit("s_envMapArray", this._envMapArrayUnit);
+                this._samplerUniformsStdPBR.setTextureUnit("s_irrVolAtlas", this._irradianceVolumeAtlasUnit);
 
                 GLTextures.setStartUnit(this._numReservedTextures);
                 const pbrMtl = material as StandardPBRMaterial;
-                this._uniSamplersStdPBR.setTexture("s_colorMap", pbrMtl.colorMap);
-                this._uniSamplersStdPBR.setTexture("s_metallicRoughnessMap", pbrMtl.metallicRoughnessMap);
-                this._uniSamplersStdPBR.setTexture("s_emissiveMap", pbrMtl.emissiveMap);
-                this._uniSamplersStdPBR.setTexture("s_normalMap", pbrMtl.normalMap);
-                this._uniSamplersStdPBR.setTexture("s_occlusionMap", pbrMtl.occlusionMap);
+                this._samplerUniformsStdPBR.setTexture("s_colorMap", pbrMtl.colorMap);
+                this._samplerUniformsStdPBR.setTexture("s_metallicRoughnessMap", pbrMtl.metallicRoughnessMap);
+                this._samplerUniformsStdPBR.setTexture("s_emissiveMap", pbrMtl.emissiveMap);
+                this._samplerUniformsStdPBR.setTexture("s_normalMap", pbrMtl.normalMap);
+                this._samplerUniformsStdPBR.setTexture("s_occlusionMap", pbrMtl.occlusionMap);
             }        
         } else {
             throw new Error("Method not implemented.")
