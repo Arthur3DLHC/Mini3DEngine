@@ -98,11 +98,11 @@ export class ClusteredForwardRenderer {
         // or just add block name and binding point to glUniformBuffers?
         this.setUniformBlockBindingPoints();
 
-        this._shadowmapAtlasStaticUnit = GLDevice.gl.TEXTURE0;
-        this._shadowmapAtlasDynamicUnit = GLDevice.gl.TEXTURE1;
-        this._decalAtlasUnit = GLDevice.gl.TEXTURE2;
-        this._envMapArrayUnit = GLDevice.gl.TEXTURE3;
-        this._irradianceVolumeAtlasUnit = GLDevice.gl.TEXTURE4;
+        this._shadowmapAtlasStaticUnit = 0;
+        this._shadowmapAtlasDynamicUnit = 1;
+        this._decalAtlasUnit = 2;
+        this._envMapArrayUnit = 3;
+        this._irradianceVolumeAtlasUnit = 4;
 
         this._numReservedTextures = 5;
 
@@ -561,13 +561,36 @@ export class ClusteredForwardRenderer {
     }
     
     private bindTexturesPerScene() {
-        
-        throw new Error("Method not implemented.")
+        GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, this._shadowmapAtlasStatic.texture);
+        GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, this._shadowmapAtlasDynamic.texture);
+        GLTextures.setTextureAt(this._decalAtlasUnit, this._decalAtlas.texture);
+        GLTextures.setTextureAt(this._envMapArrayUnit, this._envMapArray);
+        GLTextures.setTextureAt(this._irradianceVolumeAtlasUnit, this._irradianceVolumeAtlas.texture);
     }
 
     private bindTexturesPerMaterial(material: Material | null) {
-        GLTextures.setStartUnit(this._numReservedTextures);
         // if pbr mtl
+        if (material instanceof StandardPBRMaterial) {
+            // todo: need to bind per scene texture units to uniforms too?
+            if (this._uniSamplersStdPBR) {
+                this._uniSamplersStdPBR.setTextureUnit("s_shadowAtlasStatic", this._shadowmapAtlasStaticUnit);
+                this._uniSamplersStdPBR.setTextureUnit("s_shadowAtlasDynamic", this._shadowmapAtlasDynamicUnit);
+                this._uniSamplersStdPBR.setTextureUnit("s_decalAtlas", this._decalAtlasUnit);
+                this._uniSamplersStdPBR.setTextureUnit("s_envMapArray", this._envMapArrayUnit);
+                this._uniSamplersStdPBR.setTextureUnit("s_irrVolAtlas", this._irradianceVolumeAtlasUnit);
+
+                GLTextures.setStartUnit(this._numReservedTextures);
+                const pbrMtl = material as StandardPBRMaterial;
+                this._uniSamplersStdPBR.setTexture("s_colorMap", pbrMtl.colorMap);
+                this._uniSamplersStdPBR.setTexture("s_metallicRoughnessMap", pbrMtl.metallicRoughnessMap);
+                this._uniSamplersStdPBR.setTexture("s_emissiveMap", pbrMtl.emissiveMap);
+                this._uniSamplersStdPBR.setTexture("s_normalMap", pbrMtl.normalMap);
+                this._uniSamplersStdPBR.setTexture("s_occlusionMap", pbrMtl.occlusionMap);
+            }        
+        } else {
+
+        }
+        
 
         // else
         throw new Error("Method not implemented.")
@@ -645,8 +668,6 @@ export class ClusteredForwardRenderer {
                     if(item.material.cullState) GLRenderStates.setCullState(item.material.cullState);
                     if(item.material.depthStencilState) GLRenderStates.setDepthStencilState(item.material.depthStencilState);
 
-                    this.fillUniformBuffersPerMaterial(item.material);
-                    this.bindTexturesPerMaterial(item.material);
                     // todo: use program of ShaderMaterial?
                     if (item.material instanceof StandardPBRMaterial) {
                         GLPrograms.useProgram(this._stdPBRProgram);
@@ -655,6 +676,9 @@ export class ClusteredForwardRenderer {
                             GLPrograms.useProgram(item.material.program);
                         }
                     }
+                    this.fillUniformBuffersPerMaterial(item.material);
+                    this.bindTexturesPerMaterial(item.material);
+
                     // todo: set sampler index for sampler uniform locations of program
                 }
                 // draw item geometry

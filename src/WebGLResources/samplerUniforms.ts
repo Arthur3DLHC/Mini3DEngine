@@ -34,16 +34,17 @@ export class SamplerUniforms {
         }
     }
 
-    public setTexture(uniformName: string, texture: Texture) {
+    public setTexture(uniformName: string, texture: Texture | null) {
         if (this._uniformLocations[uniformName]) {
-            // check texture type? necessary?
-            const info = this._uniformInfos[uniformName];
-            if (info) {
-                if (info.type !== texture.samplerType) {
-                    throw new Error("Sampler type mismatch: " + uniformName);
+            if (texture) {
+                // check texture type? necessary?
+                const info = this._uniformInfos[uniformName];
+                if (info) {
+                    if (info.type !== texture.samplerType) {
+                        throw new Error("Sampler type mismatch: " + uniformName);
+                    }
                 }
             }
-
             // query a new texture unit
             const unit = GLTextures.queryUnit();
             GLTextures.setTextureAt(unit, texture);
