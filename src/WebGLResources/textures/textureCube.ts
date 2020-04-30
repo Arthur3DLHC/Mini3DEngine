@@ -10,6 +10,18 @@ export class Texture3D extends Texture {
         return GLDevice.gl.TEXTURE_CUBE_MAP;
     }
 
+    /**
+     * get the proper sampler type for this texture
+     */
+    public get samplerType(): GLenum {
+        // depth textures should use shadow sampler
+        if (this.format === GLDevice.gl.DEPTH || this.format === GLDevice.gl.DEPTH_STENCIL) {
+            return GLDevice.gl.SAMPLER_CUBE_SHADOW;
+        } else {
+            return GLDevice.gl.SAMPLER_CUBE;
+        }
+    }
+
     // todo: source，长图的形式？
 
     public create() {

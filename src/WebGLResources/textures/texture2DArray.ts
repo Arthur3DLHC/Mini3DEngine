@@ -10,6 +10,17 @@ export class Texture2DArray extends Texture {
         return GLDevice.gl.TEXTURE_2D_ARRAY;
     }
 
+    /**
+     * get the proper sampler type for this texture
+     */
+    public get samplerType(): GLenum {
+        if (this.format === GLDevice.gl.DEPTH || this.format === GLDevice.gl.DEPTH_STENCIL) {
+            return GLDevice.gl.SAMPLER_2D_ARRAY_SHADOW;
+        } else {
+            return GLDevice.gl.SAMPLER_2D_ARRAY;
+        }
+    }
+
     // todo: source, could be a html image element?
     // 用一个长图的形式？
 

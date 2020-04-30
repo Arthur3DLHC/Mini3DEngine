@@ -12,6 +12,18 @@ export class Texture2D extends Texture {
         return GLDevice.gl.TEXTURE_2D;
     }
 
+    /**
+     * get the proper sampler type for this texture
+     */
+    public get samplerType(): GLenum {
+        // depth textures should use shadow sampler
+        if (this.format === GLDevice.gl.DEPTH || this.format === GLDevice.gl.DEPTH_STENCIL) {
+            return GLDevice.gl.SAMPLER_2D_SHADOW;
+        } else {
+            return GLDevice.gl.SAMPLER_2D;
+        }
+    }
+
     // todo: image source, culd be html image element
     // todo: 可以作为渲染目标；
     public create() {

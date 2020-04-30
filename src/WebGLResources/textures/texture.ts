@@ -23,8 +23,18 @@ export class Texture {
 
     public glTexture: WebGLTexture | null;
 
+    /**
+     * get the proper target for this texture
+     */
     public get target(): GLenum {
         return GLDevice.gl.TEXTURE_2D;
+    }
+
+    /**
+     * get the proper sampler type for this texture
+     */
+    public get samplerType(): GLenum {
+        return GLDevice.gl.SAMPLER_2D;
     }
 
     public width: number;
