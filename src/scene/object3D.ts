@@ -1,4 +1,4 @@
-import { mat4 } from "gl-matrix";
+import { mat4, vec4 } from "gl-matrix";
 import { RenderItem } from "../renderer/renderItem.js";
 import { RenderList } from "../renderer/renderList.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
@@ -8,6 +8,7 @@ export class Object3D {
     public constructor() {
         this.name = "";
         this.visible = true;
+        this.color = vec4.fromValues(1,1,1,1);
         this._active = true;
         this.parent = null;
         this._children = [];
@@ -27,6 +28,11 @@ export class Object3D {
     public name : string;
 
     public visible: boolean;
+
+    /**
+     * every object can have a color itself
+     */
+    public color: vec4;
 
     private _active: boolean;
     public get active(): boolean {

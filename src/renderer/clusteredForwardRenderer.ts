@@ -446,15 +446,8 @@ export class ClusteredForwardRenderer {
     }
     
     private fillUniformBuffersPerScene() {
-        // todo: fill all lights in scene
-        // fix me: 这时还没有dispatch objects
-        // 是否应该改为在切换场景时先将所有静态的光源等全部get出来到列表里
-        // 然后每帧做 Frustum 剔除时从这些静态列表遍历，结果用索引；
-        // 动态创建的光源和 Decal 怎么办？追加到静态列表的末尾？
-        // 每帧只更新列表中动态的部分？
-        // 动态创建的光源如何申请shadowmap？
-        //      将一张用于动态光源的shadowmap分为几个区域，分别用于不同分辨率的shadowmap？
-        // all decals
+        // todo: fill all static lights in scene
+        // all static decals
         // all envprobes
         // all irradiance volumes
         throw new Error("Method not implemented.")
@@ -521,20 +514,21 @@ export class ClusteredForwardRenderer {
 
         this._ubView.update();
 
-        // todo: fill visible item indices
-        // need to cull by clusters
+        // todo: fill dynamic lights and decals
+
+        // todo: cull items by clusters
+        // fill visible item indices
 
         // todo: fill item indices start and count
         throw new Error("Method not implemented.")
     }
 
-    private fillUniformBuffersPerObject(item: RenderItem | null) {
-        // object world transform
+    private fillUniformBuffersPerObject(item: RenderItem) {
+        this._ubObject.setMat4("matWorld", item.object.worldTransform);
+        this._ubObject.setMat4("matWorldPrev", item.object.worldTransformPrev);
+        this._ubObject.setVec4("color", item.object.color);
 
-        // object skin transforms, if skinmesh
-
-        // object color
-        throw new Error("Method not implemented.")
+        // todo: object skin transforms, if skinmesh
     }
 
     private fillUniformBuffersPerMaterial(material: Material | null) {
@@ -543,6 +537,13 @@ export class ClusteredForwardRenderer {
     }
     
     private bindTexturesPerScene() {
+        throw new Error("Method not implemented.")
+    }
+
+    private bindTexturesPerMaterial(item: RenderItem) {
+        // if pbr mtl
+
+        // else
         throw new Error("Method not implemented.")
     }
 
