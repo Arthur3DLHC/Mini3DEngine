@@ -588,12 +588,8 @@ export class ClusteredForwardRenderer {
                 this._uniSamplersStdPBR.setTexture("s_occlusionMap", pbrMtl.occlusionMap);
             }        
         } else {
-
+            throw new Error("Method not implemented.")
         }
-        
-
-        // else
-        throw new Error("Method not implemented.")
     }
 
     private getOcclusionQueryResults() {
