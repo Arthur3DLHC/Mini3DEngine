@@ -2,6 +2,7 @@ import { BaseLight } from "./baseLight.js";
 import { DirectionalLightShadow } from "./directionalLightShadow.js";
 import { BufferGeometry } from "../../geometry/bufferGeometry.js";
 import { RenderList } from "../../renderer/renderList.js";
+import { LightType } from "./lightType.js";
 
 export class DirectionalLight extends BaseLight {
     public constructor() {
@@ -9,6 +10,10 @@ export class DirectionalLight extends BaseLight {
         this.radius = 0;
         this.shadow = new DirectionalLightShadow(this);
         this._debugGeometry = null;
+    }
+
+    public get type() : LightType {
+        return LightType.Directional;
     }
 
     /**

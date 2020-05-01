@@ -2,6 +2,7 @@ import { BaseLight } from "./baseLight.js";
 import { PointLightShadow } from "./pointLightShadow.js";
 import { BufferGeometry } from "../../geometry/bufferGeometry.js";
 import { RenderList } from "../../renderer/renderList.js";
+import { LightType } from "./lightType.js";
 
 export class PointLight extends BaseLight {
     public constructor() {
@@ -9,6 +10,10 @@ export class PointLight extends BaseLight {
         this.distance = 0;
         this.shadow = new PointLightShadow(this);
         this._debugGeometry = null;
+    }
+
+    public get type() : LightType {
+        return LightType.Point;
     }
 
     /**

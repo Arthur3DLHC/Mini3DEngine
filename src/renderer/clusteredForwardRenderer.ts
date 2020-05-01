@@ -45,6 +45,10 @@ import { Texture2DArray } from "../WebGLResources/textures/texture2DArray.js"
 import { TextureAtlas3D } from "../WebGLResources/textures/textureAtlas3D.js"
 import { Texture2D } from "../WebGLResources/textures/texture2D.js"
 import { SamplerUniforms } from "../WebGLResources/samplerUniforms.js"
+import { BufferHelper } from "../utils/bufferHelper.js"
+import { LightType } from "../scene/lights/lightType.js"
+import { PointLight } from "../scene/lights/pointLight.js"
+import { SpotLight } from "../scene/lights/spotLight.js"
 
 export class ClusteredForwardRenderer {
 
@@ -304,7 +308,7 @@ export class ClusteredForwardRenderer {
         const MAX_LIGHTS = 512;
         const MAX_DECALS = 1024;
         const MAX_ENVPROBES = 1024;
-        const MAX_IRRVOLUMES = 1024;
+        const MAX_IRRVOLUMES = 512;
         // TODO: 带结构和数组的 uniform buffer 怎么初始化和更新值？
         // 数组长度 * 对齐后的结构浮点数个数
         this._ubLights.addUniform("lights", MAX_LIGHTS * 24);
@@ -471,15 +475,54 @@ export class ClusteredForwardRenderer {
         // all static decals
         // all envprobes
         // all irradiance volumes
+        // pay attention to uniform alignment;
+        const tmpData = new Float32Array(16384);
+        const buffer = new BufferHelper(tmpData);
+        buffer.seek(0);
         for (const light of this._renderContext.staticLights) {
-            
+            buffer.addFloat(light.type);
+            const lightColor = vec3.from(light.color);
+            buffer.addFloatArray(lightColor);
+            // transform
+            const row0 = vec4.fromValues(light.worldTransform[0], light.worldTransform[1],light.worldTransform[2],light.worldTransform[3]);
+            const row1 = vec4.fromValues(light.worldTransform[4], light.worldTransform[5],light.worldTransform[6],light.worldTransform[7]);
+            const row2 = vec4.fromValues(light.worldTransform[8], light.worldTransform[9],light.worldTransform[10],light.worldTransform[11]);
+            buffer.addFloatArray(row0);
+            buffer.addFloatArray(row1);
+            buffer.addFloatArray(row2);
+            let radius = 0;
+            let angle = 0;
+            let penumbra = 0;
+            let unused = 0;
+            if (light.type === LightType.Point) {
+                radius = (light as PointLight).distance;
+            } else if (light.type === LightType.Spot) {
+                const spot = (light as SpotLight);
+                radius = spot.distance;
+                angle = spot.angle * Math.PI / 180.0;
+                penumbra = spot.penumbra;
+            }
+            buffer.addFloat(radius);
+            buffer.addFloat(angle);
+            buffer.addFloat(penumbra);
+            buffer.addFloat(unused); // uniform align
+            if (light.shadow) {
+                buffer.addFloatArray(light.shadow.mapRect);
+            } else {
+                buffer.addFloatArray(vec4.create());
+            }
         }
+        this._ubLights.setUniform("lights", tmpData, buffer.length);
+        this._ubLights.update();
+        buffer.seek(0);
         for (const decal of this._renderContext.staticDecals) {
             
         }
+        buffer.seek(0);
         for (const probe of this._renderContext.envProbes) {
             
         }
+        buffer.seek(0);
         for (const vol of this._renderContext.irradianceVolumes) {
             
         }

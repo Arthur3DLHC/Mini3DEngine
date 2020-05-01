@@ -2,11 +2,14 @@ import { vec4 } from "gl-matrix";
 import { LightShadow } from "./lightShadow.js";
 import { BufferGeometry } from "../../geometry/bufferGeometry.js";
 import { RenderList } from "../../renderer/renderList.js";
+import { LightType } from "./lightType.js";
+import { Object3D } from "../object3D.js";
 
-export class BaseLight {
+export class BaseLight extends Object3D {
     public constructor() {
+        super();
         this.on = true;
-        this.color = vec4.fromValues(1,1,1,1);
+        // this.color = vec4.fromValues(1,1,1,1);
         this.intensity = 1;
         this.shadow = null;
         this.isStatic = false;
@@ -17,7 +20,7 @@ export class BaseLight {
      * the light is switched on
      */
     public on: boolean;
-    public color: vec4;
+    // public color: vec4;
     public intensity: number;
     /**
      * if null, the light will not cast shadow.
@@ -32,5 +35,7 @@ export class BaseLight {
 
     public debugDraw: boolean;
 
-
+    public get type() : LightType {
+        return LightType.Unknow;
+    }
 }

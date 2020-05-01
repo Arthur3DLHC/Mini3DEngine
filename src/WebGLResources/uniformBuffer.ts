@@ -112,7 +112,12 @@ export class UniformBuffer {
     }
 
     // TODO: Add array
-
+    /**
+     * 
+     * @param name 
+     * @param data 
+     * @param size number of floats
+     */
     public setUniform(name: string, data: Float32Array, size: number) {
         if (!this._bufferData) {
             throw new Error("Can not set uniform before ubo build");
