@@ -1,11 +1,9 @@
-import { vec2, vec3, vec4, mat3, mat2, mat4 } from "gl-matrix";
-
 export class BufferHelper {
-    public constructor(buffer: Float32Array) {
+    public constructor(buffer: Float32Array | Int32Array) {
         this._buffer = buffer;
         this._curIdx = 0;
     }
-    private _buffer: Float32Array;
+    private _buffer: Float32Array | Int32Array;
     private _curIdx: number;
 
     public get length(): number {
@@ -16,11 +14,11 @@ export class BufferHelper {
         this._curIdx = index;
     }
 
-    public addFloat(val: number) {
+    public addNumber(val: number) {
         this._buffer[this._curIdx++] = val;
     }
 
-    public addFloatArray(val: Float32Array) {
+    public addArray(val: Float32Array | Int32Array) {
         for (let i = 0; i < val.length; i++) {
             this._buffer[this._curIdx++] = val[i];
         }

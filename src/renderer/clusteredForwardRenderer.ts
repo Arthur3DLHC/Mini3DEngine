@@ -98,6 +98,15 @@ export class ClusteredForwardRenderer {
         this._ubObject.build();
         this._ubMaterialPBR.build();
 
+        this._tmpData = new Float32Array(4096);
+        this._buffer = new BufferHelper(this._tmpData);
+
+        this._tmpIdxData = new Int32Array(4096);
+        this._idxBuffer = new BufferHelper(this._tmpIdxData);
+
+        this._tmpClusterData = new Int32Array(ClusteredForwardRenderer.NUM_CLUSTERS * ClusteredForwardRenderer.CLUSTER_SIZE_INT);
+        this._clusterBuffer = new BufferHelper(this._tmpClusterData);
+
         // todo: bind to binding points?
         // or just add block name and binding point to glUniformBuffers?
         this.setUniformBlockBindingPoints();
@@ -184,6 +193,21 @@ export class ClusteredForwardRenderer {
     private _ubClusters: UniformBuffer;
     private _ubObject: UniformBuffer;
     private _ubMaterialPBR: UniformBuffer;
+
+    private _tmpData: Float32Array;
+    private _buffer: BufferHelper;
+    private _tmpIdxData: Int32Array;
+    private _idxBuffer: BufferHelper;
+    private _tmpClusterData: Int32Array;
+    private _clusterBuffer: BufferHelper;
+
+    private static readonly LIGHT_SIZE_FLOAT = 24;
+    private static readonly DECAL_SIZE_FLOAT = 16;
+    private static readonly ENVPROBE_SIZE_FLOAT = 4;
+    private static readonly IRRVOL_SIZE_FLOAT = 20;
+
+    private static readonly NUM_CLUSTERS = 16 * 8 * 24;
+    private static readonly CLUSTER_SIZE_INT = 8;
 
     // todo: system textures: shadowmap atlas, decal atlas, envMap array, irradiance volumes
     // todo: system texture unit numbers
@@ -311,10 +335,10 @@ export class ClusteredForwardRenderer {
         const MAX_IRRVOLUMES = 512;
         // TODO: 带结构和数组的 uniform buffer 怎么初始化和更新值？
         // 数组长度 * 对齐后的结构浮点数个数
-        this._ubLights.addUniform("lights", MAX_LIGHTS * 24);
-        this._ubDecals.addUniform("decals", MAX_DECALS * 16);
-        this._ubEnvProbes.addUniform("probes", MAX_ENVPROBES * 4);
-        this._ubIrrVolumes.addUniform("volumes", MAX_IRRVOLUMES * 20);
+        this._ubLights.addUniform("lights", MAX_LIGHTS * ClusteredForwardRenderer.LIGHT_SIZE_FLOAT);
+        this._ubDecals.addUniform("decals", MAX_DECALS * ClusteredForwardRenderer.DECAL_SIZE_FLOAT);
+        this._ubEnvProbes.addUniform("probes", MAX_ENVPROBES * ClusteredForwardRenderer.ENVPROBE_SIZE_FLOAT);
+        this._ubIrrVolumes.addUniform("volumes", MAX_IRRVOLUMES * ClusteredForwardRenderer.IRRVOL_SIZE_FLOAT);
 
         // per frame,
         this._ubFrame.addFloat("time", 0);
@@ -476,58 +500,88 @@ export class ClusteredForwardRenderer {
         // all envprobes
         // all irradiance volumes
         // pay attention to uniform alignment;
-        const tmpData = new Float32Array(16384);
-        const buffer = new BufferHelper(tmpData);
-        buffer.seek(0);
+
+        this._buffer.seek(0);
         for (const light of this._renderContext.staticLights) {
-            buffer.addFloat(light.type);
-            const lightColor = vec3.from(light.color);
-            buffer.addFloatArray(lightColor);
-            // transform
-            const row0 = vec4.fromValues(light.worldTransform[0], light.worldTransform[1],light.worldTransform[2],light.worldTransform[3]);
-            const row1 = vec4.fromValues(light.worldTransform[4], light.worldTransform[5],light.worldTransform[6],light.worldTransform[7]);
-            const row2 = vec4.fromValues(light.worldTransform[8], light.worldTransform[9],light.worldTransform[10],light.worldTransform[11]);
-            buffer.addFloatArray(row0);
-            buffer.addFloatArray(row1);
-            buffer.addFloatArray(row2);
-            let radius = 0;
-            let angle = 0;
-            let penumbra = 0;
-            let unused = 0;
-            if (light.type === LightType.Point) {
-                radius = (light as PointLight).distance;
-            } else if (light.type === LightType.Spot) {
-                const spot = (light as SpotLight);
-                radius = spot.distance;
-                angle = spot.angle * Math.PI / 180.0;
-                penumbra = spot.penumbra;
-            }
-            buffer.addFloat(radius);
-            buffer.addFloat(angle);
-            buffer.addFloat(penumbra);
-            buffer.addFloat(unused); // uniform align
-            if (light.shadow) {
-                buffer.addFloatArray(light.shadow.mapRect);
-            } else {
-                buffer.addFloatArray(vec4.create());
-            }
+            this.addLightToBufer(this._buffer, light)
         }
-        this._ubLights.setUniform("lights", tmpData, buffer.length);
+        this._ubLights.setUniform("lights", this._tmpData, this._buffer.length);
         this._ubLights.update();
-        buffer.seek(0);
+        this._buffer.seek(0);
         for (const decal of this._renderContext.staticDecals) {
-            
+            this.addDecalToBuffer(this._buffer, decal)
         }
-        buffer.seek(0);
+        this._ubDecals.setUniform("decals", this._tmpData, this._buffer.length);
+        this._buffer.seek(0);
         for (const probe of this._renderContext.envProbes) {
-            
+            const position = vec3.create();
+            mat4.getTranslation(position, probe.worldTransform);
+            this._buffer.addArray(position);
+            this._buffer.addNumber(probe.textureIndex);
         }
-        buffer.seek(0);
+        this._ubEnvProbes.setUniform("probes", this._tmpData, this._buffer.length);
+        this._buffer.seek(0);
         for (const vol of this._renderContext.irradianceVolumes) {
-            
+            const row0 = vec4.fromValues(vol.worldTransform[0], vol.worldTransform[1], vol.worldTransform[2], vol.worldTransform[3]);
+            const row1 = vec4.fromValues(vol.worldTransform[4], vol.worldTransform[5], vol.worldTransform[6], vol.worldTransform[7]);
+            const row2 = vec4.fromValues(vol.worldTransform[8], vol.worldTransform[9], vol.worldTransform[10], vol.worldTransform[11]);
+            this._buffer.addArray(row0);
+            this._buffer.addArray(row1);
+            this._buffer.addArray(row2);
+            const boxMin = vec4.from(vol.atlasLocation.minPoint);
+            const boxMax = vec4.from(vol.atlasLocation.maxPoint);
+            this._buffer.addArray(boxMin);
+            this._buffer.addArray(boxMax);
         }
+        this._ubIrrVolumes.setUniform("volumes", this._tmpData, this._buffer.length);
     }
     
+    private addDecalToBuffer(buffer: BufferHelper, decal: Decal) {
+        const row0 = vec4.fromValues(decal.worldTransform[0], decal.worldTransform[1], decal.worldTransform[2], decal.worldTransform[3])
+        const row1 = vec4.fromValues(decal.worldTransform[4], decal.worldTransform[5], decal.worldTransform[6], decal.worldTransform[7])
+        const row2 = vec4.fromValues(decal.worldTransform[8], decal.worldTransform[9], decal.worldTransform[10], decal.worldTransform[11])
+        buffer.addArray(row0)
+        buffer.addArray(row1)
+        buffer.addArray(row2)
+        buffer.addArray(decal.atlasRect)
+    }
+
+    private addLightToBufer(buffer: BufferHelper, light: BaseLight) {
+        buffer.addNumber(light.type)
+        const lightColor = vec3.from(light.color)
+        buffer.addArray(lightColor)
+        // transform
+        const row0 = vec4.fromValues(light.worldTransform[0], light.worldTransform[1], light.worldTransform[2], light.worldTransform[3])
+        const row1 = vec4.fromValues(light.worldTransform[4], light.worldTransform[5], light.worldTransform[6], light.worldTransform[7])
+        const row2 = vec4.fromValues(light.worldTransform[8], light.worldTransform[9], light.worldTransform[10], light.worldTransform[11])
+        buffer.addArray(row0)
+        buffer.addArray(row1)
+        buffer.addArray(row2)
+        let radius = 0
+        let angle = 0
+        let penumbra = 0
+        let unused = 0
+        if (light.type === LightType.Point) {
+            radius = (light as PointLight).distance
+        }
+        else if (light.type === LightType.Spot) {
+            const spot = (light as SpotLight)
+            radius = spot.distance
+            angle = spot.angle * Math.PI / 180.0
+            penumbra = spot.penumbra
+        }
+        buffer.addNumber(radius)
+        buffer.addNumber(angle)
+        buffer.addNumber(penumbra)
+        buffer.addNumber(unused) // uniform align
+        if (light.shadow) {
+            buffer.addArray(light.shadow.mapRect)
+        }
+        else {
+            buffer.addArray(vec4.create())
+        }
+    }
+
     private fillUniformBuffersPerFrame() {
         // todo: set frame time
         // where to get time?
@@ -590,12 +644,87 @@ export class ClusteredForwardRenderer {
         this._ubView.update();
 
         // todo: fill dynamic lights and decals
+        // check visibility?
+        this._buffer.seek(0);
+        for (const light of this._renderContext.dynamicLights) {
+            this.addLightToBufer(this._buffer, light);
+        }
+        // how to append to the end of the light ubo? or use another ubo?
+        // update from the static light count * one light size in ubo
+        this._ubLights.updateByData(this._tmpData, this._renderContext.staticLights.length * ClusteredForwardRenderer.LIGHT_SIZE_FLOAT * 4);
 
-        // todo: cull items by clusters
+        this._buffer.seek(0);
+        for (const decal of this._renderContext.dynamicDecals) {
+            this.addDecalToBuffer(this._buffer, decal);
+        }
+        this._ubDecals.updateByData(this._tmpData, this._renderContext.staticDecals.length * ClusteredForwardRenderer.DECAL_SIZE_FLOAT * 4);
+
+        // envprobes and irradiance volumes are always static
+
+        // todo: cull all items (both static and dynamic) by clusters
         // fill visible item indices
 
-        // todo: fill item indices start and count
-        throw new Error("Method not implemented.")
+        // test: add all item indices
+        // fix me: how to add uint to uniform buffer?
+        let start = 0;
+        let count = 0;
+        this._idxBuffer.seek(0);
+        this._clusterBuffer.seek(0);
+        for (let iLight = 0; iLight < this._renderContext.staticLights.length; iLight++) {
+            const light = this._renderContext.staticLights[iLight];
+            // todo: cull light against clusters
+            // for test perpurse new, add them all:
+            this._idxBuffer.addNumber(iLight);
+            count++;
+        }
+        for (let iLight = 0; iLight < this._renderContext.dynamicLights.length; iLight++) {
+            const light = this._renderContext.dynamicLights[iLight];
+            this._idxBuffer.addNumber(iLight + this._renderContext.staticLights.length);
+            count++;
+        }
+        this._clusterBuffer.addNumber(start);
+        this._clusterBuffer.addNumber(count);
+        start = count;
+        count = 0;
+
+        for (let iDecal = 0; iDecal < this._renderContext.staticDecals.length; iDecal++) {
+            const decal = this._renderContext.staticDecals[iDecal];
+            this._idxBuffer.addNumber(iDecal);
+            count++;
+        }
+
+        for (let iDecal = 0; iDecal < this._renderContext.dynamicDecals.length; iDecal++) {
+            const decal = this._renderContext.dynamicDecals[iDecal];
+            this._idxBuffer.addNumber(iDecal + this._renderContext.staticDecals.length);
+            count++;
+        }
+        this._clusterBuffer.addNumber(start);
+        this._clusterBuffer.addNumber(count);
+        start = count;
+        count = 0;
+
+        for (let iEnv = 0; iEnv < this._renderContext.envProbes.length; iEnv++) {
+            const envProbe = this._renderContext.envProbes[iEnv];
+            this._idxBuffer.addNumber(iEnv);
+            count++;
+        }
+        this._clusterBuffer.addNumber(start);
+        this._clusterBuffer.addNumber(count);
+        start = count;
+        count = 0;
+
+        for (let iIrr = 0; iIrr < this._renderContext.irradianceVolumes.length; iIrr++) {
+            const irrVol = this._renderContext.irradianceVolumes[iIrr];
+            this._idxBuffer.addNumber(iIrr);
+            count++;
+        }
+        this._clusterBuffer.addNumber(start);
+        this._clusterBuffer.addNumber(count);
+        start = count;
+        count = 0;
+
+        this._ubItemIndices.updateByData(this._tmpIdxData, 0);
+        this._ubClusters.updateByData(this._tmpClusterData, 0);
     }
 
     private fillUniformBuffersPerObject(item: RenderItem) {

@@ -206,9 +206,24 @@ export class UniformBuffer {
         if (!this.glBuffer || !this._bufferData) {
             throw new Error("Can not update ubo before build");
         }
-
         GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, this.glBuffer);
         GLDevice.gl.bufferSubData(GLDevice.gl.UNIFORM_BUFFER, 0, this._bufferData);
+        GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, null);
+    }
+
+    /**
+     * 用任意类型数组更新 uniform buffer；
+     * @param data 包含要更新的数据的任意类型数组。注意长度需要和 ubo 创建时匹配；注意对齐；
+     */
+    public updateByData(data: BufferSource, dstByteOffset: number) {
+        if (!this.glBuffer || !this._bufferData) {
+            throw new Error("Can not update ubo before build");
+        }
+        if (data.byteLength + dstByteOffset > this._bufferData.byteLength) {
+            throw new Error("buffer overrun");
+        }
+        GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, this.glBuffer);
+        GLDevice.gl.bufferSubData(GLDevice.gl.UNIFORM_BUFFER, dstByteOffset, data);
         GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, null);
     }
     
