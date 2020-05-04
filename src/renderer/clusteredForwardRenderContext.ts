@@ -342,20 +342,21 @@ export class ClusteredForwardRenderContext extends RenderContext {
         }
         this._ubDecals.updateByData(this._tmpData, this.staticDecals.length * ClusteredForwardRenderer.DECAL_SIZE_FLOAT * 4);
         // envprobes and irradiance volumes are always static
-        // todo: cull all items (both static and dynamic) by clusters
-        // fill visible item indices
         // test: add all item indices, and assume only one cluster
         let start = 0;
         this._clusterBuffer.seek(0);
         this._idxBuffer.seek(0);
         for (let iCluster = 0; iCluster < 1; iCluster++) {
+            // todo: calculate clip space cluster AABB
+            // todo: cull all items (both static and dynamic) by this cluster
+            // fill visible item indices
             let lightCount = 0;
             let decalCount = 0;
             let envProbeCount = 0;
             let irrVolCount = 0;
             for (let iLight = 0; iLight < this.staticLights.length; iLight++) {
                 const light = this.staticLights[iLight];
-                // todo: cull light against clusters
+                // todo: cull light against cluster
                 // for test perpurse new, add them all:
                 this._idxBuffer.addNumber(iLight);
                 lightCount++;
@@ -375,21 +376,17 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 this._idxBuffer.addNumber(iDecal + this.staticDecals.length);
                 decalCount++;
             }
-            // this._clusterBuffer.addNumber(start)
             for (let iEnv = 0; iEnv < this.envProbes.length; iEnv++) {
                 const envProbe = this.envProbes[iEnv];
                 this._idxBuffer.addNumber(iEnv);
                 envProbeCount++;
             }
-            // this._clusterBuffer.addNumber(start)
-            // this._clusterBuffer.addNumber(count)
             // pack envprobe and irrvolume count together
             for (let iIrr = 0; iIrr < this.irradianceVolumes.length; iIrr++) {
                 const irrVol = this.irradianceVolumes[iIrr];
                 this._idxBuffer.addNumber(iIrr);
                 irrVolCount++;
             }
-            // this._clusterBuffer.addNumber(start)
             this._clusterBuffer.addNumber(start);       // the start index of this cluster
             this._clusterBuffer.addNumber(lightCount);       // light count
             this._clusterBuffer.addNumber(decalCount);       // decal count
