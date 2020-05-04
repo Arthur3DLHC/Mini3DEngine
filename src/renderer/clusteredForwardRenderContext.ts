@@ -344,61 +344,59 @@ export class ClusteredForwardRenderContext extends RenderContext {
         // envprobes and irradiance volumes are always static
         // todo: cull all items (both static and dynamic) by clusters
         // fill visible item indices
-        // test: add all item indices
-        // fix me: how to add uint to uniform buffer?
+        // test: add all item indices, and assume only one cluster
         let start = 0;
-        let count = 0;
-        this._idxBuffer.seek(0);
         this._clusterBuffer.seek(0);
-        for (let iLight = 0; iLight < this.staticLights.length; iLight++) {
-            const light = this.staticLights[iLight];
-            // todo: cull light against clusters
-            // for test perpurse new, add them all:
-            this._idxBuffer.addNumber(iLight);
-            count++;
+        this._idxBuffer.seek(0);
+        for (let iCluster = 0; iCluster < 1; iCluster++) {
+            let lightCount = 0;
+            let decalCount = 0;
+            let envProbeCount = 0;
+            let irrVolCount = 0;
+            for (let iLight = 0; iLight < this.staticLights.length; iLight++) {
+                const light = this.staticLights[iLight];
+                // todo: cull light against clusters
+                // for test perpurse new, add them all:
+                this._idxBuffer.addNumber(iLight);
+                lightCount++;
+            }
+            for (let iLight = 0; iLight < this.dynamicLights.length; iLight++) {
+                const light = this.dynamicLights[iLight];
+                this._idxBuffer.addNumber(iLight + this.staticLights.length);
+                lightCount++;
+            }
+            for (let iDecal = 0; iDecal < this.staticDecals.length; iDecal++) {
+                const decal = this.staticDecals[iDecal];
+                this._idxBuffer.addNumber(iDecal);
+                decalCount++;
+            }
+            for (let iDecal = 0; iDecal < this.dynamicDecals.length; iDecal++) {
+                const decal = this.dynamicDecals[iDecal];
+                this._idxBuffer.addNumber(iDecal + this.staticDecals.length);
+                decalCount++;
+            }
+            // this._clusterBuffer.addNumber(start)
+            for (let iEnv = 0; iEnv < this.envProbes.length; iEnv++) {
+                const envProbe = this.envProbes[iEnv];
+                this._idxBuffer.addNumber(iEnv);
+                envProbeCount++;
+            }
+            // this._clusterBuffer.addNumber(start)
+            // this._clusterBuffer.addNumber(count)
+            // pack envprobe and irrvolume count together
+            for (let iIrr = 0; iIrr < this.irradianceVolumes.length; iIrr++) {
+                const irrVol = this.irradianceVolumes[iIrr];
+                this._idxBuffer.addNumber(iIrr);
+                irrVolCount++;
+            }
+            // this._clusterBuffer.addNumber(start)
+            this._clusterBuffer.addNumber(start);       // the start index of this cluster
+            this._clusterBuffer.addNumber(lightCount);       // light count
+            this._clusterBuffer.addNumber(decalCount);       // decal count
+            this._clusterBuffer.addNumber(envProbeCount * 65536 + irrVolCount)        // envprobe (high 2 bytes) and irradiance volume count (low 2 bytes)
+            start += lightCount + decalCount + envProbeCount + irrVolCount;
         }
-        for (let iLight = 0; iLight < this.dynamicLights.length; iLight++) {
-            const light = this.dynamicLights[iLight];
-            this._idxBuffer.addNumber(iLight + this.staticLights.length);
-            count++;
-        }
-        this._clusterBuffer.addNumber(start);
-        this._clusterBuffer.addNumber(count);
-        start = count;
-        count = 0;
-        for (let iDecal = 0; iDecal < this.staticDecals.length; iDecal++) {
-            const decal = this.staticDecals[iDecal];
-            this._idxBuffer.addNumber(iDecal);
-            count++;
-        }
-        for (let iDecal = 0; iDecal < this.dynamicDecals.length; iDecal++) {
-            const decal = this.dynamicDecals[iDecal];
-            this._idxBuffer.addNumber(iDecal + this.staticDecals.length);
-            count++;
-        }
-        // this._clusterBuffer.addNumber(start)
-        this._clusterBuffer.addNumber(count);
-        start = count;
-        count = 0;
-        for (let iEnv = 0; iEnv < this.envProbes.length; iEnv++) {
-            const envProbe = this.envProbes[iEnv];
-            this._idxBuffer.addNumber(iEnv);
-            count++;
-        }
-        // this._clusterBuffer.addNumber(start)
-        // this._clusterBuffer.addNumber(count)
-        start = count;
-        // pack envprobe and irrvolume count together
-        count = count * 65536;
-        for (let iIrr = 0; iIrr < this.irradianceVolumes.length; iIrr++) {
-            const irrVol = this.irradianceVolumes[iIrr];
-            this._idxBuffer.addNumber(iIrr);
-            count++;
-        }
-        // this._clusterBuffer.addNumber(start)
-        this._clusterBuffer.addNumber(count)
-        start = count;
-        count = 0;
+
         this._ubItemIndices.updateByData(this._tmpIdxData, 0);
         this._ubClusters.updateByData(this._tmpClusterData, 0);
     }

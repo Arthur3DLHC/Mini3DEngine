@@ -26,17 +26,12 @@ export default /** glsl */`
 
     struct Cluster {
 
-        // fix me: 按照这个尺寸，会超过 16384 个 byte 的限制
-        // 需要进一步压缩，比如拆成16位？
-        // ivec2 lightOffsetCount;     // itemIndices中的起始偏移量和个数
-        // ivec2 decalOffsetCount;
-        // ivec2 envProbeOffsetCount;
-        // ivec2 irrVolOffsetCount;
-
+        // fix me: 按照这个尺寸，会超过 OpenGL 保证的 16384 个 byte 的限制
+        // 但是一般的DX11显卡应该都能保证 65536 个 byte
         int start;
         int lightCount;
         int decalCount;
-        int envProbeIrrVolCount;        // packed, 高16位是 envProbe 数量，低 16 位是 irrvol 数量
+        int envProbeIrrVolCount;        // 为了凑vec4, packed, 高16位是 envProbe 数量，低 16 位是 irrvol 数量
     };
     layout (std140) uniform Clusters
     {
