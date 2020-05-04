@@ -149,7 +149,7 @@ export class ClusteredForwardRenderer {
     public static readonly IRRVOL_SIZE_FLOAT = 20;
 
     public static readonly NUM_CLUSTERS = 16 * 8 * 24;
-    public static readonly CLUSTER_SIZE_INT = 8;
+    public static readonly CLUSTER_SIZE_INT = 4;
 
     // todo: system textures: shadowmap atlas, decal atlas, envMap array, irradiance volumes
     // todo: system texture unit numbers
@@ -393,7 +393,7 @@ export class ClusteredForwardRenderer {
                 this._samplerUniformsStdPBR.setTexture("s_occlusionMap", pbrMtl.occlusionMap);
             }        
         } else {
-            throw new Error("Method not implemented.")
+            throw new Error("Method not implemented.");
         }
     }
 

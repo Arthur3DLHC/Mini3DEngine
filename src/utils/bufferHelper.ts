@@ -1,9 +1,9 @@
 export class BufferHelper {
-    public constructor(buffer: Float32Array | Int32Array) {
+    public constructor(buffer: Float32Array | Uint32Array) {
         this._buffer = buffer;
         this._curIdx = 0;
     }
-    private _buffer: Float32Array | Int32Array;
+    private _buffer: Float32Array | Uint32Array;
     private _curIdx: number;
 
     public get length(): number {
@@ -18,7 +18,7 @@ export class BufferHelper {
         this._buffer[this._curIdx++] = val;
     }
 
-    public addArray(val: Float32Array | Int32Array) {
+    public addArray(val: Float32Array | Uint32Array) {
         for (let i = 0; i < val.length; i++) {
             this._buffer[this._curIdx++] = val[i];
         }

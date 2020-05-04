@@ -23,10 +23,10 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._tmpData = new Float32Array(4096);
         this._buffer = new BufferHelper(this._tmpData);
 
-        this._tmpIdxData = new Int32Array(4096);
+        this._tmpIdxData = new Uint32Array(4096);
         this._idxBuffer = new BufferHelper(this._tmpIdxData);
 
-        this._tmpClusterData = new Int32Array(ClusteredForwardRenderer.NUM_CLUSTERS * ClusteredForwardRenderer.CLUSTER_SIZE_INT);
+        this._tmpClusterData = new Uint32Array(ClusteredForwardRenderer.NUM_CLUSTERS * ClusteredForwardRenderer.CLUSTER_SIZE_INT);
         this._clusterBuffer = new BufferHelper(this._tmpClusterData);
 
         this._ubLights = new UniformBuffer();
@@ -59,9 +59,9 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
     private _tmpData: Float32Array;
     private _buffer: BufferHelper;
-    private _tmpIdxData: Int32Array;
+    private _tmpIdxData: Uint32Array;
     private _idxBuffer: BufferHelper;
-    private _tmpClusterData: Int32Array;
+    private _tmpClusterData: Uint32Array;
     private _clusterBuffer: BufferHelper;
 
     // uniform buffers
@@ -183,13 +183,13 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
         this._buffer.seek(0);
         for (const light of this.staticLights) {
-            this.addLightToBufer(this._buffer, light)
+            this.addLightToBufer(this._buffer, light);
         }
         this._ubLights.setUniform("lights", this._tmpData, this._buffer.length);
         this._ubLights.update();
         this._buffer.seek(0);
         for (const decal of this.staticDecals) {
-            this.addDecalToBuffer(this._buffer, decal)
+            this.addDecalToBuffer(this._buffer, decal);
         }
         this._ubDecals.setUniform("decals", this._tmpData, this._buffer.length);
         this._buffer.seek(0);
@@ -217,48 +217,48 @@ export class ClusteredForwardRenderContext extends RenderContext {
     }
 
     private addDecalToBuffer(buffer: BufferHelper, decal: Decal) {
-        const row0 = vec4.fromValues(decal.worldTransform[0], decal.worldTransform[1], decal.worldTransform[2], decal.worldTransform[3])
-        const row1 = vec4.fromValues(decal.worldTransform[4], decal.worldTransform[5], decal.worldTransform[6], decal.worldTransform[7])
-        const row2 = vec4.fromValues(decal.worldTransform[8], decal.worldTransform[9], decal.worldTransform[10], decal.worldTransform[11])
-        buffer.addArray(row0)
-        buffer.addArray(row1)
-        buffer.addArray(row2)
-        buffer.addArray(decal.atlasRect)
+        const row0 = vec4.fromValues(decal.worldTransform[0], decal.worldTransform[1], decal.worldTransform[2], decal.worldTransform[3]);
+        const row1 = vec4.fromValues(decal.worldTransform[4], decal.worldTransform[5], decal.worldTransform[6], decal.worldTransform[7]);
+        const row2 = vec4.fromValues(decal.worldTransform[8], decal.worldTransform[9], decal.worldTransform[10], decal.worldTransform[11]);
+        buffer.addArray(row0);
+        buffer.addArray(row1);
+        buffer.addArray(row2);
+        buffer.addArray(decal.atlasRect);
     }
 
     private addLightToBufer(buffer: BufferHelper, light: BaseLight) {
-        buffer.addNumber(light.type)
-        const lightColor = vec3.from(light.color)
-        buffer.addArray(lightColor)
+        buffer.addNumber(light.type);
+        const lightColor = vec3.from(light.color);
+        buffer.addArray(lightColor);
         // transform
-        const row0 = vec4.fromValues(light.worldTransform[0], light.worldTransform[1], light.worldTransform[2], light.worldTransform[3])
-        const row1 = vec4.fromValues(light.worldTransform[4], light.worldTransform[5], light.worldTransform[6], light.worldTransform[7])
-        const row2 = vec4.fromValues(light.worldTransform[8], light.worldTransform[9], light.worldTransform[10], light.worldTransform[11])
-        buffer.addArray(row0)
-        buffer.addArray(row1)
-        buffer.addArray(row2)
-        let radius = 0
-        let angle = 0
-        let penumbra = 0
-        let unused = 0
+        const row0 = vec4.fromValues(light.worldTransform[0], light.worldTransform[1], light.worldTransform[2], light.worldTransform[3]);
+        const row1 = vec4.fromValues(light.worldTransform[4], light.worldTransform[5], light.worldTransform[6], light.worldTransform[7]);
+        const row2 = vec4.fromValues(light.worldTransform[8], light.worldTransform[9], light.worldTransform[10], light.worldTransform[11]);
+        buffer.addArray(row0);
+        buffer.addArray(row1);
+        buffer.addArray(row2);
+        let radius = 0;
+        let angle = 0;
+        let penumbra = 0;
+        let unused = 0;
         if (light.type === LightType.Point) {
-            radius = (light as PointLight).distance
+            radius = (light as PointLight).distance;
         }
         else if (light.type === LightType.Spot) {
-            const spot = (light as SpotLight)
-            radius = spot.distance
-            angle = spot.angle * Math.PI / 180.0
-            penumbra = spot.penumbra
+            const spot = (light as SpotLight);
+            radius = spot.distance;
+            angle = spot.angle * Math.PI / 180.0;
+            penumbra = spot.penumbra;
         }
-        buffer.addNumber(radius)
-        buffer.addNumber(angle)
-        buffer.addNumber(penumbra)
-        buffer.addNumber(unused) // uniform align
+        buffer.addNumber(radius);
+        buffer.addNumber(angle);
+        buffer.addNumber(penumbra);
+        buffer.addNumber(unused); // uniform align
         if (light.shadow) {
-            buffer.addArray(light.shadow.mapRect)
+            buffer.addArray(light.shadow.mapRect);
         }
         else {
-            buffer.addArray(vec4.create())
+            buffer.addArray(vec4.create());
         }
     }
 
@@ -393,7 +393,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
             this._clusterBuffer.addNumber(start);       // the start index of this cluster
             this._clusterBuffer.addNumber(lightCount);       // light count
             this._clusterBuffer.addNumber(decalCount);       // decal count
-            this._clusterBuffer.addNumber(envProbeCount * 65536 + irrVolCount)        // envprobe (high 2 bytes) and irradiance volume count (low 2 bytes)
+            this._clusterBuffer.addNumber(envProbeCount * 65536 + irrVolCount);        // envprobe (high 2 bytes) and irradiance volume count (low 2 bytes)
             start += lightCount + decalCount + envProbeCount + irrVolCount;
         }
 
