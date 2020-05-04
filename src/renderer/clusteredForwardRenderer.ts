@@ -25,13 +25,10 @@ import { Decal } from "../scene/decal.js";
 import { IrradianceVolume } from "../scene/irradianceVolume.js";
 import { EnvironmentProbe } from "../scene/environmentProbe.js";
 import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
-import { GLUniformBuffers } from "../WebGLResources/glUnifomBuffers.js";
-import { mat4, vec4, vec3, vec2 } from "gl-matrix";
 import { GLPrograms } from "../WebGLResources/glPrograms.js";
 import { RenderStateSet } from "./renderStateSet.js";
 import { RenderStateCache } from "../WebGLResources/renderStateCache.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
-import { RenderItem } from "./renderItem.js"
 import { Material } from "../scene/materials/material.js"
 import { GLRenderStates } from "../WebGLResources/glRenderStates.js"
 import { StandardPBRMaterial } from "../scene/materials/standardPBRMaterial.js"
