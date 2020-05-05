@@ -15,6 +15,7 @@ import { RenderItem } from "./renderItem.js";
 import { Material } from "../scene/materials/material.js";
 import { GLUniformBuffers } from "../WebGLResources/glUnifomBuffers.js";
 import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
+import { StandardPBRMaterial } from "../scene/materials/standardPBRMaterial.js";
 
 export class ClusteredForwardRenderContext extends RenderContext {
     public constructor() {
@@ -408,7 +409,22 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
     public fillUniformBuffersPerMaterial(material: Material | null) {
         // if pbr material, fill pbr uniform buffer
-        throw new Error("Method not implemented.");
+        if (material) {
+            if (material instanceof StandardPBRMaterial) {
+                const stdPBRMtl = material as StandardPBRMaterial;
+                this._ubMaterialPBR.setVec4("baseColor", stdPBRMtl.color);
+                this._ubMaterialPBR.setVec4("emissive", stdPBRMtl.emissive);
+                this._ubMaterialPBR.setVec3("subsurfaceColor", stdPBRMtl.subsurfaceColor);
+                this._ubMaterialPBR.setFloat("subsurface", stdPBRMtl.subsurface);
+                this._ubMaterialPBR.setFloat("metallic", stdPBRMtl.metallic);
+                this._ubMaterialPBR.setFloat("roughness", stdPBRMtl.roughness);
+                this._ubMaterialPBR.setFloat("colorMapAmount", stdPBRMtl.colorMapAmount);
+                this._ubMaterialPBR.setFloat("metallicMapAmount", stdPBRMtl.metallicMapAmount);
+                this._ubMaterialPBR.setFloat("roughnessMapAmount", stdPBRMtl.roughnessMapAmount);
+                this._ubMaterialPBR.setFloat("normalMapAmount", stdPBRMtl.normalMapAmount);
+                this._ubMaterialPBR.setFloat("occlusionMapAmount", stdPBRMtl.occlusionMapAmount);
+                this._ubMaterialPBR.setFloat("emissiveMapAmount", stdPBRMtl.emissiveMapAmount);
+            }
+        }
     }
-
 }
