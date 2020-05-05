@@ -29,14 +29,16 @@ export class BufferGeometry {
     // todo: geometry type?
     public drawMode: GLenum;
 
-    public draw(start: number, count: number, mode: GLenum|null = null) {
+    public draw(start: number, count: number, attribLocations: Map<string, number>, mode: GLenum|null = null) {
         if (!this.vertexBuffer || !this.vertexBuffer.data || !this.vertexBuffer.glBuffer) {
             return;
         }
         GLGeometryBuffers.bindVertexBuffer(this.vertexBuffer);
         for (const attr of this.attributes) {
-            GLGeometryBuffers.setVertexAttribute(attr);
+            GLGeometryBuffers.setVertexAttribute(attr, attribLocations);
         }
+        // todo: disable unused attributes
+        
         if (this.indexBuffer && this.indexBuffer.indices && this.indexBuffer.glBuffer) {
             GLGeometryBuffers.bindIndexBuffer(this.indexBuffer);
             const s = Math.max(0, start);
@@ -52,6 +54,7 @@ export class BufferGeometry {
     }
 
     // todo: instanced?
+
     public destroy() {
         if (this.vertexBuffer) {
             this.vertexBuffer.release();

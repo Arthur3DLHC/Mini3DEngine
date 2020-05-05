@@ -2,6 +2,7 @@ import { VertexBuffer } from "./vertexBuffer.js";
 import { IndexBuffer } from "./indexBuffer.js";
 import { GLDevice } from "./glDevice.js";
 import { VertexBufferAttribute } from "./vertexBufferAttribute.js";
+import { ShaderProgram } from "./shaderProgram.js";
 
 export class GLGeometryBuffers {
     private static _vertexBuffer: VertexBuffer | null = null;
@@ -30,7 +31,13 @@ export class GLGeometryBuffers {
         }
     }
 
-    public static setVertexAttribute(attrib: VertexBufferAttribute) {
-        throw new Error("Not implemented");
+    public static setVertexAttribute(attrib: VertexBufferAttribute, attribLocations: Map<string, number>) {
+        const index = attribLocations.get(attrib.name);
+        if (index) {
+            GLDevice.gl.enableVertexAttribArray(index);
+            GLDevice.gl.vertexAttribPointer(index, attrib.size, GLDevice.gl.FLOAT, false, attrib.buffer.stride, attrib.offset);
+        }
     }
+
+    // todo: disable unused attribs
 }

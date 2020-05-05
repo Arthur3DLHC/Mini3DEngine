@@ -25,6 +25,10 @@ export class VertexBuffer {
      * 如果是从 glTF 加载的，则暂时不使用此属性？
      */
     public data: Float32Array | null;
+
+    public create() {
+        
+    }
         
     public release() {
         if (this.glBuffer) {

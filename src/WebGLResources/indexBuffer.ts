@@ -12,6 +12,10 @@ export class IndexBuffer {
      */
     public indices: Int16Array | null;
 
+    public create() {
+        
+    }
+
     public release() {
         if (this.glBuffer) {
             GLDevice.gl.deleteBuffer(this.glBuffer);

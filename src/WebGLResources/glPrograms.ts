@@ -22,6 +22,10 @@ export class GLPrograms {
 
     private static _currProgram: ShaderProgram|null = null;
 
+    public static get currProgram(): ShaderProgram | null {
+        return GLPrograms.currProgram;
+    }
+
     public static processSourceCode(code: string): string {
         // #include
         let result = GLPrograms.resolveInclude(code);

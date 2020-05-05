@@ -480,7 +480,9 @@ export class ClusteredForwardRenderer {
                     // todo: set sampler index for sampler uniform locations of program
                 }
                 // draw item geometry
-                item.geometry.draw(item.startIndex, item.count);
+                if (GLPrograms.currProgram) {
+                    item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
+                }
                 // restore default renderstates for next item.
                 this._curDefaultRenderStates.apply();
                 this._currentObject = item.object;

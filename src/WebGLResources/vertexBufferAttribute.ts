@@ -19,7 +19,7 @@ export class VertexBufferAttribute {
 
     // size and offset
     /**
-     * size in bytes?
+     * number components
      */
     public size: number;
 
