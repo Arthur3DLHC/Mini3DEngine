@@ -34,11 +34,12 @@ export class BufferGeometry {
             return;
         }
         GLGeometryBuffers.bindVertexBuffer(this.vertexBuffer);
+        GLGeometryBuffers.clearVertexAttributes();
         for (const attr of this.attributes) {
             GLGeometryBuffers.setVertexAttribute(attr, attribLocations);
         }
-        // todo: disable unused attributes
-        
+        GLGeometryBuffers.disableUnusedAttributes();
+
         if (this.indexBuffer && this.indexBuffer.indices && this.indexBuffer.glBuffer) {
             GLGeometryBuffers.bindIndexBuffer(this.indexBuffer);
             const s = Math.max(0, start);
