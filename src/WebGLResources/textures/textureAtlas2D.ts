@@ -1,6 +1,5 @@
-import { Texture } from "./texture";
 import { vec4 } from "gl-matrix";
-import { Texture2D } from "./texture2D";
+import { Texture2D } from "./texture2D.js";
 
 export class TextureAtlas2D {
     public constructor() {

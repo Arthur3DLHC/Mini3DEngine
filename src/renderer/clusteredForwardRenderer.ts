@@ -214,8 +214,11 @@ export class ClusteredForwardRenderer {
                 GLDevice.gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
             }
             // todo: camera's clear mode
-            
-            GLDevice.gl.clear(GLDevice.gl.COLOR_BUFFER_BIT | GLDevice.gl.DEPTH_BUFFER_BIT | GLDevice.gl.STENCIL_BUFFER_BIT);
+            GLDevice.clearColor = camera.backgroundColor;
+            GLDevice.clearDepth = camera.backgroundDepth;
+            GLDevice.clearStencil = camera.backgroundStencil;
+
+            GLDevice.clear(camera.clearColor, camera.clearDepth, camera.clearStencil);
 
             this._renderContext.fillUniformBuffersPerView(camera);
             this.getOcclusionQueryResults();

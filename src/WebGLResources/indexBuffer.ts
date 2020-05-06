@@ -1,4 +1,4 @@
-import { GLDevice } from "./glDevice";
+import { GLDevice } from "./glDevice.js";
 
 export class IndexBuffer {
     public constructor(usage: GLenum) {

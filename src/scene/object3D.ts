@@ -1,5 +1,4 @@
 import { mat4, vec4 } from "gl-matrix";
-import { RenderItem } from "../renderer/renderItem.js";
 import { RenderList } from "../renderer/renderList.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 

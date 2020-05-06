@@ -1,9 +1,9 @@
-import { PrimitiveGroup } from "./primitiveGroup";
-import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute";
-import { VertexBuffer } from "../WebGLResources/vertexBuffer";
-import { IndexBuffer } from "../WebGLResources/indexBuffer";
-import { GLDevice } from "../WebGLResources/glDevice";
-import { GLGeometryBuffers } from "../WebGLResources/glGeometryBuffers";
+import { PrimitiveGroup } from "./primitiveGroup.js";
+import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
+import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
+import { IndexBuffer } from "../WebGLResources/indexBuffer.js";
+import { GLDevice } from "../WebGLResources/glDevice.js";
+import { GLGeometryBuffers } from "../WebGLResources/glGeometryBuffers.js";
 
 export class BufferGeometry {
     public constructor() {

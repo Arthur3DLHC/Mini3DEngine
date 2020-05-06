@@ -1,4 +1,4 @@
-import { GLDevice } from "./glDevice";
+import { GLDevice } from "./glDevice.js";
 
 /**
  * Interleaved vertex buffer

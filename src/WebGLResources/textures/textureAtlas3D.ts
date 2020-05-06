@@ -1,5 +1,5 @@
 import { vec3 } from "gl-matrix";
-import { Texture3D } from "./texture3D";
+import { Texture3D } from "./texture3D.js";
 
 export class TextureAtlas3D {
     public constructor() {

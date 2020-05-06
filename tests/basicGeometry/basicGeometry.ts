@@ -1,4 +1,4 @@
-import { GLDevice } from "../../src/miniEngine";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera } from "../../src/miniEngine.js";
 
 window.onload = () => {
     const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
@@ -8,4 +8,16 @@ window.onload = () => {
     }
 
     GLDevice.initialize(canvas);
+
+    const renderer = new ClusteredForwardRenderer();
+    const scene = new Scene();
+    const camera = new PerspectiveCamera();
+    scene.attachChild(camera);
+
+    function gameLoop() {
+        renderer.render(scene);
+        requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
 }

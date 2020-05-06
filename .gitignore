@@ -4,4 +4,4 @@
 /build/js/geometry/
 /build/js/resourceWebGL/
 /build/js/scene
-/build/tests/
+/tests/bin/js/

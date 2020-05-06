@@ -1,5 +1,4 @@
 import { Object3D } from "./object3D.js";
-import { RenderItem } from "../renderer/renderItem.js";
 import { Material } from "./materials/material.js";
 import { BufferGeometry } from "../geometry/bufferGeometry.js";
 import { RenderList } from "../renderer/renderList.js";

@@ -1,7 +1,5 @@
 import { vec4 } from "gl-matrix";
 import { LightShadow } from "./lightShadow.js";
-import { BufferGeometry } from "../../geometry/bufferGeometry.js";
-import { RenderList } from "../../renderer/renderList.js";
 import { LightType } from "./lightType.js";
 import { Object3D } from "../object3D.js";
 

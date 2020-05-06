@@ -3,11 +3,6 @@ import { BaseLight } from "../scene/lights/baseLight.js";
 import { Decal } from "../scene/decal.js";
 import { IrradianceVolume } from "../scene/irradianceVolume.js";
 import { EnvironmentProbe } from "../scene/environmentProbe.js";
-import { BufferHelper } from "../utils/bufferHelper.js";
-import { vec3, vec4 } from "gl-matrix";
-import { LightType } from "../scene/lights/lightType.js";
-import { PointLight } from "../scene/lights/pointLight.js";
-import { SpotLight } from "../scene/lights/spotLight.js";
 
 /**
  * current rendering context, including cameras, visible lights, decals, cubemaps...

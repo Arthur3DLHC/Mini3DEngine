@@ -1,4 +1,4 @@
-import { GLDevice } from "../glDevice";
+import { GLDevice } from "../glDevice.js";
 
 export class SamplerState {
     public constructor(wrapS: GLenum = GLDevice.gl.REPEAT, wrapT: GLenum = GLDevice.gl.REPEAT, minFilter = GLDevice.gl.LINEAR, magfilter = GLDevice.gl.LINEAR, anisotropy = 1) {

@@ -2,7 +2,6 @@ import { VertexBuffer } from "./vertexBuffer.js";
 import { IndexBuffer } from "./indexBuffer.js";
 import { GLDevice } from "./glDevice.js";
 import { VertexBufferAttribute } from "./vertexBufferAttribute.js";
-import { ShaderProgram } from "./shaderProgram.js";
 
 export class GLGeometryBuffers {
     private static _vertexBuffer: VertexBuffer | null = null;

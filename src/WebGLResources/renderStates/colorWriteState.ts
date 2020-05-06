@@ -1,4 +1,4 @@
-import { GLDevice } from "../glDevice";
+import { GLDevice } from "../glDevice.js";
 
 export class ColorWriteState {
     public constructor(red: boolean, green: boolean, blue: boolean, alpha: boolean) {

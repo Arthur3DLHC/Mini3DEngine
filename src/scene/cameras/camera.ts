@@ -15,6 +15,13 @@ export class Camera extends Object3D {
     // render target? every camera has one?
 
     // clear mode?
+    public backgroundColor: vec4 = vec4.fromValues(0, 0, 0, 1);
+    public backgroundDepth: number = 1;
+    public backgroundStencil: number = 0;
+
+    public clearColor: boolean = true;
+    public clearDepth: boolean = true;
+    public clearStencil: boolean = true;
 
     public viewTransform: mat4 = mat4.create();
     public projTransform: mat4 = mat4.create();
