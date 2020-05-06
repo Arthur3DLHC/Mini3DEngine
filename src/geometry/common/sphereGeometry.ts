@@ -46,6 +46,26 @@ export class SphereGeometry extends BufferGeometry {
         this.vertexBuffer.create();
 
         // todo: fill index data
+        // heightSegments rows,
+        // every row has widthSegments * 2 triangles
+        const indices: number[] = [];
+        for (let j = 0; j < this._heightSegments; j++) {
+            for (let i = 0; i < this._widthSegments; i++) {
+                // c  d
+                // a  b
+                let a = i;
+                let b = i + 1;
+                let c = a + this._widthSegments;
+                let d = c + 1;
+                indices.push(a);
+                indices.push(b);
+                indices.push(d);
+                indices.push(a);
+                indices.push(d);
+                indices.push(c);
+            }
+        }
+        this.indexBuffer.indices = new Uint16Array(indices);
         this.indexBuffer.create();
 
         let curOffset = 0;
