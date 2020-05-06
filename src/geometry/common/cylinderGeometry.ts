@@ -69,7 +69,7 @@ export class CylinderGeometry extends BufferGeometry {
             indices.push(c);
             indices.push(d);
         }
-        // todo: top cap
+        // top cap
         let c = (this._segments + 1) * 4 + 0;
         for (let i = 0; i < this._segments; i++) {
             const a = (this._segments + 1) * 2 + i;
@@ -78,7 +78,7 @@ export class CylinderGeometry extends BufferGeometry {
             indices.push(c);
             indices.push(b);
         }
-        // todo: bottom cap
+        // bottom cap
         c = (this._segments + 1) * 4 + 1;
         for (let i = 0; i < this._segments; i++) {
             const a = (this._segments + 1) * 3 + i;

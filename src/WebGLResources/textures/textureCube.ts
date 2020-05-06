@@ -1,7 +1,7 @@
 import { Texture } from "./texture.js";
 import { GLDevice } from "../glDevice.js";
 
-export class Texture3D extends Texture {
+export class TextureCube extends Texture {
     public constructor() {
         super();
     }
