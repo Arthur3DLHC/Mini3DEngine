@@ -9,14 +9,40 @@ export class SphereGeometry extends BufferGeometry {
         super();
 
         this._radius = Math.max(radius, 0);
-        this._widthSegments = Math.max(4, widthSegments);
-        this._heightSegments = Math.max(2, heightSegments);
+        this._widthSegments = Math.max(4, Math.floor(widthSegments));
+        this._heightSegments = Math.max(2, Math.floor(heightSegments));
 
         this.vertexBuffer = new VertexBuffer(GLDevice.gl.STATIC_DRAW);
         this.indexBuffer = new IndexBuffer(GLDevice.gl.STATIC_DRAW);
 
-        this.vertexBuffer.stride = 8 * 4;
+        // floats per vertex
+        const floatCount = 8;
+
+        this.vertexBuffer.stride = floatCount * 4;
+        this.vertexBuffer.data = new Float32Array(floatCount * (this._heightSegments + 1) * (this._widthSegments + 1));
         // todo: fill vertex data
+        for (let j = 0; j <= this._heightSegments; j++) {
+            const t = (j / this._heightSegments);
+            const lat = t * Math.PI - Math.PI * 0.5;
+            const y = this._radius * Math.sin(lat);
+            const r1 = this._radius * Math.cos(lat);
+            for (let i = 0; i <= this._widthSegments; i++) {
+                const s = (i / this._widthSegments);
+                const lon = s * Math.PI * 2;
+                const z = r1 * Math.sin(lon);
+                const x = r1 * Math.cos(lon);
+                const idx = (j * (this._widthSegments + 1) + i) * floatCount;
+                this.vertexBuffer.data[idx + 0] = x;
+                this.vertexBuffer.data[idx + 1] = y;
+                this.vertexBuffer.data[idx + 2] = z;
+                this.vertexBuffer.data[idx + 3] = x / this._radius;
+                this.vertexBuffer.data[idx + 4] = y / this._radius;
+                this.vertexBuffer.data[idx + 5] = z / this._radius;
+                this.vertexBuffer.data[idx + 6] = s;
+                this.vertexBuffer.data[idx + 7] = t;
+            }
+        }
+
         this.vertexBuffer.create();
 
         // todo: fill index data
