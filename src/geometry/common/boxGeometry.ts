@@ -2,7 +2,6 @@ import { BufferGeometry } from "../bufferGeometry.js";
 import { VertexBuffer } from "../../WebGLResources/vertexBuffer.js";
 import { GLDevice } from "../../WebGLResources/glDevice.js";
 import { IndexBuffer } from "../../WebGLResources/indexBuffer.js";
-import { VertexBufferAttribute } from "../../WebGLResources/vertexBufferAttribute.js";
 
 export class BoxGeometry extends BufferGeometry {
     /**
@@ -67,16 +66,9 @@ export class BoxGeometry extends BufferGeometry {
         ]);
         this.indexBuffer.create();
 
-        this._curOffset = 0;
-        this.addAttribute("a_position", this.vertexBuffer, 3);
-        this.addAttribute("a_normal", this.vertexBuffer, 3);
-        this.addAttribute("a_texcoord0", this.vertexBuffer, 2);
-    }
-
-    private _curOffset: number = 0;
-
-    private addAttribute(name: string, vertexBuffer: VertexBuffer, size: number) {
-        this.attributes.push(new VertexBufferAttribute(name, vertexBuffer, size, this._curOffset));
-        this._curOffset += size * 4;
+        let curOffset = 0;
+        curOffset = this.addAttribute("a_position", this.vertexBuffer, 3, curOffset);
+        curOffset = this.addAttribute("a_normal", this.vertexBuffer, 3, curOffset);
+        curOffset = this.addAttribute("a_texcoord0", this.vertexBuffer, 2, curOffset);
     }
 }

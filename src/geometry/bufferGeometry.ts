@@ -66,4 +66,16 @@ export class BufferGeometry {
             this.indexBuffer = null;
         }
     }
+    
+    /**
+     * returns new offset in bytes
+     * @param name 
+     * @param vertexBuffer 
+     * @param size number elements of this attribute
+     * @param offset offset in bytes
+     */
+    protected addAttribute(name: string, vertexBuffer: VertexBuffer, size: number, offset: number): number {
+        this.attributes.push(new VertexBufferAttribute(name, vertexBuffer, size, offset));
+        return offset + size * 4;
+    }
 }
