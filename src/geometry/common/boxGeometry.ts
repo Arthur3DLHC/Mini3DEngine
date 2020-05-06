@@ -17,13 +17,17 @@ export class BoxGeometry extends BufferGeometry {
         // create vertex attributes
         // position, normal, texcoord?
         // fix me: tangent, binormal?
+        this._width = Math.max(width, 0);
+        this._height = Math.max(height, 0);
+        this._depth = Math.max(depth, 0);
+
         this.vertexBuffer = new VertexBuffer(GLDevice.gl.STATIC_DRAW);
         this.indexBuffer = new IndexBuffer(GLDevice.gl.STATIC_DRAW);
 
         this.vertexBuffer.stride = 8 * 4;
-        const x = width * 0.5;
-        const y = height * 0.5;
-        const z = depth * 0.5;
+        const x = this._width * 0.5;
+        const y = this._height * 0.5;
+        const z = this._depth * 0.5;
         this.vertexBuffer.data = new Float32Array([
             // -x plane, 4 points
             -x, -y, -z,     -1, 0, 0,   0, 0,
@@ -75,4 +79,12 @@ export class BoxGeometry extends BufferGeometry {
         const grp = new PrimitiveGroup();
         this.groups.push(grp);
     }
+
+    private _width: number;
+    private _height: number;
+    private _depth: number;
+
+    public get width(): number {return this._width;}
+    public get height(): number {return this._height;}
+    public get depth(): number {return this._depth;}
 }
