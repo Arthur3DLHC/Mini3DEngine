@@ -55,7 +55,7 @@ export class SphereGeometry extends BufferGeometry {
                 // a  b
                 let a = i;
                 let b = i + 1;
-                let c = a + this._widthSegments;
+                let c = a + this._widthSegments + 1;
                 let d = c + 1;
                 indices.push(a);
                 indices.push(b);
