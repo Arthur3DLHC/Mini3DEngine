@@ -7,7 +7,7 @@ import { ShaderProgram } from "./shaderProgram.js";
 export class GLGeometryBuffers {
     private static _vertexBuffer: VertexBuffer | null = null;
     private static _indexBuffer: IndexBuffer | null = null;
-    // todo: vertex attribute pointers?
+    // learned form three.js
     private static _enabledAttributes: Uint8Array;
     private static _newAttributes: Uint8Array;
     
@@ -60,6 +60,7 @@ export class GLGeometryBuffers {
     }
 
     public static disableUnusedAttributes() {
+        // learned form three.js
         for (let i = 0; i < this._enabledAttributes.length; i++) {
             if(this._enabledAttributes[i] !== this._newAttributes[i]) {
                 GLDevice.gl.disableVertexAttribArray(i);

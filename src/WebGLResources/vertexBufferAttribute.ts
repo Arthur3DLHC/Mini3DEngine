@@ -17,9 +17,8 @@ export class VertexBufferAttribute {
      */
     public name: string;
 
-    // size and offset
     /**
-     * number components
+     * number components (floats) of this attribute
      */
     public size: number;
 
