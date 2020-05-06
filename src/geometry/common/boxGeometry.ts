@@ -21,19 +21,49 @@ export class BoxGeometry extends BufferGeometry {
         this.indexBuffer = new IndexBuffer(GLDevice.gl.STATIC_DRAW);
 
         this.vertexBuffer.stride = 8 * 4;
+        const x = width * 0.5;
+        const y = height * 0.5;
+        const z = depth * 0.5;
         this.vertexBuffer.data = new Float32Array([
-            // -x plane
-            -width, -height, -depth, -1, 0, 0, 0, 0,
-            // -y plane
-            // -z plane
-            // x plane
-            // y plane
-            // z plane
+            // -x plane, 4 points
+            -x, -y, -z,     -1, 0, 0,   0, 0,
+            -x,  y, -z,     -1, 0, 0,   0, 1,
+            -x,  y,  z,     -1, 0, 0,   1, 1,
+            -x, -y,  z,     -1, 0, 0,   1, 0,
+            // -y plane, 4 points
+            -x, -y,  z,     0, -1, 0,   0, 0,
+             x, -y,  z,     0, -1, 0,   0, 1,
+             x, -y, -z,     0, -1, 0,   1, 1,
+            -x, -y, -z,     0, -1, 0,   1, 0,
+            // -z plane, 4 points
+             x, -y, -z,     0, 0, -1,   0, 0,
+             x,  y, -z,     0, 0, -1,   0, 1,
+            -x,  y, -z,     0, 0, -1,   1, 1,
+            -x, -y, -z,     0, 0, -1,   1, 0,
+            // x plane, 4 points
+             x, -y,  z,     1, 0, 0,    0, 0,
+             x,  y,  z,     1, 0, 0,    0, 1,
+             x,  y, -z,     1, 0, 0,    1, 1,
+             x, -y, -z,     1, 0, 0,    1, 0,
+            // y plane, 4 points
+            -x,  y, -z,     0, 1, 0,    0, 0,
+             x,  y, -z,     0, 1, 0,    0, 1,
+             x,  y,  z,     0, 1, 0,    1, 1,
+            -x,  y,  z,     0, 1, 0,    1, 0,
+            // z plane, 4 points
+            -x, -y,  z,     0, 0, 1,    0, 0,
+            -x,  y,  z,     0, 0, 1,    0, 1,
+             x,  y,  z,     0, 0, 1,    1, 1,
+             x, -y,  z,     0, 0, 1,    1, 0,
         ]);
         this.vertexBuffer.create();
         this.indexBuffer.indices = new Uint16Array([
-            0, 1, 2, 2, 1, 3,
-            // todo: all faces
+            0, 1, 2, 2, 3, 0,
+            4, 5, 6, 6, 7, 4,
+            8, 9, 10, 10, 11, 8,
+            12, 13, 14, 14, 15, 12,
+            16, 17, 18, 18, 19, 16,
+            20, 21, 22, 22, 23, 20,
         ]);
         this.indexBuffer.create();
 
