@@ -15,6 +15,8 @@ window.onload = () => {
     scene.attachChild(camera);
 
     function gameLoop() {
+        scene.updateBehavior();
+        scene.updateWorldTransform(false, true);
         renderer.render(scene);
         requestAnimationFrame(gameLoop);
     }
