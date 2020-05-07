@@ -1,7 +1,7 @@
 import { Camera } from "./camera.js";
 import { RenderList } from "../../renderer/renderList.js";
 import { BufferGeometry } from "../../geometry/bufferGeometry.js";
-import { mat4 } from "gl-matrix";
+import mat4 from "../../../lib/tsm/mat4.js";
 
 export class PerspectiveCamera extends Camera {
     public constructor() {
@@ -29,7 +29,7 @@ export class PerspectiveCamera extends Camera {
 
     public updateViewProjTransform() {
         super.updateViewProjTransform();
-        mat4.perspective(this.projTransform, this.fov * Math.PI / 180.0, this.aspect, this.near, this.far); 
+        this.projTransform = mat4.perspective(this.fov * Math.PI / 180.0, this.aspect, this.near, this.far); 
         // todo: 在这里更新视锥？
     }
 

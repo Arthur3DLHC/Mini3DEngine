@@ -3,10 +3,7 @@
   "version": "1.0.0",
   "description": "A practice for make a mini 3d engine",
   "main": "miniEngine.js",
-  "dependencies": {
-    "@types/gl-matrix": "^2.4.5",
-    "gl-matrix": "^3.3.0"
-  },
+  "dependencies": {},
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -2,7 +2,6 @@ import { RenderContext } from "./renderContext.js";
 import { BufferHelper } from "../utils/bufferHelper.js";
 import { ClusteredForwardRenderer } from "./clusteredForwardRenderer.js";
 import { UniformBuffer } from "../WebGLResources/uniformBuffer.js";
-import { mat4, vec4, vec3, vec2 } from "gl-matrix";
 import { Decal } from "../scene/decal.js";
 import { BaseLight } from "../scene/lights/baseLight.js";
 import { LightType } from "../scene/lights/lightType.js";
@@ -16,6 +15,10 @@ import { Material } from "../scene/materials/material.js";
 import { GLUniformBuffers } from "../WebGLResources/glUnifomBuffers.js";
 import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
 import { StandardPBRMaterial } from "../scene/materials/standardPBRMaterial.js";
+import mat4 from "../../lib/tsm/mat4.js";
+import vec4 from "../../lib/tsm/vec4.js";
+import vec3 from "../../lib/tsm/vec3.js";
+import vec2 from "../../lib/tsm/vec2.js";
 
 export class ClusteredForwardRenderContext extends RenderContext {
     public constructor() {
@@ -94,16 +97,16 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubFrame.addFloat("time", 0);
 
         // per view,
-        const matIdentity = mat4.create();
+        const matIdentity = mat4.identity;
         this._ubView.addMat4("matView", matIdentity);
         this._ubView.addMat4("matViewPrev", matIdentity);
         this._ubView.addMat4("matProj", matIdentity);
         this._ubView.addMat4("matProjPrev", matIdentity);
-        this._ubView.addVec4("viewport", vec4.create());
-        this._ubView.addVec3("position", vec3.create());
-        this._ubView.addVec2("zRange", vec2.create());
-        this._ubView.addVec2("rtSize", vec2.create());
-        this._ubView.addVec4("farRect", vec4.create());
+        this._ubView.addVec4("viewport", new vec4());
+        this._ubView.addVec3("position", new vec3());
+        this._ubView.addVec2("zRange", new vec2());
+        this._ubView.addVec2("rtSize", new vec2());
+        this._ubView.addVec4("farRect", new vec4());
 
         const MAX_ITEMS = 4096;
         this._ubItemIndices.addUniform("indices", MAX_ITEMS);
@@ -115,16 +118,16 @@ export class ClusteredForwardRenderContext extends RenderContext {
         const MAX_BONES = 256;
         this._ubObject.addMat4("matWorld", matIdentity);
         this._ubObject.addMat4("matPrevWorld", matIdentity);
-        this._ubObject.addVec4("color", vec4.create());
+        this._ubObject.addVec4("color", new vec4());
         // this._ubObject.addFloat("tag", 0);
         this._ubObject.addUniform("matBones", MAX_BONES * 16);
         this._ubObject.addUniform("matPrevBones", MAX_BONES * 16);
 
         // per mtl
         // default pbr material
-        this._ubMaterialPBR.addVec4("baseColor", vec4.create());
-        this._ubMaterialPBR.addVec4("emissive", vec4.create());
-        this._ubMaterialPBR.addVec3("subsurfaceColor", vec3.create());
+        this._ubMaterialPBR.addVec4("baseColor", new vec4());
+        this._ubMaterialPBR.addVec4("emissive", new vec4());
+        this._ubMaterialPBR.addVec3("subsurfaceColor", new vec3());
         this._ubMaterialPBR.addFloat("subsurface", 0);
         this._ubMaterialPBR.addFloat("metallic", 0);
         this._ubMaterialPBR.addFloat("roughness", 0);
@@ -195,49 +198,49 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubDecals.setUniform("decals", this._tmpData, this._buffer.length);
         this._buffer.seek(0);
         for (const probe of this.envProbes) {
-            const position = vec3.create();
-            mat4.getTranslation(position, probe.worldTransform);
-            this._buffer.addArray(position);
+            let position = new vec3();
+            probe.worldTransform.getTranslation(position);
+            this._buffer.addArray(position.values);
             this._buffer.addNumber(probe.textureIndex);
         }
         this._ubEnvProbes.setUniform("probes", this._tmpData, this._buffer.length);
         this._buffer.seek(0);
         for (const vol of this.irradianceVolumes) {
-            const row0 = vec4.fromValues(vol.worldTransform[0], vol.worldTransform[1], vol.worldTransform[2], vol.worldTransform[3]);
-            const row1 = vec4.fromValues(vol.worldTransform[4], vol.worldTransform[5], vol.worldTransform[6], vol.worldTransform[7]);
-            const row2 = vec4.fromValues(vol.worldTransform[8], vol.worldTransform[9], vol.worldTransform[10], vol.worldTransform[11]);
-            this._buffer.addArray(row0);
-            this._buffer.addArray(row1);
-            this._buffer.addArray(row2);
-            const boxMin = vec4.from(vol.atlasLocation.minPoint);
-            const boxMax = vec4.from(vol.atlasLocation.maxPoint);
-            this._buffer.addArray(boxMin);
-            this._buffer.addArray(boxMax);
+            const row0 = new vec4([vol.worldTransform[0], vol.worldTransform[1], vol.worldTransform[2], vol.worldTransform[3]]);
+            const row1 = new vec4([vol.worldTransform[4], vol.worldTransform[5], vol.worldTransform[6], vol.worldTransform[7]]);
+            const row2 = new vec4([vol.worldTransform[8], vol.worldTransform[9], vol.worldTransform[10], vol.worldTransform[11]]);
+            this._buffer.addArray(row0.values);
+            this._buffer.addArray(row1.values);
+            this._buffer.addArray(row2.values);
+            const boxMin = vol.atlasLocation.minPoint.copy();
+            const boxMax = vol.atlasLocation.maxPoint.copy();
+            this._buffer.addArray(boxMin.values);
+            this._buffer.addArray(boxMax.values);
         }
         this._ubIrrVolumes.setUniform("volumes", this._tmpData, this._buffer.length);
     }
 
     private addDecalToBuffer(buffer: BufferHelper, decal: Decal) {
-        const row0 = vec4.fromValues(decal.worldTransform[0], decal.worldTransform[1], decal.worldTransform[2], decal.worldTransform[3]);
-        const row1 = vec4.fromValues(decal.worldTransform[4], decal.worldTransform[5], decal.worldTransform[6], decal.worldTransform[7]);
-        const row2 = vec4.fromValues(decal.worldTransform[8], decal.worldTransform[9], decal.worldTransform[10], decal.worldTransform[11]);
-        buffer.addArray(row0);
-        buffer.addArray(row1);
-        buffer.addArray(row2);
+        const row0 = new vec4([decal.worldTransform[0], decal.worldTransform[1], decal.worldTransform[2], decal.worldTransform[3]]);
+        const row1 = new vec4([decal.worldTransform[4], decal.worldTransform[5], decal.worldTransform[6], decal.worldTransform[7]]);
+        const row2 = new vec4([decal.worldTransform[8], decal.worldTransform[9], decal.worldTransform[10], decal.worldTransform[11]]);
+        buffer.addArray(row0.values);
+        buffer.addArray(row1.values);
+        buffer.addArray(row2.values);
         buffer.addArray(decal.atlasRect);
     }
 
     private addLightToBufer(buffer: BufferHelper, light: BaseLight) {
         buffer.addNumber(light.type);
-        const lightColor = vec3.from(light.color);
+        const lightColor = light.color.copy();
         buffer.addArray(lightColor);
         // transform
-        const row0 = vec4.fromValues(light.worldTransform[0], light.worldTransform[1], light.worldTransform[2], light.worldTransform[3]);
-        const row1 = vec4.fromValues(light.worldTransform[4], light.worldTransform[5], light.worldTransform[6], light.worldTransform[7]);
-        const row2 = vec4.fromValues(light.worldTransform[8], light.worldTransform[9], light.worldTransform[10], light.worldTransform[11]);
-        buffer.addArray(row0);
-        buffer.addArray(row1);
-        buffer.addArray(row2);
+        const row0 = new vec4([light.worldTransform[0], light.worldTransform[1], light.worldTransform[2], light.worldTransform[3]]);
+        const row1 = new vec4([light.worldTransform[4], light.worldTransform[5], light.worldTransform[6], light.worldTransform[7]]);
+        const row2 = new vec4([light.worldTransform[8], light.worldTransform[9], light.worldTransform[10], light.worldTransform[11]]);
+        buffer.addArray(row0.values);
+        buffer.addArray(row1.values);
+        buffer.addArray(row2.values);
         let radius = 0;
         let angle = 0;
         let penumbra = 0;
@@ -259,7 +262,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
             buffer.addArray(light.shadow.mapRect);
         }
         else {
-            buffer.addArray(vec4.create());
+            buffer.addArray(new vec4().values);
         }
     }
 
@@ -272,7 +275,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
     }
 
     public fillUniformBuffersPerView(camera: Camera) {
-        const tmpMat = mat4.create();
+        const tmpMat = mat4.identity.copy();
         // todo: fill view and proj matrix
         this._ubView.setMat4("matView", camera.viewTransform);
         // todo: prev view matrix
@@ -282,44 +285,46 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubView.setMat4("matProjPrev", camera.projTransformPrev);
 
         const viewport: Int32Array = GLDevice.gl.getParameter(GLDevice.gl.VIEWPORT);
-        const vpVec = vec4.fromValues(viewport[0], viewport[1], viewport[2], viewport[3]);
+        const vpVec = new vec4([viewport[0], viewport[1], viewport[2], viewport[3]]);
         this._ubView.setVec4("viewport", vpVec);
 
-        let camPosition = vec3.create();
-        mat4.getTranslation(camPosition, camera.worldTransform);
+        let camPosition = new vec3();
+        camera.worldTransform.getTranslation(camPosition);
         this._ubView.setVec3("position", camPosition);
 
-        const zRange = vec2.fromValues(camera.near, camera.far);
+        const zRange = new vec2([camera.near, camera.far]);
         this._ubView.setVec2("zRange", zRange);
 
         // todo: how to get full rendertarget size?
         // for post processes, the scene will be rendered to an off-screen FBO default.
-        let rtSize = vec2.fromValues(vpVec[2], vpVec[3]);
+        let rtSize = new vec2([vpVec.z, vpVec.w]);
         if (GLDevice.renderTarget) {
             const texture = GLDevice.renderTarget.getTexture(0) as Texture2D;
             if (texture) {
-                rtSize[0] = texture.width;
-                rtSize[1] = texture.height;
+                rtSize.x = texture.width;
+                rtSize.y = texture.height;
             }
         }
         this._ubView.setVec2("rtSize", rtSize);
 
         // todo: calculate far plane rect
         // use inverse projection transform?
-        let invProj = mat4.create();
-        mat4.invert(invProj, camera.projTransform);
+        let invProj: mat4 = camera.projTransform.copy();
+        invProj.inverse();
 
         // NDC space corners
-        const leftBottom = vec4.fromValues(-1, -1, 1, 1);
-        const rightTop = vec4.fromValues(1, 1, 1, 1);
+        const leftBottom = new vec4([-1, -1, 1, 1]);
+        const rightTop = new vec4([1, 1, 1, 1]);
 
-        let farLeftBottom = vec4.create();
-        let farRightTop = vec4.create();
-        vec4.transformMat4(farLeftBottom, leftBottom, invProj);
-        vec4.transformMat4(farRightTop, rightTop, invProj);
+        let farLeftBottom = new vec4();
+        let farRightTop = new vec4();
+        invProj.multiplyVec4(leftBottom, farLeftBottom);
+        invProj.multiplyVec4(rightTop, farRightTop);
+        //vec4.transformMat4(farLeftBottom, leftBottom, invProj);
+        //vec4.transformMat4(farRightTop, rightTop, invProj);
 
         // don't forget divide by w
-        const farRect = vec4.fromValues(farLeftBottom[0] / farLeftBottom[3], farLeftBottom[1] / farLeftBottom[3], farRightTop[0] / farRightTop[3], farRightTop[1] / farRightTop[3]);
+        const farRect = new vec4([farLeftBottom.x / farLeftBottom.w, farLeftBottom.y / farLeftBottom.w, farRightTop.x / farRightTop.w, farRightTop.y / farRightTop.w]);
         this._ubView.setVec4("farRect", farRect);
 
         this._ubView.update();

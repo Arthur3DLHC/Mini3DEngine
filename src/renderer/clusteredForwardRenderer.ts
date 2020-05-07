@@ -209,7 +209,7 @@ export class ClusteredForwardRenderer {
             const camera = this._renderContext.cameras[icam];
             // set viewport
             if (camera.viewport) {
-                GLDevice.gl.viewport(camera.viewport[0], camera.viewport[1], camera.viewport[2], camera.viewport[3]);                
+                GLDevice.gl.viewport(camera.viewport.x, camera.viewport.y, camera.viewport.z, camera.viewport.w);                
             } else {
                 GLDevice.gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
             }

@@ -1,6 +1,7 @@
-import { vec2, vec4 } from "gl-matrix";
 import { BaseLight } from "./baseLight.js";
 import { Texture2D } from "../../WebGLResources/textures/texture2D.js";
+import vec2 from "../../../lib/tsm/vec2.js";
+import vec4 from "../../../lib/tsm/vec4.js";
 
 /**
  * base class for shadows
@@ -9,8 +10,8 @@ export class LightShadow {
     public constructor(light: BaseLight) {
         this._light = light;
         this.bias = 0;
-        this.mapSize = vec2.fromValues(256, 256);
-        this.mapRect = vec4.fromValues(0, 0, 256, 256);
+        this.mapSize = new vec2([256, 256]);
+        this.mapRect = new vec4([0, 0, 256, 256]);
         this.shadowMap = null;
     }
     

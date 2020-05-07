@@ -1,6 +1,7 @@
-import { mat4, vec3 } from "gl-matrix";
 import { BoundingBox } from "./boundingBox.js";
 import { BoundingSphere } from "./boundingSphere.js";
+import mat4 from "../../lib/tsm/mat4.js";
+import vec3 from "../../lib/tsm/vec3.js";
 
 /**
  * frustum for cull objects

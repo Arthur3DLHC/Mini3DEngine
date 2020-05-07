@@ -1,19 +1,20 @@
-import { mat4, vec4 } from "gl-matrix";
 import { RenderList } from "../renderer/renderList.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
+import vec4 from "../../lib/tsm/vec4.js";
+import mat4 from "../../lib/tsm/mat4.js";
 
 export class Object3D {
     // base class of all render objects
     public constructor() {
         this.name = "";
         this.visible = true;
-        this.color = vec4.fromValues(1,1,1,1);
+        this.color = new vec4([1,1,1,1]);
         this._active = true;
         this.parent = null;
         this._children = [];
-        this.localTransform = mat4.create();
-        this.worldTransform = mat4.create();
-        this.worldTransformPrev = mat4.create();
+        this.localTransform = mat4.identity.copy();
+        this.worldTransform = mat4.identity.copy();
+        this.worldTransformPrev = mat4.identity.copy();
         this.castShadow = false;
         this.receiveShadow = false;
         this.occlusionQuery = false;
@@ -147,9 +148,9 @@ export class Object3D {
         // 
 
         if (this.parent) {
-            mat4.multiply(this.worldTransform, this.parent.worldTransform, this.localTransform);
+            mat4.product(this.parent.worldTransform, this.localTransform, this.worldTransform);
         } else {
-            mat4.copy(this.worldTransform, this.localTransform);
+            this.worldTransform = this.localTransform.copy();
         }
 
         if( updateChildren ) {

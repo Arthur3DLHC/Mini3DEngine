@@ -1,17 +1,18 @@
 import { Material } from "./material.js";
-import { vec4, vec3 } from "gl-matrix";
 import { Texture } from "../../WebGLResources/textures/texture.js";
+import vec4 from "../../../lib/tsm/vec4.js";
+import vec3 from "../../../lib/tsm/vec3.js";
 
 export class StandardPBRMaterial extends Material {
     public constructor() {
         super();
-        this.color = vec4.fromValues(1.0,1.0,1.0,1.0);
-        this.emissive = vec4.fromValues(0.0,0.0,0.0,0.0);
+        this.color = new vec4([1.0,1.0,1.0,1.0]);
+        this.emissive = new vec4([0.0,0.0,0.0,0.0]);
         // this.reflectivity = 0.5;
         this.roughness = 0.5;
         this.metallic = 0.0;
 
-        this.subsurfaceColor = vec3.fromValues(1.0, 1.0, 1.0);
+        this.subsurfaceColor = new vec3([1.0, 1.0, 1.0]);
         this.subsurface = 0.0;
 
         this.colorMap = null;

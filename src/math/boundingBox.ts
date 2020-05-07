@@ -1,14 +1,14 @@
-import { vec3 } from "gl-matrix";
+import vec3 from "../../lib/tsm/vec3.js"
 
 export class BoundingBox {
     public constructor(minPt: vec3|null, maxPt: vec3|null) {
-        this.minPoint = vec3.fromValues(-Infinity, -Infinity, -Infinity);
-        this.maxPoint = vec3.fromValues(Infinity, Infinity, Infinity);
+        this.minPoint = new vec3([-Infinity, -Infinity, -Infinity]);
+        this.maxPoint = new vec3([Infinity, Infinity, Infinity]);
         if (minPt) {
-            vec3.copy(this.minPoint, minPt);
+            minPt.copy(this.minPoint);
         }
         if (maxPt) {
-            vec3.copy(this.maxPoint, maxPt);
+            maxPt.copy(this.maxPoint);
         }
     }
     public minPoint: vec3;

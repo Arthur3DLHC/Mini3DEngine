@@ -1,15 +1,15 @@
 import { Object3D } from "./object3D.js";
 import { Texture3D } from "../WebGLResources/textures/texture3D.js";
 import { BoundingBox } from "../math/boundingBox.js";
-import { vec3 } from "gl-matrix";
 import { BufferGeometry } from "../geometry/bufferGeometry.js";
 import { RenderList } from "../renderer/renderList.js";
+import vec3 from "../../lib/tsm/vec3.js";
 
 export class IrradianceVolume extends Object3D {
     public constructor() {
         super();
         this.shTextures = [];
-        this.atlasLocation = new BoundingBox(vec3.fromValues(0, 0, 0), vec3.fromValues(8, 8, 8));
+        this.atlasLocation = new BoundingBox(new vec3([0, 0, 0]), new vec3([8, 8, 8]));
 
         this.debugDraw = false;
         this._debugGeometry = null;
