@@ -2,13 +2,15 @@ import { BlendState } from "../../WebGLResources/renderStates/blendState.js";
 import { CullState } from "../../WebGLResources/renderStates/cullState.js";
 import { DepthStencilState } from "../../WebGLResources/renderStates/depthStencilState.js";
 import { UniformBuffer } from "../../WebGLResources/uniformBuffer.js";
+import { RenderStateCache } from "../../WebGLResources/renderStateCache.js";
+import { GLDevice } from "../../WebGLResources/glDevice.js";
 
 export class Material {
     public constructor() {
         this.name = "";
-        this.blendState = null;
-        this.cullState = null;
-        this.depthStencilState = null;
+        this.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+        this.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.CCW);
+        this.depthStencilState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.LEQUAL);
         this.forceDepthPrepass = false;
 
         // fix me: 材质的 ubo，用动态还是用静态？

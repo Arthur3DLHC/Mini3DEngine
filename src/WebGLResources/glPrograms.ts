@@ -23,7 +23,7 @@ export class GLPrograms {
     private static _currProgram: ShaderProgram|null = null;
 
     public static get currProgram(): ShaderProgram | null {
-        return GLPrograms.currProgram;
+        return GLPrograms._currProgram;
     }
 
     public static processSourceCode(code: string): string {

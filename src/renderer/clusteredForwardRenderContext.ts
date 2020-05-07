@@ -117,7 +117,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         // per obj
         const MAX_BONES = 256;
         this._ubObject.addMat4("matWorld", matIdentity);
-        this._ubObject.addMat4("matPrevWorld", matIdentity);
+        this._ubObject.addMat4("matWorldPrev", matIdentity);
         this._ubObject.addVec4("color", new vec4());
         // this._ubObject.addFloat("tag", 0);
         this._ubObject.addUniform("matBones", MAX_BONES * 16);
@@ -408,6 +408,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubObject.setMat4("matWorld", item.object.worldTransform);
         this._ubObject.setMat4("matWorldPrev", item.object.worldTransformPrev);
         this._ubObject.setVec4("color", item.object.color);
+        this._ubObject.update();
 
         // todo: object skin transforms, if skinmesh
     }

@@ -170,11 +170,16 @@ export class Object3D {
         // todo: subclasses add primitive to list
     }
 
-    public destroy() {
+    public destroy(destroyChildren: boolean) {
         // subclass release WebGL resources.
         if (this.occlusionQueryID) {
             GLDevice.gl.deleteQuery(this.occlusionQueryID);
             this.occlusionQueryID = null;
+        }
+        if (destroyChildren) {
+            for (const child of this._children) {
+                child.destroy(destroyChildren);
+            }
         }
     }
 }

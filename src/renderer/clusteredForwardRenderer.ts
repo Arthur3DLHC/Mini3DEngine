@@ -497,6 +497,7 @@ export class ClusteredForwardRenderer {
         }
     }
     private renderItemBoundingBoxes(renderList: RenderList, occlusionQuery: boolean = false) {
+        /*
         // render bounding boxes only, ignore all materials
         // 是每个 object 一个 boundingbox，还是每个 renderitem 一个？
         // 如果 occlusionQuery === true，需要检查对象是否有 queryID，如果没有就创建一个。
@@ -523,7 +524,6 @@ export class ClusteredForwardRenderer {
                 }
             }
         }
-
-        throw new Error("Method not implemented.");
+        */
     }
 }
