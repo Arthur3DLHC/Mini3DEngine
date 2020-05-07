@@ -1,6 +1,6 @@
-import vec2 from './vec2'
+import vec2 from './vec2.js'
 
-import { epsilon } from './constants'
+import { epsilon } from './constants.js'
 
 export default class mat2 {
 

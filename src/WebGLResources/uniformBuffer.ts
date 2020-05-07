@@ -1,6 +1,11 @@
-import { vec2, vec3, vec4, mat2, mat3, mat4 } from "gl-matrix";
 import { BufferSegment } from "./bufferSegment.js";
 import { GLDevice } from "./glDevice.js";
+import vec2 from "../../lib/tsm/vec2.js";
+import vec3 from "../../lib/tsm/vec3.js";
+import vec4 from "../../lib/tsm/vec4.js";
+import mat2 from "../../lib/tsm/mat2.js";
+import mat4 from "../../lib/tsm/mat4.js";
+import mat3 from "../../lib/tsm/mat3.js";
 
 export class UniformBuffer {
     /**
@@ -79,17 +84,17 @@ export class UniformBuffer {
     }
 
     public addVec2(name: string, val: vec2) {
-        const data = [val[0], val[1]];
+        const data = [val.x, val.y];
         this.addUniform(name, 2, data);
     }
 
     public addVec3(name: string, val: vec3) {
-        const data = [val[0], val[1], val[2]];
+        const data = [val.x, val.y, val.z];
         this.addUniform(name, 3, data);
     }
 
     public addVec4(name: string, val: vec4) {
-        const data = [val[0], val[1], val[2], val[3]];
+        const data = [val.x, val.y, val.z, val.w];
         this.addUniform(name, 4, data);
     }
 
@@ -104,11 +109,7 @@ export class UniformBuffer {
     }
 
     public addMat4(name: string, val: mat4) {
-        const data = [];
-        for (const e of val) {
-            data.push(e);
-        }
-        this.addUniform(name, 16, data);
+        this.addUniform(name, 16, val.all());
     }
 
     // TODO: Add array
@@ -140,14 +141,14 @@ export class UniformBuffer {
     public setVec2(name: string, val: vec2) {
         // UniformBuffer._tmpBuffer[0] = val[0];
         // UniformBuffer._tmpBuffer[1] = val[1];
-        this.setUniform(name, val, 2);
+        this.setUniform(name, val.values, 2);
     }
 
     public setVec3(name: string, val: vec3) {
         // UniformBuffer._tmpBuffer[0] = val[0];
         // UniformBuffer._tmpBuffer[1] = val[1];
         // UniformBuffer._tmpBuffer[2] = val[2];
-        this.setUniform(name, val, 3);
+        this.setUniform(name, val.values, 3);
     }
 
     public setVec4(name: string, val: vec4) {
@@ -155,14 +156,14 @@ export class UniformBuffer {
         // UniformBuffer._tmpBuffer[1] = val[1];
         // UniformBuffer._tmpBuffer[2] = val[2];
         // UniformBuffer._tmpBuffer[3] = val[3];
-        this.setUniform(name, val, 4);
+        this.setUniform(name, val.values, 4);
     }
 
     public setMat2(name: string, val: mat2) {
         // 需要按照对齐规则转换一下
         for (let i = 0; i < 2; i++) {
-            UniformBuffer._tmpBuffer[i * 4 + 0] = val[i * 2 + 0];
-            UniformBuffer._tmpBuffer[i * 4 + 1] = val[i * 2 + 1];
+            UniformBuffer._tmpBuffer[i * 4 + 0] = val.at(i * 2 + 0);
+            UniformBuffer._tmpBuffer[i * 4 + 1] = val.at(i * 2 + 1);
             UniformBuffer._tmpBuffer[i * 4 + 2] = 0;
             UniformBuffer._tmpBuffer[i * 4 + 3] = 0;
         }
@@ -172,16 +173,16 @@ export class UniformBuffer {
     public setMat3(name: string, val: mat3) {
         // 需要按照对齐规则转换一下
         for (let i = 0; i < 3; i++) {
-            UniformBuffer._tmpBuffer[i * 4 + 0] = val[i * 2 + 0];
-            UniformBuffer._tmpBuffer[i * 4 + 1] = val[i * 2 + 1];
-            UniformBuffer._tmpBuffer[i * 4 + 2] = val[i * 2 + 2];
+            UniformBuffer._tmpBuffer[i * 4 + 0] = val.at(i * 2 + 0);
+            UniformBuffer._tmpBuffer[i * 4 + 1] = val.at(i * 2 + 1);
+            UniformBuffer._tmpBuffer[i * 4 + 2] = val.at(i * 2 + 2);
             UniformBuffer._tmpBuffer[i * 4 + 3] = 0;
         }
         this.setUniform(name, UniformBuffer._tmpBuffer, 12);
     }
 
     public setMat4(name: string, val: mat4) {
-        this.setUniform(name, val, 16);
+        this.setUniform(name, val.values, 16);
     }
 
     // TODO: set array

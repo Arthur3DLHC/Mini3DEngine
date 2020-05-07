@@ -1,6 +1,6 @@
 import { FrameBuffer } from "./frameBuffer.js";
 import { GLGeometryBuffers } from "./glGeometryBuffers.js";
-import { vec4 } from "gl-matrix";
+import vec4 from "../../lib/tsm/vec4.js";
 
 export class GLDevice {
     public static gl: WebGL2RenderingContext;
@@ -21,7 +21,7 @@ export class GLDevice {
 
     private static _canvas: HTMLCanvasElement;
     private static _renderTarget: FrameBuffer | null;
-    private static _clearColor: vec4 = vec4.fromValues(0,0,1,1);
+    private static _clearColor: vec4 = new vec4([0,0,1,1]);
     private static _clearDepth: number = 1;
     private static _clearStencil: number = 1;
     
@@ -50,7 +50,7 @@ export class GLDevice {
 
     public static set clearColor(color: vec4) {
         GLDevice._clearColor = color;
-        GLDevice.gl.clearColor(color[0], color[1], color[2], color[3]);
+        GLDevice.gl.clearColor(color.r, color.g, color.b, color.a);
     }
     public static get clearColor(): vec4 {
         return GLDevice._clearColor;

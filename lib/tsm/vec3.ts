@@ -1,7 +1,7 @@
-import mat3 from './mat3'
-import quat from './quat'
+import mat3 from './mat3.js'
+import quat from './quat.js'
 
-import { epsilon } from './constants'
+import { epsilon } from './constants.js'
 
 export default class vec3 {
 

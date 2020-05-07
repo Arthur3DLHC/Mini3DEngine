@@ -1,5 +1,5 @@
-import { vec4 } from "gl-matrix";
 import { Texture2D } from "./texture2D.js";
+import vec4 from "../../../lib/tsm/vec4.js";
 
 export class TextureAtlas2D {
     public constructor() {

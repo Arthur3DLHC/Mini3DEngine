@@ -1,37 +1,37 @@
-import mat2 from './mat2'
-import mat3 from './mat3'
-import vec3 from './vec3'
+import mat2 from './mat2.js'
+import mat3 from './mat3.js'
+import vec3 from './vec3.js'
 
-import { epsilon } from './constants'
+import { epsilon } from './constants.js'
 
 export default class vec2 {
 
     get x(): number {
-        return this.values[0]
+        return this._values[0]
     }
 
     get y(): number {
-        return this.values[1]
+        return this._values[1]
     }
 
     get xy(): [number, number] {
         return [
-            this.values[0],
-            this.values[1],
+            this._values[0],
+            this._values[1],
         ]
     }
 
     set x(value: number) {
-        this.values[0] = value
+        this._values[0] = value
     }
 
     set y(value: number) {
-        this.values[1] = value
+        this._values[1] = value
     }
 
     set xy(values: [number, number]) {
-        this.values[0] = values[0]
-        this.values[1] = values[1]
+        this._values[0] = values[0]
+        this._values[1] = values[1]
     }
 
     constructor(values?: [number, number]) {
@@ -40,13 +40,16 @@ export default class vec2 {
         }
     }
 
-    private values = new Float32Array(2)
+    private _values = new Float32Array(2)
+    public get values(): Float32Array {
+        return this._values;
+    }
 
     static readonly zero = new vec2([0, 0])
     static readonly one = new vec2([1, 1])
 
     at(index: number): number {
-        return this.values[index]
+        return this._values[index]
     }
 
     reset(): void {

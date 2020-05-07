@@ -1,6 +1,6 @@
-import mat4 from './mat4'
+import mat4 from './mat4.js'
 
-import { epsilon } from './constants'
+import { epsilon } from './constants.js'
 
 export default class vec4 {
 

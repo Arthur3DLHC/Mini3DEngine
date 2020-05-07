@@ -1,9 +1,9 @@
-import mat4 from './mat4'
-import quat from './quat'
-import vec2 from './vec2'
-import vec3 from './vec3'
+import mat4 from './mat4.js'
+import quat from './quat.js'
+import vec2 from './vec2.js'
+import vec3 from './vec3.js'
 
-import { epsilon } from './constants'
+import { epsilon } from './constants.js'
 
 export default class mat3 {
 

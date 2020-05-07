@@ -206,9 +206,9 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubEnvProbes.setUniform("probes", this._tmpData, this._buffer.length);
         this._buffer.seek(0);
         for (const vol of this.irradianceVolumes) {
-            const row0 = new vec4([vol.worldTransform[0], vol.worldTransform[1], vol.worldTransform[2], vol.worldTransform[3]]);
-            const row1 = new vec4([vol.worldTransform[4], vol.worldTransform[5], vol.worldTransform[6], vol.worldTransform[7]]);
-            const row2 = new vec4([vol.worldTransform[8], vol.worldTransform[9], vol.worldTransform[10], vol.worldTransform[11]]);
+            const row0 = vol.worldTransform.row(0);
+            const row1 = vol.worldTransform.row(1);
+            const row2 = vol.worldTransform.row(2);
             this._buffer.addArray(row0.values);
             this._buffer.addArray(row1.values);
             this._buffer.addArray(row2.values);
@@ -221,23 +221,23 @@ export class ClusteredForwardRenderContext extends RenderContext {
     }
 
     private addDecalToBuffer(buffer: BufferHelper, decal: Decal) {
-        const row0 = new vec4([decal.worldTransform[0], decal.worldTransform[1], decal.worldTransform[2], decal.worldTransform[3]]);
-        const row1 = new vec4([decal.worldTransform[4], decal.worldTransform[5], decal.worldTransform[6], decal.worldTransform[7]]);
-        const row2 = new vec4([decal.worldTransform[8], decal.worldTransform[9], decal.worldTransform[10], decal.worldTransform[11]]);
+        const row0 = decal.worldTransform.row(0);
+        const row1 = decal.worldTransform.row(1);
+        const row2 = decal.worldTransform.row(2);
         buffer.addArray(row0.values);
         buffer.addArray(row1.values);
         buffer.addArray(row2.values);
-        buffer.addArray(decal.atlasRect);
+        buffer.addArray(decal.atlasRect.values);
     }
 
     private addLightToBufer(buffer: BufferHelper, light: BaseLight) {
         buffer.addNumber(light.type);
         const lightColor = light.color.copy();
-        buffer.addArray(lightColor);
+        buffer.addArray(lightColor.values);
         // transform
-        const row0 = new vec4([light.worldTransform[0], light.worldTransform[1], light.worldTransform[2], light.worldTransform[3]]);
-        const row1 = new vec4([light.worldTransform[4], light.worldTransform[5], light.worldTransform[6], light.worldTransform[7]]);
-        const row2 = new vec4([light.worldTransform[8], light.worldTransform[9], light.worldTransform[10], light.worldTransform[11]]);
+        const row0 = light.worldTransform.row(0);
+        const row1 = light.worldTransform.row(1);
+        const row2 = light.worldTransform.row(2);
         buffer.addArray(row0.values);
         buffer.addArray(row1.values);
         buffer.addArray(row2.values);
@@ -259,7 +259,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         buffer.addNumber(penumbra);
         buffer.addNumber(unused); // uniform align
         if (light.shadow) {
-            buffer.addArray(light.shadow.mapRect);
+            buffer.addArray(light.shadow.mapRect.values);
         }
         else {
             buffer.addArray(new vec4().values);

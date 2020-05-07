@@ -35,7 +35,8 @@ export class Camera extends Object3D {
      */
     public updateViewProjTransform() {
         this.viewTransformPrev = this.viewTransform;
-        this.worldTransform.inverse(this.viewTransform);
+        this.viewTransform = this.worldTransform.copy();
+        this.viewTransform.inverse();
         // mat4.invert(this.viewTransform, this.worldTransform);
         // todo: subclasses update proj transform
     }
