@@ -2,9 +2,12 @@
  * todo: implement default pbr shader
  */
 export default /** glsl */`
-#include <uniforms_perframe.vs>
-#include <uniforms_percamera.vs>
-// todo: funcitons?
-// todo: vertex attribute
-// todo: vertex outputs
+#include <output_final>
+in vec4 ex_color;
+void main(void)
+{
+    FinalOutput o = defaultFinalOutput();
+    o.color = ex_color;
+    outputFinal(o);
+}
 `;

@@ -8,7 +8,7 @@ export default /** glsl */`
     }
     vec4 worldToView(vec4 vWorld)
     {
-        reutrn u_view.matView * vWorld;
+        return u_view.matView * vWorld;
     }
     vec4 viewToProj(vec4 vView)
     {

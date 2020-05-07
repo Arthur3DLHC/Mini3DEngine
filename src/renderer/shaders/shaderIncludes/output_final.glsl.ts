@@ -18,16 +18,20 @@ export default /** glsl */`
         FinalOutput o;
         o.color = vec4(0,0,0,0);
         o.subsurfaceColor = vec4(0,0,0,0);
-        o.subsurface = 0;
+        o.subsurface = 0.0;
         o.roughness = 0.5;
-        o.metallic = 0;
+        o.metallic = 0.0;
         o.normal = vec3(0,0,1);
         return o;
     }
 
+    layout(location = 0) out vec4 o_color;
+    // todo: normal, spec and glossiness?
+    // todo: subsurface?
+
     void outputFinal(FinalOutput o)
     {
-        gl_FragData[0] = o.color;
+        o_color = o.color;
         // TODO: other render targets
     }
 `;

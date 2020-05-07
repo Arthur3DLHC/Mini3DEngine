@@ -172,7 +172,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         GLUniformBuffers.bindUniformBlock(program, "IrrVolumes");
         GLUniformBuffers.bindUniformBlock(program, "Frame");
         GLUniformBuffers.bindUniformBlock(program, "View");
-        GLUniformBuffers.bindUniformBlock(program, "LiItemIndicesghts");
+        GLUniformBuffers.bindUniformBlock(program, "ItemIndices");
         GLUniformBuffers.bindUniformBlock(program, "Clusters");
         GLUniformBuffers.bindUniformBlock(program, "Object");
         GLUniformBuffers.bindUniformBlock(program, "Material");

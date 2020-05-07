@@ -22,7 +22,7 @@ export default /** glsl */`
         int indices[MAX_ITEMS_PERVIEW]; // 一个int数组，其中按每个cluster顺序保存了其中所有光源索引，decal索引，envProbe索引，irradiance volume索引
     } u_itemIndices;
 
-    #define NUM_CLUSTERS_PERVIEW   3072 (16*8*24)
+    #define NUM_CLUSTERS_PERVIEW   3072 //(16*8*24)
 
     struct Cluster {
 

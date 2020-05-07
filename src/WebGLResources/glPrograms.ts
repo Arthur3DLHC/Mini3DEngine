@@ -32,8 +32,7 @@ export class GLPrograms {
         
         // 其他还需要那些预处理？
         // version and precision
-        const header = `
-        #version 300 es
+        const header = `#version 300 es
         precision highp float;
         precision highp int;
         `;
@@ -55,7 +54,7 @@ export class GLPrograms {
 
         return code.replace(GLPrograms.includePattern, (match: string, shaderKey: string): string => {
             let code = GLPrograms.shaderCodes[shaderKey];
-            if (!code) {
+            if (code === undefined) {
                 throw new Error("Can not resolve #include <" + shaderKey + ">");
             }
             return this.resolveInclude(code);

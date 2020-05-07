@@ -10,6 +10,7 @@ export default /** glsl */`
 #include <uniforms_object>
 
 // todo: include common funcitons?
+#include <function_transforms>
 
 // vertex attribute
 // 使用<attribs>规定的vertex attribute

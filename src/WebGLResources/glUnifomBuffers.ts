@@ -12,7 +12,7 @@ export class GLUniformBuffers {
      * @param unifomBlockName 
      */
     public static bindUniformBuffer(buffer: UniformBuffer | null, unifomBlockName: string) {
-        if (!GLUniformBuffers.uniformBlockNames[unifomBlockName]) {
+        if (GLUniformBuffers.uniformBlockNames[unifomBlockName] === undefined) {
             throw new Error("Uniform block binding point not assigned: " + unifomBlockName);
         }
 
@@ -27,7 +27,7 @@ export class GLUniformBuffers {
     }
 
     public static bindUniformBlock(program: ShaderProgram, blockName: string) {
-        if (!GLUniformBuffers.uniformBlockNames[blockName]) {
+        if (GLUniformBuffers.uniformBlockNames[blockName] === undefined) {
             throw new Error("Uniform block binding point not assigned: " + blockName);
         }
         if (!program.glProgram) {
@@ -35,7 +35,11 @@ export class GLUniformBuffers {
         }
         if (program.glProgram) {
             const location = GLDevice.gl.getUniformBlockIndex(program.glProgram, blockName);
-            GLDevice.gl.uniformBlockBinding(program.glProgram, location, GLUniformBuffers.uniformBlockNames[blockName]);
+            try{
+                GLDevice.gl.uniformBlockBinding(program.glProgram, location, GLUniformBuffers.uniformBlockNames[blockName]);
+            } catch (e) {
+                console.error(e);
+            }
             // GLUniformBuffers._uniformBlockNames[blockName] = index;
         }
     }
