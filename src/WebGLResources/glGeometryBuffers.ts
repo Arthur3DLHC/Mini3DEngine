@@ -47,7 +47,7 @@ export class GLGeometryBuffers {
 
     public static setVertexAttribute(attrib: VertexBufferAttribute, attribLocations: Map<string, number>) {
         const index = attribLocations.get(attrib.name);
-        if (index) {
+        if (index !== undefined) {
             this._newAttributes[index] = 1;
             if (this._enabledAttributes[index] === 0) {
                 GLDevice.gl.enableVertexAttribArray(index);

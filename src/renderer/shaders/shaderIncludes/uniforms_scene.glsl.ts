@@ -7,6 +7,8 @@ export default /** glsl */`
     #define MAX_ENVPROBES_PERSCENE  512
     #define MAX_IRRADIANCE_VOLUMES_PERSCENE  512
     
+    layout (std140, column_major) uniform; 
+
     struct Light {
         vec4 color;
         mat4 transform;     
@@ -18,7 +20,7 @@ export default /** glsl */`
         vec4 shadowMapRect;   // dir/spot
         // fix me: need to add shadow proj matrix?
     };
-    layout (std140) uniform Lights
+    uniform Lights
     {
         Light lights[MAX_LIGHTS_PERSCENE];
     } u_lights;
@@ -27,7 +29,7 @@ export default /** glsl */`
         mat4 transform;
         vec4 decalMapRect;  // 在图集中的位置
     };
-    layout (std140) uniform Decals
+    uniform Decals
     {
         Decal decals[MAX_DECALS_PERSCENE];
     } u_decals;
@@ -37,7 +39,7 @@ export default /** glsl */`
         float cubeMapIndex;  // start index for 6 faces in texture array
                             // Fix me: js中能把整数放在Float32Array中吗？如果不能，这里需要改为float类型
     };
-    layout (std140) uniform EnvProbes
+    uniform EnvProbes
     {
         EnvProbe probes[MAX_ENVPROBES_PERSCENE];
     } u_envProbes;
@@ -47,7 +49,7 @@ export default /** glsl */`
         vec4 boxMin;         // irradiance volume 三维图集中的盒子最小角
         vec4 boxMax;         // irradiance volume 三维图集中的盒子最小角
     };
-    layout (std140) uniform IrrVolumes
+    uniform IrrVolumes
     {
         IrradianceVolume volumes[MAX_IRRADIANCE_VOLUMES_PERSCENE];
     } u_irrVolumes;

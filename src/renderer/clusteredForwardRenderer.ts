@@ -218,9 +218,9 @@ export class ClusteredForwardRenderer {
 
             // todo: sort the renderlists first?
 
-            this.renderDepthPrepass();
+            // this.renderDepthPrepass();
             this.renderOpaque();
-            this.renderTransparent();
+            // this.renderTransparent();
 
             // todo: render sprites
         }
@@ -232,7 +232,7 @@ export class ClusteredForwardRenderer {
         this._renderStatesDepthPrepass.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
         this._renderStatesDepthPrepass.colorWriteState = RenderStateCache.instance.getColorWriteState(false, false, false, false);
 
-        this._renderStatesOpaque.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.EQUAL);
+        this._renderStatesOpaque.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.LEQUAL);
         this._renderStatesOpaque.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
         this._renderStatesOpaque.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
         this._renderStatesOpaque.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
@@ -420,6 +420,7 @@ export class ClusteredForwardRenderer {
         }
 
         // occlusion query objects, query for next frame;
+        /*
         if (this._renderListOpaqueOcclusionQuery.ItemCount > 0) {
             this.setRenderStateSet(this._renderStatesOpaqueOcclusion);
             GLPrograms.useProgram(this._occlusionQueryProgram);
@@ -429,6 +430,7 @@ export class ClusteredForwardRenderer {
             this.setRenderStateSet(this._renderStatesOpaque);
             this.renderItems(this._renderListOpaqueOcclusionQuery, false, true);
         }
+        */
     }
     private renderTransparent() {
         // non occlusion query objects

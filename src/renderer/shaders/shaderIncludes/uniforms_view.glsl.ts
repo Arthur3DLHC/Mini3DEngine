@@ -5,7 +5,9 @@ export default /** glsl */`
     #define MAX_ITEM_VEC4S_PERVIEW  1024 // (4096 / 4) ivec4s
     #define NUM_CLUSTERS_PERVIEW    3072 //(16*8*24)
 
-    layout (std140) uniform View
+    layout (std140, column_major) uniform; 
+
+    uniform View
     {
         mat4 matView;
         mat4 matViewPrev;
@@ -20,7 +22,7 @@ export default /** glsl */`
     } u_view;
 
 
-    layout (std140) uniform ItemIndices
+    uniform ItemIndices
     {
         // fix me: 由于对齐，每个 int 元素会占一个ivec4
         // 所以不如直接用 ivec4，然后在 shader 中处理取分量的逻辑
@@ -37,7 +39,7 @@ export default /** glsl */`
         int decalCount;
         int envProbeIrrVolCount;        // 为了凑vec4, packed, 高16位是 envProbe 数量，低 16 位是 irrvol 数量
     };
-    layout (std140) uniform Clusters
+    uniform Clusters
     {
         Cluster clusters[NUM_CLUSTERS_PERVIEW];
     } u_clusters;

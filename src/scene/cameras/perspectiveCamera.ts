@@ -29,7 +29,7 @@ export class PerspectiveCamera extends Camera {
 
     public updateViewProjTransform() {
         super.updateViewProjTransform();
-        this.projTransform = mat4.perspective(this.fov * Math.PI / 180.0, this.aspect, this.near, this.far); 
+        this.projTransform = mat4.perspective(this.fov, this.aspect, this.near, this.far); 
         // todo: 在这里更新视锥？
     }
 

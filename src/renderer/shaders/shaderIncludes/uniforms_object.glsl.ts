@@ -3,7 +3,8 @@
  */
 export default /** glsl */`
     #define MAX_BONES       256
-    layout (std140) uniform Object
+    layout (std140, column_major) uniform; 
+    uniform Object
     {
         mat4 matWorld;
         mat4 matWorldPrev;
@@ -15,7 +16,7 @@ export default /** glsl */`
     } u_object;
     // fix me: 是否可以统一用一个 uniform block？避免block过多
     /*
-    layout (std140) uniform ObjectSkin
+    uniform ObjectSkin
     {
         vec4 color;     // or use colortint and coloradd?
         float tag; 
