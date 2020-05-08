@@ -20,6 +20,7 @@ export class GLUniformBuffers {
             if (!buffer.glBuffer) {
                 buffer.build();
             }
+            console.log("bind uniform buffer: " + unifomBlockName + " to " + GLUniformBuffers.uniformBlockNames[unifomBlockName]);
             GLDevice.gl.bindBufferBase(GLDevice.gl.UNIFORM_BUFFER, GLUniformBuffers.uniformBlockNames[unifomBlockName], buffer.glBuffer);
         } else {
             GLDevice.gl.bindBufferBase(GLDevice.gl.UNIFORM_BUFFER, GLUniformBuffers.uniformBlockNames[unifomBlockName], null);

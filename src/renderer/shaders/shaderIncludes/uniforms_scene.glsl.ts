@@ -3,8 +3,8 @@
  */
 export default /** glsl */`
     #define MAX_LIGHTS_PERSCENE  512
-    #define MAX_DECALS_PERSCENE  1024
-    #define MAX_ENVPROBES_PERSCENE  1024
+    #define MAX_DECALS_PERSCENE  512
+    #define MAX_ENVPROBES_PERSCENE  512
     #define MAX_IRRADIANCE_VOLUMES_PERSCENE  512
     
     struct Light {

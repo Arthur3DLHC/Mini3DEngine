@@ -15,6 +15,9 @@ export class GLDevice {
         }
         this._canvas = canvas;
 
+        const maxUBSize = GLDevice.gl.getParameter(GLDevice.gl.MAX_UNIFORM_BLOCK_SIZE);
+        console.log("max uniform block size: " + maxUBSize);
+
         // todo: 在这里初始化所有 gl 相关模块？
         GLGeometryBuffers.initialize();
     }

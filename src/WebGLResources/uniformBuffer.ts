@@ -12,7 +12,8 @@ export class UniformBuffer {
      * 构造函数
      * @param dynamic 是否是动态 uniformbuffer。默认值 true
      */
-    public constructor(dynamic: boolean = true) {
+    public constructor(name: string, dynamic: boolean = true) {
+        this.name = name;
         this._data = [];
         this._bufferData = null;
         this.glBuffer = null;
@@ -20,6 +21,7 @@ export class UniformBuffer {
         this._dynamic = dynamic;
         this._currStartIdx = 0;
     }
+    public name: string;
     public glBuffer: WebGLBuffer | null;
 
     private _dynamic: boolean;
@@ -193,6 +195,7 @@ export class UniformBuffer {
         }
         // 用当前 buffer 数据创建glUniformBuffer对象
         this._bufferData = new Float32Array(this._data);
+        console.log("build uniform buffer [" + this.name + "] with byte size: " + this._bufferData.byteLength );
         this.glBuffer = GLDevice.gl.createBuffer();
         GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, this.glBuffer);
         if (this._dynamic) {
@@ -207,6 +210,7 @@ export class UniformBuffer {
         if (!this.glBuffer || !this._bufferData) {
             throw new Error("Can not update ubo before build");
         }
+        // console.log("update uniform buffer [" + this.name + "] with byte size: " + this._bufferData.byteLength );
         GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, this.glBuffer);
         GLDevice.gl.bufferSubData(GLDevice.gl.UNIFORM_BUFFER, 0, this._bufferData);
         GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, null);
@@ -216,15 +220,19 @@ export class UniformBuffer {
      * 用任意类型数组更新 uniform buffer；
      * @param data 包含要更新的数据的任意类型数组。注意长度需要和 ubo 创建时匹配；注意对齐；
      */
-    public updateByData(data: BufferSource, dstByteOffset: number) {
+    public updateByData(data: ArrayBufferView, dstByteOffset: number, srcElemOffset: number, length: number) {
         if (!this.glBuffer || !this._bufferData) {
             throw new Error("Can not update ubo before build");
         }
-        if (data.byteLength + dstByteOffset > this._bufferData.byteLength) {
-            throw new Error("buffer overrun");
+        if (length <= 0) {
+            return;
         }
+        // if (data.byteLength + dstByteOffset > this._bufferData.byteLength) {
+        //    throw new Error("buffer overrun");
+        // }
+        // console.log("update uniform buffer [" + this.name + "] with length: " + length );
         GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, this.glBuffer);
-        GLDevice.gl.bufferSubData(GLDevice.gl.UNIFORM_BUFFER, dstByteOffset, data);
+        GLDevice.gl.bufferSubData(GLDevice.gl.UNIFORM_BUFFER, dstByteOffset, data, srcElemOffset, length);
         GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, null);
     }
     

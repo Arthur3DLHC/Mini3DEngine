@@ -50,8 +50,7 @@ export class SamplerUniforms {
             GLTextures.setTextureAt(unit, texture);
             GLDevice.gl.uniform1i(this._uniformLocations[uniformName], unit);
         } else {
-            // throw or log error?
-            throw new Error("active uniform not found: " + uniformName);
+            // uniform not found or not active
         }
     }
 

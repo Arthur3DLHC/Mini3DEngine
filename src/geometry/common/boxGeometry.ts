@@ -62,12 +62,12 @@ export class BoxGeometry extends BufferGeometry {
         ]);
         this.vertexBuffer.create();
         this.indexBuffer.indices = new Uint16Array([
-            0, 1, 2, 2, 3, 0,
-            4, 5, 6, 6, 7, 4,
-            8, 9, 10, 10, 11, 8,
-            12, 13, 14, 14, 15, 12,
-            16, 17, 18, 18, 19, 16,
-            20, 21, 22, 22, 23, 20,
+            1, 0, 2, 2, 0, 3,
+            5, 4, 6, 6, 4, 7,
+            9, 8, 10, 10, 8, 11,
+            13, 12, 14, 14, 12, 15,
+            17, 16, 18, 18, 16, 19,
+            21, 20, 22, 22, 20, 23,
         ]);
         this.indexBuffer.create();
 

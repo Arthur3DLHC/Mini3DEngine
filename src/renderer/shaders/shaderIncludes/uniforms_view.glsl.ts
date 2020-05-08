@@ -2,6 +2,9 @@
  * todo: define uniform buffer layout
  */
 export default /** glsl */`
+    #define MAX_ITEMS_PERVIEW       4096
+    #define NUM_CLUSTERS_PERVIEW    3072 //(16*8*24)
+
     layout (std140) uniform View
     {
         mat4 matView;
@@ -10,19 +13,18 @@ export default /** glsl */`
         mat4 matProjPrev;
         vec4 viewport;          // x, y, width, height
         vec3 position;
+        float time;             // perframe buffer is too small, so put in there               
         vec2 zRange;            // near, far
         vec2 rtSize;            // render target full size, in pixels
         vec4 farRect;           // far plane left, bottom, right, top
     } u_view;
 
-    #define MAX_ITEMS_PERVIEW   4096
 
     layout (std140) uniform ItemIndices
     {
         int indices[MAX_ITEMS_PERVIEW]; // 一个int数组，其中按每个cluster顺序保存了其中所有光源索引，decal索引，envProbe索引，irradiance volume索引
     } u_itemIndices;
 
-    #define NUM_CLUSTERS_PERVIEW   3072 //(16*8*24)
 
     struct Cluster {
 

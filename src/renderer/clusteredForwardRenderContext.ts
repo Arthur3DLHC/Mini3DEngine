@@ -33,16 +33,16 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._tmpClusterData = new Uint32Array(ClusteredForwardRenderer.NUM_CLUSTERS * ClusteredForwardRenderer.CLUSTER_SIZE_INT);
         this._clusterBuffer = new BufferHelper(this._tmpClusterData);
 
-        this._ubLights = new UniformBuffer();
-        this._ubDecals = new UniformBuffer();
-        this._ubEnvProbes = new UniformBuffer();
-        this._ubIrrVolumes = new UniformBuffer();
-        this._ubFrame = new UniformBuffer();
-        this._ubView = new UniformBuffer();
-        this._ubItemIndices = new UniformBuffer();
-        this._ubClusters = new UniformBuffer();
-        this._ubObject = new UniformBuffer();
-        this._ubMaterialPBR = new UniformBuffer();
+        this._ubLights = new UniformBuffer("lights");
+        this._ubDecals = new UniformBuffer("decals");
+        this._ubEnvProbes = new UniformBuffer("envprobes");
+        this._ubIrrVolumes = new UniformBuffer("irrVolumes");
+        //this._ubFrame = new UniformBuffer();
+        this._ubView = new UniformBuffer("view");
+        this._ubItemIndices = new UniformBuffer("itemIndices");
+        this._ubClusters = new UniformBuffer("clusters");
+        this._ubObject = new UniformBuffer("object");
+        this._ubMaterialPBR = new UniformBuffer("material");
 
         this.setUniformBufferLayouts();
 
@@ -50,7 +50,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubDecals.build();
         this._ubEnvProbes.build();
         this._ubIrrVolumes.build();
-        this._ubFrame.build();
+        //this._ubFrame.build();
         this._ubView.build();
         this._ubItemIndices.build();
         this._ubClusters.build();
@@ -73,7 +73,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
     private _ubDecals: UniformBuffer;
     private _ubEnvProbes: UniformBuffer;
     private _ubIrrVolumes: UniformBuffer;
-    private _ubFrame: UniformBuffer;
+    // private _ubFrame: UniformBuffer;
     private _ubView: UniformBuffer;
     private _ubItemIndices: UniformBuffer;
     private _ubClusters: UniformBuffer;
@@ -83,9 +83,13 @@ export class ClusteredForwardRenderContext extends RenderContext {
     private setUniformBufferLayouts() {
         // per scene
         const MAX_LIGHTS = 512;
-        const MAX_DECALS = 1024;
-        const MAX_ENVPROBES = 1024;
+        const MAX_DECALS = 512;
+        const MAX_ENVPROBES = 512;
         const MAX_IRRVOLUMES = 512;
+        const MAX_ITEMS = 4096;
+        const NUM_CLUSTERS = 16 * 8 * 24;
+        const MAX_BONES = 256;
+
         // TODO: 带结构和数组的 uniform buffer 怎么初始化和更新值？
         // 数组长度 * 对齐后的结构浮点数个数
         this._ubLights.addUniform("lights", MAX_LIGHTS * ClusteredForwardRenderer.LIGHT_SIZE_FLOAT);
@@ -94,7 +98,9 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubIrrVolumes.addUniform("volumes", MAX_IRRVOLUMES * ClusteredForwardRenderer.IRRVOL_SIZE_FLOAT);
 
         // per frame,
-        this._ubFrame.addFloat("time", 0);
+        // it's too small and webgl does not allow small uniform buffers,
+        // so put the time into per view buffer
+        //this._ubFrame.addFloat("time", 0);
 
         // per view,
         const matIdentity = mat4.identity;
@@ -104,18 +110,16 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubView.addMat4("matProjPrev", matIdentity);
         this._ubView.addVec4("viewport", new vec4());
         this._ubView.addVec3("position", new vec3());
+        this._ubView.addFloat("time", 0);
         this._ubView.addVec2("zRange", new vec2());
         this._ubView.addVec2("rtSize", new vec2());
         this._ubView.addVec4("farRect", new vec4());
 
-        const MAX_ITEMS = 4096;
         this._ubItemIndices.addUniform("indices", MAX_ITEMS);
 
-        const NUM_CLUSTERS = 16 * 8 * 24;
         this._ubClusters.addUniform("clusters", NUM_CLUSTERS * 4);
 
         // per obj
-        const MAX_BONES = 256;
         this._ubObject.addMat4("matWorld", matIdentity);
         this._ubObject.addMat4("matWorldPrev", matIdentity);
         this._ubObject.addVec4("color", new vec4());
@@ -144,12 +148,12 @@ export class ClusteredForwardRenderContext extends RenderContext {
         GLUniformBuffers.uniformBlockNames["Decals"] = 1;
         GLUniformBuffers.uniformBlockNames["EnvProbes"] = 2;
         GLUniformBuffers.uniformBlockNames["IrrVolumes"] = 3;
-        GLUniformBuffers.uniformBlockNames["Frame"] = 4;
-        GLUniformBuffers.uniformBlockNames["View"] = 5;
-        GLUniformBuffers.uniformBlockNames["ItemIndices"] = 6;
-        GLUniformBuffers.uniformBlockNames["Clusters"] = 7;
-        GLUniformBuffers.uniformBlockNames["Object"] = 8;
-        GLUniformBuffers.uniformBlockNames["Material"] = 9;
+        GLUniformBuffers.uniformBlockNames["View"] = 4;
+        GLUniformBuffers.uniformBlockNames["ItemIndices"] = 5;
+        GLUniformBuffers.uniformBlockNames["Clusters"] = 6;
+        GLUniformBuffers.uniformBlockNames["Object"] = 7;
+        GLUniformBuffers.uniformBlockNames["Material"] = 8;
+        //GLUniformBuffers.uniformBlockNames["Frame"] = 9;
     }
 
     private bindUniformBuffers() {
@@ -157,7 +161,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         GLUniformBuffers.bindUniformBuffer(this._ubDecals, "Decals");
         GLUniformBuffers.bindUniformBuffer(this._ubEnvProbes, "EnvProbes");
         GLUniformBuffers.bindUniformBuffer(this._ubIrrVolumes, "IrrVolumes");
-        GLUniformBuffers.bindUniformBuffer(this._ubFrame, "Frame");
+        //GLUniformBuffers.bindUniformBuffer(this._ubFrame, "Frame");
         GLUniformBuffers.bindUniformBuffer(this._ubView, "View");
         GLUniformBuffers.bindUniformBuffer(this._ubItemIndices, "ItemIndices");
         GLUniformBuffers.bindUniformBuffer(this._ubClusters, "Clusters");
@@ -170,7 +174,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         GLUniformBuffers.bindUniformBlock(program, "Decals");
         GLUniformBuffers.bindUniformBlock(program, "EnvProbes");
         GLUniformBuffers.bindUniformBlock(program, "IrrVolumes");
-        GLUniformBuffers.bindUniformBlock(program, "Frame");
+        //GLUniformBuffers.bindUniformBlock(program, "Frame");
         GLUniformBuffers.bindUniformBlock(program, "View");
         GLUniformBuffers.bindUniformBlock(program, "ItemIndices");
         GLUniformBuffers.bindUniformBlock(program, "Clusters");
@@ -196,6 +200,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
             this.addDecalToBuffer(this._buffer, decal);
         }
         this._ubDecals.setUniform("decals", this._tmpData, this._buffer.length);
+        this._ubDecals.update();
         this._buffer.seek(0);
         for (const probe of this.envProbes) {
             let position = new vec3();
@@ -204,6 +209,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
             this._buffer.addNumber(probe.textureIndex);
         }
         this._ubEnvProbes.setUniform("probes", this._tmpData, this._buffer.length);
+        this._ubEnvProbes.update();
         this._buffer.seek(0);
         for (const vol of this.irradianceVolumes) {
             const row0 = vol.worldTransform.row(0);
@@ -218,6 +224,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
             this._buffer.addArray(boxMax.values);
         }
         this._ubIrrVolumes.setUniform("volumes", this._tmpData, this._buffer.length);
+        this._ubIrrVolumes.update();
     }
 
     private addDecalToBuffer(buffer: BufferHelper, decal: Decal) {
@@ -266,13 +273,13 @@ export class ClusteredForwardRenderContext extends RenderContext {
         }
     }
 
-    public fillUniformBuffersPerFrame() {
-        // todo: set frame time
-        // where to get time?
-        const time = 0;
-        this._ubFrame.setFloat("time", time);
-        this._ubFrame.update();
-    }
+    // public fillUniformBuffersPerFrame() {
+    //     // todo: set frame time
+    //     // where to get time?
+    //     const time = 0;
+    //     this._ubFrame.setFloat("time", time);
+    //     this._ubFrame.update();
+    // }
 
     public fillUniformBuffersPerView(camera: Camera) {
         const tmpMat = mat4.identity.copy();
@@ -291,6 +298,9 @@ export class ClusteredForwardRenderContext extends RenderContext {
         let camPosition = new vec3();
         camera.worldTransform.getTranslation(camPosition);
         this._ubView.setVec3("position", camPosition);
+
+        const time = 0;
+        this._ubView.setFloat("time", 0);
 
         const zRange = new vec2([camera.near, camera.far]);
         this._ubView.setVec2("zRange", zRange);
@@ -341,12 +351,12 @@ export class ClusteredForwardRenderContext extends RenderContext {
         }
         // how to append to the end of the light ubo? or use another ubo?
         // update from the static light count * one light size in ubo
-        this._ubLights.updateByData(this._tmpData, this.staticLights.length * ClusteredForwardRenderer.LIGHT_SIZE_FLOAT * 4);
+        this._ubLights.updateByData(this._tmpData, this.staticLights.length * ClusteredForwardRenderer.LIGHT_SIZE_FLOAT * 4, 0, this._buffer.length);
         this._buffer.seek(0);
         for (const decal of this.dynamicDecals) {
             this.addDecalToBuffer(this._buffer, decal);
         }
-        this._ubDecals.updateByData(this._tmpData, this.staticDecals.length * ClusteredForwardRenderer.DECAL_SIZE_FLOAT * 4);
+        this._ubDecals.updateByData(this._tmpData, this.staticDecals.length * ClusteredForwardRenderer.DECAL_SIZE_FLOAT * 4, 0, this._buffer.length);
         // envprobes and irradiance volumes are always static
         // test: add all item indices, and assume only one cluster
         let start = 0;
@@ -400,8 +410,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
             start += lightCount + decalCount + envProbeCount + irrVolCount;
         }
 
-        this._ubItemIndices.updateByData(this._tmpIdxData, 0);
-        this._ubClusters.updateByData(this._tmpClusterData, 0);
+        this._ubItemIndices.updateByData(this._tmpIdxData, 0, 0, this._idxBuffer.length);
+        this._ubClusters.updateByData(this._tmpClusterData, 0, 0, this._clusterBuffer.length);
     }
 
     public fillUniformBuffersPerObject(item: RenderItem) {
@@ -430,6 +440,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 this._ubMaterialPBR.setFloat("normalMapAmount", stdPBRMtl.normalMapAmount);
                 this._ubMaterialPBR.setFloat("occlusionMapAmount", stdPBRMtl.occlusionMapAmount);
                 this._ubMaterialPBR.setFloat("emissiveMapAmount", stdPBRMtl.emissiveMapAmount);
+                this._ubMaterialPBR.update();
             }
         }
     }

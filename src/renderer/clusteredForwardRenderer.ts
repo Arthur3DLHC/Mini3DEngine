@@ -1,5 +1,4 @@
 // shader includes
-import uniforms_frame from "./shaders/shaderIncludes/uniforms_frame.glsl.js"
 import uniforms_mtl_pbr from "./shaders/shaderIncludes/uniforms_mtl_pbr.glsl.js"
 import uniforms_object from "./shaders/shaderIncludes/uniforms_object.glsl.js"
 import uniforms_scene from "./shaders/shaderIncludes/uniforms_scene.glsl.js"
@@ -202,7 +201,8 @@ export class ClusteredForwardRenderer {
         this.dispatchObjects(scene, false);
 
         // todo: setup uniform buffers per frame, view;
-        this._renderContext.fillUniformBuffersPerFrame();
+        // per frame data (time) is too small, and was put into per view buffer
+        // this._renderContext.fillUniformBuffersPerFrame();
 
         // fix me: for simplicity, use only one camera; or occlusion query can not work.
         for (let icam = 0; icam < this._renderContext.cameras.length; icam++) {
@@ -263,7 +263,6 @@ export class ClusteredForwardRenderer {
 
     private registerShaderCodes() {
         // shader includes
-        GLPrograms.shaderCodes["uniforms_frame"] = uniforms_frame;
         GLPrograms.shaderCodes["uniforms_mtl_pbr"] = uniforms_mtl_pbr;
         GLPrograms.shaderCodes["uniforms_object"] = uniforms_object;
         GLPrograms.shaderCodes["uniforms_scene"] = uniforms_scene;
