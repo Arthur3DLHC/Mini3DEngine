@@ -30,7 +30,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._tmpIdxData = new Uint32Array(4096);
         this._idxBuffer = new BufferHelper(this._tmpIdxData);
 
-        this._tmpClusterData = new Uint32Array(ClusteredForwardRenderer.NUM_CLUSTERS * ClusteredForwardRenderer.CLUSTER_SIZE_INT);
+        this._tmpClusterData = new Uint32Array(ClusteredForwardRenderContext.NUM_CLUSTERS * ClusteredForwardRenderContext.CLUSTER_SIZE_INT);
         this._clusterBuffer = new BufferHelper(this._tmpClusterData);
 
         this._ubLights = new UniformBuffer("lights");
@@ -80,8 +80,16 @@ export class ClusteredForwardRenderContext extends RenderContext {
     private _ubObject: UniformBuffer;
     private _ubMaterialPBR: UniformBuffer;
 
+    
+    public static readonly LIGHT_SIZE_FLOAT = 28;
+    public static readonly DECAL_SIZE_FLOAT = 20;
+    public static readonly ENVPROBE_SIZE_FLOAT = 4;
+    public static readonly IRRVOL_SIZE_FLOAT = 24;
+
+    public static readonly NUM_CLUSTERS = 16 * 8 * 24;
+    public static readonly CLUSTER_SIZE_INT = 4;
+
     private setUniformBufferLayouts() {
-        // per scene
         const MAX_LIGHTS = 512;
         const MAX_DECALS = 512;
         const MAX_ENVPROBES = 512;
@@ -89,13 +97,14 @@ export class ClusteredForwardRenderContext extends RenderContext {
         const MAX_ITEMS = 4096;
         const NUM_CLUSTERS = 16 * 8 * 24;
         const MAX_BONES = 256;
+        // per scene
 
         // TODO: 带结构和数组的 uniform buffer 怎么初始化和更新值？
         // 数组长度 * 对齐后的结构浮点数个数
-        this._ubLights.addUniform("lights", MAX_LIGHTS * ClusteredForwardRenderer.LIGHT_SIZE_FLOAT);
-        this._ubDecals.addUniform("decals", MAX_DECALS * ClusteredForwardRenderer.DECAL_SIZE_FLOAT);
-        this._ubEnvProbes.addUniform("probes", MAX_ENVPROBES * ClusteredForwardRenderer.ENVPROBE_SIZE_FLOAT);
-        this._ubIrrVolumes.addUniform("volumes", MAX_IRRVOLUMES * ClusteredForwardRenderer.IRRVOL_SIZE_FLOAT);
+        this._ubLights.addUniform("lights", MAX_LIGHTS * ClusteredForwardRenderContext.LIGHT_SIZE_FLOAT);
+        this._ubDecals.addUniform("decals", MAX_DECALS * ClusteredForwardRenderContext.DECAL_SIZE_FLOAT);
+        this._ubEnvProbes.addUniform("probes", MAX_ENVPROBES * ClusteredForwardRenderContext.ENVPROBE_SIZE_FLOAT);
+        this._ubIrrVolumes.addUniform("volumes", MAX_IRRVOLUMES * ClusteredForwardRenderContext.IRRVOL_SIZE_FLOAT);
 
         // per frame,
         // it's too small and webgl does not allow small uniform buffers,
@@ -195,12 +204,14 @@ export class ClusteredForwardRenderContext extends RenderContext {
         }
         this._ubLights.setUniform("lights", this._tmpData, this._buffer.length);
         this._ubLights.update();
+
         this._buffer.seek(0);
         for (const decal of this.staticDecals) {
             this.addDecalToBuffer(this._buffer, decal);
         }
         this._ubDecals.setUniform("decals", this._tmpData, this._buffer.length);
         this._ubDecals.update();
+
         this._buffer.seek(0);
         for (const probe of this.envProbes) {
             let position = new vec3();
@@ -210,14 +221,10 @@ export class ClusteredForwardRenderContext extends RenderContext {
         }
         this._ubEnvProbes.setUniform("probes", this._tmpData, this._buffer.length);
         this._ubEnvProbes.update();
+
         this._buffer.seek(0);
         for (const vol of this.irradianceVolumes) {
-            const row0 = vol.worldTransform.row(0);
-            const row1 = vol.worldTransform.row(1);
-            const row2 = vol.worldTransform.row(2);
-            this._buffer.addArray(row0.values);
-            this._buffer.addArray(row1.values);
-            this._buffer.addArray(row2.values);
+            this._buffer.addArray(vol.worldTransform.values);
             const boxMin = vol.atlasLocation.minPoint.copy();
             const boxMax = vol.atlasLocation.maxPoint.copy();
             this._buffer.addArray(boxMin.values);
@@ -228,30 +235,25 @@ export class ClusteredForwardRenderContext extends RenderContext {
     }
 
     private addDecalToBuffer(buffer: BufferHelper, decal: Decal) {
-        const row0 = decal.worldTransform.row(0);
-        const row1 = decal.worldTransform.row(1);
-        const row2 = decal.worldTransform.row(2);
-        buffer.addArray(row0.values);
-        buffer.addArray(row1.values);
-        buffer.addArray(row2.values);
+        buffer.addArray(decal.worldTransform.values);
         buffer.addArray(decal.atlasRect.values);
     }
 
     private addLightToBufer(buffer: BufferHelper, light: BaseLight) {
-        buffer.addNumber(light.type);
         const lightColor = light.color.copy();
         buffer.addArray(lightColor.values);
         // transform
-        const row0 = light.worldTransform.row(0);
-        const row1 = light.worldTransform.row(1);
-        const row2 = light.worldTransform.row(2);
-        buffer.addArray(row0.values);
-        buffer.addArray(row1.values);
-        buffer.addArray(row2.values);
+        // const row0 = light.worldTransform.row(0);
+        // const row1 = light.worldTransform.row(1);
+        // const row2 = light.worldTransform.row(2);
+        // buffer.addArray(row0.values);
+        // buffer.addArray(row1.values);
+        // buffer.addArray(row2.values);
+        buffer.addArray(light.worldTransform.values);
+        buffer.addNumber(light.type);
         let radius = 0;
         let angle = 0;
         let penumbra = 0;
-        let unused = 0;
         if (light.type === LightType.Point) {
             radius = (light as PointLight).distance;
         }
@@ -264,7 +266,6 @@ export class ClusteredForwardRenderContext extends RenderContext {
         buffer.addNumber(radius);
         buffer.addNumber(angle);
         buffer.addNumber(penumbra);
-        buffer.addNumber(unused); // uniform align
         if (light.shadow) {
             buffer.addArray(light.shadow.mapRect.values);
         }
@@ -351,12 +352,12 @@ export class ClusteredForwardRenderContext extends RenderContext {
         }
         // how to append to the end of the light ubo? or use another ubo?
         // update from the static light count * one light size in ubo
-        this._ubLights.updateByData(this._tmpData, this.staticLights.length * ClusteredForwardRenderer.LIGHT_SIZE_FLOAT * 4, 0, this._buffer.length);
+        this._ubLights.updateByData(this._tmpData, this.staticLights.length * ClusteredForwardRenderContext.LIGHT_SIZE_FLOAT * 4, 0, this._buffer.length);
         this._buffer.seek(0);
         for (const decal of this.dynamicDecals) {
             this.addDecalToBuffer(this._buffer, decal);
         }
-        this._ubDecals.updateByData(this._tmpData, this.staticDecals.length * ClusteredForwardRenderer.DECAL_SIZE_FLOAT * 4, 0, this._buffer.length);
+        this._ubDecals.updateByData(this._tmpData, this.staticDecals.length * ClusteredForwardRenderContext.DECAL_SIZE_FLOAT * 4, 0, this._buffer.length);
         // envprobes and irradiance volumes are always static
         // test: add all item indices, and assume only one cluster
         let start = 0;

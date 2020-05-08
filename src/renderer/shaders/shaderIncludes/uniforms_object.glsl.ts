@@ -17,7 +17,6 @@ export default /** glsl */`
     /*
     layout (std140) uniform ObjectSkin
     {
-
         vec4 color;     // or use colortint and coloradd?
         float tag; 
     } u_objectSkin;

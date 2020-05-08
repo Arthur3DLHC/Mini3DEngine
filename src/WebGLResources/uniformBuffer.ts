@@ -24,6 +24,13 @@ export class UniformBuffer {
     public name: string;
     public glBuffer: WebGLBuffer | null;
 
+    public get byteLength(): number {
+        if (this._bufferData) {
+            return this._bufferData.byteLength;
+        }
+        return 0;
+    }
+
     private _dynamic: boolean;
     private _uniforms: {[key: string]: BufferSegment};
     private _currStartIdx: number;

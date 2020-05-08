@@ -139,13 +139,6 @@ export class ClusteredForwardRenderer {
 
     // todo: a unit box geometry for draw bounding boxes; used by occlusion query pass
 
-    public static readonly LIGHT_SIZE_FLOAT = 24;
-    public static readonly DECAL_SIZE_FLOAT = 16;
-    public static readonly ENVPROBE_SIZE_FLOAT = 4;
-    public static readonly IRRVOL_SIZE_FLOAT = 20;
-
-    public static readonly NUM_CLUSTERS = 16 * 8 * 24;
-    public static readonly CLUSTER_SIZE_INT = 4;
 
     // todo: system textures: shadowmap atlas, decal atlas, envMap array, irradiance volumes
     // todo: system texture unit numbers

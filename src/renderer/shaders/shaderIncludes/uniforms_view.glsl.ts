@@ -2,7 +2,7 @@
  * todo: define uniform buffer layout
  */
 export default /** glsl */`
-    #define MAX_ITEMS_PERVIEW       4096
+    #define MAX_ITEM_VEC4S_PERVIEW  1024 // (4096 / 4) ivec4s
     #define NUM_CLUSTERS_PERVIEW    3072 //(16*8*24)
 
     layout (std140) uniform View
@@ -22,7 +22,9 @@ export default /** glsl */`
 
     layout (std140) uniform ItemIndices
     {
-        int indices[MAX_ITEMS_PERVIEW]; // 一个int数组，其中按每个cluster顺序保存了其中所有光源索引，decal索引，envProbe索引，irradiance volume索引
+        // fix me: 由于对齐，每个 int 元素会占一个ivec4
+        // 所以不如直接用 ivec4，然后在 shader 中处理取分量的逻辑
+        ivec4 indices[MAX_ITEM_VEC4S_PERVIEW]; // 一个int数组，其中按每个cluster顺序保存了其中所有光源索引，decal索引，envProbe索引，irradiance volume索引
     } u_itemIndices;
 
 
