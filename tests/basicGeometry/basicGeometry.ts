@@ -18,8 +18,9 @@ window.onload = () => {
     camera.localTransform.fromTranslation(new vec3([0, 0, 5]));
     scene.attachChild(camera);
 
+    // todo: test multiple objects in scene at same time
+
     // test box geometry
-    /*
     const boxMesh = new Mesh();
     boxMesh.name = "box01";
     boxMesh.geometry = new BoxGeometry(1, 1, 1);
@@ -32,15 +33,17 @@ window.onload = () => {
     boxMesh.behaviors.push(boxAutoRot);
 
     scene.attachChild(boxMesh);
-    */
 
-    /*
     const sphereMesh = new Mesh();
     sphereMesh.name = "sphere01";
+    sphereMesh.localTransform.fromTranslation(new vec3([0, 0, 3]));
     sphereMesh.geometry = new SphereGeometry(1, 8, 4);
     const sphereMtl = new StandardPBRMaterial();
     sphereMesh.materials.push(sphereMtl);
 
+    boxMesh.attachChild(sphereMesh);
+
+    /*
     const sphereAutoRot = new AutoRotateBehavior(sphereMesh);
     sphereMesh.behaviors.push(sphereAutoRot);
 
@@ -49,12 +52,15 @@ window.onload = () => {
 
     const cylinderMesh = new Mesh();
     cylinderMesh.name = "cylinder01";
+    cylinderMesh.localTransform.fromTranslation(new vec3([3, 0, 0]));
     cylinderMesh.geometry = new CylinderGeometry(1, 2, 8);
     const cylinderMtl = new StandardPBRMaterial();
     cylinderMesh.materials.push(cylinderMtl);
 
+    /*
     const cylinderAutoRot = new AutoRotateBehavior(cylinderMesh);
     cylinderMesh.behaviors.push(cylinderAutoRot);
+    */
 
     scene.attachChild(cylinderMesh);
 
