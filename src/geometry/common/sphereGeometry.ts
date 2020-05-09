@@ -21,12 +21,12 @@ export class SphereGeometry extends BufferGeometry {
         this.vertexBuffer.stride = floatCount * 4;
         this.vertexBuffer.data = new Float32Array(floatCount * (this._heightSegments + 1) * (this._widthSegments + 1));
         // todo: fill vertex data
-        for (let j = 0; j <= this._heightSegments; j++) {
+        for (let j = 0; j < this._heightSegments + 1; j++) {
             const t = (j / this._heightSegments);
             const lat = t * Math.PI - Math.PI * 0.5;
             const y = this._radius * Math.sin(lat);
             const r1 = this._radius * Math.cos(lat);
-            for (let i = 0; i <= this._widthSegments; i++) {
+            for (let i = 0; i < this._widthSegments + 1; i++) {
                 const s = (i / this._widthSegments);
                 const lon = s * Math.PI * 2;
                 const z = r1 * Math.sin(lon);
@@ -51,17 +51,17 @@ export class SphereGeometry extends BufferGeometry {
         const indices: number[] = [];
         for (let j = 0; j < this._heightSegments; j++) {
             for (let i = 0; i < this._widthSegments; i++) {
-                // c  d
-                // a  b
-                let a = i;
-                let b = i + 1;
-                let c = a + this._widthSegments + 1;
+                // d  c
+                // b  a
+                let a = i + j * (this._widthSegments + 1);
+                let b = a + 1;
+                let c = a + (this._widthSegments + 1);
                 let d = c + 1;
-                indices.push(a);
                 indices.push(b);
-                indices.push(d);
                 indices.push(a);
                 indices.push(d);
+                indices.push(d);
+                indices.push(a);
                 indices.push(c);
             }
         }
