@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial } from "../../src/miniEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock } from "../../src/miniEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 
 window.onload = () => {
@@ -24,12 +24,13 @@ window.onload = () => {
     boxMesh.materials.push(material);
     scene.attachChild(boxMesh);
 
-    function gameLoop() {
+    function gameLoop(now: number) {
+        Clock.instance.update(now);
         scene.updateBehavior();
         scene.updateWorldTransform(false, true);
         renderer.render(scene);
         requestAnimationFrame(gameLoop);
     }
 
-    gameLoop();
+    requestAnimationFrame(gameLoop);
 }

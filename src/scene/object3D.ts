@@ -2,6 +2,7 @@ import { RenderList } from "../renderer/renderList.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import mat4 from "../../lib/tsm/mat4.js";
+import { Behavior } from "./behavior.js";
 
 export class Object3D {
     // base class of all render objects
@@ -10,6 +11,7 @@ export class Object3D {
         this.visible = true;
         this.color = new vec4([1,1,1,1]);
         this._active = true;
+        this.behaviors = [];
         this.parent = null;
         this._children = [];
         this.localTransform = mat4.identity.copy();
@@ -54,6 +56,8 @@ export class Object3D {
     public occlusionQuery: boolean;
     public occlusionQueryID: WebGLQuery|null;
     public occlusionQueryResult: boolean;
+
+    public behaviors: Behavior[];
 
     public parent: Object3D | null;
     
@@ -128,6 +132,9 @@ export class Object3D {
     public updateBehavior() {
         // update behavior list of this
         // physics is a behavior?
+        for (const behavior of this.behaviors) {
+            behavior.update();
+        }
 
         // update children?
         for (const child of this._children) {
