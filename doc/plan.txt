@@ -82,9 +82,16 @@ TODO:       主要类结构
                 摄像机lookat控制？
                 
             先实现简单的 forward shading
-
+            直接光照
+                PBR 光照计算
+                多光源；
+                阴影；
+                    实现和测试设置 RenderTarget
+                        渲染到一张纹理，然后贴到场景中的物体表面；
+                    使用 depth texture 作为 Shadowmap;
             
             间接光照
+                RenderTarget; 渲染到cubemap；
                 image based lighting, 生成 SH
                 生成 envmap cube
                 生成 irradiance volume
