@@ -458,9 +458,10 @@ export class ClusteredForwardRenderer {
                 if (checkOcclusionResults && !item.object.occlusionQueryResult) {
                     continue;
                 }
-                if (this._currentObject !== item.object) {
+                // item may be animated
+                //if (this._currentObject !== item.object) {
                     this._renderContext.fillUniformBuffersPerObject(item);
-                }
+                //}
                 if (!ignoreMaterial && item.material) {
                     // todo: set material render states?
                     if(item.material.blendState)GLRenderStates.setBlendState(item.material.blendState);

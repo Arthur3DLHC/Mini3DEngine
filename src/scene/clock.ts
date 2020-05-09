@@ -16,7 +16,7 @@ export class Clock {
     private _then: number = -1;
     private _elapsedTime: number = 0;
     private _curTime: number = 0;
-    private _running = false;
+    private _running = true;
     private _speed = 1;
 
     public start() {
