@@ -55,18 +55,18 @@ export class CylinderGeometry extends BufferGeometry {
         const indices: number[] = [];
         // side
         for (let i = 0; i < this._segments * 2; i += 2) {
-            // a c
-            // b d
+            // c a
+            // d b
             const a = i;
             const b = i + 1;
             const c = i + 2;
             const d = i + 3;
 
             indices.push(a);
-            indices.push(b);
-            indices.push(c);
             indices.push(c);
             indices.push(b);
+            indices.push(b);
+            indices.push(c);
             indices.push(d);
         }
         // top cap
@@ -75,8 +75,8 @@ export class CylinderGeometry extends BufferGeometry {
             const a = (this._segments + 1) * 2 + i;
             const b = a + 1;
             indices.push(a);
-            indices.push(b);
             indices.push(c);
+            indices.push(b);
         }
         // bottom cap
         c = (this._segments + 1) * 4 + 1;
@@ -84,8 +84,8 @@ export class CylinderGeometry extends BufferGeometry {
             const a = (this._segments + 1) * 3 + i;
             const b = a + 1;
             indices.push(a);
-            indices.push(c);
             indices.push(b);
+            indices.push(c);
         }
         this.indexBuffer.indices = new Uint16Array(indices);
         this.indexBuffer.create();

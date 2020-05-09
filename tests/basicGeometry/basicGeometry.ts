@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry } from "../../src/miniEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry } from "../../src/miniEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "./autoRotateBehavior.js";
 
@@ -28,12 +28,13 @@ window.onload = () => {
     boxMesh.materials.push(material);
 
     // auto rotate
-    const autoRot = new AutoRotateBehavior(boxMesh);
-    boxMesh.behaviors.push(autoRot);
+    const boxAutoRot = new AutoRotateBehavior(boxMesh);
+    boxMesh.behaviors.push(boxAutoRot);
 
     scene.attachChild(boxMesh);
     */
 
+    /*
     const sphereMesh = new Mesh();
     sphereMesh.name = "sphere01";
     sphereMesh.geometry = new SphereGeometry(1, 8, 4);
@@ -44,6 +45,18 @@ window.onload = () => {
     sphereMesh.behaviors.push(sphereAutoRot);
 
     scene.attachChild(sphereMesh);
+    */
+
+    const cylinderMesh = new Mesh();
+    cylinderMesh.name = "cylinder01";
+    cylinderMesh.geometry = new CylinderGeometry(1, 2, 8);
+    const cylinderMtl = new StandardPBRMaterial();
+    cylinderMesh.materials.push(cylinderMtl);
+
+    const cylinderAutoRot = new AutoRotateBehavior(cylinderMesh);
+    cylinderMesh.behaviors.push(cylinderAutoRot);
+
+    scene.attachChild(cylinderMesh);
 
     Clock.instance.start();
 
