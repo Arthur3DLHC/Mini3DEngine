@@ -2,6 +2,7 @@
 export * from "./geometry/bufferGeometry.js";
 export * from "./geometry/common/boxGeometry.js";
 export * from "./geometry/common/cylinderGeometry.js";
+export * from "./geometry/common/planeGeometry.js"
 export * from "./geometry/common/sphereGeometry.js";
 export * from "./geometry/primitiveGroup.js";
 export * from "./math/boundingBox.js";

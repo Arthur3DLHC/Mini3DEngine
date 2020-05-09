@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry } from "../../src/miniEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry } from "../../src/miniEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "./autoRotateBehavior.js";
 
@@ -63,6 +63,16 @@ window.onload = () => {
     */
 
     scene.attachChild(cylinderMesh);
+
+    // plane
+    const planeMesh = new Mesh();
+    planeMesh.name = "plane01";
+    planeMesh.localTransform.fromTranslation(new vec3([0, -0.5, 0]));
+    planeMesh.geometry = new PlaneGeometry(2, 2, 1, 1);
+    const planeMtl = new StandardPBRMaterial();
+    planeMesh.materials.push(planeMtl);
+
+    scene.attachChild(planeMesh);
 
     Clock.instance.start();
 

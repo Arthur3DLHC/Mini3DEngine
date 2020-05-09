@@ -57,7 +57,7 @@ TODO:       主要类结构
                     或者统一用材质 shader；
             简单Geometry生成、添加、绘制测试
                 创建顶点缓冲；Vertex Attribute；Index buffer;
-                Box，Sphere，用于测试绘制；
+                Box，Sphere，Plane, 用于测试绘制；
                 遍历图元列表，绘制
                     光源等非网格对象的 providePrimitive 也得调用，绘制调试图形；
                     Fustum culling; 
