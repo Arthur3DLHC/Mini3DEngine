@@ -14,14 +14,21 @@ export default /** glsl */`
 // vertex attribute
 // 使用<attribs>规定的vertex attribute
 in vec3 a_position;
+in vec3 a_normal;
+in vec2 a_texcoord0;
 
 // vertex output
 out vec4 ex_color;
+out vec3 ex_normal;
+out vec2 ex_texcoord;
 
 void main(void)
 {
     gl_Position = viewToProj(worldToView(localToWorld(vec4(a_position, 1))));
     ex_color = u_object.color;
+    // todo: transform normal to view space
+    ex_normal = worldToView(localToWorld(vec4(a_normal, 0))).xyz;
+    ex_texcoord = a_texcoord0;
 }
 
 `;
