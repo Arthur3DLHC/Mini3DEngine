@@ -14,9 +14,15 @@ void main(void)
 {
     FinalOutput o = defaultFinalOutput();
     // o.color = ex_color;
+
+    // test normal
     vec3 normal = normalize(ex_normal);
     o.color.xyz = (normal + vec3(1.0,1.0,1.0)) * 0.5;
     o.color.w = 1.0;
+
+    // test texcoord
+    // o.color = vec4(ex_texcoord, 1, 1);
+
     outputFinal(o);
 }
 `;

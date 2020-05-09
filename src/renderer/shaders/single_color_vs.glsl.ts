@@ -14,6 +14,8 @@ export default /** glsl */`
 // vertex attribute
 // 使用<attribs>规定的vertex attribute
 in vec3 a_position;
+in vec3 a_normal;
+in vec2 a_texcoord0;
 
 // vertex output
 out vec4 ex_color;

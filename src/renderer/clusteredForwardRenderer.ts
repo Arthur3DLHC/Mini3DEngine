@@ -112,7 +112,10 @@ export class ClusteredForwardRenderer {
         // todo: bind uniform blocks?
         // bind to a program with all uniform blocks presented?
         // or need to bind to every programs?
+        this._renderContext.bindUniformBlocks(this._colorProgram);
         this._renderContext.bindUniformBlocks(this._stdPBRProgram);
+        this._renderContext.bindUniformBlocks(this._depthPrepassProgram);
+        this._renderContext.bindUniformBlocks(this._occlusionQueryProgram);
     }
 
     private _renderListDepthPrepass: RenderList;
@@ -218,7 +221,7 @@ export class ClusteredForwardRenderer {
 
             // todo: sort the renderlists first?
 
-            // this.renderDepthPrepass();
+            this.renderDepthPrepass();
             this.renderOpaque();
             // this.renderTransparent();
 
@@ -231,6 +234,8 @@ export class ClusteredForwardRenderer {
         this._renderStatesDepthPrepass.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
         this._renderStatesDepthPrepass.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
         this._renderStatesDepthPrepass.colorWriteState = RenderStateCache.instance.getColorWriteState(false, false, false, false);
+        // debug show depth prepass output
+        // this._renderStatesDepthPrepass.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
 
         this._renderStatesOpaque.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.LEQUAL);
         this._renderStatesOpaque.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
