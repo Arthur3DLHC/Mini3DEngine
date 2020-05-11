@@ -59,7 +59,7 @@ export class ClusteredForwardRenderer {
         this._renderStatesOpaqueOcclusion = new RenderStateSet();
         this._renderStatesTransparent = new RenderStateSet();
         this._renderStatesTransparentOcclusion = new RenderStateSet();
-        this._curDefaultRenderStates = this._renderStatesDepthPrepass;
+        this._curDefaultRenderStates = null;
 
         // todo: prepare default renderstates for every phase
         this.createRenderStates();
@@ -139,7 +139,7 @@ export class ClusteredForwardRenderer {
     private _renderStatesOpaqueOcclusion: RenderStateSet;
     private _renderStatesTransparent: RenderStateSet;
     private _renderStatesTransparentOcclusion: RenderStateSet;
-    private _curDefaultRenderStates: RenderStateSet;
+    private _curDefaultRenderStates: RenderStateSet | null;
 
     // todo: a unit box geometry for draw bounding boxes; used by occlusion query pass
 
@@ -222,7 +222,11 @@ export class ClusteredForwardRenderer {
 
             // todo: sort the renderlists first?
 
+           // GLDevice.gl.colorMask(false, false, false, false);
+            //GLDevice.gl.depthFunc(GLDevice.gl.LEQUAL);
+            //GLDevice.gl.disable(GLDevice.gl.BLEND);
             this.renderDepthPrepass();
+            //GLDevice.gl.colorMask(true, true, true, true);
             this.renderOpaque();
             // this.renderTransparent();
 
@@ -493,7 +497,9 @@ export class ClusteredForwardRenderer {
                     item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
                 }
                 // restore default renderstates for next item.
-                this._curDefaultRenderStates.apply();
+                if (this._curDefaultRenderStates) {
+                    this._curDefaultRenderStates.apply();
+                }                
                 this._currentObject = item.object;
             }
         }
