@@ -1,6 +1,7 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry } from "../../src/miniEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight } from "../../src/miniEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "./autoRotateBehavior.js";
+import vec4 from "../../lib/tsm/vec4.js";
 
 window.onload = () => {
     const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
@@ -73,6 +74,17 @@ window.onload = () => {
     planeMesh.materials.push(planeMtl);
 
     scene.attachChild(planeMesh);
+
+    // add some lights
+    // test static lights first
+    const pointLight = new PointLight();
+    pointLight.isStatic = true;
+    pointLight.on = true;
+    pointLight.color = new vec4([1, 0, 0, 1]);
+    pointLight.distance = 20;
+    pointLight.localTransform.fromTranslation(new vec3([0, 5, 0]));
+
+    scene.attachChild(pointLight);
 
     Clock.instance.start();
 

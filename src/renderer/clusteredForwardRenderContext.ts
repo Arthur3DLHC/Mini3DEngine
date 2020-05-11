@@ -346,19 +346,24 @@ export class ClusteredForwardRenderContext extends RenderContext {
     }
 
     private fillItemsPerView() {
-        this._buffer.seek(0);
-        for (const light of this.dynamicLights) {
-            this.addLightToBufer(this._buffer, light);
+        if (this.dynamicLights.length > 0) {
+            this._buffer.seek(0);
+            for (const light of this.dynamicLights) {
+                this.addLightToBufer(this._buffer, light);
+            }
+            // how to append to the end of the light ubo? or use another ubo?
+            // update from the static light count * one light size in ubo
+            this._ubLights.updateByData(this._tmpData, this.staticLights.length * ClusteredForwardRenderContext.LIGHT_SIZE_FLOAT * 4, 0, this._buffer.length);
         }
-        // how to append to the end of the light ubo? or use another ubo?
-        // update from the static light count * one light size in ubo
-        this._ubLights.updateByData(this._tmpData, this.staticLights.length * ClusteredForwardRenderContext.LIGHT_SIZE_FLOAT * 4, 0, this._buffer.length);
-        this._buffer.seek(0);
-        for (const decal of this.dynamicDecals) {
-            this.addDecalToBuffer(this._buffer, decal);
+ 
+        if (this.dynamicDecals.length > 0) {
+            this._buffer.seek(0);
+            for (const decal of this.dynamicDecals) {
+                this.addDecalToBuffer(this._buffer, decal);
+            }
+            this._ubDecals.updateByData(this._tmpData, this.staticDecals.length * ClusteredForwardRenderContext.DECAL_SIZE_FLOAT * 4, 0, this._buffer.length);
         }
-        this._ubDecals.updateByData(this._tmpData, this.staticDecals.length * ClusteredForwardRenderContext.DECAL_SIZE_FLOAT * 4, 0, this._buffer.length);
-        // envprobes and irradiance volumes are always static
+         // envprobes and irradiance volumes are always static
         // test: add all item indices, and assume only one cluster
         let start = 0;
         this._clusterBuffer.seek(0);

@@ -21,10 +21,17 @@ void main(void)
     FinalOutput o = defaultFinalOutput();
     // o.color = ex_color;
 
+    uint cluster = clusterOfPixel(ex_hPosition);
+    uint lightCount = getLightCountInCluster(cluster);
+    for(uint i = 0u; i < lightCount; i++) {
+        Light light = getLightInCluster(cluster, i);
+        o.color += light.color;
+    }
+
     // test normal
-    vec3 normal = normalize(ex_worldNormal);
-    o.color.xyz = (normal + vec3(1.0,1.0,1.0)) * 0.5;
-    o.color.w = 1.0;
+    // vec3 normal = normalize(ex_worldNormal);
+    // o.color.xyz = (normal + vec3(1.0,1.0,1.0)) * 0.5;
+    // o.color.w = 1.0;
 
     // test texcoord
     // o.color = vec4(ex_texcoord, 1, 1);

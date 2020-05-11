@@ -26,7 +26,7 @@ export default /** glsl */`
     {
         // fix me: 由于对齐，每个 int 元素会占一个ivec4
         // 所以不如直接用 ivec4，然后在 shader 中处理取分量的逻辑
-        ivec4 indices[MAX_ITEM_VEC4S_PERVIEW]; // 一个int数组，其中按每个cluster顺序保存了其中所有光源索引，decal索引，envProbe索引，irradiance volume索引
+        uvec4 indices[MAX_ITEM_VEC4S_PERVIEW]; // 一个int数组，其中按每个cluster顺序保存了其中所有光源索引，decal索引，envProbe索引，irradiance volume索引
     } u_itemIndices;
 
 
@@ -34,10 +34,10 @@ export default /** glsl */`
 
         // fix me: 按照这个尺寸，会超过 OpenGL 保证的 16384 个 byte 的限制
         // 但是一般的DX11显卡应该都能保证 65536 个 byte
-        int start;
-        int lightCount;
-        int decalCount;
-        int envProbeIrrVolCount;        // 为了凑vec4, packed, 高16位是 envProbe 数量，低 16 位是 irrvol 数量
+        uint start;
+        uint lightCount;
+        uint decalCount;
+        uint envProbeIrrVolCount;        // 为了凑vec4, packed, 高16位是 envProbe 数量，低 16 位是 irrvol 数量
     };
     uniform Clusters
     {
