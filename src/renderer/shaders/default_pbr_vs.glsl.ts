@@ -18,16 +18,20 @@ in vec3 a_normal;
 in vec2 a_texcoord0;
 
 // vertex output
+out vec4 ex_hPosition;
+out vec4 ex_worldPosition;      // because all lights, decals, cubemaps, irrvols are in world space, we transform position, normal to world space.
+out vec3 ex_worldNormal;
 out vec4 ex_color;
-out vec3 ex_normal;
 out vec2 ex_texcoord;
 
 void main(void)
 {
-    gl_Position = viewToProj(worldToView(localToWorld(vec4(a_position, 1))));
+    ex_worldPosition = localToWorld(vec4(a_position, 1));
+    ex_hPosition = viewToProj(worldToView(ex_worldPosition));
+    gl_Position = ex_hPosition;
     ex_color = u_object.color;
     // todo: transform normal to view space
-    ex_normal = worldToView(localToWorld(vec4(a_normal, 0))).xyz;
+    ex_worldNormal = localToWorld(vec4(a_normal, 0)).xyz;
     ex_texcoord = a_texcoord0;
 }
 
