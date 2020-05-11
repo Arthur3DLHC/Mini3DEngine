@@ -16,7 +16,7 @@ export default /** glsl */`
     FinalOutput defaultFinalOutput()
     {
         FinalOutput o;
-        o.color = vec4(0,0,0,0);
+        o.color = vec4(0,0,0,1);
         o.subsurfaceColor = vec4(0,0,0,0);
         o.subsurface = 0.0;
         o.roughness = 0.5;

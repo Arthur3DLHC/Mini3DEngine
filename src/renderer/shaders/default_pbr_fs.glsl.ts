@@ -25,7 +25,14 @@ void main(void)
     uint lightCount = getLightCountInCluster(cluster);
     for(uint i = 0u; i < lightCount; i++) {
         Light light = getLightInCluster(cluster, i);
-        o.color += light.color;
+        // test distance
+        // light world position
+        vec4 lightPos = light.transform[3];
+        float dist = distance(lightPos.xyz, ex_worldPosition.xyz);
+        o.color = vec4(clamp(1.0 - dist / light.properties.y, 0.0, 1.0), 0.0, 0.0, 1.0);
+
+        // test color
+        // o.color += light.color;
     }
 
     // test normal
