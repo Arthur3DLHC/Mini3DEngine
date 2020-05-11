@@ -20,7 +20,7 @@ export default /** glsl */`
         // 获得cluster中的光源索引列表在对象索引数组的起始偏移
         int offset = u_clusters.clusters[cluster].start + iLight;
         // 从对象索引列表中获得光源索引
-        int lightIdx = getItemIndex(offset);
+        int lightIdx = getItemIndexAt(offset);
         return u_lights.lights[lightIdx];
     }
 `;
