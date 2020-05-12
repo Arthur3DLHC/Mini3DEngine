@@ -43,4 +43,8 @@ float getSpotAttenuation(vec3 pointToLight, vec3 spotDirection, float outerConeC
     }
     return 0.0;
 }
+
+float clampedDot(vec3 x, vec3 y) {
+    return clamp(dot(x, y), 0.0, 1.0);
+}
 `;

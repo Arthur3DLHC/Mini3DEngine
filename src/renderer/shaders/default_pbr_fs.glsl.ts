@@ -21,6 +21,7 @@ in vec2 ex_texcoord;
 
 vec3 getNormal() {
     // todo: check if normalmap have been present
+    // todo: return tangent and binormal
     return normalize(ex_worldNormal);
 }
 
@@ -29,17 +30,28 @@ void main(void)
     FinalOutput o = defaultFinalOutput();
     // o.color = ex_color;
 
+    vec3 n = getNormal();
+    vec3 v = normalize(u_view.position - ex_worldPosition);
+    float NdotV = clampedDot(n, v);
+
+    vec3 f_diffuse = vec3(0.0);
+    vec3 f_specular = vec3(0.0);
+    vec3 f_emissive = vec3(0.0);
+
     // todo: decals
 
     uint cluster = clusterOfPixel(ex_hPosition);
     uint lightCount = getLightCountInCluster(cluster);
     for(uint i = 0u; i < lightCount; i++) {
+
         Light light = getLightInCluster(cluster, i);
         uint lightType = getLightType(light);
+
         float rangeAttenuation = 1.0;
         float spotAttenuation = 1.0;
         vec3 lightPosition = light.transform[3].xyz;
         vec3 pointToLight = (light.transform * vec4(0.0, 0.0, 1.0, 1.0)).xyz;    // light look at -z, so point to light use +z
+        
         // todo: check light type
         if (lightType != LightType_Directional) {
             pointToLight = lightPosition - ex_worldPosition;
@@ -51,12 +63,28 @@ void main(void)
         }
 
         // test range attenuation
+        // o.color = vec4(rangeAttenuation, rangeAttenuation, rangeAttenuation, 1.0);
 
-        o.color = vec4(rangeAttenuation, rangeAttenuation, rangeAttenuation, 1.0);
+        vec3 intensity = rangeAttenuation * spotAttenuation * light.color.rgb;
+
+        vec3 l = normalize(pointToLight);   // Direction from surface point to light
+        vec3 h = normalize(l + v);          // Direction of the vector between l and v, called halfway vector
+        float NdotL = clampedDot(n, l);
+        // float NdotV = clampedDot(n, v);  // 前面已经算过了，与光源无关
+        float NdotH = clampedDot(n, h);
+        float LdotH = clampedDot(l, h);
+        float VdotH = clampedDot(v, h);
+
+        if (NdotL > 0.0 || NdotV > 0.0)
+        {
+            f_diffuse += intensity * NdotL;
+        }
 
         // test color
         // o.color += light.color;
     }
+
+    o.color = vec4(f_diffuse, 1);
 
     // test normal
     // vec3 normal = normalize(ex_worldNormal);
