@@ -42,6 +42,10 @@ vec3 F_Schlick(vec3 f0, vec3 f90, float VdotH)
 vec3 BRDF_lambertian(vec3 f0, vec3 f90, vec3 diffuseColor, float VdotH)
 {
     // see https://seblagarde.wordpress.com/2012/01/08/pi-or-not-to-pi-in-game-lighting-equation/
+    // 假设一束光线照射表面上一点 p，由于漫反射出的光线是近似均匀分布在以 p 为中心的半球面上的，所以这些光线的能量在
+    // 这个半球上的总和应该小于等于这一点漫反射出的光的总能量，而相机在透过半球面观察这个点时，则只会取半球表面上和这个点面积
+    // 相近的一小部分。在数学上，半球积分系数为 π，也就是P点和半球上一点能量的比例为 π，所以为了求出通过半球到达相机的
+    // 光的能量，需要用 p 点漫反射的总能量除以 π
     return (1.0 - F_Schlick(f0, f90, VdotH)) * (diffuseColor / M_PI);
 }
 
@@ -104,11 +108,16 @@ void main(void)
         float LdotH = clampedDot(l, h);
         float VdotH = clampedDot(v, h);
 
+
+
         if (NdotL > 0.0 || NdotV > 0.0)
         {
             // f_diffuse += albedoColor;
             // f_diffuse += vec3(VdotH);
-            f_diffuse += intensity * NdotL * BRDF_lambertian(f0, f90, albedoColor, VdotH);
+            vec3 illuminance = intensity * NdotL;
+
+            f_diffuse += illuminance * BRDF_lambertian(f0, f90, albedoColor, VdotH);
+            f_specular += illuminance * 
         }
 
         // test color
