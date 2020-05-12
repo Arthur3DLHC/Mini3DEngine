@@ -4,7 +4,8 @@ import uniforms_object from "./shaders/shaderIncludes/uniforms_object.glsl.js"
 import uniforms_scene from "./shaders/shaderIncludes/uniforms_scene.glsl.js"
 import uniforms_view from "./shaders/shaderIncludes/uniforms_view.glsl.js"
 import function_cluster from "./shaders/shaderIncludes/function_cluster.glsl.js"
-import function_lights from "./shaders/shaderIncludes/function_get_lights.glsl.js"
+import function_get_lights from "./shaders/shaderIncludes/function_get_lights.glsl.js"
+import function_punctual_lights from "./shaders/shaderIncludes/function_punctual_lights.glsl.js"
 import function_shading_pbr from "./shaders/shaderIncludes/function_shading_pbr.glsl.js"
 import function_transforms from "./shaders/shaderIncludes/function_transforms.glsl.js"
 import output_pbr from "./shaders/shaderIncludes/output_pbr.glsl.js"
@@ -271,7 +272,8 @@ export class ClusteredForwardRenderer {
         GLPrograms.shaderCodes["uniforms_scene"] = uniforms_scene;
         GLPrograms.shaderCodes["uniforms_view"] = uniforms_view;
         GLPrograms.shaderCodes["function_cluster"] = function_cluster;
-        GLPrograms.shaderCodes["function_get_lights"] = function_lights;
+        GLPrograms.shaderCodes["function_get_lights"] = function_get_lights;
+        GLPrograms.shaderCodes["function_punctual_lights"] = function_punctual_lights;
         GLPrograms.shaderCodes["function_shading_pbr"] = function_shading_pbr;
         GLPrograms.shaderCodes["function_transforms"] = function_transforms;
         GLPrograms.shaderCodes["output_pbr"] = output_pbr;
