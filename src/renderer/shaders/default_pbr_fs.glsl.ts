@@ -79,7 +79,8 @@ void main(void)
         float rangeAttenuation = 1.0;
         float spotAttenuation = 1.0;
         vec3 lightPosition = light.transform[3].xyz;
-        vec3 pointToLight = (light.transform * vec4(0.0, 0.0, 1.0, 1.0)).xyz;    // light look at -z, so point to light use +z
+        vec3 lightDir = (light.transform * vec4(0.0, 0.0, -1.0, 1.0)).xyz;
+        vec3 pointToLight = -lightDir;
         
         // todo: check light type
         if (lightType != LightType_Directional) {
@@ -87,14 +88,13 @@ void main(void)
             rangeAttenuation = getRangeAttenuation(getLightRadius(light), length(pointToLight));
         }
         if (lightType == LightType_Spot) {
-            // todo: use penumbra
-            // spotAttenuation = getSpotAttenuation()
+            spotAttenuation = getSpotAttenuation(pointToLight, lightDir, getLightOuterConeCos(light), getLightInnerConeCos(light));
         }
 
         // test range attenuation
         // o.color = vec4(rangeAttenuation, rangeAttenuation, rangeAttenuation, 1.0);
 
-        vec3 intensity = rangeAttenuation * light.color.rgb;
+        vec3 intensity = rangeAttenuation * spotAttenuation * light.color.rgb;
 
         vec3 l = normalize(pointToLight);   // Direction from surface point to light
         vec3 h = normalize(l + v);          // Direction of the vector between l and v, called halfway vector

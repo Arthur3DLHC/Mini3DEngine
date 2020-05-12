@@ -7,8 +7,8 @@ import { LightType } from "./lightType.js";
 export class SpotLight extends BaseLight {
     public constructor() {
         super();
-        this.angle = 60;
-        this.penumbra = 0;
+        this.outerConeAngle = Math.PI * 0.5;
+        this.innerConeAngle = Math.PI * 0.3;
         this.distance = 0;
         this.shadow = new SpotLightShadow(this);
         this._debugGeometry = null;
@@ -19,14 +19,14 @@ export class SpotLight extends BaseLight {
     }
 
     /**
-     * the whole cone angle, in degrees.
+     * the outer cone angle, in radians.
      */
-    public angle: number;
+    public outerConeAngle: number;
 
     /**
      * 半影区占比。范围：0 ~ 1。默认值：0 （无半影区）
      */
-    public penumbra: number;
+    public innerConeAngle: number;
 
     public distance: number;
 

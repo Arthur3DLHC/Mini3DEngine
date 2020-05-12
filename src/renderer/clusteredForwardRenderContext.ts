@@ -252,20 +252,20 @@ export class ClusteredForwardRenderContext extends RenderContext {
         buffer.addArray(light.worldTransform.values);
         buffer.addNumber(light.type);
         let radius = 0;
-        let angle = 0;
-        let penumbra = 0;
+        let outerConeCos = 0;
+        let innerConeCos = 0;
         if (light.type === LightType.Point) {
             radius = (light as PointLight).distance;
         }
         else if (light.type === LightType.Spot) {
-            const spot = (light as SpotLight);
+            const spot: SpotLight = (light as SpotLight);
             radius = spot.distance;
-            angle = spot.angle * Math.PI / 180.0;
-            penumbra = spot.penumbra;
+            outerConeCos = Math.cos(spot.outerConeAngle);
+            innerConeCos = Math.cos(spot.innerConeAngle);
         }
         buffer.addNumber(radius);
-        buffer.addNumber(angle);
-        buffer.addNumber(penumbra);
+        buffer.addNumber(outerConeCos);
+        buffer.addNumber(innerConeCos);
         if (light.shadow) {
             buffer.addArray(light.shadow.mapRect.values);
         }

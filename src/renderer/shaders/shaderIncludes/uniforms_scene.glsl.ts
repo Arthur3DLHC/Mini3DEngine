@@ -15,8 +15,8 @@ export default /** glsl */`
         vec4 properties;      // pack following props to a vec4
         //float type;         // light type
         //float radius;       // point/dir/spot
-        //float angle;        // spot
-        //float penumbra;     // spot
+        //float outerConeCos; // spot
+        //float innerConeCos; // spot
         vec4 shadowMapRect;   // dir/spot
         // fix me: need to add shadow proj matrix?
     };

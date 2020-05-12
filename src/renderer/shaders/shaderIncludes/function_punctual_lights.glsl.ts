@@ -15,11 +15,11 @@ float getLightRadius(Light light) {
     return light.properties.y;
 }
 
-float getLightAngle(Light light) {
+float getLightOuterConeCos(Light light) {
     return light.properties.z;
 }
 
-float getLightPenumbra(Light light) {
+float getLightInnerConeCos(Light light) {
     return light.properties.w;
 }
 
