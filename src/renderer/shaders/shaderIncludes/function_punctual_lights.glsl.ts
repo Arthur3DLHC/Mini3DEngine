@@ -29,7 +29,11 @@ float getRangeAttenuation(float range, float distance) {
         return 1.0;
     }
     // return clamp(1.0 - distance / range, 0.0, 1.0);
-    return max(min(1.0 - pow(distance / range, 4.0), 1.0), 0.0) / pow(distance, 2.0);
+    // the formular in Unreal:
+    return clamp(pow(1.0 - pow(distance / range, 4.0), 2.0), 0.0, 1.0) / (distance * distance + 1.0);
+
+    // the formular used by Khronos group glTF Viewer:
+    // return max(min(1.0 - pow(distance / range, 4.0), 1.0), 0.0) / pow(distance, 2.0);
 }
 
 float getSpotAttenuation(vec3 pointToLight, vec3 spotDirection, float outerConeCos, float innerConeCos) {
