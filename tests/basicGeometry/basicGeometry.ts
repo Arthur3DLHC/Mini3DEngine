@@ -80,8 +80,8 @@ window.onload = () => {
     const pointLight = new PointLight();
     pointLight.isStatic = true;
     pointLight.on = true;
-    pointLight.color = new vec4([1, 0, 0, 1]);
-    pointLight.distance = 50;
+    pointLight.color = new vec4([10, 0, 0, 1]);
+    pointLight.distance = 10;
     pointLight.localTransform.fromTranslation(new vec3([0, 3, 0]));
 
     scene.attachChild(pointLight);
