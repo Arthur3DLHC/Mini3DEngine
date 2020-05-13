@@ -63,8 +63,8 @@ window.onload = () => {
     cylinderMesh.geometry = new CylinderGeometry(1, 2, 24);
     const cylinderMtl = new StandardPBRMaterial();
     cylinderMtl.color = new vec4([0.0, 1.0, 0.0, 1.0]);
-    cylinderMtl.metallic = 0.8;
-    cylinderMtl.roughness = 1.0;
+    cylinderMtl.metallic = 0.2;
+    cylinderMtl.roughness = 0.6;
     cylinderMesh.materials.push(cylinderMtl);
 
     /*
@@ -88,14 +88,23 @@ window.onload = () => {
 
     // add some lights
     // test static lights first
-    const pointLight = new PointLight();
-    pointLight.isStatic = true;
-    pointLight.on = true;
-    pointLight.color = new vec4([10, 10, 10, 1]);
-    pointLight.distance = 10;
-    pointLight.localTransform.fromTranslation(new vec3([0, 3, 0]));
+    const pointLight01 = new PointLight();
+    pointLight01.isStatic = true;
+    pointLight01.on = true;
+    pointLight01.color = new vec4([10, 10, 10, 1]);
+    pointLight01.distance = 10;
+    pointLight01.localTransform.fromTranslation(new vec3([0, 3, 0]));
 
-    scene.attachChild(pointLight);
+    scene.attachChild(pointLight01);
+
+    const pointLight02 = new PointLight();
+    pointLight02.isStatic = true;
+    pointLight02.on = true;
+    pointLight02.color = new vec4([10, 10, 10, 1]);
+    pointLight02.distance = 10;
+    pointLight02.localTransform.fromTranslation(new vec3([3, 3, 3]));
+
+    scene.attachChild(pointLight02);
 
     Clock.instance.start();
 
