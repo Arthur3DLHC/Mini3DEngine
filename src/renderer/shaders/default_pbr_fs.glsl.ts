@@ -31,11 +31,47 @@ vec3 getBaseColor() {
     return (u_material.baseColor * ex_color).rgb;
 }
 
+vec2 getMetallicRoughness() {
+    // todo: roughness matallic map
+    vec2 ret = vec2(u_material.metallic, u_material.roughness);
+    return clamp(ret, vec2(0.0), vec2(1.0));
+}
+
 // The following equation models the Fresnel reflectance term of the spec equation (aka F())
 // Implementation of fresnel from [4], Equation 15
 vec3 F_Schlick(vec3 f0, vec3 f90, float VdotH)
 {
     return f0 + (f90 - f0) * pow(clamp(1.0 - VdotH, 0.0, 1.0), 5.0);
+}
+
+// Smith Joint GGX
+// Note: Vis = G / (4 * NdotL * NdotV)
+// see Eric Heitz. 2014. Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs. Journal of Computer Graphics Techniques, 3
+// see Real-Time Rendering. Page 331 to 336.
+// see https://google.github.io/filament/Filament.md.html#materialsystem/specularbrdf/geometricshadowing(specularg)
+float V_GGX(float NdotL, float NdotV, float alphaRoughness)
+{
+    float alphaRoughnessSq = alphaRoughness * alphaRoughness;
+
+    float GGXV = NdotL * sqrt(NdotV * NdotV * (1.0 - alphaRoughnessSq) + alphaRoughnessSq);
+    float GGXL = NdotV * sqrt(NdotL * NdotL * (1.0 - alphaRoughnessSq) + alphaRoughnessSq);
+
+    float GGX = GGXV + GGXL;
+    if (GGX > 0.0)
+    {
+        return 0.5 / GGX;
+    }
+    return 0.0;
+}
+
+// The following equation(s) model the distribution of microfacet normals across the area being drawn (aka D())
+// Implementation from "Average Irregularity Representation of a Roughened Surface for Ray Reflection" by T. S. Trowbridge, and K. P. Reitz
+// Follows the distribution function recommended in the SIGGRAPH 2013 course notes from EPIC Games [1], Equation 3.
+float D_GGX(float NdotH, float alphaRoughness)
+{
+    float alphaRoughnessSq = alphaRoughness * alphaRoughness;
+    float f = (NdotH * NdotH) * (alphaRoughnessSq - 1.0) + 1.0;
+    return alphaRoughnessSq / (M_PI * f * f);
 }
 
 //https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
@@ -49,6 +85,16 @@ vec3 BRDF_lambertian(vec3 f0, vec3 f90, vec3 diffuseColor, float VdotH)
     return (1.0 - F_Schlick(f0, f90, VdotH)) * (diffuseColor / M_PI);
 }
 
+//  https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
+vec3 BRDF_specularGGX(vec3 f0, vec3 f90, float alphaRoughness, float VdotH, float NdotL, float NdotV, float NdotH)
+{
+    vec3 F = F_Schlick(f0, f90, VdotH);
+    float Vis = V_GGX(NdotL, NdotV, alphaRoughness);
+    float D = D_GGX(NdotH, alphaRoughness);
+
+    return F * Vis * D;
+}
+
 void main(void)
 {
     FinalOutput o = defaultFinalOutput();
@@ -59,13 +105,17 @@ void main(void)
     float NdotV = clampedDot(n, v);
 
     vec3 baseColor = getBaseColor();
+    vec2 metallicRoughness = getMetallicRoughness();
+    float metallic = metallicRoughness.x;
+    float roughness = metallicRoughness.y;
 
     // simple default f0
     vec3 f0 = vec3(0.04);
     // use metallic factor to lerp between default 0.04 and baseColor
-    vec3 albedoColor = mix(baseColor.rgb * (vec3(1.0) - f0),  vec3(0), u_material.metallic);
-    f0 = mix(vec3(0.04), baseColor.rgb, u_material.metallic);
+    vec3 albedoColor = mix(baseColor.rgb * (vec3(1.0) - f0),  vec3(0), metallic);
+    f0 = mix(vec3(0.04), baseColor.rgb, metallic);
     vec3 f90 = vec3(1.0);
+    float alphaRoughness = roughness * roughness;
 
     vec3 f_diffuse = vec3(0.0);
     vec3 f_specular = vec3(0.0);
@@ -108,8 +158,6 @@ void main(void)
         float LdotH = clampedDot(l, h);
         float VdotH = clampedDot(v, h);
 
-
-
         if (NdotL > 0.0 || NdotV > 0.0)
         {
             // f_diffuse += albedoColor;
@@ -117,14 +165,14 @@ void main(void)
             vec3 illuminance = intensity * NdotL;
 
             f_diffuse += illuminance * BRDF_lambertian(f0, f90, albedoColor, VdotH);
-            f_specular += illuminance * 
+            f_specular += illuminance * BRDF_specularGGX(f0, f90, alphaRoughness, VdotH, NdotL, NdotV, NdotH);
         }
 
         // test color
         // o.color += light.color;
     }
 
-    o.color = vec4(f_diffuse, 1);
+    o.color = vec4(f_diffuse + f_specular, 1);
 
     // test normal
     // vec3 normal = normalize(ex_worldNormal);

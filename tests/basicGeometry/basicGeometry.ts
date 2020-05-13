@@ -26,8 +26,10 @@ window.onload = () => {
     boxMesh.name = "box01";
     boxMesh.geometry = new BoxGeometry(1, 1, 1);
     // boxMesh.localTransform.fromTranslation(new vec3([0, 0, -5]));
-    const material = new StandardPBRMaterial();
-    boxMesh.materials.push(material);
+    const boxMtl = new StandardPBRMaterial();
+    boxMtl.color = new vec4([1.0, 1.0, 0.0, 1.0]);
+    boxMtl.metallic = 0.8;
+    boxMesh.materials.push(boxMtl);
 
     // auto rotate
     const boxAutoRot = new AutoRotateBehavior(boxMesh);
@@ -38,8 +40,10 @@ window.onload = () => {
     const sphereMesh = new Mesh();
     sphereMesh.name = "sphere01";
     sphereMesh.localTransform.fromTranslation(new vec3([0, 0, 3]));
-    sphereMesh.geometry = new SphereGeometry(1, 8, 4);
+    sphereMesh.geometry = new SphereGeometry(1, 16, 8);
     const sphereMtl = new StandardPBRMaterial();
+    sphereMtl.color = new vec4([1.0, 0.0, 0.0, 1.0]);
+    sphereMtl.metallic = 0.5;
     sphereMesh.materials.push(sphereMtl);
 
     boxMesh.attachChild(sphereMesh);
@@ -56,6 +60,8 @@ window.onload = () => {
     cylinderMesh.localTransform.fromTranslation(new vec3([3, 0, 0]));
     cylinderMesh.geometry = new CylinderGeometry(1, 2, 8);
     const cylinderMtl = new StandardPBRMaterial();
+    cylinderMtl.color = new vec4([0.0, 1.0, 0.0, 1.0]);
+    cylinderMtl.metallic = 0.2;
     cylinderMesh.materials.push(cylinderMtl);
 
     /*
@@ -71,6 +77,8 @@ window.onload = () => {
     planeMesh.localTransform.fromTranslation(new vec3([0, -0.5, 0]));
     planeMesh.geometry = new PlaneGeometry(2, 2, 1, 1);
     const planeMtl = new StandardPBRMaterial();
+    planeMtl.color = new vec4([0.0, 0.0, 1.0, 1.0]);
+    planeMtl.metallic = 0.0;
     planeMesh.materials.push(planeMtl);
 
     scene.attachChild(planeMesh);
@@ -80,7 +88,7 @@ window.onload = () => {
     const pointLight = new PointLight();
     pointLight.isStatic = true;
     pointLight.on = true;
-    pointLight.color = new vec4([10, 0, 0, 1]);
+    pointLight.color = new vec4([10, 10, 10, 1]);
     pointLight.distance = 10;
     pointLight.localTransform.fromTranslation(new vec3([0, 3, 0]));
 
