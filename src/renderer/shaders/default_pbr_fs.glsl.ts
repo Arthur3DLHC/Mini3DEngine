@@ -77,7 +77,8 @@ void main(void)
         float rangeAttenuation = 1.0;
         float spotAttenuation = 1.0;
         vec3 lightPosition = light.transform[3].xyz;
-        vec3 lightDir = (light.transform * vec4(0.0, 0.0, -1.0, 1.0)).xyz;
+        vec3 lightDir = (light.transform * vec4(0.0, 0.0, -1.0, 0.0)).xyz;
+        // vec3 lightDir = vec3(0.0, 0.0, -1.0);
         vec3 pointToLight = -lightDir;
         
         // todo: check light type

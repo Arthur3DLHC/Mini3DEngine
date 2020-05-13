@@ -300,8 +300,8 @@ export class ClusteredForwardRenderer {
 
     private dispatchObject(object: Object3D, statics: boolean) {
 
-        // check visible
-        if (object.visible) {
+        // check visible, only for dynamic objects
+        if (object.visible || statics) {
             if (object instanceof Camera) {
                 const camera = object as Camera;
                 camera.updateViewProjTransform();

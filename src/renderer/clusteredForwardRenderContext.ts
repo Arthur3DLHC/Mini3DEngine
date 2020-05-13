@@ -378,36 +378,49 @@ export class ClusteredForwardRenderContext extends RenderContext {
             let irrVolCount = 0;
             for (let iLight = 0; iLight < this.staticLights.length; iLight++) {
                 const light = this.staticLights[iLight];
-                // todo: cull light against cluster
-                // for test perpurse new, add them all:
-                this._idxBuffer.addNumber(iLight);
-                lightCount++;
+                if (light.on) {
+                    // todo: cull light against clusters
+                    // for test perpurse new, add them all:
+                    this._idxBuffer.addNumber(iLight);
+                    lightCount++;                    
+                }
             }
             for (let iLight = 0; iLight < this.dynamicLights.length; iLight++) {
                 const light = this.dynamicLights[iLight];
-                this._idxBuffer.addNumber(iLight + this.staticLights.length);
-                lightCount++;
+                if (light.on) {
+                    this._idxBuffer.addNumber(iLight + this.staticLights.length);
+                    lightCount++;                    
+                }
             }
             for (let iDecal = 0; iDecal < this.staticDecals.length; iDecal++) {
                 const decal = this.staticDecals[iDecal];
-                this._idxBuffer.addNumber(iDecal);
-                decalCount++;
+                // todo: check decal distance; cull against clusters
+                if (decal.visible) {
+                    this._idxBuffer.addNumber(iDecal);
+                    decalCount++; 
+                }
             }
             for (let iDecal = 0; iDecal < this.dynamicDecals.length; iDecal++) {
                 const decal = this.dynamicDecals[iDecal];
-                this._idxBuffer.addNumber(iDecal + this.staticDecals.length);
-                decalCount++;
+                if (decal.visible) {
+                    this._idxBuffer.addNumber(iDecal + this.staticDecals.length);
+                    decalCount++; 
+                }
             }
             for (let iEnv = 0; iEnv < this.envProbes.length; iEnv++) {
                 const envProbe = this.envProbes[iEnv];
-                this._idxBuffer.addNumber(iEnv);
-                envProbeCount++;
+                if (envProbe.visible) {
+                    this._idxBuffer.addNumber(iEnv);
+                    envProbeCount++;
+                }
             }
             // pack envprobe and irrvolume count together
             for (let iIrr = 0; iIrr < this.irradianceVolumes.length; iIrr++) {
                 const irrVol = this.irradianceVolumes[iIrr];
-                this._idxBuffer.addNumber(iIrr);
-                irrVolCount++;
+                if (irrVol.visible) {
+                    this._idxBuffer.addNumber(iIrr);
+                    irrVolCount++; 
+                }
             }
             this._clusterBuffer.addNumber(start);       // the start index of this cluster
             this._clusterBuffer.addNumber(lightCount);       // light count

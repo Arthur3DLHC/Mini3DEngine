@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight } from "../../src/miniEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight } from "../../src/miniEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "./autoRotateBehavior.js";
 import vec4 from "../../lib/tsm/vec4.js";
@@ -78,7 +78,7 @@ window.onload = () => {
     const planeMesh = new Mesh();
     planeMesh.name = "plane01";
     planeMesh.localTransform.fromTranslation(new vec3([0, -0.5, 0]));
-    planeMesh.geometry = new PlaneGeometry(2, 2, 1, 1);
+    planeMesh.geometry = new PlaneGeometry(20, 20, 1, 1);
     const planeMtl = new StandardPBRMaterial();
     planeMtl.color = new vec4([0.0, 0.0, 1.0, 1.0]);
     planeMtl.metallic = 0.0;
@@ -88,23 +88,32 @@ window.onload = () => {
 
     // add some lights
     // test static lights first
-    const pointLight01 = new PointLight();
-    pointLight01.isStatic = true;
-    pointLight01.on = true;
-    pointLight01.color = new vec4([10, 10, 10, 1]);
-    pointLight01.distance = 10;
-    pointLight01.localTransform.fromTranslation(new vec3([0, 3, 0]));
+    // const pointLight01 = new PointLight();
+    // pointLight01.isStatic = true;
+    // pointLight01.on = true;
+    // pointLight01.color = new vec4([10, 10, 10, 1]);
+    // pointLight01.distance = 10;
+    // pointLight01.localTransform.fromTranslation(new vec3([1, 3, 1]));
 
-    scene.attachChild(pointLight01);
+    // scene.attachChild(pointLight01);
 
-    const pointLight02 = new PointLight();
-    pointLight02.isStatic = true;
-    pointLight02.on = true;
-    pointLight02.color = new vec4([10, 10, 10, 1]);
-    pointLight02.distance = 10;
-    pointLight02.localTransform.fromTranslation(new vec3([3, 3, 3]));
+    const spotLight01 = new SpotLight();
+    spotLight01.isStatic = true;
+    spotLight01.on = true;
+    spotLight01.color = new vec4([10, 10, 10, 1]);
+    spotLight01.distance = 0;
+    spotLight01.localTransform.fromTranslation(new vec3([0, 0, 3]));
 
-    scene.attachChild(pointLight02);
+    scene.attachChild(spotLight01);
+
+    // const pointLight02 = new PointLight();
+    // pointLight02.isStatic = true;
+    // pointLight02.on = true;
+    // pointLight02.color = new vec4([10, 10, 10, 1]);
+    // pointLight02.distance = 10;
+    // pointLight02.localTransform.fromTranslation(new vec3([3, 3, 3]));
+
+    // scene.attachChild(pointLight02);
 
     Clock.instance.start();
 
