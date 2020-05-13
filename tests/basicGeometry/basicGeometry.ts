@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight } from "../../src/miniEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight } from "../../src/miniEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "./autoRotateBehavior.js";
 import vec4 from "../../lib/tsm/vec4.js";
@@ -91,21 +91,12 @@ window.onload = () => {
     // const pointLight01 = new PointLight();
     // pointLight01.isStatic = true;
     // pointLight01.on = true;
-    // pointLight01.color = new vec4([10, 10, 10, 1]);
+    // pointLight01.color = new vec4([5, 5, 5, 1]);
     // pointLight01.distance = 10;
     // pointLight01.localTransform.fromTranslation(new vec3([1, 3, 1]));
 
     // scene.attachChild(pointLight01);
-
-    const spotLight01 = new SpotLight();
-    spotLight01.isStatic = true;
-    spotLight01.on = true;
-    spotLight01.color = new vec4([10, 10, 10, 1]);
-    spotLight01.distance = 0;
-    spotLight01.localTransform.fromTranslation(new vec3([0, 0, 3]));
-
-    scene.attachChild(spotLight01);
-
+    
     // const pointLight02 = new PointLight();
     // pointLight02.isStatic = true;
     // pointLight02.on = true;
@@ -114,6 +105,22 @@ window.onload = () => {
     // pointLight02.localTransform.fromTranslation(new vec3([3, 3, 3]));
 
     // scene.attachChild(pointLight02);
+
+    // const spotLight01 = new SpotLight();
+    // spotLight01.isStatic = true;
+    // spotLight01.on = true;
+    // spotLight01.color = new vec4([5, 5, 5, 1]);
+    // spotLight01.distance = 0;
+    // spotLight01.localTransform.fromTranslation(new vec3([0, 0, 3]));
+
+    // scene.attachChild(spotLight01);
+
+    const dirLight01 = new DirectionalLight();
+    dirLight01.isStatic = true;
+    dirLight01.on = true;
+    dirLight01.color = new vec4([3,3,3,1]);
+    dirLight01.localTransform.fromRotation(-Math.PI / 4, new vec3([1,1,1]));
+    scene.attachChild(dirLight01);
 
     Clock.instance.start();
 

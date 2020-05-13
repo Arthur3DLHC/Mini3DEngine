@@ -26,7 +26,8 @@ export class BaseLight extends Object3D {
     public shadow: LightShadow | null;
 
     /**
-     * light do not move
+     * light do not change any properties, except on/off
+     * for optimization
      */
     public isStatic: boolean;
 
