@@ -29,6 +29,7 @@ window.onload = () => {
     const boxMtl = new StandardPBRMaterial();
     boxMtl.color = new vec4([1.0, 1.0, 0.0, 1.0]);
     boxMtl.metallic = 0.8;
+    boxMtl.roughness = 0.4;
     boxMesh.materials.push(boxMtl);
 
     // auto rotate
@@ -43,7 +44,8 @@ window.onload = () => {
     sphereMesh.geometry = new SphereGeometry(1, 16, 8);
     const sphereMtl = new StandardPBRMaterial();
     sphereMtl.color = new vec4([1.0, 0.0, 0.0, 1.0]);
-    sphereMtl.metallic = 0.5;
+    sphereMtl.metallic = 0.8;
+    sphereMtl.roughness = 0.6;
     sphereMesh.materials.push(sphereMtl);
 
     boxMesh.attachChild(sphereMesh);
@@ -58,10 +60,11 @@ window.onload = () => {
     const cylinderMesh = new Mesh();
     cylinderMesh.name = "cylinder01";
     cylinderMesh.localTransform.fromTranslation(new vec3([3, 0, 0]));
-    cylinderMesh.geometry = new CylinderGeometry(1, 2, 8);
+    cylinderMesh.geometry = new CylinderGeometry(1, 2, 24);
     const cylinderMtl = new StandardPBRMaterial();
     cylinderMtl.color = new vec4([0.0, 1.0, 0.0, 1.0]);
-    cylinderMtl.metallic = 0.2;
+    cylinderMtl.metallic = 0.8;
+    cylinderMtl.roughness = 1.0;
     cylinderMesh.materials.push(cylinderMtl);
 
     /*
