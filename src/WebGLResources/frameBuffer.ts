@@ -63,7 +63,7 @@ export class FrameBuffer {
             // TODO: attach textures and depth stencil buffers
             for(let i = 0; i < this._textures.length && i < 4; i++) {
                 // if texture not created, create it
-                let texture: Texture|null = this._textures[i];                 
+                let texture: Texture|null = this._textures[i];
                 if (texture !== null) {
                     if (texture.samplerState.minFilter !== GLDevice.gl.NEAREST || texture.samplerState.magFilter !== GLDevice.gl.NEAREST) {
                         throw new Error("Texture as rendertarget muse has nearest filter");

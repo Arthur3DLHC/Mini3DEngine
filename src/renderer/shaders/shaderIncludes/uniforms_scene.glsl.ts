@@ -2,7 +2,7 @@
  * uniform blocks per scene
  */
 export default /** glsl */`
-    #define MAX_LIGHTS_PERSCENE  512
+    #define MAX_LIGHTS_PERSCENE  256
     #define MAX_DECALS_PERSCENE  512
     #define MAX_ENVPROBES_PERSCENE  512
     #define MAX_IRRADIANCE_VOLUMES_PERSCENE  512
@@ -17,8 +17,7 @@ export default /** glsl */`
         //float radius;       // point/dir/spot
         //float outerConeCos; // spot
         //float innerConeCos; // spot
-        vec4 shadowMapRect;   // dir/spot
-        // fix me: need to add shadow proj matrix?
+        mat4 matShadow;       // dir/spot; light viewport(atlas location) * frustum proj * light view (inv transform)
     };
     uniform Lights
     {

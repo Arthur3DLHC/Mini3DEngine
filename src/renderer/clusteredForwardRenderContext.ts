@@ -19,6 +19,8 @@ import mat4 from "../../lib/tsm/mat4.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec2 from "../../lib/tsm/vec2.js";
+import { DirectionalLight } from "../scene/lights/directionalLight.js";
+import { DirectionalLightShadow } from "../scene/lights/directionalLightShadow.js";
 
 export class ClusteredForwardRenderContext extends RenderContext {
     public constructor() {
@@ -81,7 +83,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
     private _ubMaterialPBR: UniformBuffer;
 
     
-    public static readonly LIGHT_SIZE_FLOAT = 28;
+    public static readonly LIGHT_SIZE_FLOAT = 40;
     public static readonly DECAL_SIZE_FLOAT = 20;
     public static readonly ENVPROBE_SIZE_FLOAT = 4;
     public static readonly IRRVOL_SIZE_FLOAT = 24;
@@ -90,7 +92,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
     public static readonly CLUSTER_SIZE_INT = 4;
 
     private setUniformBufferLayouts() {
-        const MAX_LIGHTS = 512;
+        const MAX_LIGHTS = 256;
         const MAX_DECALS = 512;
         const MAX_ENVPROBES = 512;
         const MAX_IRRVOLUMES = 512;
@@ -241,19 +243,12 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
     private addLightToBufer(buffer: BufferHelper, light: BaseLight) {
         const lightColor = light.color.copy();
-        buffer.addArray(lightColor.values);
-        // transform
-        // const row0 = light.worldTransform.row(0);
-        // const row1 = light.worldTransform.row(1);
-        // const row2 = light.worldTransform.row(2);
-        // buffer.addArray(row0.values);
-        // buffer.addArray(row1.values);
-        // buffer.addArray(row2.values);
-        buffer.addArray(light.worldTransform.values);
-        buffer.addNumber(light.type);
+
         let radius = 0;
         let outerConeCos = 0;
         let innerConeCos = 0;
+        let matShadow: mat4 = new mat4();
+        matShadow.setIdentity();
         if (light.type === LightType.Point) {
             radius = (light as PointLight).distance;
         }
@@ -262,16 +257,50 @@ export class ClusteredForwardRenderContext extends RenderContext {
             radius = spot.distance;
             outerConeCos = Math.cos(spot.outerConeAngle);
             innerConeCos = Math.cos(spot.innerConeAngle);
+            if (light.shadow) {
+                let matLightView = light.worldTransform.copy();
+                matLightView.inverse();
+                let matLightProj = mat4.perspective(spot.outerConeAngle * 2, 1, 0.1, radius);
+                mat4.product(matLightProj, matLightView, matShadow);
+            }
         }
+        else if (light.type === LightType.Directional) {
+            if (light.shadow) {
+                const dir: DirectionalLight = (light as DirectionalLight);
+                const dirShadow: DirectionalLightShadow = (light.shadow as DirectionalLightShadow);
+                let matLightView = light.worldTransform.copy();
+                matLightView.inverse();
+                let matLightProj = mat4.orthographic(-dirShadow.radius, dirShadow.radius, -dirShadow.radius, dirShadow.radius, 0.1, dir.radius);
+                mat4.product(matLightProj, matLightView, matShadow);
+            }
+        }
+        if (light.shadow) {
+            // NOTE: these matrices is for sample shadow map, not for render shadow map.
+            // todo: shadow bias matrix
+            let matBias = new mat4();
+            matBias.fromTranslation(new vec3([0, 0, light.shadow.bias]));
+            // todo: shadowmap atlas rect as viewport matrix
+            let sx = light.shadow.mapRect.z / light.shadow.mapSize.x;
+            let sy = light.shadow.mapRect.w / light.shadow.mapSize.y;
+            // todo: translation
+            let tx = 0;
+            let ty = 0;
+            let matLightViewport = new mat4([
+                sx, 0, 0, 0,
+                0, sy, 0, 0,
+                0, 0, 1, 0,
+                tx, ty, 0, 1,
+            ]);
+            mat4.product(matBias, matShadow, matShadow);
+            mat4.product(matLightViewport, matShadow, matShadow);
+        }
+        buffer.addArray(lightColor.values);
+        buffer.addArray(light.worldTransform.values);
+        buffer.addNumber(light.type);
         buffer.addNumber(radius);
         buffer.addNumber(outerConeCos);
         buffer.addNumber(innerConeCos);
-        if (light.shadow) {
-            buffer.addArray(light.shadow.mapRect.values);
-        }
-        else {
-            buffer.addArray(new vec4().values);
-        }
+        buffer.addArray(matShadow.values);
     }
 
     // public fillUniformBuffersPerFrame() {

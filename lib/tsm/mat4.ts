@@ -829,7 +829,7 @@ export default class mat4 {
         ])
     }
 
-    static product(m1: mat4, m2: mat4, result: mat4): mat4 {
+    static product(m1: mat4, m2: mat4, result?: mat4): mat4 {
         const a00 = m1.at(0)
         const a01 = m1.at(1)
         const a02 = m1.at(2)
