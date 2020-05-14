@@ -14,7 +14,7 @@ export class Texture {
         this.depth = 0;
         this.format = GLDevice.gl.RGBA;
         this.componentType = GLDevice.gl.UNSIGNED_BYTE;
-        this.samplerState = new SamplerState();
+        this.samplerState = null;
         this.cached = false;
     }
     // todo: 源图片或数据？是否放在基类中？
@@ -46,8 +46,9 @@ export class Texture {
 
     /**
      * default sampler state? or put sampler state to material?
+     * 注意：如果是shadowmap，则不要使用 samplerState
      */
-    public samplerState: SamplerState;
+    public samplerState: SamplerState | null;
 
     /**
      * if texture is in cache, must set to true

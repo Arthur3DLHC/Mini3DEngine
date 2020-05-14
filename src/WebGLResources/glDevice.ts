@@ -36,7 +36,7 @@ export class GLDevice {
      * set current render target
      * @param renderTarget null for render to window
      */
-    public static setRenderTarget(renderTarget: FrameBuffer | null) {
+    public static set renderTarget(renderTarget: FrameBuffer | null) {
         // if gl fbo not created, create it
         if (renderTarget) {
             renderTarget.prepare();

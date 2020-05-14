@@ -13,6 +13,8 @@ import output_final from "./shaders/shaderIncludes/output_final.glsl.js"
 // shader codes
 import single_color_vs from "./shaders/single_color_vs.glsl.js"
 import single_color_fs from "./shaders/single_color_fs.glsl.js"
+import screen_rect_vs from "./shaders/screen_Rect_vs.glsl.js"
+import screen_rect_fs from "./shaders/screen_rect_fs.glsl.js"
 import default_pbr_vs from "./shaders/default_pbr_vs.glsl.js"
 import default_pbr_fs from "./shaders/default_pbr_fs.glsl.js"
 // modules
@@ -109,7 +111,13 @@ export class ClusteredForwardRenderer {
         this._occlusionQueryProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_fs"]);
         this._occlusionQueryProgram.build();
 
+        this._screenRectProgram = new ShaderProgram();
+        this._screenRectProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["screen_rect_vs"]);
+        this._screenRectProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["screen_rect_fs"]);
+        this._screenRectProgram.build();
+
         this._samplerUniformsStdPBR = new SamplerUniforms(this._stdPBRProgram);
+        this._samplerUniformsScreenRect = new SamplerUniforms(this._screenRectProgram);
 
         // todo: bind uniform blocks?
         // bind to a program with all uniform blocks presented?
@@ -118,6 +126,7 @@ export class ClusteredForwardRenderer {
         this._renderContext.bindUniformBlocks(this._stdPBRProgram);
         this._renderContext.bindUniformBlocks(this._depthPrepassProgram);
         this._renderContext.bindUniformBlocks(this._occlusionQueryProgram);
+        this._renderContext.bindUniformBlocks(this._screenRectProgram);
     }
 
     private _renderListDepthPrepass: RenderList;
@@ -167,10 +176,11 @@ export class ClusteredForwardRenderer {
     private _colorProgram: ShaderProgram;
     private _depthPrepassProgram: ShaderProgram;
     private _occlusionQueryProgram: ShaderProgram;
-    // todo: other programs: depth prepass, shadowmap, occlusion query...
+    private _screenRectProgram: ShaderProgram;
 
     // sampler uniforms
     private _samplerUniformsStdPBR: SamplerUniforms | null;
+    private _samplerUniformsScreenRect: SamplerUniforms | null;
     
     public render(scene: Scene) {
 
@@ -280,6 +290,8 @@ export class ClusteredForwardRenderer {
         GLPrograms.shaderCodes["output_final"] = output_final;
 
         // shaders
+        GLPrograms.shaderCodes["screen_rect_vs"] = screen_rect_vs;
+        GLPrograms.shaderCodes["screen_rect_fs"] = screen_rect_fs;
         GLPrograms.shaderCodes["single_color_vs"] = single_color_vs;
         GLPrograms.shaderCodes["single_color_fs"] = single_color_fs;
         GLPrograms.shaderCodes["default_pbr_vs"] = default_pbr_vs;

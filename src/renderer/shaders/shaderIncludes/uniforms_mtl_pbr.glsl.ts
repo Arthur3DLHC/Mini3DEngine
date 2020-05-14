@@ -21,4 +21,11 @@ export default /** glsl */`
         // 注意: sampler 不能放在uniform block里
 
     } u_material;
+
+    // samplers
+    uniform sampler2D s_baseColorMap;
+    uniform sampler2D s_metallicRoughnessMap;
+    uniform sampler2D s_normalMap;
+    uniform sampler2D s_occlusionMap;
+    uniform sampler2D s_emissiveMap;
 `;
