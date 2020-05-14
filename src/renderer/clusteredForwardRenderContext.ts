@@ -280,16 +280,21 @@ export class ClusteredForwardRenderContext extends RenderContext {
             let matBias = new mat4();
             matBias.fromTranslation(new vec3([0, 0, light.shadow.bias]));
             // todo: shadowmap atlas rect as viewport matrix
-            let sx = light.shadow.mapRect.z / light.shadow.mapSize.x;
-            let sy = light.shadow.mapRect.w / light.shadow.mapSize.y;
+            let w = light.shadow.mapRect.z / light.shadow.mapSize.x;
+            let h = light.shadow.mapRect.w / light.shadow.mapSize.y;
             // todo: translation
-            let tx = 0;
-            let ty = 0;
+            let l = light.shadow.mapRect.x;
+            let b = light.shadow.mapRect.y;
+            // ndc space is [-1, 1]
+            // texcoord uv space is [0,1]
+            // depth range in depthbuffer is also [0,1]
+            // so need to apply * 0.5 + 0.5
+            // and shadowmap altas rectangle, same as viewport
             let matLightViewport = new mat4([
-                sx, 0, 0, 0,
-                0, sy, 0, 0,
-                0, 0, 1, 0,
-                tx, ty, 0, 1,
+                w * 0.5,     0,           0,   0,
+                0,           h * 0.5,     0,   0,
+                0,           0,           0.5, 0,
+                w * 0.5 + l, h * 0.5 + b, 0.5, 1,
             ]);
             mat4.product(matBias, matShadow, matShadow);
             mat4.product(matLightViewport, matShadow, matShadow);
