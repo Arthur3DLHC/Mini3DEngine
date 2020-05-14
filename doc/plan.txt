@@ -91,9 +91,10 @@ TODO:       主要类结构
                 多光源；
                 测试各种光源类型；
                 测试材质的各种参数；
-                    TODO: emissive 和 opacity
+                    TODO: emissive 和 opacity color
                 阴影；
                     实现和测试设置 RenderTarget
+                        实现和测试画到屏幕的二维矩形 shader
                         渲染到一张纹理，然后贴到场景中的物体表面；
                         屏幕矩形图元；或者屏幕矩形shader；
                     使用 depth texture 作为 Shadowmap;

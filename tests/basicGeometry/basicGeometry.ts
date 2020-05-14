@@ -63,6 +63,7 @@ window.onload = () => {
     cylinderMesh.geometry = new CylinderGeometry(1, 2, 24);
     const cylinderMtl = new StandardPBRMaterial();
     cylinderMtl.color = new vec4([0.0, 1.0, 0.0, 1.0]);
+    cylinderMtl.emissive = new vec4([0.5, 0.5, 0.5, 1]);
     cylinderMtl.metallic = 0.2;
     cylinderMtl.roughness = 0.6;
     cylinderMesh.materials.push(cylinderMtl);

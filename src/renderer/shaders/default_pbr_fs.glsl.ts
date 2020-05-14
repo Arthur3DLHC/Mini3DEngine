@@ -31,13 +31,20 @@ vec3 getBaseColor() {
     return (u_material.baseColor * ex_color).rgb;
 }
 
+vec3 getEmissive() {
+    // todo: emissive map
+    return u_material.emissive.rgb;
+}
+
 vec2 getMetallicRoughness() {
     // todo: roughness matallic map
     vec2 ret = vec2(u_material.metallic, u_material.roughness);
     return clamp(ret, vec2(0.0), vec2(1.0));
 }
 
-
+float getOpacity() {
+    return u_material.baseColor.a;
+}
 
 void main(void)
 {
@@ -117,7 +124,10 @@ void main(void)
         // o.color += light.color;
     }
 
-    o.color = vec4(f_diffuse + f_specular, 1);
+    f_emissive = getEmissive();
+
+    // todo: opacity for transparent surfaces;
+    o.color = vec4(f_diffuse + f_specular + f_emissive, getOpacity());
 
     // test normal
     // vec3 normal = normalize(ex_worldNormal);
