@@ -1,6 +1,6 @@
-import { Behavior } from "../../src/scene/behavior.js";
-import { Object3D, Clock } from "../../src/miniEngine.js";
-import mat4 from "../../lib/tsm/mat4.js";
+import { Behavior } from "../../../src/scene/behavior.js";
+import { Object3D, Clock } from "../../../src/miniEngine.js";
+import mat4 from "../../../lib/tsm/mat4.js";
 
 export class AutoRotateBehavior extends Behavior {
     public constructor(owner: Object3D) {
