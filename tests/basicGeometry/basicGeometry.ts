@@ -132,7 +132,7 @@ window.onload = () => {
         renderer.render(scene);
 
         // test drawing a screen space rectangle
-        renderer.renderScreenRect(0, 0, 0.4, 0.4, new vec4([1,1,1,1]));
+        renderer.renderScreenRect(0.2, 0.2, 0.4, 0.2, new vec4([1,1,1,1]));
 
         requestAnimationFrame(gameLoop);
     }
