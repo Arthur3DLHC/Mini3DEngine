@@ -15,7 +15,7 @@ export class TextureCube extends Texture {
      */
     public get samplerType(): GLenum {
         // depth textures should use shadow sampler
-        if (this.format === GLDevice.gl.DEPTH || this.format === GLDevice.gl.DEPTH_STENCIL) {
+        if (this.format === GLDevice.gl.DEPTH_COMPONENT || this.format === GLDevice.gl.DEPTH_STENCIL) {
             return GLDevice.gl.SAMPLER_CUBE_SHADOW;
         } else {
             return GLDevice.gl.SAMPLER_CUBE;

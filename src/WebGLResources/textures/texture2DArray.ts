@@ -14,7 +14,7 @@ export class Texture2DArray extends Texture {
      * get the proper sampler type for this texture
      */
     public get samplerType(): GLenum {
-        if (this.format === GLDevice.gl.DEPTH || this.format === GLDevice.gl.DEPTH_STENCIL) {
+        if (this.format === GLDevice.gl.DEPTH_COMPONENT || this.format === GLDevice.gl.DEPTH_STENCIL) {
             return GLDevice.gl.SAMPLER_2D_ARRAY_SHADOW;
         } else {
             return GLDevice.gl.SAMPLER_2D_ARRAY;

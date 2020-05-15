@@ -92,7 +92,30 @@ export class FrameBuffer {
                     }
                     GLDevice.gl.framebufferRenderbuffer(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_STENCIL_ATTACHMENT, GLDevice.gl.RENDERBUFFER, this._depthStencilBuffer.glBuffer);
                 }
-            } 
+            }
+
+            const status = GLDevice.gl.checkFramebufferStatus(GLDevice.gl.FRAMEBUFFER);
+            if (status !== GLDevice.gl.FRAMEBUFFER_COMPLETE) {
+                switch (status) {
+                    case GLDevice.gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+                        console.error("framebuffer incomplete attachment")
+                        break;
+                    case GLDevice.gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+                        console.error("framebuffer incomplete missing attachment")
+                        break;
+                    case GLDevice.gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+                        console.error("framebuffer incomplete dimensions")
+                        break;
+                    case GLDevice.gl.FRAMEBUFFER_UNSUPPORTED:
+                        console.error("framebuffer unsupported")
+                        break;
+                    case GLDevice.gl.FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+                        console.error("framebuffer incomplete multisample")
+                        break;
+                    default:
+                        break;
+                }
+            }
 
             // drawbuffers 设置会保存在 GL 的 frame buffer object 中
             GLDevice.gl.drawBuffers(attachments);

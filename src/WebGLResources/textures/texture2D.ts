@@ -22,7 +22,7 @@ export class Texture2D extends Texture {
      */
     public get samplerType(): GLenum {
         // depth textures should use shadow sampler
-        if ((this.format === GLDevice.gl.DEPTH || this.format === GLDevice.gl.DEPTH_STENCIL) && this.isShadowMap) {
+        if ((this.format === GLDevice.gl.DEPTH_COMPONENT || this.format === GLDevice.gl.DEPTH_STENCIL) && this.isShadowMap) {
             return GLDevice.gl.SAMPLER_2D_SHADOW;
         } else {
             return GLDevice.gl.SAMPLER_2D;
@@ -45,7 +45,7 @@ export class Texture2D extends Texture {
         const internalFmt = GLTextures.internalFormatFrom(this.format, this.componentType);
         GLDevice.gl.texImage2D(GLDevice.gl.TEXTURE_2D, 0, internalFmt, this.width, this.height, 0, this.format, this.componentType, null);
 
-        if (this.format === GLDevice.gl.DEPTH || this.format === GLDevice.gl.DEPTH_STENCIL) {
+        if (this.format === GLDevice.gl.DEPTH_COMPONENT || this.format === GLDevice.gl.DEPTH_STENCIL) {
             // enable texture compare, so sampler2DShadow can work
             GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_COMPARE_MODE, GLDevice.gl.COMPARE_REF_TO_TEXTURE);
             GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_COMPARE_FUNC, GLDevice.gl.LEQUAL);

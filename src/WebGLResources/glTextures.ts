@@ -26,7 +26,7 @@ export class GLTextures {
                 if (type === GLDevice.gl.HALF_FLOAT) internalFormat = GLDevice.gl.RGBA16F;
                 if (type === GLDevice.gl.UNSIGNED_BYTE) internalFormat = GLDevice.gl.RGBA8;
                 break;
-            case GLDevice.gl.DEPTH:
+            case GLDevice.gl.DEPTH_COMPONENT:
                 internalFormat = GLDevice.gl.DEPTH_COMPONENT24;
                 break;
             case GLDevice.gl.DEPTH_STENCIL:

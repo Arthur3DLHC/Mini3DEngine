@@ -46,6 +46,8 @@ import { PlaneGeometry } from "../geometry/common/planeGeometry.js"
 import vec4 from "../../lib/tsm/vec4.js"
 import { Texture2D } from "../WebGLResources/textures/texture2D.js"
 import mat4 from "../../lib/tsm/mat4.js"
+import { FrameBuffer } from "../WebGLResources/frameBuffer.js"
+import { Texture } from "../WebGLResources/textures/texture.js"
 
 export class ClusteredForwardRenderer {
 
@@ -93,10 +95,34 @@ export class ClusteredForwardRenderer {
         // 能否用同一张纹理的两个通道呢？用 colorwritemask 实现分别绘制？
         this._shadowmapAtlasStatic = new TextureAtlas2D();
         this._shadowmapAtlasDynamic = new TextureAtlas2D();
+        // todo: create atlas texture
+        this._shadowmapAtlasDynamic.texture = new Texture2D();
+        this._shadowmapAtlasDynamic.texture.width = GLDevice.canvas.width;
+        this._shadowmapAtlasDynamic.texture.height = GLDevice.canvas.height;
+        this._shadowmapAtlasDynamic.texture.depth = 1;
+        this._shadowmapAtlasDynamic.texture.format = GLDevice.gl.RGBA;
+        this._shadowmapAtlasDynamic.texture.componentType = GLDevice.gl.UNSIGNED_BYTE;
+        this._shadowmapAtlasDynamic.texture.create();
 
         this._decalAtlas = new TextureAtlas2D();
         this._envMapArray = null;
         this._irradianceVolumeAtlas = new TextureAtlas3D();
+
+        this._shadowmapFBODynamic = new FrameBuffer(GLDevice.canvas.width, GLDevice.canvas.height);
+        this._debugDepthTexture = new Texture2D();
+        this._debugDepthTexture.width = GLDevice.canvas.width;
+        this._debugDepthTexture.height = GLDevice.canvas.height;
+        this._debugDepthTexture.depth = 1;
+        this._debugDepthTexture.isShadowMap = true;
+        this._debugDepthTexture.format = GLDevice.gl.DEPTH_STENCIL;
+        this._debugDepthTexture.componentType = GLDevice.gl.UNSIGNED_INT_24_8;
+        this._debugDepthTexture.create();
+
+        this._shadowmapFBODynamic.depthStencilTexture = this._debugDepthTexture;
+        this._shadowmapFBODynamic.setTexture(0, this._shadowmapAtlasDynamic.texture);
+        this._shadowmapFBODynamic.prepare();
+
+
 
         this.registerShaderCodes();
 
@@ -189,6 +215,9 @@ export class ClusteredForwardRenderer {
     private _envMapArray: Texture2DArray|null;
     private _irradianceVolumeAtlas: TextureAtlas3D;
 
+    private _shadowmapFBODynamic: FrameBuffer;
+    private _debugDepthTexture: Texture2D;        // debug use
+
     private _numReservedTextures: number;
     
     // default shader programs
@@ -236,6 +265,10 @@ export class ClusteredForwardRenderer {
         // fix me: for simplicity, use only one camera; or occlusion query can not work.
         for (let icam = 0; icam < this._renderContext.cameras.length; icam++) {
             const camera = this._renderContext.cameras[icam];
+
+            // Test code: set render target
+            GLDevice.renderTarget = this._shadowmapFBODynamic;
+
             // set viewport
             if (camera.viewport) {
                 GLDevice.gl.viewport(camera.viewport.x, camera.viewport.y, camera.viewport.z, camera.viewport.w);                
@@ -263,6 +296,11 @@ export class ClusteredForwardRenderer {
             // this.renderTransparent();
 
             // todo: render sprites
+
+            // Test code: apply render target texture to a screen space rectangle
+            // test drawing a screen space rectangle
+            GLDevice.renderTarget = null;
+            this.renderScreenRect(0, 0, 0.2, 0.2, new vec4([1,1,1,1]), this._shadowmapFBODynamic.depthStencilTexture, 1, false);
         }
     }
 
@@ -589,7 +627,7 @@ export class ClusteredForwardRenderer {
      * @param texture 
      * @param textureAmount 
      */
-    public renderScreenRect(left: number, bottom: number, width: number, height: number, color: vec4, texture: Texture2D | null = null, textureAmount: number = 0.0, transparent: boolean = false) {
+    public renderScreenRect(left: number, bottom: number, width: number, height: number, color: vec4, texture: Texture | null = null, textureAmount: number = 0.0, transparent: boolean = false) {
         // renderstate?
         // opaque or transparent?
         if (transparent) {
@@ -624,6 +662,8 @@ export class ClusteredForwardRenderer {
         // set material uniform block and texture
         this._renderContext.ubMaterialPBR.setFloat("colorMapAmount", textureAmount);
         this._renderContext.ubMaterialPBR.update();
+
+        // todo: set uniform sampler
 
         // draw geometry
         this._rectGeom.draw(0, Infinity, this._screenRectProgram.attributes);
