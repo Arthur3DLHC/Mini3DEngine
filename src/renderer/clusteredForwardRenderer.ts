@@ -66,6 +66,9 @@ export class ClusteredForwardRenderer {
         this._renderStatesOpaqueOcclusion = new RenderStateSet();
         this._renderStatesTransparent = new RenderStateSet();
         this._renderStatesTransparentOcclusion = new RenderStateSet();
+        this._renderStatesScrRectOpaque = new RenderStateSet();
+        this._renderStatesScrRectTransparent = new RenderStateSet();
+
         this._curDefaultRenderStates = null;
 
         // todo: prepare default renderstates for every phase
@@ -162,6 +165,9 @@ export class ClusteredForwardRenderer {
     private _renderStatesOpaqueOcclusion: RenderStateSet;
     private _renderStatesTransparent: RenderStateSet;
     private _renderStatesTransparentOcclusion: RenderStateSet;
+    private _renderStatesScrRectOpaque: RenderStateSet;
+    private _renderStatesScrRectTransparent: RenderStateSet;
+
     private _curDefaultRenderStates: RenderStateSet | null;
 
     // a geometry to render screen space rectangles?
@@ -287,6 +293,16 @@ export class ClusteredForwardRenderer {
         this._renderStatesTransparentOcclusion.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
         this._renderStatesTransparentOcclusion.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
         this._renderStatesTransparentOcclusion.colorWriteState = RenderStateCache.instance.getColorWriteState(false, false, false, false);
+
+        this._renderStatesScrRectOpaque.depthState = RenderStateCache.instance.getDepthStencilState(false, false, GLDevice.gl.ALWAYS);
+        this._renderStatesScrRectOpaque.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+        this._renderStatesScrRectOpaque.cullState = RenderStateCache.instance.getCullState(false, GLDevice.gl.BACK);
+        this._renderStatesScrRectOpaque.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
+    
+        this._renderStatesScrRectTransparent.depthState = RenderStateCache.instance.getDepthStencilState(false, false, GLDevice.gl.ALWAYS);
+        this._renderStatesScrRectTransparent.blendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+        this._renderStatesScrRectTransparent.cullState = RenderStateCache.instance.getCullState(false, GLDevice.gl.BACK);
+        this._renderStatesScrRectTransparent.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
     }
 
 
@@ -573,7 +589,15 @@ export class ClusteredForwardRenderer {
      * @param texture 
      * @param textureAmount 
      */
-    private renderScreenRect(left: number, bottom: number, width: number, height: number, color: vec4, texture: Texture2D | null, textureAmount: number) {
+    public renderScreenRect(left: number, bottom: number, width: number, height: number, color: vec4, texture: Texture2D | null = null, textureAmount: number = 0.0, transparent: boolean = false) {
+        // renderstate?
+        // opaque or transparent?
+        if (transparent) {
+            this._renderStatesScrRectTransparent.apply();
+        } else {
+            this._renderStatesScrRectOpaque.apply();
+        }
+        
         // use program
         GLPrograms.useProgram(this._screenRectProgram);
         // transform matrix
