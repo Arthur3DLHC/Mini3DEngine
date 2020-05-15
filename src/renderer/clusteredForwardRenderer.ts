@@ -42,6 +42,10 @@ import { Texture2DArray } from "../WebGLResources/textures/texture2DArray.js"
 import { TextureAtlas3D } from "../WebGLResources/textures/textureAtlas3D.js"
 import { SamplerUniforms } from "../WebGLResources/samplerUniforms.js"
 import { ClusteredForwardRenderContext } from "./clusteredForwardRenderContext.js"
+import { PlaneGeometry } from "../geometry/common/planeGeometry.js"
+import vec4 from "../../lib/tsm/vec4.js"
+import { Texture2D } from "../WebGLResources/textures/texture2D.js"
+import mat4 from "../../lib/tsm/mat4.js"
 
 export class ClusteredForwardRenderer {
 
@@ -66,6 +70,10 @@ export class ClusteredForwardRenderer {
 
         // todo: prepare default renderstates for every phase
         this.createRenderStates();
+
+        // builtin geometries
+        this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
+        this._rectTransform = new mat4();
 
         this._shadowmapAtlasStaticUnit = 0;
         this._shadowmapAtlasDynamicUnit = 1;
@@ -156,8 +164,10 @@ export class ClusteredForwardRenderer {
     private _renderStatesTransparentOcclusion: RenderStateSet;
     private _curDefaultRenderStates: RenderStateSet | null;
 
+    // a geometry to render screen space rectangles?
+    private _rectGeom: PlaneGeometry;
+    private _rectTransform: mat4;
     // todo: a unit box geometry for draw bounding boxes; used by occlusion query pass
-
 
     // todo: system textures: shadowmap atlas, decal atlas, envMap array, irradiance volumes
     // todo: system texture unit numbers
@@ -186,7 +196,7 @@ export class ClusteredForwardRenderer {
     // sampler uniforms
     private _samplerUniformsStdPBR: SamplerUniforms | null;
     private _samplerUniformsScreenRect: SamplerUniforms | null;
-    
+
     public render(scene: Scene) {
 
         // if scene changed, setup uniform buffers for scene.
@@ -552,5 +562,46 @@ export class ClusteredForwardRenderer {
             }
         }
         */
+    }
+    /**
+     * render a rectangle in screen space
+     * @param left left corner in [0,1] space
+     * @param bottom bottom corner in [0,1] space
+     * @param width width in [0, 1] space
+     * @param height height in [0, 1] space
+     * @param color 
+     * @param texture 
+     * @param textureAmount 
+     */
+    private renderScreenRect(left: number, bottom: number, width: number, height: number, color: vec4, texture: Texture2D | null, textureAmount: number) {
+        // use program
+        GLPrograms.useProgram(this._screenRectProgram);
+        // transform matrix
+        // from 0,1 to -1,1
+        const l = left * 2 - 1;
+        const b = bottom * 2 - 1;
+        // because the vertices are also [-1, 1], so width and height do not need to change
+        const w = width;
+        const h = height;
+        // const transform: mat4 = new mat4([
+        //     w,              0,              0,  0,
+        //     0,              h,              0,  0,
+        //     0,              0,              1,  0,
+        //     w + l,          h + b,          0,  1,
+        // ]);
+        this._rectTransform.init([
+            w,              0,              0,  0,
+            0,              h,              0,  0,
+            0,              0,              1,  0,
+            w + l,          h + b,          0,  1,
+        ]);
+        this._renderContext.fillUniformBuffersPerObjectByValues(this._rectTransform, this._rectTransform, color);
+
+        // set material uniform block and texture
+        this._renderContext.ubMaterialPBR.setFloat("colorMapAmount", textureAmount);
+        this._renderContext.ubMaterialPBR.update();
+
+        // draw geometry
+        this._rectGeom.draw(0, Infinity, this._screenRectProgram.attributes);
     }
 }

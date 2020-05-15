@@ -82,6 +82,9 @@ export class ClusteredForwardRenderContext extends RenderContext {
     private _ubObject: UniformBuffer;
     private _ubMaterialPBR: UniformBuffer;
 
+    public get ubMaterialPBR(): UniformBuffer {
+        return this._ubMaterialPBR;
+    }
     
     public static readonly LIGHT_SIZE_FLOAT = 40;
     public static readonly DECAL_SIZE_FLOAT = 20;
@@ -474,6 +477,13 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubObject.update();
 
         // todo: object skin transforms, if skinmesh
+    }
+
+    public fillUniformBuffersPerObjectByValues(matWorld: mat4, matWorldPrev: mat4, color: vec4) {
+        this._ubObject.setMat4("matWorld", matWorld);
+        this._ubObject.setMat4("matWorldPrev", matWorldPrev);
+        this._ubObject.setVec4("color", color);
+        this._ubObject.update();
     }
 
     public fillUniformBuffersPerMaterial(material: Material | null) {
