@@ -91,27 +91,32 @@ export class ClusteredForwardRenderer {
 
         // todo: import default shader code strings and create shader objects
         this._colorProgram = new ShaderProgram();
+        this._colorProgram.name = "single_color";
         this._colorProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_vs"]);
         this._colorProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_fs"]);
         this._colorProgram.build();
 
         this._stdPBRProgram = new ShaderProgram();
+        this._stdPBRProgram.name = "default_pbr";
         this._stdPBRProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["default_pbr_vs"]);
         this._stdPBRProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["default_pbr_fs"]);
         this._stdPBRProgram.build();
 
         // all can use simple color program
         this._depthPrepassProgram = new ShaderProgram();
+        this._depthPrepassProgram.name = "depth_prepass";
         this._depthPrepassProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_vs"]);
         this._depthPrepassProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_fs"]);
         this._depthPrepassProgram.build();
 
         this._occlusionQueryProgram = new ShaderProgram();
+        this._occlusionQueryProgram.name = "occlusion_query";
         this._occlusionQueryProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_vs"]);
         this._occlusionQueryProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_fs"]);
         this._occlusionQueryProgram.build();
 
         this._screenRectProgram = new ShaderProgram();
+        this._screenRectProgram.name = "screen_rect";
         this._screenRectProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["screen_rect_vs"]);
         this._screenRectProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["screen_rect_fs"]);
         this._screenRectProgram.build();

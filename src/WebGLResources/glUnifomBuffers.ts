@@ -39,11 +39,15 @@ export class GLUniformBuffers {
         }
         if (program.glProgram) {
             const location = GLDevice.gl.getUniformBlockIndex(program.glProgram, blockName);
-            const size = GLDevice.gl.getActiveUniformBlockParameter(program.glProgram, location, GLDevice.gl.UNIFORM_BLOCK_DATA_SIZE);
-            console.log("Binding uniform block [" + blockName + "] (location: " + location + " size: " + size + ") to " + GLUniformBuffers.uniformBlockNames[blockName]);
-            GLDevice.gl.uniformBlockBinding(program.glProgram, location, GLUniformBuffers.uniformBlockNames[blockName]);
-            // GLUniformBuffers._uniformBlockNames[blockName] = index;
-            this._uniformBlockSizes[blockName] = size;
+            if (location === GLDevice.gl.INVALID_INDEX) {
+                console.log("Active uniform block not found:" + blockName);
+            } else {
+                const size = GLDevice.gl.getActiveUniformBlockParameter(program.glProgram, location, GLDevice.gl.UNIFORM_BLOCK_DATA_SIZE);
+                console.log("Binding uniform block [" + blockName + "] (location: " + location + " size: " + size + " in " + program.name + ") to " + GLUniformBuffers.uniformBlockNames[blockName]);
+                GLDevice.gl.uniformBlockBinding(program.glProgram, location, GLUniformBuffers.uniformBlockNames[blockName]);
+                // GLUniformBuffers._uniformBlockNames[blockName] = index;
+                this._uniformBlockSizes[blockName] = size;
+            }
         }
     }
 
