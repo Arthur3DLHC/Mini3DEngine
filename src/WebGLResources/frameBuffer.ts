@@ -105,23 +105,24 @@ export class FrameBuffer {
                 if (!this._depthStencilTexture.glTexture) {
                     this._depthStencilTexture.create();
                 }
+                let attachment = GLDevice.gl.DEPTH_STENCIL_ATTACHMENT;
                 if (this._depthStencilTexture.format === GLDevice.gl.DEPTH_COMPONENT) {
-                    GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_ATTACHMENT, GLDevice.gl.TEXTURE_2D, this._depthStencilTexture.glTexture, 0);
-                } else {
-                    GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_STENCIL_ATTACHMENT, GLDevice.gl.TEXTURE_2D, this._depthStencilTexture.glTexture, 0);
+                    attachment = GLDevice.gl.DEPTH_ATTACHMENT;
                 }
-            } else{
+                GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, attachment, GLDevice.gl.TEXTURE_2D, this._depthStencilTexture.glTexture, 0);
+
+            } else {
                 GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_STENCIL_ATTACHMENT, GLDevice.gl.TEXTURE_2D, null, 0);
                 GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_ATTACHMENT, GLDevice.gl.TEXTURE_2D, null, 0);
                 if (this._depthStencilBuffer) {
                     if (!this._depthStencilBuffer.glBuffer) {
                         this._depthStencilBuffer.create();
                     }
+                    let attachment = GLDevice.gl.DEPTH_STENCIL_ATTACHMENT;
                     if (this._depthStencilBuffer.format === GLDevice.gl.DEPTH_COMPONENT) {
-                        GLDevice.gl.framebufferRenderbuffer(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_ATTACHMENT, GLDevice.gl.RENDERBUFFER, this._depthStencilBuffer.glBuffer);
-                    } else {
-                        GLDevice.gl.framebufferRenderbuffer(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_STENCIL_ATTACHMENT, GLDevice.gl.RENDERBUFFER, this._depthStencilBuffer.glBuffer);
+                        attachment = GLDevice.gl.DEPTH_ATTACHMENT;
                     }
+                    GLDevice.gl.framebufferRenderbuffer(GLDevice.gl.DRAW_FRAMEBUFFER, attachment, GLDevice.gl.RENDERBUFFER, this._depthStencilBuffer.glBuffer);
                 }
             }
 

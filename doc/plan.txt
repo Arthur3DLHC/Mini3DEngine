@@ -97,6 +97,8 @@ TODO:       主要类结构
                         实现和测试画到屏幕的二维矩形 shader
                         渲染到一张纹理，然后贴到场景中的物体表面；
                         屏幕矩形图元；或者屏幕矩形shader；
+                        据说 FrameBufferObject 中切换 attached texture 要比切换 FrameBufferObject 快？
+                            需要实现 FrameBufferObject 的灵活切换 attached texture 的方法
                     使用 depth texture 作为 Shadowmap;
             
             间接光照

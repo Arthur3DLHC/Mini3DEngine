@@ -122,8 +122,6 @@ export class ClusteredForwardRenderer {
         this._shadowmapFBODynamic.depthStencilTexture = this._debugDepthTexture;
         this._shadowmapFBODynamic.prepare();
 
-
-
         this.registerShaderCodes();
 
         // todo: import default shader code strings and create shader objects
@@ -275,6 +273,10 @@ export class ClusteredForwardRenderer {
             } else {
                 GLDevice.gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
             }
+
+            // need to allow color write and depth write
+            this.setRenderStateSet(this._renderStatesOpaque);
+
             // todo: camera's clear mode
             GLDevice.clearColor = camera.backgroundColor;
             GLDevice.clearDepth = camera.backgroundDepth;
