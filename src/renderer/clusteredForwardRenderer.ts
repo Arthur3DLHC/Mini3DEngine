@@ -113,7 +113,7 @@ export class ClusteredForwardRenderer {
         this._debugDepthTexture.width = GLDevice.canvas.width;
         this._debugDepthTexture.height = GLDevice.canvas.height;
         this._debugDepthTexture.depth = 1;
-        this._debugDepthTexture.isShadowMap = true;
+        this._debugDepthTexture.isShadowMap = false;
         this._debugDepthTexture.format = GLDevice.gl.DEPTH_STENCIL;
         this._debugDepthTexture.componentType = GLDevice.gl.UNSIGNED_INT_24_8;
         this._debugDepthTexture.create();
@@ -302,7 +302,8 @@ export class ClusteredForwardRenderer {
             // Test code: apply render target texture to a screen space rectangle
             // test drawing a screen space rectangle
             GLDevice.renderTarget = null;
-            this.renderScreenRect(0, 0, 0.5, 0.5, new vec4([1,1,1,1]), this._shadowmapAtlasDynamic.texture, 1, false);
+            // this.renderScreenRect(0, 0, 0.5, 0.5, new vec4([1,1,1,1]), this._shadowmapAtlasDynamic.texture, 1, false);
+            this.renderScreenRect(0, 0, 0.5, 0.5, new vec4([1,1,1,1]), this._debugDepthTexture, 1, false);
         }
     }
 
