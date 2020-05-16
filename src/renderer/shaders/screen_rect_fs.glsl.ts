@@ -15,6 +15,7 @@ void main(void)
     // todo: use base color or basecolormap
     vec4 texColor = texture(s_baseColorMap, ex_texcoord);
     o.color = mix(ex_color, texColor, u_material.colorMapAmount);
+    o.color.a = 1.0;
 
     outputFinal(o);
 }

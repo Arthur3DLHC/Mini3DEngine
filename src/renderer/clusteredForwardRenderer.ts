@@ -118,8 +118,8 @@ export class ClusteredForwardRenderer {
         this._debugDepthTexture.componentType = GLDevice.gl.UNSIGNED_INT_24_8;
         this._debugDepthTexture.create();
 
-        this._shadowmapFBODynamic.depthStencilTexture = this._debugDepthTexture;
         this._shadowmapFBODynamic.setTexture(0, this._shadowmapAtlasDynamic.texture);
+        this._shadowmapFBODynamic.depthStencilTexture = this._debugDepthTexture;
         this._shadowmapFBODynamic.prepare();
 
 
@@ -290,7 +290,7 @@ export class ClusteredForwardRenderer {
            // GLDevice.gl.colorMask(false, false, false, false);
             //GLDevice.gl.depthFunc(GLDevice.gl.LEQUAL);
             //GLDevice.gl.disable(GLDevice.gl.BLEND);
-            this.renderDepthPrepass();
+            // this.renderDepthPrepass();
             //GLDevice.gl.colorMask(true, true, true, true);
             this.renderOpaque();
             // this.renderTransparent();
@@ -300,7 +300,7 @@ export class ClusteredForwardRenderer {
             // Test code: apply render target texture to a screen space rectangle
             // test drawing a screen space rectangle
             GLDevice.renderTarget = null;
-            this.renderScreenRect(0, 0, 0.2, 0.2, new vec4([1,1,1,1]), this._shadowmapFBODynamic.depthStencilTexture, 1, false);
+            this.renderScreenRect(0, 0, 0.5, 0.5, new vec4([1,1,1,1]), this._shadowmapAtlasDynamic.texture, 1, false);
         }
     }
 
@@ -476,7 +476,7 @@ export class ClusteredForwardRenderer {
 
                 GLTextures.setStartUnit(this._numReservedTextures);
                 const pbrMtl = material as StandardPBRMaterial;
-                this._samplerUniformsStdPBR.setTexture("s_colorMap", pbrMtl.colorMap);
+                this._samplerUniformsStdPBR.setTexture("s_baseColorMap", pbrMtl.colorMap);
                 this._samplerUniformsStdPBR.setTexture("s_metallicRoughnessMap", pbrMtl.metallicRoughnessMap);
                 this._samplerUniformsStdPBR.setTexture("s_emissiveMap", pbrMtl.emissiveMap);
                 this._samplerUniformsStdPBR.setTexture("s_normalMap", pbrMtl.normalMap);
@@ -631,9 +631,9 @@ export class ClusteredForwardRenderer {
         // renderstate?
         // opaque or transparent?
         if (transparent) {
-            this._renderStatesScrRectTransparent.apply();
+            this.setRenderStateSet(this._renderStatesScrRectTransparent);
         } else {
-            this._renderStatesScrRectOpaque.apply();
+            this.setRenderStateSet(this._renderStatesScrRectOpaque);
         }
         
         // use program
@@ -664,8 +664,18 @@ export class ClusteredForwardRenderer {
         this._renderContext.ubMaterialPBR.update();
 
         // todo: set uniform sampler
+        if (this._samplerUniformsScreenRect) {
+            // GLTextures.setStartUnit(this._numReservedTextures);
+            GLTextures.setTextureAt(this._numReservedTextures, texture);
+            this._samplerUniformsScreenRect.setTextureUnit("s_baseColorMap", this._numReservedTextures);
+        }
 
         // draw geometry
         this._rectGeom.draw(0, Infinity, this._screenRectProgram.attributes);
+
+        // 纹理有可能是 render target，所以在这里取消绑定一下？
+        if (this._samplerUniformsScreenRect) {
+            GLTextures.setTextureAt(this._numReservedTextures, null);
+        }
     }
 }

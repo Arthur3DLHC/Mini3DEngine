@@ -40,9 +40,9 @@ export class GLDevice {
         // if gl fbo not created, create it
         if (renderTarget) {
             renderTarget.prepare();
-            GLDevice.gl.bindFramebuffer(GLDevice.gl.FRAMEBUFFER, renderTarget.glFrameBuffer);
+            GLDevice.gl.bindFramebuffer(GLDevice.gl.DRAW_FRAMEBUFFER, renderTarget.glFrameBuffer);
         } else {
-            GLDevice.gl.bindFramebuffer(GLDevice.gl.FRAMEBUFFER, null);
+            GLDevice.gl.bindFramebuffer(GLDevice.gl.DRAW_FRAMEBUFFER, null);
         }
         this._renderTarget = renderTarget;
     }

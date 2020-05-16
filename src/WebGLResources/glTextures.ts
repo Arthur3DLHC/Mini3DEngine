@@ -27,7 +27,11 @@ export class GLTextures {
                 if (type === GLDevice.gl.UNSIGNED_BYTE) internalFormat = GLDevice.gl.RGBA8;
                 break;
             case GLDevice.gl.DEPTH_COMPONENT:
-                internalFormat = GLDevice.gl.DEPTH_COMPONENT24;
+                if (type === GLDevice.gl.UNSIGNED_SHORT) {
+                    internalFormat = GLDevice.gl.DEPTH_COMPONENT16;
+                } else {
+                    internalFormat = GLDevice.gl.DEPTH_COMPONENT24;
+                }
                 break;
             case GLDevice.gl.DEPTH_STENCIL:
                 internalFormat = GLDevice.gl.DEPTH24_STENCIL8;
@@ -50,6 +54,8 @@ export class GLTextures {
 
     // TODO: 设置绘制使用的纹理
     public static setTextureAt(unit: number, texture: Texture | null, target: GLenum = GLDevice.gl.TEXTURE_2D) {
+        // fix me: optimize
+        // 是否记录一下当前的所有unit的纹理对象，只有不同时才调用gl.bindTexture？
         GLDevice.gl.activeTexture(GLTextures.glUnitFrom(unit));
         if (texture) {
             // todo: 2d or 3d or cube or array

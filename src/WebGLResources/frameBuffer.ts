@@ -58,23 +58,45 @@ export class FrameBuffer {
             this.glFrameBuffer = GLDevice.gl.createFramebuffer();
         }
         if (this._needUpdate) {
-            GLDevice.gl.bindFramebuffer(GLDevice.gl.FRAMEBUFFER, this.glFrameBuffer);
+            GLDevice.gl.bindFramebuffer(GLDevice.gl.DRAW_FRAMEBUFFER, this.glFrameBuffer);
             const attachments: GLenum[] = [];
             // TODO: attach textures and depth stencil buffers
             for(let i = 0; i < this._textures.length && i < 4; i++) {
+                let attachment = GLDevice.gl.COLOR_ATTACHMENT0;
+                switch (i) {
+                    case 0:
+                        attachment = GLDevice.gl.COLOR_ATTACHMENT0;
+                        break;
+                        case 1:
+                            attachment = GLDevice.gl.COLOR_ATTACHMENT1;
+                            break;
+                            case 2:
+                                attachment = GLDevice.gl.COLOR_ATTACHMENT2;
+                                break;
+                                case 3:
+                                    attachment = GLDevice.gl.COLOR_ATTACHMENT3;
+                                    break;
+                    default:
+                        throw new Error("Color attachment not supported:" + i);
+                        break;
+                }
                 // if texture not created, create it
                 let texture: Texture|null = this._textures[i];
-                if (texture !== null && texture.samplerState !== null) {
-                    if (texture.samplerState.minFilter !== GLDevice.gl.NEAREST || texture.samplerState.magFilter !== GLDevice.gl.NEAREST) {
-                        throw new Error("Texture as rendertarget muse has nearest filter");
+                if (texture !== null) {
+                    if (texture.samplerState !== null) {
+                        if (texture.samplerState.minFilter !== GLDevice.gl.NEAREST || texture.samplerState.magFilter !== GLDevice.gl.NEAREST) {
+                            throw new Error("Texture as rendertarget muse has nearest filter");
+                        }    
                     }
+                    
                     if (!texture.glTexture) {
                         texture.create();
                     }
-                    GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.COLOR_ATTACHMENT0 + i, GLDevice.gl.TEXTURE_2D, texture.glTexture, 0);
-                    attachments.push(GLDevice.gl.COLOR_ATTACHMENT0 + i);
+
+                    GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, attachment, GLDevice.gl.TEXTURE_2D, texture.glTexture, 0);
+                    attachments.push(attachment);
                 } else {
-                    GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.COLOR_ATTACHMENT0 + i, GLDevice.gl.TEXTURE_2D, null, 0);
+                    GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, attachment, GLDevice.gl.TEXTURE_2D, null, 0);
                 }
             }
 
@@ -83,18 +105,27 @@ export class FrameBuffer {
                 if (!this._depthStencilTexture.glTexture) {
                     this._depthStencilTexture.create();
                 }
-                GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_STENCIL_ATTACHMENT, GLDevice.gl.TEXTURE_2D, this._depthStencilTexture.glTexture, 0);
+                if (this._depthStencilTexture.format === GLDevice.gl.DEPTH_COMPONENT) {
+                    GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_ATTACHMENT, GLDevice.gl.TEXTURE_2D, this._depthStencilTexture.glTexture, 0);
+                } else {
+                    GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_STENCIL_ATTACHMENT, GLDevice.gl.TEXTURE_2D, this._depthStencilTexture.glTexture, 0);
+                }
             } else{
                 GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_STENCIL_ATTACHMENT, GLDevice.gl.TEXTURE_2D, null, 0);
+                GLDevice.gl.framebufferTexture2D(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_ATTACHMENT, GLDevice.gl.TEXTURE_2D, null, 0);
                 if (this._depthStencilBuffer) {
                     if (!this._depthStencilBuffer.glBuffer) {
                         this._depthStencilBuffer.create();
                     }
-                    GLDevice.gl.framebufferRenderbuffer(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_STENCIL_ATTACHMENT, GLDevice.gl.RENDERBUFFER, this._depthStencilBuffer.glBuffer);
+                    if (this._depthStencilBuffer.format === GLDevice.gl.DEPTH_COMPONENT) {
+                        GLDevice.gl.framebufferRenderbuffer(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_ATTACHMENT, GLDevice.gl.RENDERBUFFER, this._depthStencilBuffer.glBuffer);
+                    } else {
+                        GLDevice.gl.framebufferRenderbuffer(GLDevice.gl.DRAW_FRAMEBUFFER, GLDevice.gl.DEPTH_STENCIL_ATTACHMENT, GLDevice.gl.RENDERBUFFER, this._depthStencilBuffer.glBuffer);
+                    }
                 }
             }
 
-            const status = GLDevice.gl.checkFramebufferStatus(GLDevice.gl.FRAMEBUFFER);
+            const status = GLDevice.gl.checkFramebufferStatus(GLDevice.gl.DRAW_FRAMEBUFFER);
             if (status !== GLDevice.gl.FRAMEBUFFER_COMPLETE) {
                 switch (status) {
                     case GLDevice.gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
@@ -120,7 +151,7 @@ export class FrameBuffer {
             // drawbuffers 设置会保存在 GL 的 frame buffer object 中
             GLDevice.gl.drawBuffers(attachments);
             this._needUpdate = false;
-            GLDevice.gl.bindFramebuffer(GLDevice.gl.FRAMEBUFFER, null);
+            GLDevice.gl.bindFramebuffer(GLDevice.gl.DRAW_FRAMEBUFFER, null);
         }
     }
 

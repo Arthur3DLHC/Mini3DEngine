@@ -45,10 +45,14 @@ export class Texture2D extends Texture {
         const internalFmt = GLTextures.internalFormatFrom(this.format, this.componentType);
         GLDevice.gl.texImage2D(GLDevice.gl.TEXTURE_2D, 0, internalFmt, this.width, this.height, 0, this.format, this.componentType, null);
 
-        if (this.format === GLDevice.gl.DEPTH_COMPONENT || this.format === GLDevice.gl.DEPTH_STENCIL) {
+        if (this.format === GLDevice.gl.DEPTH_COMPONENT || this.format === GLDevice.gl.DEPTH_STENCIL && this.isShadowMap) {
             // enable texture compare, so sampler2DShadow can work
             GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_COMPARE_MODE, GLDevice.gl.COMPARE_REF_TO_TEXTURE);
             GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_COMPARE_FUNC, GLDevice.gl.LEQUAL);
+            GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_MIN_FILTER, GLDevice.gl.NEAREST);
+            GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_MAG_FILTER, GLDevice.gl.NEAREST);
+            GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_WRAP_S, GLDevice.gl.CLAMP_TO_EDGE);
+            GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_WRAP_T, GLDevice.gl.CLAMP_TO_EDGE);
         } else {
             GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_COMPARE_MODE, GLDevice.gl.NONE);
             GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_COMPARE_FUNC, GLDevice.gl.ALWAYS);

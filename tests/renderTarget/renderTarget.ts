@@ -16,6 +16,7 @@ window.onload = () => {
     const scene = new Scene();
     const camera = new PerspectiveCamera();
     camera.aspect = canvas.width / canvas.height;
+    camera.far = 20;
     camera.localTransform.fromTranslation(new vec3([0, 0, 5]));
     scene.attachChild(camera);
 
