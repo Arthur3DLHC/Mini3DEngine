@@ -100,11 +100,12 @@ TODO:       主要类结构
                         据说 FrameBufferObject 中切换 attached texture 要比切换 FrameBufferObject 快？
                             需要实现 FrameBufferObject 的灵活切换 attached texture 的方法？
                             暂时没必要；持各种观点的人都有，未必对性能影响那么大
-                    先测试只有一个光源的阴影
-                        使用 depth texture 作为 Shadowmap，传入shader;
+                    先测试只有一个光源的阴影；动态光影；
                         给光源渲染 shadow map，在屏幕矩形上显示，用于调试
+                        使用 depth texture 作为 Shadowmap，传入shader;
                         pbr shader 中计算光照时取样 shadowmap，
                             注意要使用 samplerShadow 类型
+                    Shadow map atlas; 阴影的动态和静态更新逻辑
             
             间接光照
                 RenderTarget; 渲染到cubemap；

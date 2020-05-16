@@ -256,9 +256,10 @@ export class ClusteredForwardRenderer {
         // dispatch dynamic objects
         this.dispatchObjects(scene, false);
 
-        // todo: setup uniform buffers per frame, view;
-        // per frame data (time) is too small, and was put into per view buffer
-        // this._renderContext.fillUniformBuffersPerFrame();
+        // todo: update light shadowmaps
+        // check which light need update
+        // frustum culling, distance
+        this.updateShadowmaps();
 
         // fix me: for simplicity, use only one camera; or occlusion query can not work.
         for (let icam = 0; icam < this._renderContext.cameras.length; icam++) {
@@ -679,6 +680,30 @@ export class ClusteredForwardRenderer {
         // 纹理有可能是 render target，所以在这里取消绑定一下？
         if (this._samplerUniformsScreenRect) {
             GLTextures.setTextureAt(this._numReservedTextures, null);
+        }
+    }
+
+    private allocShadowmapAtlasLocations() {
+        // todo: alloc shadowmap altas locaitons for static lights?
+    }
+
+    private updateShadowmaps() {
+        // iterate static lights
+        for (const light of this._renderContext.staticLights) {
+            if (light.shadow && light.castShadow) {
+                // frustum culling and distance?
+                // if shadowmap not generated yet, generate
+                // if light can drop dynamic object shadow, and there is dynamic object which can cast shadow moving inside light frustum, update
+            }
+        }
+
+        // iterate dynamic lights
+        for (const light of this._renderContext.dynamicLights) {
+            if (light.shadow && light.castShadow) {
+                // frustum culling and distance?
+                // if shadowmap not generated yet, generate
+                // if light moved, or there is dynamic object can cast shadow moving in light view, update
+            }
         }
     }
 }

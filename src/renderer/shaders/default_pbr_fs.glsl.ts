@@ -117,12 +117,12 @@ void main(void)
         // float NdotV = clampedDot(n, v);  // 前面已经算过了，与光源无关
         if (NdotL > 0.0 || NdotV > 0.0)
         {
+            // these values may be used by sheen, clearcoat, subsurface or other effets
+            // if so, they may be need to move outside
             vec3 h = normalize(l + v);          // Direction of the vector between l and v, called halfway vector
             float NdotH = clampedDot(n, h);
             float LdotH = clampedDot(l, h);
             float VdotH = clampedDot(v, h);
-            // f_diffuse += albedoColor;
-            // f_diffuse += vec3(VdotH);
             vec3 illuminance = intensity * NdotL;
 
             f_diffuse += illuminance * BRDF_lambertian(f0, f90, albedoColor, VdotH);
