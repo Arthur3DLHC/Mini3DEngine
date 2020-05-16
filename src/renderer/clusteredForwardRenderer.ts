@@ -265,7 +265,7 @@ export class ClusteredForwardRenderer {
             const camera = this._renderContext.cameras[icam];
 
             // Test code: set render target
-            GLDevice.renderTarget = this._shadowmapFBODynamic;
+            // GLDevice.renderTarget = this._shadowmapFBODynamic;
 
             // set viewport
             if (camera.viewport) {
@@ -292,7 +292,7 @@ export class ClusteredForwardRenderer {
            // GLDevice.gl.colorMask(false, false, false, false);
             //GLDevice.gl.depthFunc(GLDevice.gl.LEQUAL);
             //GLDevice.gl.disable(GLDevice.gl.BLEND);
-            // this.renderDepthPrepass();
+            this.renderDepthPrepass();
             //GLDevice.gl.colorMask(true, true, true, true);
             this.renderOpaque();
             // this.renderTransparent();
@@ -301,9 +301,9 @@ export class ClusteredForwardRenderer {
 
             // Test code: apply render target texture to a screen space rectangle
             // test drawing a screen space rectangle
-            GLDevice.renderTarget = null;
+            // GLDevice.renderTarget = null;
             // this.renderScreenRect(0, 0, 0.5, 0.5, new vec4([1,1,1,1]), this._shadowmapAtlasDynamic.texture, 1, false);
-            this.renderScreenRect(0, 0, 0.5, 0.5, new vec4([1,1,1,1]), this._debugDepthTexture, 1, false);
+            // this.renderScreenRect(0, 0, 0.5, 0.5, new vec4([1,1,1,1]), this._debugDepthTexture, 1, false);
         }
     }
 

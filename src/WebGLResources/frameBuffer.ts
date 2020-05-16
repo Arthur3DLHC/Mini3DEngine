@@ -13,7 +13,6 @@ export class FrameBuffer {
     public glFrameBuffer: WebGLFramebuffer | null;
 
     // 下列成员使用弱引用，使得可以多个 FrameBuffer 共享
-    // todo: mrt textures
     public setTexture(index: number, texture: Texture | null) {
         if (this._textures[index] !== texture) {
             this._textures[index] = texture;            

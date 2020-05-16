@@ -88,13 +88,23 @@ void main(void)
         // vec3 lightDir = vec3(0.0, 0.0, -1.0);
         vec3 pointToLight = -lightDir;
         
-        // todo: check light type
+        // check light type
         if (lightType != LightType_Directional) {
             pointToLight = lightPosition - ex_worldPosition;
-            rangeAttenuation = getRangeAttenuation(getLightRadius(light), length(pointToLight));
+            float lightRadius = getLightRadius(light);
+            float lightDist = length(pointToLight);
+            // block out light early
+            if (lightRadius > 0.0 && lightDist > lightRadius) {
+                continue;
+            }
+            rangeAttenuation = getRangeAttenuation(lightRadius, lightDist);
         }
         if (lightType == LightType_Spot) {
             spotAttenuation = getSpotAttenuation(pointToLight, lightDir, getLightOuterConeCos(light), getLightInnerConeCos(light));
+            // block out light early
+            if (spotAttenuation < 0.001) {
+                continue;
+            }
         }
 
         // test range attenuation
@@ -103,15 +113,14 @@ void main(void)
         vec3 intensity = rangeAttenuation * spotAttenuation * light.color.rgb;
 
         vec3 l = normalize(pointToLight);   // Direction from surface point to light
-        vec3 h = normalize(l + v);          // Direction of the vector between l and v, called halfway vector
         float NdotL = clampedDot(n, l);
         // float NdotV = clampedDot(n, v);  // 前面已经算过了，与光源无关
-        float NdotH = clampedDot(n, h);
-        float LdotH = clampedDot(l, h);
-        float VdotH = clampedDot(v, h);
-
         if (NdotL > 0.0 || NdotV > 0.0)
         {
+            vec3 h = normalize(l + v);          // Direction of the vector between l and v, called halfway vector
+            float NdotH = clampedDot(n, h);
+            float LdotH = clampedDot(l, h);
+            float VdotH = clampedDot(v, h);
             // f_diffuse += albedoColor;
             // f_diffuse += vec3(VdotH);
             vec3 illuminance = intensity * NdotL;
