@@ -108,8 +108,9 @@ window.onload = () => {
 
     // scene.attachChild(pointLight02);
 
+    // 测试动态光源的阴影
     // const spotLight01 = new SpotLight();
-    // spotLight01.isStatic = true;
+    // spotLight01.isStatic = false;
     // spotLight01.on = true;
     // spotLight01.color = new vec4([5, 5, 5, 1]);
     // spotLight01.distance = 0;
@@ -118,7 +119,7 @@ window.onload = () => {
     // scene.attachChild(spotLight01);
 
     const dirLight01 = new DirectionalLight();
-    dirLight01.isStatic = true;
+    dirLight01.isStatic = false;
     dirLight01.on = true;
     dirLight01.color = new vec4([3,3,3,1]);
     dirLight01.localTransform.fromRotation(-Math.PI / 4, new vec3([1,1,1]));

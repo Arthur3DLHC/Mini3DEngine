@@ -48,6 +48,7 @@ import { Texture2D } from "../WebGLResources/textures/texture2D.js"
 import mat4 from "../../lib/tsm/mat4.js"
 import { FrameBuffer } from "../WebGLResources/frameBuffer.js"
 import { Texture } from "../WebGLResources/textures/texture.js"
+import { Frustum } from "../math/frustum.js"
 
 export class ClusteredForwardRenderer {
 
@@ -150,6 +151,12 @@ export class ClusteredForwardRenderer {
         this._stdPBRProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["default_pbr_fs"]);
         this._stdPBRProgram.build();
 
+        this._shadowProgram = new ShaderProgram();
+        this._shadowProgram.name = "shadow";
+        this._shadowProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_vs"]);
+        this._shadowProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_fs"]);
+        this._shadowProgram.build();
+
         // all can use simple color program
         this._depthPrepassProgram = new ShaderProgram();
         this._depthPrepassProgram.name = "depth_prepass";
@@ -177,6 +184,7 @@ export class ClusteredForwardRenderer {
         // or need to bind to every programs?
         this._renderContext.bindUniformBlocks(this._colorProgram);
         this._renderContext.bindUniformBlocks(this._stdPBRProgram);
+        this._renderContext.bindUniformBlocks(this._shadowProgram);
         this._renderContext.bindUniformBlocks(this._depthPrepassProgram);
         this._renderContext.bindUniformBlocks(this._occlusionQueryProgram);
         this._renderContext.bindUniformBlocks(this._screenRectProgram);
@@ -236,6 +244,7 @@ export class ClusteredForwardRenderer {
     // or put them into render phases?
     private _stdPBRProgram: ShaderProgram;
     private _colorProgram: ShaderProgram;
+    private _shadowProgram: ShaderProgram;
     private _depthPrepassProgram: ShaderProgram;
     private _occlusionQueryProgram: ShaderProgram;
     private _screenRectProgram: ShaderProgram;
@@ -278,7 +287,8 @@ export class ClusteredForwardRenderer {
         // fix me: for simplicity, use only one camera; or occlusion query can not work.
         for (let icam = 0; icam < this._renderContext.cameras.length; icam++) {
             const camera = this._renderContext.cameras[icam];
-
+            // todo: calculate frustum
+            const frustum = new Frustum();
             // Test code: set render target
             // GLDevice.renderTarget = this._shadowmapFBODynamic;
 
@@ -307,9 +317,9 @@ export class ClusteredForwardRenderer {
            // GLDevice.gl.colorMask(false, false, false, false);
             //GLDevice.gl.depthFunc(GLDevice.gl.LEQUAL);
             //GLDevice.gl.disable(GLDevice.gl.BLEND);
-            this.renderDepthPrepass();
+            this.renderDepthPrepass(frustum);
             //GLDevice.gl.colorMask(true, true, true, true);
-            this.renderOpaque();
+            this.renderOpaque(frustum);
             // this.renderTransparent();
 
             // todo: render sprites
@@ -519,7 +529,7 @@ export class ClusteredForwardRenderer {
         this._curDefaultRenderStates = states;
         states.apply();
     }
-    private renderDepthPrepass() {
+    private renderDepthPrepass(frustum: Frustum) {
         if (this._renderListDepthPrepass.ItemCount <= 0) {
             return;
         }
@@ -527,13 +537,13 @@ export class ClusteredForwardRenderer {
         this.setRenderStateSet(this._renderStatesDepthPrepass);
         // use program
         GLPrograms.useProgram(this._depthPrepassProgram);
-        this.renderItems(this._renderListDepthPrepass, true);
+        this.renderItems(this._renderListDepthPrepass, frustum, true);
     }
-    private renderOpaque() {
+    private renderOpaque(frustum: Frustum) {
         // non occlusion query objects
         if (this._renderListOpaque.ItemCount > 0) {
             this.setRenderStateSet(this._renderStatesOpaque);
-            this.renderItems(this._renderListOpaque, false);
+            this.renderItems(this._renderListOpaque, frustum, false);
         }
 
         // occlusion query objects, query for next frame;
@@ -549,12 +559,12 @@ export class ClusteredForwardRenderer {
         }
         */
     }
-    private renderTransparent() {
+    private renderTransparent(frustum: Frustum) {
         // non occlusion query objects
         if (this._renderListTransparent.ItemCount > 0) {
             this.setRenderStateSet(this._renderStatesTransparent);
             // 半透明物体和不透明物体使用的 Shader 是统一的！
-            this.renderItems(this._renderListTransparent);
+            this.renderItems(this._renderListTransparent, frustum);
         }
 
         // occlusion query objects, query for next frame;
@@ -565,16 +575,18 @@ export class ClusteredForwardRenderer {
 
             // occlusion query objects, render according to last frame query result
             this.setRenderStateSet(this._renderStatesTransparent);
-            this.renderItems(this._renderListTransparentOcclusionQuery, false, true);
+            this.renderItems(this._renderListTransparentOcclusionQuery, frustum, false, true);
         }
     }
-    private renderItems(renderList: RenderList, ignoreMaterial: boolean = false, checkOcclusionResults: boolean = false) {
+    private renderItems(renderList: RenderList, frustum: Frustum, ignoreMaterial: boolean = false, checkOcclusionResults: boolean = false) {
         for (let i = 0; i < renderList.ItemCount; i++) {
             const item = renderList.getItemAt(i);
             if (item) {
                 if (checkOcclusionResults && !item.object.occlusionQueryResult) {
                     continue;
                 }
+                // todo frustum culling
+
                 // item may be animated
                 //if (this._currentObject !== item.object) {
                     this._renderContext.fillUniformBuffersPerObject(item);
@@ -610,6 +622,22 @@ export class ClusteredForwardRenderer {
             }
         }
     }
+
+    private rendeShadowItems(renderList: RenderList, frustum: Frustum) {
+        for (let i = 0; i < renderList.ItemCount; i++) {
+            const item = renderList.getItemAt(i);
+            if (item && item.object.castShadow) {
+                this._renderContext.fillUniformBuffersPerObject(item);
+                
+                // draw item geometry
+                if (GLPrograms.currProgram) {
+                    item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
+                }
+                this._currentObject = item.object;
+            }
+        }
+    }
+
     private renderItemBoundingBoxes(renderList: RenderList, occlusionQuery: boolean = false) {
         /*
         // render bounding boxes only, ignore all materials
@@ -732,7 +760,10 @@ export class ClusteredForwardRenderer {
                 this.setRenderStateSet(this._renderStatesShadow);
 
                 // render opaque objects which can drop shadow
-
+                GLPrograms.useProgram(this._shadowProgram);
+                // todo: calculate light shadow frustm
+                const frustum = new Frustum();
+                this.rendeShadowItems(this._renderListOpaque, frustum);
             }
         }
         GLDevice.renderTarget = null;
