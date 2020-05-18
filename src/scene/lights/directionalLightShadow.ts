@@ -12,4 +12,9 @@ export class DirectionalLightShadow extends LightShadow {
      * if zero, automatically use the light radius as shadow radius.
      */
     public radius: number;
+
+    public updateShadowMatrices() {
+        // todo: subclass update shadow matrices according to light pose and properties
+        // throw new Error("Not implemented.");
+    }
 }

@@ -21,6 +21,7 @@ import vec3 from "../../lib/tsm/vec3.js";
 import vec2 from "../../lib/tsm/vec2.js";
 import { DirectionalLight } from "../scene/lights/directionalLight.js";
 import { DirectionalLightShadow } from "../scene/lights/directionalLightShadow.js";
+import { Clock } from "../scene/clock.js";
 
 export class ClusteredForwardRenderContext extends RenderContext {
     public constructor() {
@@ -336,8 +337,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         camera.worldTransform.getTranslation(camPosition);
         this._ubView.setVec3("position", camPosition);
 
-        const time = 0;
-        this._ubView.setFloat("time", 0);
+        this._ubView.setFloat("time", Clock.instance.curTime);
 
         const zRange = new vec2([camera.near, camera.far]);
         this._ubView.setVec2("zRange", zRange);
@@ -470,7 +470,16 @@ export class ClusteredForwardRenderContext extends RenderContext {
     }
 
     public fillUniformBuffersPerLightView(light: BaseLight) {
+        // todo: calculate shadow view proj transform matrices
+        // implement in light class?
+        if (light.shadow && light.castShadow) {
+            light.shadow.updateShadowMatrices();
 
+            // only need these params?
+            this._ubView.setMat4("matView", light.shadow.matView);
+            this._ubView.setMat4("matProj", light.shadow.matProj);
+            this._ubView.setFloat("time", Clock.instance.curTime);
+        }
     }
 
     public fillUniformBuffersPerObject(item: RenderItem) {
