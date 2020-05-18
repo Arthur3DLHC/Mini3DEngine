@@ -66,6 +66,13 @@ export default class mat4 {
         ]);
     }
 
+    setRow(index: number, row: vec4) {
+        this._values[index * 4 + 0] = row.x;
+        this._values[index * 4 + 1] = row.y;
+        this._values[index * 4 + 2] = row.z;
+        this._values[index * 4 + 3] = row.w;
+    }
+
     col(index: number): vec4 {
         return new vec4([
             this._values[index],

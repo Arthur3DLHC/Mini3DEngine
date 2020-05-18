@@ -16,6 +16,7 @@ export * from "./renderer/renderList.js";
 export * from "./renderer/renderTarget.js";
 export * from "./scene/cameras/camera.js";
 export * from "./scene/cameras/perspectiveCamera.js";
+export * from "./scene/behavior.js";
 export * from "./scene/clock.js";
 export * from "./scene/decal.js";
 export * from "./scene/environmentProbe.js";

@@ -2,6 +2,7 @@ import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, Box
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "../common/behaviors/autoRotateBehavior.js";
 import vec4 from "../../lib/tsm/vec4.js";
+import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
 
 window.onload = () => {
     const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
@@ -129,8 +130,15 @@ window.onload = () => {
     dirLight01.radius = 5;
     dirLight01.castShadow = true;
     (dirLight01.shadow as DirectionalLightShadow).distance = 10;
-    dirLight01.localTransform.fromRotation(-Math.PI / 4, new vec3([1,1,1]));
-    dirLight01.localTransform.translate(new vec3([-5, 5, 5]));
+    // dirLight01.localTransform.fromRotation(-Math.PI / 4, new vec3([1,1,1]));
+    // dirLight01.localTransform.translate(new vec3([-5, 5, 5]));
+
+    const lightLookAt = new LookatBehavior(dirLight01);
+    dirLight01.behaviors.push(lightLookAt);
+    lightLookAt.position = new vec3([-5, 5, 5]);
+    lightLookAt.target = new vec3([0, 0, 0]);
+    lightLookAt.up = new vec3([0, 1, 0]);
+
     scene.attachChild(dirLight01);
 
     Clock.instance.start();
