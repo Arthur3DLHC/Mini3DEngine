@@ -37,14 +37,17 @@ export class GLDevice {
      * @param renderTarget null for render to window
      */
     public static set renderTarget(renderTarget: FrameBuffer | null) {
-        // if gl fbo not created, create it
-        if (renderTarget) {
-            renderTarget.prepare();
-            GLDevice.gl.bindFramebuffer(GLDevice.gl.DRAW_FRAMEBUFFER, renderTarget.glFrameBuffer);
-        } else {
-            GLDevice.gl.bindFramebuffer(GLDevice.gl.DRAW_FRAMEBUFFER, null);
+        // set only when changed
+        if (this._renderTarget !== renderTarget) {
+            // if gl fbo not created, create it
+            if (renderTarget) {
+                renderTarget.prepare();
+                GLDevice.gl.bindFramebuffer(GLDevice.gl.DRAW_FRAMEBUFFER, renderTarget.glFrameBuffer);
+            } else {
+                GLDevice.gl.bindFramebuffer(GLDevice.gl.DRAW_FRAMEBUFFER, null);
+            }
+            this._renderTarget = renderTarget;            
         }
-        this._renderTarget = renderTarget;
     }
 
     public static get renderTarget(): FrameBuffer | null {

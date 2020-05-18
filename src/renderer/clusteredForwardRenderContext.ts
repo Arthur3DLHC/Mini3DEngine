@@ -320,7 +320,6 @@ export class ClusteredForwardRenderContext extends RenderContext {
     // }
 
     public fillUniformBuffersPerView(camera: Camera) {
-        const tmpMat = mat4.identity.copy();
         // todo: fill view and proj matrix
         this._ubView.setMat4("matView", camera.viewTransform);
         // todo: prev view matrix
@@ -379,10 +378,10 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
         // todo: fill dynamic lights and decals
         // check visibility?
-        this.fillItemsPerView();
+        this.fillItemsPerView(camera);
     }
 
-    private fillItemsPerView() {
+    private fillItemsPerView(camera: Camera) {
         if (this.dynamicLights.length > 0) {
             this._buffer.seek(0);
             for (const light of this.dynamicLights) {
@@ -468,6 +467,10 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
         this._ubItemIndices.updateByData(this._tmpIdxData, 0, 0, this._idxBuffer.length);
         this._ubClusters.updateByData(this._tmpClusterData, 0, 0, this._clusterBuffer.length);
+    }
+
+    public fillUniformBuffersPerLightView(light: BaseLight) {
+
     }
 
     public fillUniformBuffersPerObject(item: RenderItem) {

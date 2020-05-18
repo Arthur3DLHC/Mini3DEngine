@@ -63,6 +63,7 @@ export class ClusteredForwardRenderer {
         this._currentScene = null;
         this._currentObject = null;
 
+        this._renderStatesShadow = new RenderStateSet();
         this._renderStatesDepthPrepass = new RenderStateSet();
         this._renderStatesOpaque = new RenderStateSet();
         this._renderStatesOpaqueOcclusion = new RenderStateSet();
@@ -97,11 +98,18 @@ export class ClusteredForwardRenderer {
         this._shadowmapAtlasDynamic = new TextureAtlas2D();
         // todo: create atlas texture
         this._shadowmapAtlasDynamic.texture = new Texture2D();
-        this._shadowmapAtlasDynamic.texture.width = GLDevice.canvas.width;
-        this._shadowmapAtlasDynamic.texture.height = GLDevice.canvas.height;
+        this._shadowmapAtlasDynamic.texture.width = 512;
+        this._shadowmapAtlasDynamic.texture.height = 512;
+        // this._shadowmapAtlasDynamic.texture.width = GLDevice.canvas.width;
+        // this._shadowmapAtlasDynamic.texture.height = GLDevice.canvas.height;
         this._shadowmapAtlasDynamic.texture.depth = 1;
-        this._shadowmapAtlasDynamic.texture.format = GLDevice.gl.RGBA;
-        this._shadowmapAtlasDynamic.texture.componentType = GLDevice.gl.UNSIGNED_BYTE;
+        // this._shadowmapAtlasDynamic.texture.isShadowMap = true;
+        this._shadowmapAtlasDynamic.texture.isShadowMap = false; // debug draw
+        this._shadowmapAtlasDynamic.texture.format = GLDevice.gl.DEPTH_STENCIL;
+        this._shadowmapAtlasDynamic.texture.componentType = GLDevice.gl.UNSIGNED_INT_24_8;
+        // debug draw:
+        // this._shadowmapAtlasDynamic.texture.format = GLDevice.gl.RGBA;
+        // this._shadowmapAtlasDynamic.texture.componentType = GLDevice.gl.UNSIGNED_BYTE;
         this._shadowmapAtlasDynamic.texture.create();
 
         this._decalAtlas = new TextureAtlas2D();
@@ -110,16 +118,21 @@ export class ClusteredForwardRenderer {
 
         this._shadowmapFBODynamic = new FrameBuffer(GLDevice.canvas.width, GLDevice.canvas.height);
         this._debugDepthTexture = new Texture2D();
-        this._debugDepthTexture.width = GLDevice.canvas.width;
-        this._debugDepthTexture.height = GLDevice.canvas.height;
+        this._debugDepthTexture.width = 512;
+        this._debugDepthTexture.height = 512;
+        // this._debugDepthTexture.width = GLDevice.canvas.width;
+        // this._debugDepthTexture.height = GLDevice.canvas.height;
         this._debugDepthTexture.depth = 1;
         this._debugDepthTexture.isShadowMap = false;
         this._debugDepthTexture.format = GLDevice.gl.DEPTH_STENCIL;
         this._debugDepthTexture.componentType = GLDevice.gl.UNSIGNED_INT_24_8;
         this._debugDepthTexture.create();
 
-        this._shadowmapFBODynamic.setTexture(0, this._shadowmapAtlasDynamic.texture);
-        this._shadowmapFBODynamic.depthStencilTexture = this._debugDepthTexture;
+        // shadowmaps only need depthstencil
+        this._shadowmapFBODynamic.depthStencilTexture = this._shadowmapAtlasDynamic.texture;
+        // debug draw:
+        // this._shadowmapFBODynamic.setTexture(0, this._shadowmapAtlasDynamic.texture);
+        // this._shadowmapFBODynamic.depthStencilTexture = this._debugDepthTexture;
         this._shadowmapFBODynamic.prepare();
 
         this.registerShaderCodes();
@@ -184,6 +197,7 @@ export class ClusteredForwardRenderer {
      */
     private _currentObject: Object3D|null;
 
+    private _renderStatesShadow: RenderStateSet;
     private _renderStatesDepthPrepass: RenderStateSet;
     private _renderStatesOpaque: RenderStateSet;
     private _renderStatesOpaqueOcclusion: RenderStateSet;
@@ -309,6 +323,11 @@ export class ClusteredForwardRenderer {
     }
 
     private createRenderStates() {
+        this._renderStatesShadow.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.LEQUAL);
+        this._renderStatesShadow.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+        this._renderStatesShadow.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+        this._renderStatesShadow.colorWriteState = RenderStateCache.instance.getColorWriteState(false, false, false, false);
+
         this._renderStatesDepthPrepass.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.LEQUAL);
         this._renderStatesDepthPrepass.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
         this._renderStatesDepthPrepass.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
@@ -703,7 +722,20 @@ export class ClusteredForwardRenderer {
                 // frustum culling and distance?
                 // if shadowmap not generated yet, generate
                 // if light moved, or there is dynamic object can cast shadow moving in light view, update
+
+                // set render target, viewport and shadow project matrix
+                // GLDevice will prevent redundant render target swithes
+                GLDevice.renderTarget = this._shadowmapFBODynamic;
+                GLDevice.gl.viewport(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
+                this._renderContext.fillUniformBuffersPerLightView(light);
+                // disable color output
+                this.setRenderStateSet(this._renderStatesShadow);
+
+                // render opaque objects which can drop shadow
+
             }
         }
+        GLDevice.renderTarget = null;
+        // todo: debug draw the shadowmap on a screen rect
     }
 }
