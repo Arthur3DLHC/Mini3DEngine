@@ -33,7 +33,7 @@ export class LightShadow {
      */
     public shadowMap: Texture2D | null;
 
-    private _light: BaseLight;
+    protected _light: BaseLight;
 
     // todo: shadow matrices
     protected _matView: mat4;

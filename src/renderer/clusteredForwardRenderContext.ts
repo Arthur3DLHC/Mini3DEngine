@@ -479,6 +479,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
             this._ubView.setMat4("matView", light.shadow.matView);
             this._ubView.setMat4("matProj", light.shadow.matProj);
             this._ubView.setFloat("time", Clock.instance.curTime);
+            this._ubView.update();
         }
     }
 

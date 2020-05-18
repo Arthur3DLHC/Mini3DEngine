@@ -99,8 +99,8 @@ export class ClusteredForwardRenderer {
         this._shadowmapAtlasDynamic = new TextureAtlas2D();
         // todo: create atlas texture
         this._shadowmapAtlasDynamic.texture = new Texture2D();
-        this._shadowmapAtlasDynamic.texture.width = 512;
-        this._shadowmapAtlasDynamic.texture.height = 512;
+        this._shadowmapAtlasDynamic.texture.width = 256;
+        this._shadowmapAtlasDynamic.texture.height = 256;
         // this._shadowmapAtlasDynamic.texture.width = GLDevice.canvas.width;
         // this._shadowmapAtlasDynamic.texture.height = GLDevice.canvas.height;
         this._shadowmapAtlasDynamic.texture.depth = 1;
@@ -119,8 +119,8 @@ export class ClusteredForwardRenderer {
 
         this._shadowmapFBODynamic = new FrameBuffer(GLDevice.canvas.width, GLDevice.canvas.height);
         this._debugDepthTexture = new Texture2D();
-        this._debugDepthTexture.width = 512;
-        this._debugDepthTexture.height = 512;
+        this._debugDepthTexture.width = 256;
+        this._debugDepthTexture.height = 256;
         // this._debugDepthTexture.width = GLDevice.canvas.width;
         // this._debugDepthTexture.height = GLDevice.canvas.height;
         this._debugDepthTexture.depth = 1;
@@ -327,7 +327,7 @@ export class ClusteredForwardRenderer {
             // Test code: apply render target texture to a screen space rectangle
             // test drawing a screen space rectangle
             // GLDevice.renderTarget = null;
-            // this.renderScreenRect(0, 0, 0.5, 0.5, new vec4([1,1,1,1]), this._shadowmapAtlasDynamic.texture, 1, false);
+            this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._shadowmapAtlasDynamic.texture, 1, false);
             // this.renderScreenRect(0, 0, 0.5, 0.5, new vec4([1,1,1,1]), this._debugDepthTexture, 1, false);
         }
     }
@@ -623,7 +623,7 @@ export class ClusteredForwardRenderer {
         }
     }
 
-    private rendeShadowItems(renderList: RenderList, frustum: Frustum) {
+    private renderShadowItems(renderList: RenderList, frustum: Frustum) {
         for (let i = 0; i < renderList.ItemCount; i++) {
             const item = renderList.getItemAt(i);
             if (item && item.object.castShadow) {
@@ -755,15 +755,17 @@ export class ClusteredForwardRenderer {
                 // GLDevice will prevent redundant render target swithes
                 GLDevice.renderTarget = this._shadowmapFBODynamic;
                 GLDevice.gl.viewport(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
+
                 this._renderContext.fillUniformBuffersPerLightView(light);
                 // disable color output
                 this.setRenderStateSet(this._renderStatesShadow);
-
+                GLDevice.clearDepth = 1.0;
+                GLDevice.clear(false, true, true);
                 // render opaque objects which can drop shadow
                 GLPrograms.useProgram(this._shadowProgram);
                 // todo: calculate light shadow frustm
                 const frustum = new Frustum();
-                this.rendeShadowItems(this._renderListOpaque, frustum);
+                this.renderShadowItems(this._renderListOpaque, frustum);
             }
         }
         GLDevice.renderTarget = null;

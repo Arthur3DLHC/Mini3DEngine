@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight } from "../../src/miniEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow } from "../../src/miniEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "../common/behaviors/autoRotateBehavior.js";
 import vec4 from "../../lib/tsm/vec4.js";
@@ -26,6 +26,7 @@ window.onload = () => {
     const boxMesh = new Mesh();
     boxMesh.name = "box01";
     boxMesh.geometry = new BoxGeometry(1, 1, 1);
+    boxMesh.castShadow = true;
     // boxMesh.localTransform.fromTranslation(new vec3([0, 0, -5]));
     const boxMtl = new StandardPBRMaterial();
     boxMtl.color = new vec4([1.0, 1.0, 0.0, 1.0]);
@@ -43,6 +44,7 @@ window.onload = () => {
     sphereMesh.name = "sphere01";
     sphereMesh.localTransform.fromTranslation(new vec3([0, 0, 3]));
     sphereMesh.geometry = new SphereGeometry(1, 16, 8);
+    sphereMesh.castShadow = true;
     const sphereMtl = new StandardPBRMaterial();
     sphereMtl.color = new vec4([1.0, 0.0, 0.0, 1.0]);
     sphereMtl.metallic = 0.8;
@@ -62,6 +64,7 @@ window.onload = () => {
     cylinderMesh.name = "cylinder01";
     cylinderMesh.localTransform.fromTranslation(new vec3([3, 0, 0]));
     cylinderMesh.geometry = new CylinderGeometry(1, 2, 24);
+    cylinderMesh.castShadow = true;
     const cylinderMtl = new StandardPBRMaterial();
     cylinderMtl.color = new vec4([0.0, 1.0, 0.0, 1.0]);
     cylinderMtl.emissive = new vec4([0.5, 0.5, 0.5, 1]);
@@ -81,6 +84,7 @@ window.onload = () => {
     planeMesh.name = "plane01";
     planeMesh.localTransform.fromTranslation(new vec3([0, -0.5, 0]));
     planeMesh.geometry = new PlaneGeometry(20, 20, 1, 1);
+    planeMesh.castShadow = true;
     const planeMtl = new StandardPBRMaterial();
     planeMtl.color = new vec4([0.0, 0.0, 1.0, 1.0]);
     planeMtl.metallic = 0.0;
@@ -122,7 +126,11 @@ window.onload = () => {
     dirLight01.isStatic = false;
     dirLight01.on = true;
     dirLight01.color = new vec4([3,3,3,1]);
+    dirLight01.radius = 5;
+    dirLight01.castShadow = true;
+    (dirLight01.shadow as DirectionalLightShadow).distance = 10;
     dirLight01.localTransform.fromRotation(-Math.PI / 4, new vec3([1,1,1]));
+    dirLight01.localTransform.translate(new vec3([-5, 5, 5]));
     scene.attachChild(dirLight01);
 
     Clock.instance.start();
