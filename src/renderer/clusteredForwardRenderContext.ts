@@ -252,7 +252,9 @@ export class ClusteredForwardRenderContext extends RenderContext {
         let outerConeCos = 0;
         let innerConeCos = 0;
         let matShadow: mat4 = new mat4();
-        matShadow.setIdentity();
+        // if light do not cast shadow, use a zero matrix
+        // matShadow.setIdentity();
+        matShadow.reset();
         if (light.type === LightType.Point) {
             radius = (light as PointLight).distance;
         }
@@ -261,24 +263,12 @@ export class ClusteredForwardRenderContext extends RenderContext {
             radius = spot.distance;
             outerConeCos = Math.cos(spot.outerConeAngle);
             innerConeCos = Math.cos(spot.innerConeAngle);
-            if (light.shadow) {
-                let matLightView = light.worldTransform.copy();
-                matLightView.inverse();
-                let matLightProj = mat4.perspective(spot.outerConeAngle * 2, 1, 0.1, radius);
-                mat4.product(matLightProj, matLightView, matShadow);
-            }
         }
         else if (light.type === LightType.Directional) {
-            if (light.shadow) {
-                const dir: DirectionalLight = (light as DirectionalLight);
-                const dirShadow: DirectionalLightShadow = (light.shadow as DirectionalLightShadow);
-                let matLightView = light.worldTransform.copy();
-                matLightView.inverse();
-                let matLightProj = mat4.orthographic(-dirShadow.radius, dirShadow.radius, -dirShadow.radius, dirShadow.radius, 0.1, dir.radius);
-                mat4.product(matLightProj, matLightView, matShadow);
-            }
         }
-        if (light.shadow) {
+        if (light.shadow && light.castShadow) {
+            light.shadow.updateShadowMatrices();
+            mat4.product(light.shadow.matProj, light.shadow.matView, matShadow);
             // NOTE: these matrices is for sample shadow map, not for render shadow map.
             // todo: shadow bias matrix
             let matBias = new mat4();

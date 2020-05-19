@@ -1,22 +1,23 @@
 // shader includes
-import uniforms_mtl_pbr from "./shaders/shaderIncludes/uniforms_mtl_pbr.glsl.js"
-import uniforms_object from "./shaders/shaderIncludes/uniforms_object.glsl.js"
-import uniforms_scene from "./shaders/shaderIncludes/uniforms_scene.glsl.js"
-import uniforms_view from "./shaders/shaderIncludes/uniforms_view.glsl.js"
-import function_cluster from "./shaders/shaderIncludes/function_cluster.glsl.js"
-import function_get_lights from "./shaders/shaderIncludes/function_get_lights.glsl.js"
-import function_punctual_lights from "./shaders/shaderIncludes/function_punctual_lights.glsl.js"
-import function_brdf_pbr from "./shaders/shaderIncludes/function_brdf_pbr.glsl.js"
-import function_transforms from "./shaders/shaderIncludes/function_transforms.glsl.js"
-import output_pbr from "./shaders/shaderIncludes/output_pbr.glsl.js"
-import output_final from "./shaders/shaderIncludes/output_final.glsl.js"
+import samplers_scene from "./shaders/shaderIncludes/samplers_scene.glsl.js";
+import uniforms_mtl_pbr from "./shaders/shaderIncludes/uniforms_mtl_pbr.glsl.js";
+import uniforms_object from "./shaders/shaderIncludes/uniforms_object.glsl.js";
+import uniforms_scene from "./shaders/shaderIncludes/uniforms_scene.glsl.js";
+import uniforms_view from "./shaders/shaderIncludes/uniforms_view.glsl.js";
+import function_cluster from "./shaders/shaderIncludes/function_cluster.glsl.js";
+import function_get_lights from "./shaders/shaderIncludes/function_get_lights.glsl.js";
+import function_punctual_lights from "./shaders/shaderIncludes/function_punctual_lights.glsl.js";
+import function_brdf_pbr from "./shaders/shaderIncludes/function_brdf_pbr.glsl.js";
+import function_transforms from "./shaders/shaderIncludes/function_transforms.glsl.js";
+import output_pbr from "./shaders/shaderIncludes/output_pbr.glsl.js";
+import output_final from "./shaders/shaderIncludes/output_final.glsl.js";
 // shader codes
-import single_color_vs from "./shaders/single_color_vs.glsl.js"
-import single_color_fs from "./shaders/single_color_fs.glsl.js"
-import screen_rect_vs from "./shaders/screen_Rect_vs.glsl.js"
-import screen_rect_fs from "./shaders/screen_rect_fs.glsl.js"
-import default_pbr_vs from "./shaders/default_pbr_vs.glsl.js"
-import default_pbr_fs from "./shaders/default_pbr_fs.glsl.js"
+import single_color_vs from "./shaders/single_color_vs.glsl.js";
+import single_color_fs from "./shaders/single_color_fs.glsl.js";
+import screen_rect_vs from "./shaders/screen_Rect_vs.glsl.js";
+import screen_rect_fs from "./shaders/screen_rect_fs.glsl.js";
+import default_pbr_vs from "./shaders/default_pbr_vs.glsl.js";
+import default_pbr_fs from "./shaders/default_pbr_fs.glsl.js";
 // modules
 import { Scene } from "../scene/scene.js";
 import { RenderList } from "./renderList.js";
@@ -379,6 +380,7 @@ export class ClusteredForwardRenderer {
 
     private registerShaderCodes() {
         // shader includes
+        GLPrograms.shaderCodes["samplers_scene"] = samplers_scene;
         GLPrograms.shaderCodes["uniforms_mtl_pbr"] = uniforms_mtl_pbr;
         GLPrograms.shaderCodes["uniforms_object"] = uniforms_object;
         GLPrograms.shaderCodes["uniforms_scene"] = uniforms_scene;

@@ -3,6 +3,7 @@
  * mostly from https://github.com/KhronosGroup/glTF-Sample-Viewer/
  */
 export default /** glsl */`
+#include <samplers_scene>
 #include <uniforms_scene>
 #include <uniforms_view>
 #include <uniforms_object>
@@ -105,6 +106,24 @@ void main(void)
             if (spotAttenuation < 0.001) {
                 continue;
             }
+        }
+
+        // todo: test shadow
+        if (getLightCastShadow(light)) {
+            mat4 matShadow = mat4(0.0);
+            if (lightType != LightType_Point) {
+                // if spot or direction, project the pixel position to shadow map
+                matShadow = light.matShadow;
+            } else {
+                // if point light, need to du a custom cube shadow map sampling
+
+            }
+            vec4 projPosition = matShadow * vec4(ex_worldPosition, 1.0);
+            // debug shadow texture
+            float shadow = texture(s_shadowAtlasDynamic, projPosition.xy).r;
+            f_diffuse.r += shadow;
+            continue;
+            // float shadow = texture(s_shadowAtlasDynamic, projPosition.xyz);
         }
 
         // test range attenuation

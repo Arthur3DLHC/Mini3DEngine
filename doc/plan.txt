@@ -102,16 +102,18 @@ TODO:       主要类结构
                             暂时没必要；持各种观点的人都有，未必对性能影响那么大
                     先测试只有一个光源的阴影；动态光影；
                         实现 shadowmap shader；
-                            能直接使用存在光源列表里的 shadow proj matrix 吗？
-                                需要应用 viewport;
-                                还是使用 uniforms perview 吧
-                        实现Frustum culling?
                         给光源渲染 shadow map，在屏幕矩形上显示，用于调试
                         使用 depth texture 作为 Shadowmap，传入shader;
                         pbr shader 中计算光照时取样 shadowmap，
                             注意要使用 samplerShadow 类型
                     Shadow map atlas; 阴影的动态和静态更新逻辑
+                        如何处理带有镂空纹理的材质
+                        * 也按照和 depth prepass 类似的方法处理
+                    cube shadow map for point light;
+            实现 Frustum culling?
             
+            测试 Occlusion query?
+
             间接光照
                 RenderTarget; 渲染到cubemap；
                 image based lighting, 生成 SH
@@ -134,12 +136,7 @@ TODO:       主要类结构
                     用纹理文件 url 作为 key
                 读取light, decal, envprobe, irradiance volume;
 
-            生成 Shadowmap 阴影
-                light view frustum culling
-                是否直接使用深度缓冲作为 depth map
-                如何处理带有镂空纹理的材质
-                    * 也按照和 depth prepass 类似的方法处理
-                cube shadow map for point light;
+
 
             SSAO，屏幕空间反射；subsurface scattering
 

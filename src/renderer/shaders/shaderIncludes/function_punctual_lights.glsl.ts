@@ -23,6 +23,10 @@ float getLightInnerConeCos(Light light) {
     return light.properties.w;
 }
 
+bool getLightCastShadow(Light light) {
+    return light.matShadow != mat4(0.0);
+}
+
 float getRangeAttenuation(float range, float distance) {
     if (range <= 0.0)
     {

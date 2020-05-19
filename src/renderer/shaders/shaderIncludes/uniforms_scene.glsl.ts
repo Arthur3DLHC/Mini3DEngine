@@ -11,13 +11,14 @@ export default /** glsl */`
 
     struct Light {
         vec4 color;
-        mat4 transform;     
+        mat4 transform;
         vec4 properties;      // pack following props to a vec4
         //float type;         // light type
         //float radius;       // point/dir/spot
         //float outerConeCos; // spot
         //float innerConeCos; // spot
         mat4 matShadow;       // dir/spot; light viewport(atlas location) * frustum proj * light view (inv transform)
+                              // if all zero, light do not cast shadow ?
     };
     uniform Lights
     {
@@ -52,4 +53,6 @@ export default /** glsl */`
     {
         IrradianceVolume volumes[MAX_IRRADIANCE_VOLUMES_PERSCENE];
     } u_irrVolumes;
+
+
 `;
