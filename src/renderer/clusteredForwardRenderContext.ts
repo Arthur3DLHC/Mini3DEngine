@@ -268,11 +268,10 @@ export class ClusteredForwardRenderContext extends RenderContext {
         }
         if (light.shadow && light.castShadow) {
             light.shadow.updateShadowMatrices();
-            mat4.product(light.shadow.matProj, light.shadow.matView, matShadow);
             // NOTE: these matrices is for sample shadow map, not for render shadow map.
             // todo: shadow bias matrix
             let matBias = new mat4();
-            matBias.fromTranslation(new vec3([0, 0, light.shadow.bias]));
+            matBias.fromTranslation(new vec3([0, 0, -light.shadow.bias]));
             // todo: shadowmap atlas rect as viewport matrix
             let w = light.shadow.mapRect.z / light.shadow.mapSize.x;
             let h = light.shadow.mapRect.w / light.shadow.mapSize.y;
@@ -290,7 +289,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 0,           0,           0.5, 0,
                 w * 0.5 + l, h * 0.5 + b, 0.5, 1,
             ]);
-            mat4.product(matBias, matShadow, matShadow);
+            mat4.product(matBias, light.shadow.matView, matShadow);
+            mat4.product(light.shadow.matProj, matShadow, matShadow);
             mat4.product(matLightViewport, matShadow, matShadow);
         }
         buffer.addArray(lightColor.values);

@@ -114,32 +114,37 @@ window.onload = () => {
     // scene.attachChild(pointLight02);
 
     // 测试动态光源的阴影
-    // const spotLight01 = new SpotLight();
-    // spotLight01.isStatic = false;
-    // spotLight01.on = true;
-    // spotLight01.color = new vec4([5, 5, 5, 1]);
-    // spotLight01.distance = 0;
-    // spotLight01.localTransform.fromTranslation(new vec3([0, 0, 3]));
+    const spotLight01 = new SpotLight();
+    spotLight01.isStatic = false;
+    spotLight01.on = true;
+    spotLight01.color = new vec4([100, 100, 100, 1]);
+    spotLight01.distance = 10;
+    spotLight01.castShadow = true;
+    // spotLight01.localTransform.fromTranslation(new vec3([0, 1, 3]));
+    const spotLightLookAt = new LookatBehavior(spotLight01);
+    spotLight01.behaviors.push(spotLightLookAt);
+    spotLightLookAt.position = new vec3([-3, 3, 3]);
+    spotLightLookAt.target = new vec3([0, 0, 0]);
+    spotLightLookAt.up = new vec3([0, 1, 0]);
 
-    // scene.attachChild(spotLight01);
+    scene.attachChild(spotLight01);
 
+    /*
     const dirLight01 = new DirectionalLight();
     dirLight01.isStatic = false;
     dirLight01.on = true;
     dirLight01.color = new vec4([3,3,3,1]);
     dirLight01.radius = 5;
     dirLight01.castShadow = true;
-    (dirLight01.shadow as DirectionalLightShadow).distance = 10;
-    // dirLight01.localTransform.fromRotation(-Math.PI / 4, new vec3([1,1,1]));
-    // dirLight01.localTransform.translate(new vec3([-5, 5, 5]));
-
-    const lightLookAt = new LookatBehavior(dirLight01);
-    dirLight01.behaviors.push(lightLookAt);
-    lightLookAt.position = new vec3([-5, 5, 5]);
-    lightLookAt.target = new vec3([0, 0, 0]);
-    lightLookAt.up = new vec3([0, 1, 0]);
+    (dirLight01.shadow as DirectionalLightShadow).distance = 15;
+    const dirLightLookAt = new LookatBehavior(dirLight01);
+    dirLight01.behaviors.push(dirLightLookAt);
+    dirLightLookAt.position = new vec3([-5, 5, 5]);
+    dirLightLookAt.target = new vec3([0, 0, 0]);
+    dirLightLookAt.up = new vec3([0, 1, 0]);
 
     scene.attachChild(dirLight01);
+    */
 
     Clock.instance.start();
 

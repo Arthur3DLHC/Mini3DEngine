@@ -117,13 +117,15 @@ void main(void)
                 matShadow = light.matShadow;
             } else {
                 // if point light, need to du a custom cube shadow map sampling
-
             }
             vec4 projPosition = matShadow * vec4(ex_worldPosition, 1.0);
             // debug shadow texture
             // float shadow = texture(s_shadowAtlasDynamic, projPosition.xy).r;
             // f_diffuse.r += shadow;
             // continue;
+            //vec3 uvw = projPosition.xyz / projPosition.w;
+            //uvw.xyz = uvw.xyz * 0.5 + vec3(0.5);
+            //shadow = texture(s_shadowAtlasDynamic, uvw);
             shadow = texture(s_shadowAtlasDynamic, projPosition.xyz / projPosition.w);
             if(shadow < 0.001) {
                 continue;

@@ -7,8 +7,8 @@ import { LightType } from "./lightType.js";
 export class SpotLight extends BaseLight {
     public constructor() {
         super();
-        this.outerConeAngle = Math.PI * 0.5;
-        this.innerConeAngle = Math.PI * 0.3;
+        this.outerConeAngle = Math.PI * 0.25;
+        this.innerConeAngle = Math.PI * 0.2;
         this.distance = 0;
         this.shadow = new SpotLightShadow(this);
         this._debugGeometry = null;

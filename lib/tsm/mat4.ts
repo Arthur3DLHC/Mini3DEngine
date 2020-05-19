@@ -768,6 +768,13 @@ export default class mat4 {
         ])
     }
 
+    /**
+     * 
+     * @param fov vertical field of view, in degrees
+     * @param aspect 
+     * @param near 
+     * @param far 
+     */
     static perspective(fov: number, aspect: number, near: number, far: number): mat4 {
         const top = near * Math.tan(fov * Math.PI / 360.0)
         const right = top * aspect

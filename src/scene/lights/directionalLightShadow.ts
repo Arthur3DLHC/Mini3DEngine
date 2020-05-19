@@ -25,6 +25,6 @@ export class DirectionalLightShadow extends LightShadow {
         if (this.radius > 0) {
             r = this.radius;
         }
-        this._matProj = mat4.orthographic(-r, r, -r, r, 0.01, this.distance);
+        this._matProj = mat4.orthographic(-r, r, -r, r, 0.01, this.distance > 0 ? this.distance : 20);
     }
 }
