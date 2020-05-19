@@ -109,6 +109,7 @@ void main(void)
         }
 
         // todo: test shadow
+        float shadow = 1.0;
         if (getLightCastShadow(light)) {
             mat4 matShadow = mat4(0.0);
             if (lightType != LightType_Point) {
@@ -123,15 +124,16 @@ void main(void)
             // float shadow = texture(s_shadowAtlasDynamic, projPosition.xy).r;
             // f_diffuse.r += shadow;
             // continue;
-            float shadow = texture(s_shadowAtlasDynamic, projPosition.xyz / projPosition.w);
-            f_diffuse.r += shadow;
-            continue;
+            shadow = texture(s_shadowAtlasDynamic, projPosition.xyz / projPosition.w);
+            if(shadow < 0.001) {
+                continue;
+            }
         }
 
         // test range attenuation
         // o.color = vec4(rangeAttenuation, rangeAttenuation, rangeAttenuation, 1.0);
 
-        vec3 intensity = rangeAttenuation * spotAttenuation * light.color.rgb;
+        vec3 intensity = rangeAttenuation * spotAttenuation * light.color.rgb * shadow;
 
         vec3 l = normalize(pointToLight);   // Direction from surface point to light
         float NdotL = clampedDot(n, l);
