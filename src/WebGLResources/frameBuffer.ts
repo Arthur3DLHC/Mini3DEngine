@@ -3,7 +3,7 @@ import { Texture } from "./textures/texture.js";
 import { RenderBuffer } from "./renderBuffer.js";
 
 export class FrameBuffer {
-    public constructor(width: number, height: number) {
+    public constructor() {
         this.glFrameBuffer = null;
         this._needUpdate = true;
         this._textures = [];
@@ -66,15 +66,15 @@ export class FrameBuffer {
                     case 0:
                         attachment = GLDevice.gl.COLOR_ATTACHMENT0;
                         break;
-                        case 1:
-                            attachment = GLDevice.gl.COLOR_ATTACHMENT1;
-                            break;
-                            case 2:
-                                attachment = GLDevice.gl.COLOR_ATTACHMENT2;
-                                break;
-                                case 3:
-                                    attachment = GLDevice.gl.COLOR_ATTACHMENT3;
-                                    break;
+                    case 1:
+                        attachment = GLDevice.gl.COLOR_ATTACHMENT1;
+                        break;
+                    case 2:
+                        attachment = GLDevice.gl.COLOR_ATTACHMENT2;
+                        break;
+                    case 3:
+                        attachment = GLDevice.gl.COLOR_ATTACHMENT3;
+                        break;
                     default:
                         throw new Error("Color attachment not supported:" + i);
                         break;

@@ -106,10 +106,12 @@ TODO:       主要类结构
                         使用 depth texture 作为 Shadowmap，传入shader;
                         pbr shader 中计算光照时取样 shadowmap，
                             注意要使用 samplerShadow 类型
-                    Shadow map atlas; 阴影的动态和静态更新逻辑
+                        测试不同类型光源的阴影；
+                        实现点光源阴影？
+                    Shadow map atlas; 
+                    阴影的动态和静态更新逻辑
                         如何处理带有镂空纹理的材质
                         * 也按照和 depth prepass 类似的方法处理
-                    cube shadow map for point light;
             实现 Frustum culling?
             
             测试 Occlusion query?

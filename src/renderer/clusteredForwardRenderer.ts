@@ -12,6 +12,8 @@ import function_transforms from "./shaders/shaderIncludes/function_transforms.gl
 import output_pbr from "./shaders/shaderIncludes/output_pbr.glsl.js";
 import output_final from "./shaders/shaderIncludes/output_final.glsl.js";
 // shader codes
+import shadowmap_vs from "./shaders/shadowmap_vs.glsl.js";
+import shadowmap_fs from "./shaders/shadowmap_fs.glsl.js";
 import single_color_vs from "./shaders/single_color_vs.glsl.js";
 import single_color_fs from "./shaders/single_color_fs.glsl.js";
 import screen_rect_vs from "./shaders/screen_Rect_vs.glsl.js";
@@ -54,6 +56,8 @@ import { Frustum } from "../math/frustum.js"
 export class ClusteredForwardRenderer {
 
     public constructor() {
+        this._drawDebugTexture = true;
+
         this._renderListDepthPrepass = new RenderList();
         this._renderListOpaque = new RenderList();
         this._renderListOpaqueOcclusionQuery = new RenderList();
@@ -91,6 +95,7 @@ export class ClusteredForwardRenderer {
 
         this._numReservedTextures = 5;
 
+
         // todo: 静态shadowmap和动态shadowmap需要分开
         // 在位置不变的光源中，对于场景中的静态部分，起始绘制一张静态shadowmap；
         // 如果它设为可以给动态物体产生阴影，则单将动态物体绘制到另一张动态shadowmap中；
@@ -118,7 +123,6 @@ export class ClusteredForwardRenderer {
         this._envMapArray = null;
         this._irradianceVolumeAtlas = new TextureAtlas3D();
 
-        this._shadowmapFBODynamic = new FrameBuffer(GLDevice.canvas.width, GLDevice.canvas.height);
         this._debugDepthTexture = new Texture2D();
         this._debugDepthTexture.width = 256;
         this._debugDepthTexture.height = 256;
@@ -126,14 +130,17 @@ export class ClusteredForwardRenderer {
         // this._debugDepthTexture.height = GLDevice.canvas.height;
         this._debugDepthTexture.depth = 1;
         this._debugDepthTexture.isShadowMap = false;
-        this._debugDepthTexture.format = GLDevice.gl.DEPTH_STENCIL;
-        this._debugDepthTexture.componentType = GLDevice.gl.UNSIGNED_INT_24_8;
+        this._debugDepthTexture.format = GLDevice.gl.RGBA;
+        this._debugDepthTexture.componentType = GLDevice.gl.UNSIGNED_BYTE;
         this._debugDepthTexture.create();
 
+        this._shadowmapFBODynamic = new FrameBuffer();
         // shadowmaps only need depthstencil
         this._shadowmapFBODynamic.depthStencilTexture = this._shadowmapAtlasDynamic.texture;
         // debug draw:
-        // this._shadowmapFBODynamic.setTexture(0, this._shadowmapAtlasDynamic.texture);
+        if (this._drawDebugTexture) {
+            this._shadowmapFBODynamic.setTexture(0, this._debugDepthTexture);
+        }
         // this._shadowmapFBODynamic.depthStencilTexture = this._debugDepthTexture;
         this._shadowmapFBODynamic.prepare();
 
@@ -154,8 +161,8 @@ export class ClusteredForwardRenderer {
 
         this._shadowProgram = new ShaderProgram();
         this._shadowProgram.name = "shadow";
-        this._shadowProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_vs"]);
-        this._shadowProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_fs"]);
+        this._shadowProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["shadowmap_vs"]);
+        this._shadowProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["shadowmap_fs"]);
         this._shadowProgram.build();
 
         // all can use simple color program
@@ -238,6 +245,7 @@ export class ClusteredForwardRenderer {
 
     private _shadowmapFBODynamic: FrameBuffer;
     private _debugDepthTexture: Texture2D;        // debug use
+    private _drawDebugTexture: boolean;
 
     private _numReservedTextures: number;
     
@@ -283,7 +291,11 @@ export class ClusteredForwardRenderer {
         // todo: update light shadowmaps
         // check which light need update
         // frustum culling, distance
+        GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, null);
+
         this.updateShadowmaps();
+
+        GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, this._shadowmapAtlasDynamic.texture);
 
         // fix me: for simplicity, use only one camera; or occlusion query can not work.
         for (let icam = 0; icam < this._renderContext.cameras.length; icam++) {
@@ -328,7 +340,9 @@ export class ClusteredForwardRenderer {
             // Test code: apply render target texture to a screen space rectangle
             // test drawing a screen space rectangle
             // GLDevice.renderTarget = null;
-            this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._shadowmapAtlasDynamic.texture, 1, false);
+            if (this._drawDebugTexture) {
+                this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._debugDepthTexture, 1, false);
+            }
             // this.renderScreenRect(0, 0, 0.5, 0.5, new vec4([1,1,1,1]), this._debugDepthTexture, 1, false);
         }
     }
@@ -337,7 +351,11 @@ export class ClusteredForwardRenderer {
         this._renderStatesShadow.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.LEQUAL);
         this._renderStatesShadow.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
         this._renderStatesShadow.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
-        this._renderStatesShadow.colorWriteState = RenderStateCache.instance.getColorWriteState(false, false, false, false);
+        if (this._drawDebugTexture) {
+            this._renderStatesShadow.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
+        } else {
+            this._renderStatesShadow.colorWriteState = RenderStateCache.instance.getColorWriteState(false, false, false, false);
+        }
 
         this._renderStatesDepthPrepass.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.LEQUAL);
         this._renderStatesDepthPrepass.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
@@ -394,6 +412,8 @@ export class ClusteredForwardRenderer {
         GLPrograms.shaderCodes["output_final"] = output_final;
 
         // shaders
+        GLPrograms.shaderCodes["shadowmap_vs"] = shadowmap_vs;
+        GLPrograms.shaderCodes["shadowmap_fs"] = shadowmap_fs;
         GLPrograms.shaderCodes["screen_rect_vs"] = screen_rect_vs;
         GLPrograms.shaderCodes["screen_rect_fs"] = screen_rect_fs;
         GLPrograms.shaderCodes["single_color_vs"] = single_color_vs;
@@ -492,7 +512,7 @@ export class ClusteredForwardRenderer {
     
     private bindTexturesPerScene() {
         GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, this._shadowmapAtlasStatic.texture);
-        GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, this._shadowmapAtlasDynamic.texture);
+        // GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, this._shadowmapAtlasDynamic.texture);
         GLTextures.setTextureAt(this._decalAtlasUnit, this._decalAtlas.texture);
         GLTextures.setTextureAt(this._envMapArrayUnit, this._envMapArray);
         GLTextures.setTextureAt(this._irradianceVolumeAtlasUnit, this._irradianceVolumeAtlas.texture);
@@ -761,8 +781,9 @@ export class ClusteredForwardRenderer {
                 this._renderContext.fillUniformBuffersPerLightView(light);
                 // disable color output
                 this.setRenderStateSet(this._renderStatesShadow);
+                GLDevice.clearColor = new vec4([1,1,1,1]);
                 GLDevice.clearDepth = 1.0;
-                GLDevice.clear(false, true, true);
+                GLDevice.clear(true, true, true);
                 // render opaque objects which can drop shadow
                 GLPrograms.useProgram(this._shadowProgram);
                 // todo: calculate light shadow frustm
