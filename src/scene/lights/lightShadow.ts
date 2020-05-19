@@ -10,7 +10,7 @@ import mat4 from "../../../lib/tsm/mat4.js";
 export class LightShadow {
     public constructor(light: BaseLight) {
         this._light = light;
-        this.bias = 0;
+        this.bias = -0.1;
         this.mapSize = new vec2([256, 256]);
         this.mapRect = new vec4([0, 0, 256, 256]);
         this.shadowMap = null;

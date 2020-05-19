@@ -49,8 +49,8 @@ export class Texture2D extends Texture {
             // enable texture compare, so sampler2DShadow can work
             GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_COMPARE_MODE, GLDevice.gl.COMPARE_REF_TO_TEXTURE);
             GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_COMPARE_FUNC, GLDevice.gl.LEQUAL);
-            GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_MIN_FILTER, GLDevice.gl.NEAREST);
-            GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_MAG_FILTER, GLDevice.gl.NEAREST);
+            GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_MIN_FILTER, GLDevice.gl.LINEAR);  // PCF shadow
+            GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_MAG_FILTER, GLDevice.gl.LINEAR);
             GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_WRAP_S, GLDevice.gl.CLAMP_TO_EDGE);
             GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_WRAP_T, GLDevice.gl.CLAMP_TO_EDGE);
         } else {

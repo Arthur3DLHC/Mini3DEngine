@@ -120,10 +120,12 @@ void main(void)
             }
             vec4 projPosition = matShadow * vec4(ex_worldPosition, 1.0);
             // debug shadow texture
-            float shadow = texture(s_shadowAtlasDynamic, projPosition.xy).r;
+            // float shadow = texture(s_shadowAtlasDynamic, projPosition.xy).r;
+            // f_diffuse.r += shadow;
+            // continue;
+            float shadow = texture(s_shadowAtlasDynamic, projPosition.xyz / projPosition.w);
             f_diffuse.r += shadow;
             continue;
-            // float shadow = texture(s_shadowAtlasDynamic, projPosition.xyz);
         }
 
         // test range attenuation

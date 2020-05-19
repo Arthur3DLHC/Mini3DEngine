@@ -106,7 +106,7 @@ export class ClusteredForwardRenderer {
         // this._shadowmapAtlasDynamic.texture.height = GLDevice.canvas.height;
         this._shadowmapAtlasDynamic.texture.depth = 1;
         // this._shadowmapAtlasDynamic.texture.isShadowMap = true;
-        this._shadowmapAtlasDynamic.texture.isShadowMap = false; // debug draw
+        this._shadowmapAtlasDynamic.texture.isShadowMap = true; // debug draw
         this._shadowmapAtlasDynamic.texture.format = GLDevice.gl.DEPTH_STENCIL;
         this._shadowmapAtlasDynamic.texture.componentType = GLDevice.gl.UNSIGNED_INT_24_8;
         // debug draw:
