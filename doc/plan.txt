@@ -111,19 +111,34 @@ TODO:       主要类结构
                         实现点光源阴影？
                     Shadow map atlas; 
                         如何处理光源的 atlas rect size 变化的情况？还是一旦光源建立，就不允许改了？
+                            如果光源的 atlas rect size 变化了，需要设置一个标志；还需要记录一下旧的 rect 尺寸？
+                            在分配动态光源的 shadow map rect 时，在旧尺寸的列表里查找一下它，从列表中删除？
+                            或者能否在发生变化时直接替换掉光源中的整个shadow对象？
+                            shadowmapAtlas检查这个标志
                     阴影的动态和静态更新逻辑
+                        能否静态和动态光源都使用同一张 shadow map atlas 和统一的逻辑？
+                        静态光源和动态光源的区别：前者不会实时添加或删除，也不能移动或改颜色；后者是实时添加或删除的光源，可以移动、改属性；
+                            但是两种类型的光源都可以更新阴影；
+                            或者能否利用 unform buffer 的 subData 函数，只更新改变过的光源数据，使所有光源都能修改属性？
+                        光源设置一个标志：是否需要更新阴影
+                            在光源对象 update 时判断
+                                如果光源运动了，设为 true；
+                                如果光源内有运动的或有动画的动态 mesh，设为 true
+                            每帧遍历检查光源是否可见时，如果光源可见且标志为 true，则更新shadowmap，然后将标志置 false;
                     如何处理带有镂空纹理的材质
                         * 也按照和 depth prepass 类似的方法处理
             实现 Frustum culling?
                 有了此功能，才能判断光源中是否有活动的动态物体；
             
             测试 Occlusion query?
+                调试绘制：Occlusion test 失败的，画一个不会被遮挡的线框 box？
 
             间接光照
                 RenderTarget; 渲染到cubemap；
-                image based lighting, 生成 SH
-                生成 envmap cube
-                生成 irradiance volume
+                image based lighting
+                生成 envmap cube（64 x 64）
+                    生成 mipmaps？
+                生成 irradiance volume？或者尝试用low mipmap envmap cube 做间接光照？
 
             贴图
                 sampler state
