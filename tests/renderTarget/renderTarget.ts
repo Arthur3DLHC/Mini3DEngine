@@ -83,7 +83,7 @@ window.onload = () => {
     // plane
     const planeMesh = new Mesh();
     planeMesh.name = "plane01";
-    planeMesh.localTransform.fromTranslation(new vec3([0, -0.5, 0]));
+    planeMesh.localTransform.fromTranslation(new vec3([0, -1, 0]));
     planeMesh.geometry = new PlaneGeometry(20, 20, 1, 1);
     planeMesh.castShadow = true;
     const planeMtl = new StandardPBRMaterial();

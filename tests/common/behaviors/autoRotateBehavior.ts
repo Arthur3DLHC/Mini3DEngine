@@ -12,8 +12,8 @@ export class AutoRotateBehavior extends Behavior {
 
     public update() {
         const elapsed = Clock.instance.elapsedTime;
-        this._curYaw += elapsed;
-        this._curPitch += elapsed * 0.2;
+        this._curYaw += elapsed * 0.2;
+        this._curPitch += elapsed * 0.1;
 
         // calculate transform matrix
         const matYaw: mat4 = new mat4();

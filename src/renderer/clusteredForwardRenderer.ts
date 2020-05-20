@@ -105,8 +105,8 @@ export class ClusteredForwardRenderer {
         this._shadowmapAtlasDynamic = new TextureAtlas2D();
         // todo: create atlas texture
         this._shadowmapAtlasDynamic.texture = new Texture2D();
-        this._shadowmapAtlasDynamic.texture.width = 256;
-        this._shadowmapAtlasDynamic.texture.height = 256;
+        this._shadowmapAtlasDynamic.texture.width = 512;
+        this._shadowmapAtlasDynamic.texture.height = 512;
         // this._shadowmapAtlasDynamic.texture.width = GLDevice.canvas.width;
         // this._shadowmapAtlasDynamic.texture.height = GLDevice.canvas.height;
         this._shadowmapAtlasDynamic.texture.depth = 1;
@@ -124,8 +124,8 @@ export class ClusteredForwardRenderer {
         this._irradianceVolumeAtlas = new TextureAtlas3D();
 
         this._debugDepthTexture = new Texture2D();
-        this._debugDepthTexture.width = 256;
-        this._debugDepthTexture.height = 256;
+        this._debugDepthTexture.width = 512;
+        this._debugDepthTexture.height = 512;
         // this._debugDepthTexture.width = GLDevice.canvas.width;
         // this._debugDepthTexture.height = GLDevice.canvas.height;
         this._debugDepthTexture.depth = 1;
@@ -445,6 +445,19 @@ export class ClusteredForwardRenderer {
             } else if (object instanceof BaseLight) {
                 const light = object as BaseLight;
                 if (light.isStatic === statics) {
+                    if (light.shadow && light.castShadow) {
+                        if (light.isStatic) {
+                            light.shadow.shadowMap = this._shadowmapAtlasStatic.texture;
+                            // todo: alloc shadowmap atlas?
+                        } else {
+                            light.shadow.shadowMap = this._shadowmapAtlasDynamic.texture;
+                            // todo: alloc shadowmap atlas?
+                        }
+                        if (light.shadow.shadowMap) {
+                            light.shadow.mapSize.x = light.shadow.shadowMap.width;
+                            light.shadow.mapSize.y = light.shadow.shadowMap.height;
+                        }
+                    }
                     this._renderContext.addLight(light);
                 }
             } else if (object instanceof Mesh) {
