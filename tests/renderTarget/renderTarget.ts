@@ -129,7 +129,6 @@ window.onload = () => {
 
     scene.attachChild(spotLight01);
 
-    /*
     const dirLight01 = new DirectionalLight();
     dirLight01.isStatic = false;
     dirLight01.on = true;
@@ -139,12 +138,11 @@ window.onload = () => {
     (dirLight01.shadow as DirectionalLightShadow).distance = 15;
     const dirLightLookAt = new LookatBehavior(dirLight01);
     dirLight01.behaviors.push(dirLightLookAt);
-    dirLightLookAt.position = new vec3([-5, 5, 5]);
+    dirLightLookAt.position = new vec3([5, 5, 5]);
     dirLightLookAt.target = new vec3([0, 0, 0]);
     dirLightLookAt.up = new vec3([0, 1, 0]);
 
     scene.attachChild(dirLight01);
-    */
 
     Clock.instance.start();
 

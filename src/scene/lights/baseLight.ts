@@ -36,4 +36,13 @@ export class BaseLight extends Object3D {
     public get type() : LightType {
         return LightType.Unknow;
     }
+
+    public destroy(destroyChildren: boolean) {
+        // release alloced shadowmap atlas
+        if (this.shadow) {
+            // indicate the shadowmap atlas will not be used anymore.
+            this.shadow.shadowMap = null;
+        }
+        super.destroy(destroyChildren);
+    }
 }

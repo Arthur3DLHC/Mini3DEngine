@@ -276,8 +276,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
             let w = light.shadow.mapRect.z / light.shadow.mapSize.x;
             let h = light.shadow.mapRect.w / light.shadow.mapSize.y;
             // todo: translation
-            let l = light.shadow.mapRect.x;
-            let b = light.shadow.mapRect.y;
+            let l = light.shadow.mapRect.x / light.shadow.mapSize.x;
+            let b = light.shadow.mapRect.y / light.shadow.mapSize.y;
             // ndc space is [-1, 1]
             // texcoord uv space is [0,1]
             // depth range in depthbuffer is also [0,1]

@@ -52,11 +52,14 @@ import mat4 from "../../lib/tsm/mat4.js"
 import { FrameBuffer } from "../WebGLResources/frameBuffer.js"
 import { Texture } from "../WebGLResources/textures/texture.js"
 import { Frustum } from "../math/frustum.js"
+import { ShadowmapAtlas } from "./shadowmapAtlas.js";
 
 export class ClusteredForwardRenderer {
 
     public constructor() {
         this._drawDebugTexture = true;
+
+        GLDevice.gl.enable(GLDevice.gl.SCISSOR_TEST);
 
         this._renderListDepthPrepass = new RenderList();
         this._renderListOpaque = new RenderList();
@@ -101,12 +104,12 @@ export class ClusteredForwardRenderer {
         // 如果它设为可以给动态物体产生阴影，则单将动态物体绘制到另一张动态shadowmap中；
         // 绘制对象时需要同时从这两张 shadowmap 中查询
         // 能否用同一张纹理的两个通道呢？用 colorwritemask 实现分别绘制？
-        this._shadowmapAtlasStatic = new TextureAtlas2D();
-        this._shadowmapAtlasDynamic = new TextureAtlas2D();
+        this._shadowmapAtlasStatic = new ShadowmapAtlas();
+        this._shadowmapAtlasDynamic = new ShadowmapAtlas();
         // todo: create atlas texture
         this._shadowmapAtlasDynamic.texture = new Texture2D();
-        this._shadowmapAtlasDynamic.texture.width = 512;
-        this._shadowmapAtlasDynamic.texture.height = 512;
+        this._shadowmapAtlasDynamic.texture.width = 4096;
+        this._shadowmapAtlasDynamic.texture.height = 4096;
         // this._shadowmapAtlasDynamic.texture.width = GLDevice.canvas.width;
         // this._shadowmapAtlasDynamic.texture.height = GLDevice.canvas.height;
         this._shadowmapAtlasDynamic.texture.depth = 1;
@@ -124,8 +127,8 @@ export class ClusteredForwardRenderer {
         this._irradianceVolumeAtlas = new TextureAtlas3D();
 
         this._debugDepthTexture = new Texture2D();
-        this._debugDepthTexture.width = 512;
-        this._debugDepthTexture.height = 512;
+        this._debugDepthTexture.width = 4096;
+        this._debugDepthTexture.height = 4096;
         // this._debugDepthTexture.width = GLDevice.canvas.width;
         // this._debugDepthTexture.height = GLDevice.canvas.height;
         this._debugDepthTexture.depth = 1;
@@ -237,8 +240,8 @@ export class ClusteredForwardRenderer {
     private _envMapArrayUnit: GLenum;
     private _irradianceVolumeAtlasUnit: GLenum;
 
-    private _shadowmapAtlasStatic: TextureAtlas2D;
-    private _shadowmapAtlasDynamic: TextureAtlas2D;
+    private _shadowmapAtlasStatic: ShadowmapAtlas;
+    private _shadowmapAtlasDynamic: ShadowmapAtlas;
     private _decalAtlas: TextureAtlas2D;
     private _envMapArray: Texture2DArray|null;
     private _irradianceVolumeAtlas: TextureAtlas3D;
@@ -307,9 +310,11 @@ export class ClusteredForwardRenderer {
 
             // set viewport
             if (camera.viewport) {
-                GLDevice.gl.viewport(camera.viewport.x, camera.viewport.y, camera.viewport.z, camera.viewport.w);                
+                GLDevice.gl.viewport(camera.viewport.x, camera.viewport.y, camera.viewport.z, camera.viewport.w);    
+                GLDevice.gl.scissor(camera.viewport.x, camera.viewport.y, camera.viewport.z, camera.viewport.w);
             } else {
                 GLDevice.gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+                GLDevice.gl.scissor(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
             }
 
             // need to allow color write and depth write
@@ -446,12 +451,16 @@ export class ClusteredForwardRenderer {
                 const light = object as BaseLight;
                 if (light.isStatic === statics) {
                     if (light.shadow && light.castShadow) {
-                        if (light.isStatic) {
-                            light.shadow.shadowMap = this._shadowmapAtlasStatic.texture;
-                            // todo: alloc shadowmap atlas?
-                        } else {
-                            light.shadow.shadowMap = this._shadowmapAtlasDynamic.texture;
-                            // todo: alloc shadowmap atlas?
+                        if (light.shadow.shadowMap === null) {
+                            if (light.isStatic) {
+                                // todo: alloc shadowmap atlas
+                                this._shadowmapAtlasStatic.alloc(light.shadow);
+                                // light.shadow.shadowMap = this._shadowmapAtlasStatic.texture;
+                            } else {
+                                // todo: alloc shadowmap atlas
+                                this._shadowmapAtlasDynamic.alloc(light.shadow);
+                                // light.shadow.shadowMap = this._shadowmapAtlasDynamic.texture;
+                            }
                         }
                         if (light.shadow.shadowMap) {
                             light.shadow.mapSize.x = light.shadow.shadowMap.width;
@@ -790,11 +799,12 @@ export class ClusteredForwardRenderer {
                 // GLDevice will prevent redundant render target swithes
                 GLDevice.renderTarget = this._shadowmapFBODynamic;
                 GLDevice.gl.viewport(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
+                GLDevice.gl.scissor(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
 
                 this._renderContext.fillUniformBuffersPerLightView(light);
                 // disable color output
                 this.setRenderStateSet(this._renderStatesShadow);
-                GLDevice.clearColor = new vec4([1,1,1,1]);
+                GLDevice.clearColor = new vec4([1,0,0,1]);
                 GLDevice.clearDepth = 1.0;
                 GLDevice.clear(true, true, true);
                 // render opaque objects which can drop shadow
