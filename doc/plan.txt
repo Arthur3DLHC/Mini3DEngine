@@ -119,6 +119,8 @@ TODO:       主要类结构
                     阴影的动态和静态更新逻辑
                         实现 Frustum culling?
                             有了此功能，才能判断光源中是否有活动的动态物体；
+                        网格的包围球和包围盒
+                            用包围球可能简单一些；无论怎么变换都是球；
                         能否静态和动态光源都使用同一张 shadow map atlas 和统一的逻辑？
                         静态光源和动态光源的区别：前者不会实时添加或删除，也不能移动或改颜色；后者是实时添加或删除的光源，可以移动、改属性；
                             但是两种类型的光源都可以更新阴影；
@@ -130,24 +132,32 @@ TODO:       主要类结构
                     如何处理带有镂空纹理的材质
                         * 也按照和 depth prepass 类似的方法处理
 
+            间接光照
+                RenderTarget; 渲染到cubemap；
+                生成 envmap cube（64 x 64）
+                    生成 mipmaps？如何进行卷积过滤？
+
+                image based lighting
+
+                生成 irradiance volume？或者尝试用low mipmap envmap cube 做间接光照？
+
+            SSAO，屏幕空间反射, 屏幕空间 GI？；
+
+            Subsurface scattering
+                参考Khronos Group glTF Viewer; Blender;
             
             测试 Occlusion query?
                 调试绘制：Occlusion test 失败的，画一个不会被遮挡的线框 box？
 
-            间接光照
-                RenderTarget; 渲染到cubemap；
-                image based lighting
-                生成 envmap cube（64 x 64）
-                    生成 mipmaps？
-                生成 irradiance volume？或者尝试用low mipmap envmap cube 做间接光照？
+            Clustered 光源、envmap、irradiance volume
 
-            贴图
+            加载贴图
                 sampler state
                 贴图的属性
                 贴图的加载和绑定
             FileLoader
             GLTFLoader
-                先直接引用 minimal gltf loader?
+                先直接引用 minimal gltf loader? 或者参考Khronos Group glTF Viewer
                 读取mesh, material, texture
                 File Cache
                 Geometry Cache
@@ -157,17 +167,16 @@ TODO:       主要类结构
                     用纹理文件 url 作为 key
                 读取light, decal, envprobe, irradiance volume;
 
-
-
-            SSAO，屏幕空间反射；subsurface scattering
-
-            Clustered 光源、envmap、irradiance volume
+            资源加载器
+                资源列表和资源计数？
+                所有资源加载完后再开始逻辑循环？
 
             particle system; sprite;
 
             从GLTF加载组件信息？
                     读取object的自定义属性：组件列表和组件属性？或者prefab文件名？
-                    使用json定义object prefab对象？
+                    或者使用命名规范、前缀来定义；
+                    使用json定义object prefab对象
 
 LOG：
 
