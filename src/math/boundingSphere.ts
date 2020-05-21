@@ -1,4 +1,4 @@
-import vec3 from "../../lib/tsm/vec3";
+import vec3 from "../../lib/tsm/vec3.js";
 
 /**
  * from three.js: sphere.js
