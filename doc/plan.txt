@@ -111,10 +111,8 @@ TODO:       主要类结构
                         实现点光源阴影？
                     Shadow map atlas; 
                         如何处理光源的 atlas rect size 变化的情况？还是一旦光源建立，就不允许改了？
-                            如果光源的 atlas rect size 变化了，需要设置一个标志；还需要记录一下旧的 rect 尺寸？
-                            在分配动态光源的 shadow map rect 时，在旧尺寸的列表里查找一下它，从列表中删除？
-                            或者能否在发生变化时直接替换掉光源中的整个shadow对象？
-                            shadowmapAtlas检查这个标志
+                            重构一下，在 lightshadow 上记录 shadow rect 的尺寸，以及当前在 atlas 中的位置；
+                            用户只能修改 rect 尺寸；当修改了尺寸后，dispatchobject 时发现与当前尺寸不一致了，就从旧列表中移除，添加到新列表；
                     阴影的动态和静态更新逻辑
                         能否静态和动态光源都使用同一张 shadow map atlas 和统一的逻辑？
                         静态光源和动态光源的区别：前者不会实时添加或删除，也不能移动或改颜色；后者是实时添加或删除的光源，可以移动、改属性；
