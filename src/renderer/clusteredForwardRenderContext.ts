@@ -266,18 +266,18 @@ export class ClusteredForwardRenderContext extends RenderContext {
         }
         else if (light.type === LightType.Directional) {
         }
-        if (light.shadow && light.castShadow) {
+        if (light.shadow && light.castShadow && light.shadow.shadowMap) {
             light.shadow.updateShadowMatrices();
             // NOTE: these matrices is for sample shadow map, not for render shadow map.
             // todo: shadow bias matrix
             let matBias = new mat4();
             matBias.fromTranslation(new vec3([0, 0, -light.shadow.bias]));
             // todo: shadowmap atlas rect as viewport matrix
-            let w = light.shadow.mapRect.z / light.shadow.mapSize.x;
-            let h = light.shadow.mapRect.w / light.shadow.mapSize.y;
+            let w = light.shadow.mapRect.z / light.shadow.shadowMap.width;
+            let h = light.shadow.mapRect.w / light.shadow.shadowMap.height;
             // todo: translation
-            let l = light.shadow.mapRect.x / light.shadow.mapSize.x;
-            let b = light.shadow.mapRect.y / light.shadow.mapSize.y;
+            let l = light.shadow.mapRect.x / light.shadow.shadowMap.width;
+            let b = light.shadow.mapRect.y / light.shadow.shadowMap.height;
             // ndc space is [-1, 1]
             // texcoord uv space is [0,1]
             // depth range in depthbuffer is also [0,1]

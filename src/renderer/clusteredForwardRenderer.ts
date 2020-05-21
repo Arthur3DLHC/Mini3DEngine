@@ -451,7 +451,7 @@ export class ClusteredForwardRenderer {
                 const light = object as BaseLight;
                 if (light.isStatic === statics) {
                     if (light.shadow && light.castShadow) {
-                        if (light.shadow.shadowMap === null) {
+                        if (light.shadow.shadowMap === null || light.shadow.mapSizeChanged) {
                             if (light.isStatic) {
                                 // todo: alloc shadowmap atlas
                                 this._shadowmapAtlasStatic.alloc(light.shadow);
@@ -461,10 +461,6 @@ export class ClusteredForwardRenderer {
                                 this._shadowmapAtlasDynamic.alloc(light.shadow);
                                 // light.shadow.shadowMap = this._shadowmapAtlasDynamic.texture;
                             }
-                        }
-                        if (light.shadow.shadowMap) {
-                            light.shadow.mapSize.x = light.shadow.shadowMap.width;
-                            light.shadow.mapSize.y = light.shadow.shadowMap.height;
                         }
                     }
                     this._renderContext.addLight(light);

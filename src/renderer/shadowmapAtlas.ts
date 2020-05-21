@@ -1,6 +1,58 @@
 import { LightShadow } from "../scene/lights/lightShadow";
 import { Texture2D } from "../WebGLResources/textures/texture2D";
 
+class shadowMapList {
+    public constructor(maxCount: number, startY: number) {
+        this.maxCount = maxCount;
+        this.startY = startY;
+    }
+    public shadows: (LightShadow | null)[] = [];
+    public maxCount: number;
+    public startY: number;
+
+    public alloc(shadow: LightShadow, texture: Texture2D) {
+        for (let i = 0; i < this.shadows.length; i++) {
+            const shadowmap = this.shadows[i];
+            if (shadowmap === null || shadowmap.shadowMap === null) {
+                this.shadows[i] = shadow;
+                shadow.shadowMap = texture;
+                this.calcLocation(shadow, i, texture);
+                return;
+            }
+        }
+        // no unused locations found, alloc new one
+        // todo: calc locaiton rectangle
+        if (this.shadows.length >= this.maxCount) {
+            throw new Error("too much shadowmaps with size:" + shadow.mapSize.x);
+        }
+        this.shadows.push(shadow);
+        shadow.shadowMap = texture;
+        this.calcLocation(shadow, this.shadows.length - 1, texture);
+    }
+
+    release(shadow: LightShadow) {
+        for (let i = 0; i < this.shadows.length; i++) {
+            const element = this.shadows[i];
+            if (element === shadow) {
+                shadow.shadowMap = null;
+                this.shadows[i] = null;
+            }
+        }
+    }
+
+    private calcLocation(shadow: LightShadow, i: number, texture: Texture2D) {
+            const width = shadow.mapSize.x;
+            const height = shadow.mapSize.y;
+            const maxCol = texture.width / width;
+            const row = Math.floor(i / maxCol);
+            const col = i - row * maxCol;
+            shadow.mapRect.x = col * width;
+            shadow.mapRect.y = row * height + this.startY;
+            shadow.mapRect.z = width;
+            shadow.mapRect.w = height;
+    }
+}
+
 /**
  * alloc and free shadowmap atlas rectangles
  * for simplicity now, only use several fixed shadowmap sizes, such as
@@ -12,82 +64,50 @@ export class ShadowmapAtlas {
     public constructor() {
         this.texture = null;
 
-        this._shadowmaps512 = [];
-        this._shadowmaps256 = [];
-        this._shadowmaps128 = [];
-        this._shadowmaps64 = [];
-
         // todo: calculate default counts
         //                 columns x rows
-        this.maxMaps512 = 8  *  2;
-        this.maxMaps256 = 16 *  4;
-        this.maxMaps128 = 32 *  8;
-        this.maxMaps64 =  64 *  16;
+        this._shadowmaps512 = new shadowMapList(8 * 2, 0);
+        this._shadowmaps256 = new shadowMapList(16 * 4, 1024);
+        this._shadowmaps128 = new shadowMapList(32 * 8, 2048);
+        this._shadowmaps64 = new shadowMapList(64 * 16, 3072);
     }
 
     public texture: Texture2D | null;
 
-    private _shadowmaps512: LightShadow[];
-    private _shadowmaps256: LightShadow[];
-    private _shadowmaps128: LightShadow[];
-    private _shadowmaps64: LightShadow[];
-
-    public maxMaps512: number;
-    public maxMaps256: number;
-    public maxMaps128: number;
-    public maxMaps64: number;
+    private _shadowmaps512: shadowMapList;
+    private _shadowmaps256: shadowMapList;
+    private _shadowmaps128: shadowMapList;
+    private _shadowmaps64: shadowMapList;
 
     public alloc(shadow: LightShadow) {
-        if (shadow.mapRect.z === 512 && shadow.mapRect.w === 512) {
-            this.allocInList(this._shadowmaps512, this.maxMaps512, shadow, 0);
-        } else if (shadow.mapRect.z === 256 && shadow.mapRect.w === 256) {
-            this.allocInList(this._shadowmaps256, this.maxMaps256, shadow, 1024);
-        } else if (shadow.mapRect.z === 128 && shadow.mapRect.w === 128) {
-            this.allocInList(this._shadowmaps128, this.maxMaps128, shadow, 2048);
-        } else if (shadow.mapRect.z === 64 && shadow.mapRect.w === 64) {
-            this.allocInList(this._shadowmaps64, this.maxMaps64, shadow, 3072);
-        } else {
-            throw new Error("unsupport shadowmap size: " + shadow.mapRect.z + " x " + shadow.mapRect.w);
+        if (!this.texture) {
+            throw new Error("shadowmap atlas texture not set yet.");
+            
         }
-    }
-
-    private allocInList(shadowmapList: LightShadow[], maxCount: number, shadow: LightShadow, startY: number) {
-        for (let i = 0; i < shadowmapList.length; i++) {
-            const shadowmap = shadowmapList[i];
-            if (shadowmap === null) {
-                shadowmapList[i] = shadow;
-                shadow.shadowMap = this.texture;
-                this.calcLocation(shadow, i, startY);
-                return;
-            } else if (shadowmap.shadowMap === null) {
-                // if light destroyed, it will set its shadowmap to null
-                shadowmapList[i] = shadow;
-                shadow.shadowMap = this.texture;
-                this.calcLocation(shadow, i, startY);
-                return;
+        // todo: if already allocated...
+        // remove it from list firstly
+        if (shadow.shadowMap !== null) {
+            if (shadow.mapSizeChanged) {
+                const oldList = this.getListBySize(shadow.mapRect.z, shadow.mapRect.w);
+                oldList.release(shadow);
             }
         }
-        // no unused locations found, alloc new one
-        // todo: calc locaiton rectangle
-        if (shadowmapList.length >= maxCount) {
-            throw new Error("too much shadowmaps with size:" + shadow.mapRect.z);
-        }
-        shadowmapList.push(shadow);
-        shadow.shadowMap = this.texture;
-        this.calcLocation(shadow, shadowmapList.length - 1, startY);
+
+        const list = this.getListBySize(shadow.mapSize.x, shadow.mapSize.y);
+        list.alloc(shadow, this.texture);
     }
 
-    private calcLocation(shadow: LightShadow, i: number, startY: number) {
-        if (this.texture) {
-            const w = shadow.mapRect.z;
-            const h = shadow.mapRect.w;
-            const maxCol = this.texture.width / w;
-            const row = Math.floor(i / maxCol);
-            const col = i - row * maxCol;
-            shadow.mapRect.x = col * w;
-            shadow.mapRect.y = row * h + startY;
+    private getListBySize(width: number, height: number): shadowMapList {
+        if (width === 512 && height === 512) {
+            return this._shadowmaps512;
+        } else if (width === 256 && height === 256) {
+            return this._shadowmaps256;
+        } else if (width === 128 && height === 128) {
+            return this._shadowmaps128;
+        } else if (width === 64 && height === 64) {
+            return this._shadowmaps64;
         } else {
-            throw new Error("shadowmap texture not set.");
+            throw new Error("unsupport shadowmap size: " + width + " x " + height);
         }
     }
 
