@@ -113,6 +113,8 @@ TODO:       主要类结构
                         如何处理光源的 atlas rect size 变化的情况？还是一旦光源建立，就不允许改了？
                             重构一下，在 lightshadow 上记录 shadow rect 的尺寸，以及当前在 atlas 中的位置；
                             用户只能修改 rect 尺寸；当修改了尺寸后，dispatchobject 时发现与当前尺寸不一致了，就从旧列表中移除，添加到新列表；
+                            能否将 lightshadow 和 atlas 位置解耦，将其对应关系以 map 的形式保存在 shadowmapAtlas 对象里？
+                                renderer 每次更新 shadowmap 时都需要查询；
                     阴影的动态和静态更新逻辑
                         能否静态和动态光源都使用同一张 shadow map atlas 和统一的逻辑？
                         静态光源和动态光源的区别：前者不会实时添加或删除，也不能移动或改颜色；后者是实时添加或删除的光源，可以移动、改属性；
