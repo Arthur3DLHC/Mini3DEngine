@@ -14,6 +14,15 @@ export class Plane {
         return new Plane(this.normal.x, this.normal.y, this.normal.z, this.constant);
     }
 
+    public setComponents(x: number, y: number, z: number, w: number): Plane {
+        this.normal.x = x;
+        this.normal.y = y;
+        this.normal.z = z;
+		this.constant = w;
+
+        return this;
+    }
+
     public setFromPoints(point1: vec3, point2: vec3, point3: vec3): Plane {
         // from babylon.js, and do not sure whether is same with three.js yet
         var x1 = point2.x - point1.x;
