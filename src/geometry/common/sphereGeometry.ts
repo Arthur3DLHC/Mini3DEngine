@@ -76,6 +76,8 @@ export class SphereGeometry extends BufferGeometry {
 
         const grp = new PrimitiveGroup();
         this.groups.push(grp);
+
+        this.boundingSphere.radius = this._radius;
     }
 
     private _radius: number;

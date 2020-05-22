@@ -6,7 +6,6 @@ import { epsilon } from './constants.js'
 import quat from './quat.js'
 
 export default class mat4 {
-
     constructor(values?: number[]) {
         if (values !== undefined) {
             this.init(values)

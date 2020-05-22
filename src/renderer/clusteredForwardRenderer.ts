@@ -53,6 +53,7 @@ import { FrameBuffer } from "../WebGLResources/frameBuffer.js"
 import { Texture } from "../WebGLResources/textures/texture.js"
 import { Frustum } from "../math/frustum.js"
 import { ShadowmapAtlas } from "./shadowmapAtlas.js";
+import { BoundingSphere } from "../math/boundingSphere.js";
 
 export class ClusteredForwardRenderer {
 
@@ -71,6 +72,8 @@ export class ClusteredForwardRenderer {
         this._renderContext = new ClusteredForwardRenderContext();
         this._currentScene = null;
         this._currentObject = null;
+        this._objectsMoved = [];
+        this._curNumMovedObjects = 0;
 
         this._renderStatesShadow = new RenderStateSet();
         this._renderStatesDepthPrepass = new RenderStateSet();
@@ -215,6 +218,11 @@ export class ClusteredForwardRenderer {
      * current object rendering
      */
     private _currentObject: Object3D|null;
+    /**
+     * moved or animated objects in this frame
+     */
+    private _objectsMoved: Mesh[];
+    private _curNumMovedObjects: number;
 
     private _renderStatesShadow: RenderStateSet;
     private _renderStatesDepthPrepass: RenderStateSet;
@@ -436,6 +444,7 @@ export class ClusteredForwardRenderer {
         this._renderListTransparentOcclusionQuery.clear();
         this._renderListSprites.clear();
         this._renderContext.clear(statics, true);
+        this._curNumMovedObjects = 0;
 
         this.dispatchObject(scene, statics);
     }
@@ -467,7 +476,11 @@ export class ClusteredForwardRenderer {
                     this._renderContext.addLight(light);
                 }
             } else if (object instanceof Mesh) {
-                // nothing to do yet.                
+                // check if it has moved or animated
+                if (! object.worldTransformPrev.equals(object.worldTransform)) {
+                    this._objectsMoved[this._curNumMovedObjects] = object;
+                    this._curNumMovedObjects++;
+                }
             } else if (object instanceof Decal) {
                 const decal = object as Decal;
                 if (decal.isStatic === statics) {
@@ -513,7 +526,6 @@ export class ClusteredForwardRenderer {
                                     this._renderListOpaque.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
                                     this._renderListDepthPrepass.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
                                 }
-
                             }
                         }
                     }
@@ -804,6 +816,16 @@ export class ClusteredForwardRenderer {
             light.shadow.updateShadowMatrices();
 
             // check moved meshes, if there is one can cast shadow moving in light view, update
+            const sphere = new BoundingSphere();
+            for(let i = 0; i < this._curNumMovedObjects; i++) {
+                const mesh = this._objectsMoved[i];
+                if (mesh && mesh.geometry) {
+                    mesh.geometry.boundingSphere.transform(mesh.worldTransform, sphere);
+                    if (light.shadow.frustum.intersectsSphere(sphere)) {
+                        light.shadow.dirty = true;
+                    }
+                }
+            }
 
             if (light.shadow.dirty) {
                 GLDevice.renderTarget = this._shadowmapFBODynamic;

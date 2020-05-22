@@ -79,6 +79,8 @@ export class BoxGeometry extends BufferGeometry {
 
         const grp = new PrimitiveGroup();
         this.groups.push(grp);
+
+        this.computeBoundingSphere();
     }
 
     private _width: number;
