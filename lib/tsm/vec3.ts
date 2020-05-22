@@ -355,4 +355,24 @@ export default class vec3 {
 
         return dest
     }
+
+    static componentsMin(vector: vec3, vector2: vec3, dest?: vec3): vec3 {
+        if (!dest) {
+            dest = new vec3();
+        }
+        dest.x = Math.min(vector.x, vector2.x);
+        dest.y = Math.min(vector.y, vector2.y);
+        dest.z = Math.min(vector.z, vector2.z);
+        return dest;
+    }
+
+    static componentsMax(vector: vec3, vector2: vec3, dest?: vec3): vec3 {
+        if (!dest) {
+            dest = new vec3();
+        }
+        dest.x = Math.max(vector.x, vector2.x);
+        dest.y = Math.max(vector.y, vector2.y);
+        dest.z = Math.max(vector.z, vector2.z);
+        return dest;
+    }
 }

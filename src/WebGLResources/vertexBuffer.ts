@@ -27,6 +27,13 @@ export class VertexBuffer {
      */
     public data: Float32Array | null;
 
+    public get vertexCount(): number {
+        if (this.data && this.stride > 0) {
+            return this.data.length / (this.stride / 4);
+        }
+        return 0;
+    }
+
     private _usage: GLenum;
 
     public create() {

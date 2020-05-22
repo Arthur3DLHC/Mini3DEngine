@@ -1,7 +1,9 @@
 import { BufferGeometry } from "../bufferGeometry.js";
 import { VertexBuffer } from "../../WebGLResources/vertexBuffer.js";
+import { IndexBuffer } from "../../WebGLResources/indexBuffer.js";
 import { GLDevice } from "../../WebGLResources/glDevice.js";
-import { IndexBuffer, PrimitiveGroup } from "../../miniEngine.js";
+import { PrimitiveGroup } from "../primitiveGroup.js";
+import { VertexBufferAttribute } from "../../WebGLResources/vertexBufferAttribute.js";
 
 export class PlaneGeometry extends BufferGeometry {
     public constructor(width: number, height: number, widthSegments: number, heightSegments: number) {
@@ -61,9 +63,9 @@ export class PlaneGeometry extends BufferGeometry {
         this.indexBuffer.create();
 
         let curOffset = 0;
-        curOffset = this.addAttribute("a_position", this.vertexBuffer, 3, curOffset);
-        curOffset = this.addAttribute("a_normal", this.vertexBuffer, 3, curOffset);
-        curOffset = this.addAttribute("a_texcoord0", this.vertexBuffer, 2, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNamePosition, this.vertexBuffer, 3, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameNormal, this.vertexBuffer, 3, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameTexcoord0, this.vertexBuffer, 2, curOffset);
 
         const grp = new PrimitiveGroup();
         this.groups.push(grp);

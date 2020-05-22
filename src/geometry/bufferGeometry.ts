@@ -4,6 +4,9 @@ import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { IndexBuffer } from "../WebGLResources/indexBuffer.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { GLGeometryBuffers } from "../WebGLResources/glGeometryBuffers.js";
+import { BoundingSphere } from "../math/boundingSphere.js";
+import vec3 from "../../lib/tsm/vec3.js";
+import { BoundingBox } from "../math/boundingBox.js";
 
 export class BufferGeometry {
     public constructor() {
@@ -12,6 +15,7 @@ export class BufferGeometry {
         this.indexBuffer = null;
         this.groups = [];
         this.drawMode = GLDevice.gl.TRIANGLES;
+        this.boundingSphere = new BoundingSphere();
     }
 
     // vertex attributes
@@ -28,6 +32,8 @@ export class BufferGeometry {
 
     // todo: geometry type?
     public drawMode: GLenum;
+
+    public boundingSphere: BoundingSphere;
 
     public draw(start: number, count: number, attribLocations: Map<string, number>, mode: GLenum|null = null) {
         if (!this.vertexBuffer || !this.vertexBuffer.data || !this.vertexBuffer.glBuffer) {
@@ -64,6 +70,38 @@ export class BufferGeometry {
         if (this.indexBuffer) {
             this.indexBuffer.release();
             this.indexBuffer = null;
+        }
+    }
+    
+    public computeBoundingSphere() {
+        // get the position attribute first
+        const box = new BoundingBox();
+        const vp: vec3 = new vec3();
+        const positions = this.attributes.find(e => e.name === VertexBufferAttribute.defaultNamePosition);
+        if (positions) {
+            // iterate all positions, calculate center
+            // from three.js,
+            // us a box center is better than average center
+            let p: number[] = [0, 0, 0];
+            for (let i = 0; i < positions.buffer.vertexCount; i++) {
+                positions.getVertex(i, p);
+                vp.x = p[0];
+                vp.y = p[1];
+                vp.z = p[2];
+                box.expandByPoint(vp);
+            }
+
+            // iterate all positions, calculate max distance to center (radius)
+            this.boundingSphere.center = box.center;
+            let distSq = 0;
+            for (let i = 0; i < positions.buffer.vertexCount; i++) {
+                positions.getVertex(i, p);
+                vp.x = p[0] - this.boundingSphere.center.x;
+                vp.y = p[1] - this.boundingSphere.center.y;
+                vp.z = p[2] - this.boundingSphere.center.z;
+                distSq = Math.max(distSq, vp.x * vp.x + vp.y * vp.y + vp.z * vp.z);
+            }
+            this.boundingSphere.radius = Math.sqrt(distSq);
         }
     }
     
