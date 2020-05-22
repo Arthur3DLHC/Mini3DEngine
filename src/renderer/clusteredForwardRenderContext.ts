@@ -267,7 +267,6 @@ export class ClusteredForwardRenderContext extends RenderContext {
         else if (light.type === LightType.Directional) {
         }
         if (light.shadow && light.castShadow && light.shadow.shadowMap) {
-            light.shadow.updateShadowMatrices();
             // NOTE: these matrices is for sample shadow map, not for render shadow map.
             // todo: shadow bias matrix
             let matBias = new mat4();
@@ -463,7 +462,6 @@ export class ClusteredForwardRenderContext extends RenderContext {
         // todo: calculate shadow view proj transform matrices
         // implement in light class?
         if (light.shadow && light.castShadow) {
-            light.shadow.updateShadowMatrices();
 
             // only need these params?
             this._ubView.setMat4("matView", light.shadow.matView);

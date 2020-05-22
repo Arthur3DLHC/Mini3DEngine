@@ -17,6 +17,10 @@ export class DirectionalLightShadow extends LightShadow {
     public distance: number;
 
     public updateShadowMatrices() {
+        // todo: check dirty
+        if (! this._light.worldTransform.equals(this._light.worldTransformPrev)) {
+            this.dirty = true;
+        }
         this._light.worldTransform.copy(this._matView);
         this._matView.inverse();
 
@@ -25,6 +29,15 @@ export class DirectionalLightShadow extends LightShadow {
         if (this.radius > 0) {
             r = this.radius;
         }
-        this._matProj = mat4.orthographic(-r, r, -r, r, 0.01, this.distance > 0 ? this.distance : 20);
+        const matProj = mat4.orthographic(-r, r, -r, r, 0.01, this.distance > 0 ? this.distance : 20);
+        if (! matProj.equals(this._matProj)) {
+            this.dirty = true;
+            matProj.copy(this._matProj);
+        }
+        if (this.dirty) {
+            const viewProj = new mat4();
+            mat4.product(this._matProj, this._matView, viewProj);
+            this.frustum.setFromProjectionMatrix(viewProj);
+        }
     }
 }

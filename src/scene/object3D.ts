@@ -154,10 +154,13 @@ export class Object3D {
 
         // 
 
+        // record prev transform
+        this.worldTransform.copy(this.worldTransformPrev);
+
         if (this.parent) {
             mat4.product(this.parent.worldTransform, this.localTransform, this.worldTransform);
         } else {
-            this.worldTransform = this.localTransform.copy();
+            this.localTransform.copy(this.worldTransform);
         }
 
         if( updateChildren ) {

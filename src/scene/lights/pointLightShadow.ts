@@ -5,4 +5,13 @@ export class PointLightShadow extends LightShadow {
     public constructor(light: PointLight) {
         super(light);
     }
+
+    public updateShadowMatrices() {
+        // todo: check dirty
+        if (! this._light.worldTransform.equals(this._light.worldTransformPrev)) {
+            this.dirty = true;
+        }
+
+        // todo: point light's frustum is not a view frustum, but a bouding box
+    }
 }

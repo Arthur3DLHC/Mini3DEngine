@@ -3,6 +3,7 @@ import { Texture2D } from "../../WebGLResources/textures/texture2D.js";
 import vec2 from "../../../lib/tsm/vec2.js";
 import vec4 from "../../../lib/tsm/vec4.js";
 import mat4 from "../../../lib/tsm/mat4.js";
+import { Frustum } from "../../math/frustum.js";
 
 /**
  * base class for shadows
@@ -14,8 +15,10 @@ export class LightShadow {
         this.mapSize = new vec2([256, 256]);
         this.mapRect = new vec4([0, 0, 256, 256]);
         this.shadowMap = null;
+        this.dirty = true;
         this._matView = mat4.identity.copy();
         this._matProj = mat4.identity.copy();
+        this.frustum = new Frustum();
     }
     
     // fustum, bias, shadowmap resolution...
@@ -44,11 +47,18 @@ export class LightShadow {
      */
     public shadowMap: Texture2D | null;
 
+    /**
+     * shadowmap needs update?
+     */
+    public dirty: boolean;
+
     protected _light: BaseLight;
 
     // todo: shadow matrices
     protected _matView: mat4;
     protected _matProj: mat4;
+
+    public frustum: Frustum;
 
     public get matView(): mat4 {
         return this._matView;

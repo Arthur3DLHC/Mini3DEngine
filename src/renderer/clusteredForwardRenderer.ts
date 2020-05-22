@@ -266,11 +266,14 @@ export class ClusteredForwardRenderer {
     private _samplerUniformsScreenRect: SamplerUniforms | null;
 
     public render(scene: Scene) {
+        GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, null);
 
         // if scene changed, setup uniform buffers for scene.
         if (this._currentScene !== scene) {
             // dispatch static objects
             this.dispatchObjects(scene, true);
+
+            this.updateShadowmaps();
 
             this._renderContext.fillUniformBuffersPerScene();
             // todo: generate static light shadowmaps;
@@ -294,8 +297,6 @@ export class ClusteredForwardRenderer {
         // todo: update light shadowmaps
         // check which light need update
         // frustum culling, distance
-        GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, null);
-
         this.updateShadowmaps();
 
         GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, this._shadowmapAtlasDynamic.texture);
@@ -778,21 +779,33 @@ export class ClusteredForwardRenderer {
         // iterate static lights
         for (const light of this._renderContext.staticLights) {
             if (light.shadow && light.castShadow) {
-                // frustum culling and distance?
-                // if shadowmap not generated yet, generate
-                // if light can drop dynamic object shadow, and there is dynamic object which can cast shadow moving inside light frustum, update
+                this.updateShadowMapFor(light);
             }
         }
 
         // iterate dynamic lights
         for (const light of this._renderContext.dynamicLights) {
             if (light.shadow && light.castShadow) {
-                // frustum culling and distance?
-                // if shadowmap not generated yet, generate
-                // if light moved, or there is dynamic object can cast shadow moving in light view, update
+                this.updateShadowMapFor(light);
+            }
+        }
+        GLDevice.renderTarget = null;
+        // todo: debug draw the shadowmap on a screen rect
+    }
 
-                // set render target, viewport and shadow project matrix
-                // GLDevice will prevent redundant render target swithes
+    private updateShadowMapFor(light: BaseLight) {
+        if (light.shadow && light.castShadow && light.on) {
+
+            // todo: cull light outside view frustum
+
+            // if shadowmap not generated yet, generate
+
+            // if light moved, update
+            light.shadow.updateShadowMatrices();
+
+            // check moved meshes, if there is one can cast shadow moving in light view, update
+
+            if (light.shadow.dirty) {
                 GLDevice.renderTarget = this._shadowmapFBODynamic;
                 GLDevice.gl.viewport(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
                 GLDevice.gl.scissor(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
@@ -805,12 +818,11 @@ export class ClusteredForwardRenderer {
                 GLDevice.clear(true, true, true);
                 // render opaque objects which can drop shadow
                 GLPrograms.useProgram(this._shadowProgram);
-                // todo: calculate light shadow frustm
-                const frustum = new Frustum();
-                this.renderShadowItems(this._renderListOpaque, frustum);
+                // todo: point light's frustum is not a view frustum, but a bouding box
+                this.renderShadowItems(this._renderListOpaque, light.shadow.frustum);
+
+                light.shadow.dirty = false;
             }
         }
-        GLDevice.renderTarget = null;
-        // todo: debug draw the shadowmap on a screen rect
     }
 }
