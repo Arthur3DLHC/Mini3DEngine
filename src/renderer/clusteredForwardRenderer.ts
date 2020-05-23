@@ -697,6 +697,9 @@ export class ClusteredForwardRenderer {
             if (item && item.object.castShadow) {
                 // check item moved?
                 // todo: check animated? or overwrite moved flag by skinnedMesh class.
+                // fix me: should add a staic flag to object
+                // static objects never move
+                // dynamic objects may move, or not move.
                 const isStatic = !item.object.moved;
                 if (isStatic !== drawStatics) {
                     continue;
