@@ -54,6 +54,7 @@ import { Texture } from "../WebGLResources/textures/texture.js"
 import { Frustum } from "../math/frustum.js"
 import { ShadowmapAtlas } from "./shadowmapAtlas.js";
 import { BoundingSphere } from "../math/boundingSphere.js";
+import { LightShadow } from "../scene/lights/lightShadow.js";
 
 export class ClusteredForwardRenderer {
 
@@ -140,6 +141,13 @@ export class ClusteredForwardRenderer {
         this._debugDepthTexture.componentType = GLDevice.gl.UNSIGNED_BYTE;
         this._debugDepthTexture.create();
 
+        this._shadowmapFBOStatic = new FrameBuffer();
+        this._shadowmapFBOStatic.depthStencilTexture = this._shadowmapAtlasStatic.texture;
+        if (this._debugDepthTexture) {
+            this._shadowmapFBOStatic.setTexture(0, this._debugDepthTexture);
+        }
+        this._shadowmapFBOStatic.prepare();
+
         this._shadowmapFBODynamic = new FrameBuffer();
         // shadowmaps only need depthstencil
         this._shadowmapFBODynamic.depthStencilTexture = this._shadowmapAtlasDynamic.texture;
@@ -149,6 +157,7 @@ export class ClusteredForwardRenderer {
         }
         // this._shadowmapFBODynamic.depthStencilTexture = this._debugDepthTexture;
         this._shadowmapFBODynamic.prepare();
+
 
         this.registerShaderCodes();
 
@@ -248,12 +257,13 @@ export class ClusteredForwardRenderer {
     private _envMapArrayUnit: GLenum;
     private _irradianceVolumeAtlasUnit: GLenum;
 
-    private _shadowmapAtlasStatic: ShadowmapAtlas;
-    private _shadowmapAtlasDynamic: ShadowmapAtlas;
+    private _shadowmapAtlasStatic: ShadowmapAtlas;  // static objects only
+    private _shadowmapAtlasDynamic: ShadowmapAtlas; // dynamic objects only
     private _decalAtlas: TextureAtlas2D;
     private _envMapArray: Texture2DArray|null;
     private _irradianceVolumeAtlas: TextureAtlas3D;
 
+    private _shadowmapFBOStatic: FrameBuffer;
     private _shadowmapFBODynamic: FrameBuffer;
     private _debugDepthTexture: Texture2D;        // debug use
     private _drawDebugTexture: boolean;
@@ -676,17 +686,52 @@ export class ClusteredForwardRenderer {
         }
     }
 
-    private renderShadowItems(renderList: RenderList, frustum: Frustum) {
+    private renderShadowItems(renderList: RenderList, light: BaseLight, drawStatics: boolean) {
+        if (!light.shadow) {
+            return;
+        }
+        let inited = false;
+        const sphere = new BoundingSphere();
         for (let i = 0; i < renderList.ItemCount; i++) {
             const item = renderList.getItemAt(i);
             if (item && item.object.castShadow) {
-                this._renderContext.fillUniformBuffersPerObject(item);
-                
-                // draw item geometry
-                if (GLPrograms.currProgram) {
-                    item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
+                // check item moved?
+                // todo: check animated? or overwrite moved flag by skinnedMesh class.
+                const isStatic = !item.object.moved;
+                if (isStatic !== drawStatics) {
+                    continue;
                 }
-                this._currentObject = item.object;
+                // todo: check frustum culling
+                item.geometry.boundingSphere.transform(item.object.worldTransform);
+                if (light.shadow.frustum.intersectsSphere(sphere)) {
+                    if (!inited) {
+                        if (drawStatics) {
+                            GLDevice.renderTarget = this._shadowmapFBOStatic;
+                        } else {
+                            GLDevice.renderTarget = this._shadowmapFBODynamic;
+                        }
+                        GLDevice.gl.viewport(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
+                        GLDevice.gl.scissor(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
+
+                        this._renderContext.fillUniformBuffersPerLightView(light);
+                        // disable color output
+                        this.setRenderStateSet(this._renderStatesShadow);
+                        GLDevice.clearColor = new vec4([1, 0, 0, 1]);
+                        GLDevice.clearDepth = 1.0;
+                        GLDevice.clear(true, true, true);
+                        // render opaque objects which can drop shadow
+                        GLPrograms.useProgram(this._shadowProgram);
+                        inited = true;
+                    }
+
+                    this._renderContext.fillUniformBuffersPerObject(item);
+
+                    // draw item geometry
+                    if (GLPrograms.currProgram) {
+                        item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
+                    }
+                    this._currentObject = item.object;
+                }
             }
         }
     }
@@ -802,7 +847,6 @@ export class ClusteredForwardRenderer {
             }
         }
         GLDevice.renderTarget = null;
-        // todo: debug draw the shadowmap on a screen rect
     }
 
     private updateShadowMapFor(light: BaseLight) {
@@ -812,21 +856,71 @@ export class ClusteredForwardRenderer {
 
             // if shadowmap not generated yet, generate
 
-            // if light moved, update
             light.shadow.updateShadowMatrices();
+            if (light.shadow.dirty) {
+                this._renderContext.fillUniformBuffersPerLightView(light);
+                // disable color output
+                this.setRenderStateSet(this._renderStatesShadow);
+                GLDevice.clearColor = new vec4([1,0,0,1]);
+                GLDevice.clearDepth = 1.0;
+                GLPrograms.useProgram(this._shadowProgram);
 
-            // check moved meshes, if there is one can cast shadow moving in light view, update
-            const sphere = new BoundingSphere();
-            for(let i = 0; i < this._curNumMovedObjects; i++) {
-                const mesh = this._objectsMoved[i];
-                if (mesh && mesh.geometry) {
-                    mesh.geometry.boundingSphere.transform(mesh.worldTransform, sphere);
-                    if (light.shadow.frustum.intersectsSphere(sphere)) {
-                        light.shadow.dirty = true;
+                // if light moved, update static shadowmap. draw static objects to it.
+                GLDevice.renderTarget = this._shadowmapFBOStatic;
+                GLDevice.gl.viewport(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
+                GLDevice.gl.scissor(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
+
+                GLDevice.clear(true, true, true);
+                // render opaque objects which can drop shadow
+                // todo: point light's frustum is not a view frustum, but a bouding box
+                this.renderShadowItems(this._renderListOpaque, light, true);
+
+                // and if there is any dynamic object in light view, update dynamic shadowmap too.
+                GLDevice.renderTarget = this._shadowmapFBODynamic;
+                // need call viewport and scissor again?
+                GLDevice.gl.viewport(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
+                GLDevice.gl.scissor(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
+                GLDevice.clear(true, true, true);
+                // render opaque objects which can drop shadow
+                // todo: point light's frustum is not a view frustum, but a bouding box
+                this.renderShadowItems(this._renderListOpaque, light, false);
+
+                light.shadow.dirty = false;
+            } else {
+                // else (light did not move),
+                this.renderShadowItems(this._renderListOpaque, light, false);
+                // check moved meshes, if there is one can cast shadow moving in light view, update dynamic shadowmap
+                /*
+                const sphere = new BoundingSphere();
+                const inited = false;
+                for(let i = 0; i < this._curNumMovedObjects; i++) {
+                    const mesh = this._objectsMoved[i];
+                    if (mesh && mesh.geometry && mesh.castShadow) {
+                        mesh.geometry.boundingSphere.transform(mesh.worldTransform, sphere);
+                        if (light.shadow.frustum.intersectsSphere(sphere)) {
+                            if (!inited) {
+                                GLDevice.renderTarget = this._shadowmapFBODynamic;
+                                GLDevice.gl.viewport(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
+                                GLDevice.gl.scissor(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
+
+                                this._renderContext.fillUniformBuffersPerLightView(light);
+                                // disable color output
+                                this.setRenderStateSet(this._renderStatesShadow);
+                                GLDevice.clearColor = new vec4([1,0,0,1]);
+                                GLDevice.clearDepth = 1.0;
+                                GLDevice.clear(true, true, true);
+                                // render opaque objects which can drop shadow
+                                GLPrograms.useProgram(this._shadowProgram);
+                            }
+                            // todo: render this object only?
+                            // this._renderContext.fillUniformBuffersPerObject()
+                        }
                     }
                 }
+                */
             }
 
+            /*
             if (light.shadow.dirty) {
                 GLDevice.renderTarget = this._shadowmapFBODynamic;
                 GLDevice.gl.viewport(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
@@ -841,10 +935,11 @@ export class ClusteredForwardRenderer {
                 // render opaque objects which can drop shadow
                 GLPrograms.useProgram(this._shadowProgram);
                 // todo: point light's frustum is not a view frustum, but a bouding box
-                this.renderShadowItems(this._renderListOpaque, light.shadow.frustum);
+                this.renderShadowItems(this._renderListOpaque, light.shadow.frustum, true);
 
                 light.shadow.dirty = false;
             }
+            */
         }
     }
 }

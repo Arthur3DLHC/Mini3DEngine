@@ -17,6 +17,7 @@ export class Object3D {
         this.localTransform = mat4.identity.copy();
         this.worldTransform = mat4.identity.copy();
         this.worldTransformPrev = mat4.identity.copy();
+        this._moved = false;
         this.castShadow = false;
         this.receiveShadow = false;
         this.occlusionQuery = false;
@@ -48,6 +49,11 @@ export class Object3D {
     public worldTransform : mat4;
     // todo: prev frame world transform? for temporal effects?
     public worldTransformPrev: mat4;
+
+    private _moved: boolean;
+    public get moved(): boolean {
+        return this._moved;
+    }
 
     public castShadow: boolean;
     public receiveShadow: boolean;
@@ -162,6 +168,8 @@ export class Object3D {
         } else {
             this.localTransform.copy(this.worldTransform);
         }
+
+        this._moved = ! this.worldTransformPrev.equals(this.worldTransform);
 
         if( updateChildren ) {
             for (const child of this._children) {
