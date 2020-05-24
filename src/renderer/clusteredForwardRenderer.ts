@@ -227,6 +227,8 @@ export class ClusteredForwardRenderer {
         this._renderContext.bindUniformBlocks(this._depthPrepassProgram);
         this._renderContext.bindUniformBlocks(this._occlusionQueryProgram);
         this._renderContext.bindUniformBlocks(this._screenRectProgram);
+
+        this._frustum = new Frustum();
     }
 
     private _renderListDepthPrepass: RenderList;
@@ -299,6 +301,8 @@ export class ClusteredForwardRenderer {
     private _samplerUniformsStdPBR: SamplerUniforms | null;
     private _samplerUniformsScreenRect: SamplerUniforms | null;
 
+    private _frustum: Frustum;
+
     public render(scene: Scene) {
         GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, null);
         GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, null);
@@ -343,11 +347,16 @@ export class ClusteredForwardRenderer {
         GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, this._shadowmapAtlasStatic.texture);
         GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, this._shadowmapAtlasDynamic.texture);
 
+        const matViewProj = new mat4();
+
         // fix me: for simplicity, use only one camera; or occlusion query can not work.
         for (let icam = 0; icam < this._renderContext.cameras.length; icam++) {
             const camera = this._renderContext.cameras[icam];
             // todo: calculate frustum
-            const frustum = new Frustum();
+            mat4.product(camera.projTransform, camera.viewTransform, matViewProj);
+
+            this._frustum.setFromProjectionMatrix(matViewProj);
+
             // Test code: set render target
             // GLDevice.renderTarget = this._shadowmapFBODynamic;
 
@@ -378,9 +387,9 @@ export class ClusteredForwardRenderer {
            // GLDevice.gl.colorMask(false, false, false, false);
             //GLDevice.gl.depthFunc(GLDevice.gl.LEQUAL);
             //GLDevice.gl.disable(GLDevice.gl.BLEND);
-            this.renderDepthPrepass(frustum);
+            this.renderDepthPrepass(this._frustum);
             //GLDevice.gl.colorMask(true, true, true, true);
-            this.renderOpaque(frustum);
+            this.renderOpaque(this._frustum);
             // this.renderTransparent();
 
             // todo: render sprites
@@ -666,13 +675,22 @@ export class ClusteredForwardRenderer {
         }
     }
     private renderItems(renderList: RenderList, frustum: Frustum, ignoreMaterial: boolean = false, checkOcclusionResults: boolean = false) {
+        
+        const sphere = new BoundingSphere();
+
         for (let i = 0; i < renderList.ItemCount; i++) {
             const item = renderList.getItemAt(i);
             if (item) {
+                
                 if (checkOcclusionResults && !item.object.occlusionQueryResult) {
                     continue;
                 }
+
                 // todo frustum culling
+                item.geometry.boundingSphere.transform(item.object.worldTransform, sphere);
+                if (!frustum.intersectsSphere(sphere)) {
+                    continue;
+                }
 
                 // item may be animated
                 //if (this._currentObject !== item.object) {
