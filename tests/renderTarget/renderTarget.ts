@@ -18,7 +18,7 @@ window.onload = () => {
     const camera = new PerspectiveCamera();
     camera.aspect = canvas.width / canvas.height;
     camera.far = 20;
-    camera.localTransform.fromTranslation(new vec3([0, 0, 5]));
+    camera.localTransform.fromTranslation(new vec3([0, 0, 8]));
     scene.attachChild(camera);
 
     // todo: test multiple objects in scene at same time
@@ -84,7 +84,7 @@ window.onload = () => {
     // plane
     const planeMesh = new Mesh();
     planeMesh.name = "plane01";
-    planeMesh.localTransform.fromTranslation(new vec3([0, -1, 0]));
+    planeMesh.localTransform.fromTranslation(new vec3([0, -2, 0]));
     planeMesh.geometry = new PlaneGeometry(20, 20, 1, 1);
     planeMesh.castShadow = true;
     planeMesh.isStatic = true;
