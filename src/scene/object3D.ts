@@ -11,6 +11,7 @@ export class Object3D {
         this.visible = true;
         this.color = new vec4([1,1,1,1]);
         this._active = true;
+        this.isStatic = false;
         this.behaviors = [];
         this.parent = null;
         this._children = [];
@@ -41,6 +42,8 @@ export class Object3D {
     public get active(): boolean {
         return this._active;
     }
+
+    public isStatic: boolean;
 
     // 在对象这里，只存变换矩阵；由附加的变换组件来计算这些矩阵？
     // 组件机制之后再实现？

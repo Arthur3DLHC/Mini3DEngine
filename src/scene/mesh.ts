@@ -14,6 +14,7 @@ export class Mesh extends Object3D {
     // todo: material list
     public materials: Material[];
 
+
     public provideRenderItem(renderList: RenderList) {
         if (this.geometry) {
             if (this.geometry.groups) {

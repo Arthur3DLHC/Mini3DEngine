@@ -84,6 +84,8 @@ void main(void)
 
         float rangeAttenuation = 1.0;
         float spotAttenuation = 1.0;
+        float shadow = 1.0;
+
         vec3 lightPosition = light.transform[3].xyz;
         vec3 lightDir = (light.transform * vec4(0.0, 0.0, -1.0, 0.0)).xyz;
         // vec3 lightDir = vec3(0.0, 0.0, -1.0);
@@ -108,8 +110,9 @@ void main(void)
             }
         }
 
+        // todo: check n dot l early? but if is subsurface material...
+
         // todo: test shadow
-        float shadow = 1.0;
         if (getLightCastShadow(light)) {
             mat4 matShadow = mat4(0.0);
             if (lightType != LightType_Point) {
@@ -119,6 +122,7 @@ void main(void)
                 // if point light, need to du a custom cube shadow map sampling
             }
             vec4 projPosition = matShadow * vec4(ex_worldPosition, 1.0);
+            vec3 shadowCoord = projPosition.xyz / projPosition.w;
             // debug shadow texture
             // float shadow = texture(s_shadowAtlasDynamic, projPosition.xy).r;
             // f_diffuse.r += shadow;
@@ -126,7 +130,11 @@ void main(void)
             //vec3 uvw = projPosition.xyz / projPosition.w;
             //uvw.xyz = uvw.xyz * 0.5 + vec3(0.5);
             //shadow = texture(s_shadowAtlasDynamic, uvw);
-            shadow = texture(s_shadowAtlasDynamic, projPosition.xyz / projPosition.w);
+            shadow = texture(s_shadowAtlasStatic, shadowCoord);
+            if(shadow < 0.001) {
+                continue;
+            }
+            shadow = texture(s_shadowAtlasDynamic, shadowCoord);
             if(shadow < 0.001) {
                 continue;
             }
@@ -134,14 +142,12 @@ void main(void)
 
         // test range attenuation
         // o.color = vec4(rangeAttenuation, rangeAttenuation, rangeAttenuation, 1.0);
-
-        vec3 intensity = rangeAttenuation * spotAttenuation * light.color.rgb * shadow;
-
         vec3 l = normalize(pointToLight);   // Direction from surface point to light
         float NdotL = clampedDot(n, l);
         // float NdotV = clampedDot(n, v);  // 前面已经算过了，与光源无关
         if (NdotL > 0.0 || NdotV > 0.0)
         {
+            vec3 intensity = rangeAttenuation * spotAttenuation * light.color.rgb * shadow;
             // these values may be used by sheen, clearcoat, subsurface or other effets
             // if so, they may be need to move outside
             vec3 h = normalize(l + v);          // Direction of the vector between l and v, called halfway vector

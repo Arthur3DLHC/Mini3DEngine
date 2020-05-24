@@ -5,8 +5,8 @@ import vec3 from "../../lib/tsm/vec3.js"
  */
 export class BoundingBox {
     public constructor(minPt?: vec3, maxPt?: vec3) {
-        this.minPoint = new vec3([-Infinity, -Infinity, -Infinity]);
-        this.maxPoint = new vec3([Infinity, Infinity, Infinity]);
+        this.minPoint = new vec3([Infinity, Infinity, Infinity]);
+        this.maxPoint = new vec3([-Infinity, -Infinity, -Infinity]);
         if (minPt) {
             minPt.copy(this.minPoint);
         }

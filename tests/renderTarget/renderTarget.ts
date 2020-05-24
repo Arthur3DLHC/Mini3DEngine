@@ -66,6 +66,7 @@ window.onload = () => {
     cylinderMesh.localTransform.fromTranslation(new vec3([3, 0, 0]));
     cylinderMesh.geometry = new CylinderGeometry(1, 2, 24);
     cylinderMesh.castShadow = true;
+    cylinderMesh.isStatic = true;
     const cylinderMtl = new StandardPBRMaterial();
     cylinderMtl.color = new vec4([0.0, 1.0, 0.0, 1.0]);
     cylinderMtl.emissive = new vec4([0.5, 0.5, 0.5, 1]);
@@ -86,6 +87,7 @@ window.onload = () => {
     planeMesh.localTransform.fromTranslation(new vec3([0, -1, 0]));
     planeMesh.geometry = new PlaneGeometry(20, 20, 1, 1);
     planeMesh.castShadow = true;
+    planeMesh.isStatic = true;
     const planeMtl = new StandardPBRMaterial();
     planeMtl.color = new vec4([0.0, 0.0, 1.0, 1.0]);
     planeMtl.metallic = 0.0;
