@@ -3,6 +3,7 @@ import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "../common/behaviors/autoRotateBehavior.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
+import { FirstPersonViewBehavior } from "../common/behaviors/firstPersonViewBehavior.js";
 
 window.onload = () => {
     const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
@@ -19,7 +20,32 @@ window.onload = () => {
     camera.aspect = canvas.width / canvas.height;
     camera.far = 20;
     camera.localTransform.fromTranslation(new vec3([0, 0, 8]));
+
+    // first person view controller
+    const fpsBehavior = new FirstPersonViewBehavior(camera);
+    camera.behaviors.push(fpsBehavior);
+    fpsBehavior.position = new vec3([0, 0, 8]);
     scene.attachChild(camera);
+
+    window.onmousedown = (ev: MouseEvent) => {
+        fpsBehavior.onMouseDown(ev);
+    }
+
+    window.onmouseup = (ev: MouseEvent) => {
+        fpsBehavior.onMouseUp(ev);
+    }
+
+    window.onmousemove = (ev: MouseEvent) => {
+        fpsBehavior.onMouseMove(ev);
+    }
+
+    window.onkeydown = (ev: KeyboardEvent) => {
+        fpsBehavior.onKeyDown(ev);
+    }
+
+    window.onkeyup = (ev: KeyboardEvent) => {
+        fpsBehavior.onKeyUp(ev);
+    }
 
     // todo: test multiple objects in scene at same time
 

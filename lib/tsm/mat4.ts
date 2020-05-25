@@ -290,16 +290,18 @@ export default class mat4 {
         return this
     }
 
-    multiplyVec3(vector: vec3): vec3 {
+    multiplyVec3(vector: vec3, dest?: vec3): vec3 {
+        if (!dest) {
+            dest = new vec3();
+        }
         const x = vector.x
         const y = vector.y
         const z = vector.z
 
-        return new vec3([
-            this._values[0] * x + this._values[4] * y + this._values[8] * z + this._values[12],
-            this._values[1] * x + this._values[5] * y + this._values[9] * z + this._values[13],
-            this._values[2] * x + this._values[6] * y + this._values[10] * z + this._values[14],
-        ])
+        dest.x = this._values[0] * x + this._values[4] * y + this._values[8] * z + this._values[12];
+        dest.y = this._values[1] * x + this._values[5] * y + this._values[9] * z + this._values[13];
+        dest.z = this._values[2] * x + this._values[6] * y + this._values[10] * z + this._values[14];
+        return dest;
     }
 
     multiplyVec4(vector: vec4, dest?: vec4): vec4 {
@@ -629,6 +631,13 @@ export default class mat4 {
         out.y = this._values[13];
         out.z = this._values[14];
         return out;
+    }
+
+    setTranslation(translation: vec3): mat4 {
+        this._values[12] = translation.x;
+        this._values[13] = translation.y;
+        this._values[14] = translation.z;
+        return this;
     }
 
     getScaling(out: vec3): vec3 {

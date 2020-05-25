@@ -1,4 +1,4 @@
-import { Behavior, Object3D, KeyCodes } from "../../../src/miniEngine.js";
+import { Behavior, Object3D, KeyCodes, Clock } from "../../../src/miniEngine.js";
 import vec2 from "../../../lib/tsm/vec2.js";
 import vec3 from "../../../lib/tsm/vec3.js";
 import mat4 from "../../../lib/tsm/mat4.js";
@@ -12,6 +12,8 @@ export class FirstPersonViewBehavior extends Behavior {
         this.yaw = 0;
         this.pitch = 0;
         this.moveDir = new vec3();
+        this.position = new vec3();
+        this.moveSpeed = 1.0;
 
         this.keyForward = KeyCodes.w;
         this.keyBackward = KeyCodes.s;
@@ -37,6 +39,7 @@ export class FirstPersonViewBehavior extends Behavior {
     public mouseSensitivity: number;
     public smoothMouse: boolean;
     public smoothness: number;
+    public moveSpeed: number;
 
     public keyForward: number;
     public keyBackward: number;
@@ -48,6 +51,7 @@ export class FirstPersonViewBehavior extends Behavior {
     public yaw: number;
     public pitch: number;
     public moveDir: vec3;
+    public position: vec3;
 
     private _dragging: boolean;
     private _oldMousePos: vec2;
@@ -141,8 +145,8 @@ export class FirstPersonViewBehavior extends Behavior {
     }
 
     public update() {
-        this.yaw += this._deltaRot.x * this.smoothness;
-        this.pitch += this._deltaRot.y * this.smoothness;
+        this.yaw -= this._deltaRot.x * this.smoothness;
+        this.pitch -= this._deltaRot.y * this.smoothness;
 
         this._deltaRot.x -= this._deltaRot.x * this.smoothness;
         this._deltaRot.y -= this._deltaRot.y * this.smoothness;
@@ -179,8 +183,13 @@ export class FirstPersonViewBehavior extends Behavior {
         } else if (this.isMovingDown) {
             this.moveDir.y = -1;
         }
+        this.moveDir.normalize();
+
+        this.owner.localTransform.multiplyVec3(this.moveDir, this.moveDir);
+
+        this.position.add(this.moveDir.scale(Clock.instance.elapsedTime * this.moveSpeed));
 
         // todo: update local transform of owner
-        this.owner.localTransform.translate(this.moveDir);
+        this.owner.localTransform.setTranslation(this.position);
     }
 }
