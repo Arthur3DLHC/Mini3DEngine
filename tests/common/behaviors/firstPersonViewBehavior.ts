@@ -1,5 +1,7 @@
 import { Behavior, Object3D } from "../../../src/miniEngine.js";
 import vec2 from "../../../lib/tsm/vec2.js";
+import vec3 from "../../../lib/tsm/vec3.js";
+import mat4 from "../../../lib/tsm/mat4.js";
 
 export class FirstPersonViewBehavior extends Behavior {
     public constructor(owner: Object3D) {
@@ -9,9 +11,12 @@ export class FirstPersonViewBehavior extends Behavior {
         this.smoothness = 0.25;
         this.yaw = 0;
         this.pitch = 0;
+        this.moveDir = new vec3();
         this._dragging = false;
-        this._oldPos = new vec2();
+        this._oldMousePos = new vec2();
         this._deltaRot = new vec2();
+        this._matRotYaw = mat4.identity.copy();
+        this._matRotPitch = mat4.identity.copy();
     }
 
     public mouseSensitivity: number;
@@ -20,10 +25,14 @@ export class FirstPersonViewBehavior extends Behavior {
 
     public yaw: number;
     public pitch: number;
+    public moveDir: vec3;
 
     private _dragging: boolean;
-    private _oldPos: vec2;
+    private _oldMousePos: vec2;
     private _deltaRot: vec2;
+
+    private _matRotYaw: mat4;
+    private _matRotPitch: mat4;
 
     // todo: keyboard and mouse input event handlers
     public onMouseDown(ev: MouseEvent) {
@@ -32,8 +41,8 @@ export class FirstPersonViewBehavior extends Behavior {
             return;
         }
         this._dragging = true;
-        this._oldPos.x = ev.clientX;
-        this._oldPos.y = ev.clientY;
+        this._oldMousePos.x = ev.clientX;
+        this._oldMousePos.y = ev.clientY;
     }
 
     public onMouseUp(ev: MouseEvent) {
@@ -45,11 +54,11 @@ export class FirstPersonViewBehavior extends Behavior {
             return;
         }
 
-        this._deltaRot.x += (ev.clientX - this._oldPos.x) * this.mouseSensitivity;
-        this._deltaRot.y += (ev.clientY - this._oldPos.y) * this.mouseSensitivity;
+        this._deltaRot.x += (ev.clientX - this._oldMousePos.x) * this.mouseSensitivity;
+        this._deltaRot.y += (ev.clientY - this._oldMousePos.y) * this.mouseSensitivity;
 
-        this._oldPos.x = ev.clientX;
-        this._oldPos.y = ev.clientY;
+        this._oldMousePos.x = ev.clientX;
+        this._oldMousePos.y = ev.clientY;
     }
 
     public onKeyDown(ev: KeyboardEvent) {
@@ -74,9 +83,16 @@ export class FirstPersonViewBehavior extends Behavior {
             this.pitch = -1.56;
         }
 
-        // todo: compute position
+        // compute rotation matrix
+        this._matRotYaw.fromYRotation(this.yaw);
+        this._matRotPitch.fromXRotation(this.pitch);
+        
+        mat4.product(this._matRotYaw, this._matRotPitch, this.owner.localTransform);
+
+        // todo: compute move dir in local space
+
 
         // todo: update local transform of owner
-
+        this.owner.localTransform.translate(this.moveDir);
     }
 }
