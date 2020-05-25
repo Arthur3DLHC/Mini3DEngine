@@ -36,46 +36,47 @@ export class Texture2D extends Texture {
         if (this.glTexture) {
             throw new Error("Already created.");
         }
-        this.glTexture = GLDevice.gl.createTexture();
+        const gl = GLDevice.gl;
+        this.glTexture = gl.createTexture();
 
-        GLDevice.gl.activeTexture(GLDevice.gl.TEXTURE0);
-        GLDevice.gl.bindTexture(GLDevice.gl.TEXTURE_2D, this.glTexture);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.glTexture);
 
         // initialize tex by gl.TexImage2D
         const internalFmt = GLTextures.internalFormatFrom(this.format, this.componentType);
-        GLDevice.gl.texImage2D(GLDevice.gl.TEXTURE_2D, 0, internalFmt, this.width, this.height, 0, this.format, this.componentType, null);
+        gl.texImage2D(gl.TEXTURE_2D, 0, internalFmt, this.width, this.height, 0, this.format, this.componentType, null);
 
-        if (this.format === GLDevice.gl.DEPTH_COMPONENT || this.format === GLDevice.gl.DEPTH_STENCIL && this.isShadowMap) {
+        if (this.format === gl.DEPTH_COMPONENT || this.format === gl.DEPTH_STENCIL && this.isShadowMap) {
             // enable texture compare, so sampler2DShadow can work
-            GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_COMPARE_MODE, GLDevice.gl.COMPARE_REF_TO_TEXTURE);
-            GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_COMPARE_FUNC, GLDevice.gl.LEQUAL);
-            GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_MIN_FILTER, GLDevice.gl.LINEAR);  // PCF shadow
-            GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_MAG_FILTER, GLDevice.gl.LINEAR);
-            GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_WRAP_S, GLDevice.gl.CLAMP_TO_EDGE);
-            GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_WRAP_T, GLDevice.gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_MODE, gl.COMPARE_REF_TO_TEXTURE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_FUNC, gl.LEQUAL);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);  // PCF shadow
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         } else {
-            GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_COMPARE_MODE, GLDevice.gl.NONE);
-            GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_COMPARE_FUNC, GLDevice.gl.ALWAYS);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_MODE, gl.NONE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_FUNC, gl.ALWAYS);
             // set sampler state
             // 设置一次后，会记录在纹理对象中；下次修改之前，只要绑定了此纹理，自动应用它记录的 sampler state
             if (this.samplerState) {
-                GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_MIN_FILTER, this.samplerState.minFilter);
-                GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_MAG_FILTER, this.samplerState.magFilter);
-                GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_WRAP_S, this.samplerState.wrapS);
-                GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_WRAP_T, this.samplerState.wrapT);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this.samplerState.minFilter);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this.samplerState.magFilter);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, this.samplerState.wrapS);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, this.samplerState.wrapT);
             } else {
                 // default for frame buffer objects
-                GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_MIN_FILTER, GLDevice.gl.NEAREST);
-                GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_MAG_FILTER, GLDevice.gl.NEAREST);
-                GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_WRAP_S, GLDevice.gl.CLAMP_TO_EDGE);
-                GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.TEXTURE_WRAP_T, GLDevice.gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             }
         }
 
         // anisotropy not supported by webgl?
-        // GLDevice.gl.texParameteri(GLDevice.gl.TEXTURE_2D, GLDevice.gl.texture_max_)
+        // gl.texParameteri(gl.TEXTURE_2D, gl.texture_max_)
 
-        GLDevice.gl.bindTexture(GLDevice.gl.TEXTURE_2D, null);
+        gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
     public upload() {

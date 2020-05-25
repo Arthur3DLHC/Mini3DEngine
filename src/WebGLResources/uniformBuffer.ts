@@ -203,24 +203,26 @@ export class UniformBuffer {
         // 用当前 buffer 数据创建glUniformBuffer对象
         this._bufferData = new Float32Array(this._data);
         console.log("build uniform buffer [" + this.name + "] with byte size: " + this._bufferData.byteLength );
-        this.glBuffer = GLDevice.gl.createBuffer();
-        GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, this.glBuffer);
+        const gl = GLDevice.gl;
+        this.glBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.UNIFORM_BUFFER, this.glBuffer);
         if (this._dynamic) {
-            GLDevice.gl.bufferData(GLDevice.gl.UNIFORM_BUFFER, this._bufferData, GLDevice.gl.DYNAMIC_DRAW);
+            gl.bufferData(gl.UNIFORM_BUFFER, this._bufferData, gl.DYNAMIC_DRAW);
         } else {
-            GLDevice.gl.bufferData(GLDevice.gl.UNIFORM_BUFFER, this._bufferData, GLDevice.gl.STATIC_DRAW);
+            gl.bufferData(gl.UNIFORM_BUFFER, this._bufferData, gl.STATIC_DRAW);
         }
-        GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, null);
+        gl.bindBuffer(gl.UNIFORM_BUFFER, null);
     }
 
     public update() {
         if (!this.glBuffer || !this._bufferData) {
             throw new Error("Can not update ubo before build");
         }
+        const gl = GLDevice.gl;
         // console.log("update uniform buffer [" + this.name + "] with byte size: " + this._bufferData.byteLength );
-        GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, this.glBuffer);
-        GLDevice.gl.bufferSubData(GLDevice.gl.UNIFORM_BUFFER, 0, this._bufferData);
-        GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, null);
+        gl.bindBuffer(gl.UNIFORM_BUFFER, this.glBuffer);
+        gl.bufferSubData(gl.UNIFORM_BUFFER, 0, this._bufferData);
+        gl.bindBuffer(gl.UNIFORM_BUFFER, null);
     }
 
     /**
@@ -238,9 +240,10 @@ export class UniformBuffer {
         //    throw new Error("buffer overrun");
         // }
         // console.log("update uniform buffer [" + this.name + "] with length: " + length );
-        GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, this.glBuffer);
-        GLDevice.gl.bufferSubData(GLDevice.gl.UNIFORM_BUFFER, dstByteOffset, data, srcElemOffset, length);
-        GLDevice.gl.bindBuffer(GLDevice.gl.UNIFORM_BUFFER, null);
+        const gl = GLDevice.gl;
+        gl.bindBuffer(gl.UNIFORM_BUFFER, this.glBuffer);
+        gl.bufferSubData(gl.UNIFORM_BUFFER, dstByteOffset, data, srcElemOffset, length);
+        gl.bindBuffer(gl.UNIFORM_BUFFER, null);
     }
     
     public release() {

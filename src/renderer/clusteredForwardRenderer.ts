@@ -60,8 +60,8 @@ export class ClusteredForwardRenderer {
 
     public constructor() {
         this._drawDebugTexture = true;
-
-        GLDevice.gl.enable(GLDevice.gl.SCISSOR_TEST);
+        const gl = GLDevice.gl;
+        gl.enable(gl.SCISSOR_TEST);
 
         this._renderListDepthPrepass = new RenderList();
         this._renderListOpaque = new RenderList();
@@ -117,11 +117,11 @@ export class ClusteredForwardRenderer {
         this._shadowmapAtlasStatic.texture.depth = 1;
         // this._shadowmapAtlasDynamic.texture.isShadowMap = true;
         this._shadowmapAtlasStatic.texture.isShadowMap = true; // debug draw
-        this._shadowmapAtlasStatic.texture.format = GLDevice.gl.DEPTH_STENCIL;
-        this._shadowmapAtlasStatic.texture.componentType = GLDevice.gl.UNSIGNED_INT_24_8;
+        this._shadowmapAtlasStatic.texture.format = gl.DEPTH_STENCIL;
+        this._shadowmapAtlasStatic.texture.componentType = gl.UNSIGNED_INT_24_8;
         // debug draw:
-        // this._shadowmapAtlasDynamic.texture.format = GLDevice.gl.RGBA;
-        // this._shadowmapAtlasDynamic.texture.componentType = GLDevice.gl.UNSIGNED_BYTE;
+        // this._shadowmapAtlasDynamic.texture.format = gl.RGBA;
+        // this._shadowmapAtlasDynamic.texture.componentType = gl.UNSIGNED_BYTE;
         this._shadowmapAtlasStatic.texture.create();
 
 
@@ -135,11 +135,11 @@ export class ClusteredForwardRenderer {
         this._shadowmapAtlasDynamic.texture.depth = 1;
         // this._shadowmapAtlasDynamic.texture.isShadowMap = true;
         this._shadowmapAtlasDynamic.texture.isShadowMap = true; // debug draw
-        this._shadowmapAtlasDynamic.texture.format = GLDevice.gl.DEPTH_STENCIL;
-        this._shadowmapAtlasDynamic.texture.componentType = GLDevice.gl.UNSIGNED_INT_24_8;
+        this._shadowmapAtlasDynamic.texture.format = gl.DEPTH_STENCIL;
+        this._shadowmapAtlasDynamic.texture.componentType = gl.UNSIGNED_INT_24_8;
         // debug draw:
-        // this._shadowmapAtlasDynamic.texture.format = GLDevice.gl.RGBA;
-        // this._shadowmapAtlasDynamic.texture.componentType = GLDevice.gl.UNSIGNED_BYTE;
+        // this._shadowmapAtlasDynamic.texture.format = gl.RGBA;
+        // this._shadowmapAtlasDynamic.texture.componentType = gl.UNSIGNED_BYTE;
         this._shadowmapAtlasDynamic.texture.create();
 
         this._decalAtlas = new TextureAtlas2D();
@@ -153,8 +153,8 @@ export class ClusteredForwardRenderer {
         // this._debugDepthTexture.height = GLDevice.canvas.height;
         this._debugDepthTexture.depth = 1;
         this._debugDepthTexture.isShadowMap = false;
-        this._debugDepthTexture.format = GLDevice.gl.RGBA;
-        this._debugDepthTexture.componentType = GLDevice.gl.UNSIGNED_BYTE;
+        this._debugDepthTexture.format = gl.RGBA;
+        this._debugDepthTexture.componentType = gl.UNSIGNED_BYTE;
         this._debugDepthTexture.create();
 
         this._shadowmapFBOStatic = new FrameBuffer();
@@ -304,6 +304,7 @@ export class ClusteredForwardRenderer {
     private _frustum: Frustum;
 
     public render(scene: Scene) {
+        const gl = GLDevice.gl;
         GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, null);
         GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, null);
 
@@ -362,11 +363,11 @@ export class ClusteredForwardRenderer {
 
             // set viewport
             if (camera.viewport) {
-                GLDevice.gl.viewport(camera.viewport.x, camera.viewport.y, camera.viewport.z, camera.viewport.w);    
-                GLDevice.gl.scissor(camera.viewport.x, camera.viewport.y, camera.viewport.z, camera.viewport.w);
+                gl.viewport(camera.viewport.x, camera.viewport.y, camera.viewport.z, camera.viewport.w);    
+                gl.scissor(camera.viewport.x, camera.viewport.y, camera.viewport.z, camera.viewport.w);
             } else {
-                GLDevice.gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
-                GLDevice.gl.scissor(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+                gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+                gl.scissor(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
             }
 
             // need to allow color write and depth write
@@ -384,11 +385,11 @@ export class ClusteredForwardRenderer {
 
             // todo: sort the renderlists first?
 
-           // GLDevice.gl.colorMask(false, false, false, false);
-            //GLDevice.gl.depthFunc(GLDevice.gl.LEQUAL);
-            //GLDevice.gl.disable(GLDevice.gl.BLEND);
+           // gl.colorMask(false, false, false, false);
+            //gl.depthFunc(gl.LEQUAL);
+            //gl.disable(gl.BLEND);
             this.renderDepthPrepass(this._frustum);
-            //GLDevice.gl.colorMask(true, true, true, true);
+            //gl.colorMask(true, true, true, true);
             this.renderOpaque(this._frustum);
             // this.renderTransparent();
 
@@ -405,50 +406,51 @@ export class ClusteredForwardRenderer {
     }
 
     private createRenderStates() {
-        this._renderStatesShadow.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.LEQUAL);
-        this._renderStatesShadow.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
-        this._renderStatesShadow.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+        const gl = GLDevice.gl;
+        this._renderStatesShadow.depthState = RenderStateCache.instance.getDepthStencilState(true, true, gl.LEQUAL);
+        this._renderStatesShadow.blendState = RenderStateCache.instance.getBlendState(false, gl.FUNC_ADD, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        this._renderStatesShadow.cullState = RenderStateCache.instance.getCullState(true, gl.BACK);
         if (this._drawDebugTexture) {
             this._renderStatesShadow.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
         } else {
             this._renderStatesShadow.colorWriteState = RenderStateCache.instance.getColorWriteState(false, false, false, false);
         }
 
-        this._renderStatesDepthPrepass.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.LEQUAL);
-        this._renderStatesDepthPrepass.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
-        this._renderStatesDepthPrepass.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+        this._renderStatesDepthPrepass.depthState = RenderStateCache.instance.getDepthStencilState(true, true, gl.LEQUAL);
+        this._renderStatesDepthPrepass.blendState = RenderStateCache.instance.getBlendState(false, gl.FUNC_ADD, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        this._renderStatesDepthPrepass.cullState = RenderStateCache.instance.getCullState(true, gl.BACK);
         this._renderStatesDepthPrepass.colorWriteState = RenderStateCache.instance.getColorWriteState(false, false, false, false);
         // debug show depth prepass output
         // this._renderStatesDepthPrepass.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
 
-        this._renderStatesOpaque.depthState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.LEQUAL);
-        this._renderStatesOpaque.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
-        this._renderStatesOpaque.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+        this._renderStatesOpaque.depthState = RenderStateCache.instance.getDepthStencilState(true, true, gl.LEQUAL);
+        this._renderStatesOpaque.blendState = RenderStateCache.instance.getBlendState(false, gl.FUNC_ADD, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        this._renderStatesOpaque.cullState = RenderStateCache.instance.getCullState(true, gl.BACK);
         this._renderStatesOpaque.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
 
-        this._renderStatesOpaqueOcclusion.depthState = RenderStateCache.instance.getDepthStencilState(true, false, GLDevice.gl.LESS);
-        this._renderStatesOpaqueOcclusion.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
-        this._renderStatesOpaqueOcclusion.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+        this._renderStatesOpaqueOcclusion.depthState = RenderStateCache.instance.getDepthStencilState(true, false, gl.LESS);
+        this._renderStatesOpaqueOcclusion.blendState = RenderStateCache.instance.getBlendState(false, gl.FUNC_ADD, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        this._renderStatesOpaqueOcclusion.cullState = RenderStateCache.instance.getCullState(true, gl.BACK);
         this._renderStatesOpaqueOcclusion.colorWriteState = RenderStateCache.instance.getColorWriteState(false, false, false, false);
 
-        this._renderStatesTransparent.depthState = RenderStateCache.instance.getDepthStencilState(true, false, GLDevice.gl.LESS);
-        this._renderStatesTransparent.blendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
-        this._renderStatesTransparent.cullState = RenderStateCache.instance.getCullState(false, GLDevice.gl.BACK);
+        this._renderStatesTransparent.depthState = RenderStateCache.instance.getDepthStencilState(true, false, gl.LESS);
+        this._renderStatesTransparent.blendState = RenderStateCache.instance.getBlendState(true, gl.FUNC_ADD, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        this._renderStatesTransparent.cullState = RenderStateCache.instance.getCullState(false, gl.BACK);
         this._renderStatesTransparent.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
 
-        this._renderStatesTransparentOcclusion.depthState = RenderStateCache.instance.getDepthStencilState(true, false, GLDevice.gl.LESS);
-        this._renderStatesTransparentOcclusion.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
-        this._renderStatesTransparentOcclusion.cullState = RenderStateCache.instance.getCullState(true, GLDevice.gl.BACK);
+        this._renderStatesTransparentOcclusion.depthState = RenderStateCache.instance.getDepthStencilState(true, false, gl.LESS);
+        this._renderStatesTransparentOcclusion.blendState = RenderStateCache.instance.getBlendState(false, gl.FUNC_ADD, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        this._renderStatesTransparentOcclusion.cullState = RenderStateCache.instance.getCullState(true, gl.BACK);
         this._renderStatesTransparentOcclusion.colorWriteState = RenderStateCache.instance.getColorWriteState(false, false, false, false);
 
-        this._renderStatesScrRectOpaque.depthState = RenderStateCache.instance.getDepthStencilState(false, false, GLDevice.gl.ALWAYS);
-        this._renderStatesScrRectOpaque.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
-        this._renderStatesScrRectOpaque.cullState = RenderStateCache.instance.getCullState(false, GLDevice.gl.BACK);
+        this._renderStatesScrRectOpaque.depthState = RenderStateCache.instance.getDepthStencilState(false, false, gl.ALWAYS);
+        this._renderStatesScrRectOpaque.blendState = RenderStateCache.instance.getBlendState(false, gl.FUNC_ADD, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        this._renderStatesScrRectOpaque.cullState = RenderStateCache.instance.getCullState(false, gl.BACK);
         this._renderStatesScrRectOpaque.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
     
-        this._renderStatesScrRectTransparent.depthState = RenderStateCache.instance.getDepthStencilState(false, false, GLDevice.gl.ALWAYS);
-        this._renderStatesScrRectTransparent.blendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
-        this._renderStatesScrRectTransparent.cullState = RenderStateCache.instance.getCullState(false, GLDevice.gl.BACK);
+        this._renderStatesScrRectTransparent.depthState = RenderStateCache.instance.getDepthStencilState(false, false, gl.ALWAYS);
+        this._renderStatesScrRectTransparent.blendState = RenderStateCache.instance.getBlendState(true, gl.FUNC_ADD, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        this._renderStatesScrRectTransparent.cullState = RenderStateCache.instance.getCullState(false, gl.BACK);
         this._renderStatesScrRectTransparent.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
     }
 
@@ -732,6 +734,7 @@ export class ClusteredForwardRenderer {
         if (!light.shadow) {
             return;
         }
+        const gl = GLDevice.gl;
         let inited = false;
         const sphere = new BoundingSphere();
         for (let i = 0; i < renderList.ItemCount; i++) {
@@ -755,8 +758,8 @@ export class ClusteredForwardRenderer {
                         } else {
                             GLDevice.renderTarget = this._shadowmapFBODynamic;
                         }
-                        GLDevice.gl.viewport(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
-                        GLDevice.gl.scissor(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
+                        gl.viewport(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
+                        gl.scissor(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
 
                         this._renderContext.fillUniformBuffersPerLightView(light);
                         // disable color output
@@ -791,10 +794,10 @@ export class ClusteredForwardRenderer {
             if (item) {
                 if (occlusionQuery) {
                     if (!item.object.occlusionQueryID) {
-                        item.object.occlusionQueryID = GLDevice.gl.createQuery();
+                        item.object.occlusionQueryID = gl.createQuery();
                     }
                     if (item.object.occlusionQueryID) {
-                        GLDevice.gl.beginQuery(GLDevice.gl.ANY_SAMPLES_PASSED, item.object.occlusionQueryID);
+                        gl.beginQuery(gl.ANY_SAMPLES_PASSED, item.object.occlusionQueryID);
                     }
                 }
                 // todo: draw bounding box
@@ -804,7 +807,7 @@ export class ClusteredForwardRenderer {
                 // 因为一个 object 可能会提供多个 renderItem
                 if (occlusionQuery) {
                     if (item.object.occlusionQueryID) {
-                        GLDevice.gl.endQuery(GLDevice.gl.ANY_SAMPLES_PASSED);
+                        gl.endQuery(gl.ANY_SAMPLES_PASSED);
                     }
                 }
             }

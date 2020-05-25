@@ -10,20 +10,21 @@ export class SamplerUniforms {
         if (!program.glProgram) {
             throw new Error("Program not built yet");
         }
+        const gl = GLDevice.gl;
         this._uniformLocations = {};
         this._uniformInfos = {};
-        const count = GLDevice.gl.getProgramParameter(program.glProgram, GLDevice.gl.ACTIVE_UNIFORMS);
+        const count = gl.getProgramParameter(program.glProgram, gl.ACTIVE_UNIFORMS);
         for (let i = 0; i < count; i++) {
-            const info = GLDevice.gl.getActiveUniform(program.glProgram, i);
+            const info = gl.getActiveUniform(program.glProgram, i);
             if (info) {
-                if (info.type === GLDevice.gl.SAMPLER_2D
-                    || info.type === GLDevice.gl.SAMPLER_3D
-                    || info.type === GLDevice.gl.SAMPLER_CUBE
-                    || info.type === GLDevice.gl.SAMPLER_2D_SHADOW
-                    || info.type === GLDevice.gl.SAMPLER_2D_ARRAY
-                    || info.type === GLDevice.gl.SAMPLER_2D_ARRAY_SHADOW
-                    || info.type === GLDevice.gl.SAMPLER_CUBE_SHADOW ) {
-                        const location = GLDevice.gl.getUniformLocation(program.glProgram, info.name);
+                if (info.type === gl.SAMPLER_2D
+                    || info.type === gl.SAMPLER_3D
+                    || info.type === gl.SAMPLER_CUBE
+                    || info.type === gl.SAMPLER_2D_SHADOW
+                    || info.type === gl.SAMPLER_2D_ARRAY
+                    || info.type === gl.SAMPLER_2D_ARRAY_SHADOW
+                    || info.type === gl.SAMPLER_CUBE_SHADOW ) {
+                        const location = gl.getUniformLocation(program.glProgram, info.name);
                         if (location) {
                             this._uniformInfos[info.name] = info;
                             this._uniformLocations[info.name] = location;
