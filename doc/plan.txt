@@ -141,6 +141,25 @@ TODO:       主要类结构
 -----------------------------------------------------
                     Mesh, light 对相机 Frustum 的剔除；
                     优化：应该通过 gl.BlitFrameBuffer 将静态阴影图集中的子图拷贝到动态阴影图集；
+                        维护两个纹理，两个FBO：shadowmapAtlas 和 shadowmapCacheAtlas
+                        shader 中只使用 shadowmapAtlas
+                        一个标志：cacheDirty
+                        当光源运动时
+                            清 shadowmapAtlas
+                            直接向 ShadowmapAtlas 中渲染静态和动态物体
+                            置 cacheDirty = true
+                        当光源不动时
+                            置 cacheCopied = false;
+                            如果 cacheDirty == true,
+                                清 shadowmapCacheAtlas; 
+                                渲染所有静态物体到 shadowmapCacheAtlas;
+                                将 cache 拷贝到 shadowmapAtlas
+                                置 cacheCopied = true;
+                                置 cacheDirty = false
+                            如果光源中有动态物体，则
+                                如果 cacheCopied == false，拷贝；
+                                向 shadowmapAtlas 中渲染动态物体（不清深度缓冲）
+
                     点光源的阴影；
                         需要向阴影图集中渲染六次；占用六个连续子图；
                         shader 中判断如果是点光源，需要计算像素处于哪个frustum并根据预置的投影矩阵计算投影坐标；

@@ -24,7 +24,8 @@ export class GLDevice {
     }
 
     private static _canvas: HTMLCanvasElement;
-    private static _renderTarget: FrameBuffer | null;
+    private static _renderTarget: FrameBuffer | null = null;
+    private static _sourceFBO: FrameBuffer | null = null;
     private static _clearColor: vec4 = new vec4([0,0,1,1]);
     private static _clearDepth: number = 1;
     private static _clearStencil: number = 1;
@@ -69,6 +70,22 @@ export class GLDevice {
 
     public static get renderTarget(): FrameBuffer | null {
         return GLDevice._renderTarget;
+    }
+
+    public static set sourceFBO(source: FrameBuffer | null) {
+        if (this._sourceFBO !== source) {
+            if (source) {
+                source.prepare();
+                GLDevice.gl.bindFramebuffer(GLDevice.gl.READ_FRAMEBUFFER, source.glFrameBuffer);
+            } else {
+                GLDevice.gl.bindFramebuffer(GLDevice.gl.READ_FRAMEBUFFER, null);
+            }
+            this._sourceFBO = source;
+        }
+    }
+
+    public static get sourceFBO(): FrameBuffer | null {
+        return this._sourceFBO;
     }
 
     public static set clearColor(color: vec4) {

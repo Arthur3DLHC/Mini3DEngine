@@ -99,8 +99,7 @@ export class ClusteredForwardRenderer {
         this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
         this._rectTransform = new mat4();
 
-        this._shadowmapAtlasStaticUnit = 0;
-        this._shadowmapAtlasDynamicUnit = 1;
+        this._shadowmapAtlasUnit = 1;
         this._decalAtlasUnit = 2;
         this._envMapArrayUnit = 3;
         this._irradianceVolumeAtlasUnit = 4;
@@ -113,39 +112,39 @@ export class ClusteredForwardRenderer {
         // 如果它设为可以给动态物体产生阴影，则单将动态物体绘制到另一张动态shadowmap中；
         // 绘制对象时需要同时从这两张 shadowmap 中查询
         // 能否用同一张纹理的两个通道呢？用 colorwritemask 实现分别绘制？
-        this._shadowmapAtlasStatic = new ShadowmapAtlas();
-        this._shadowmapAtlasStatic.texture = new Texture2D();
-        this._shadowmapAtlasStatic.texture.width = 4096;
-        this._shadowmapAtlasStatic.texture.height = 4096;
+        this._shadowmapAtlasCache = new ShadowmapAtlas();
+        this._shadowmapAtlasCache.texture = new Texture2D();
+        this._shadowmapAtlasCache.texture.width = 4096;
+        this._shadowmapAtlasCache.texture.height = 4096;
         // this._shadowmapAtlasDynamic.texture.width = GLDevice.canvas.width;
         // this._shadowmapAtlasDynamic.texture.height = GLDevice.canvas.height;
-        this._shadowmapAtlasStatic.texture.depth = 1;
+        this._shadowmapAtlasCache.texture.depth = 1;
         // this._shadowmapAtlasDynamic.texture.isShadowMap = true;
-        this._shadowmapAtlasStatic.texture.isShadowMap = true; // debug draw
-        this._shadowmapAtlasStatic.texture.format = gl.DEPTH_STENCIL;
-        this._shadowmapAtlasStatic.texture.componentType = gl.UNSIGNED_INT_24_8;
+        this._shadowmapAtlasCache.texture.isShadowMap = true; // debug draw
+        this._shadowmapAtlasCache.texture.format = gl.DEPTH_STENCIL;
+        this._shadowmapAtlasCache.texture.componentType = gl.UNSIGNED_INT_24_8;
         // debug draw:
         // this._shadowmapAtlasDynamic.texture.format = gl.RGBA;
         // this._shadowmapAtlasDynamic.texture.componentType = gl.UNSIGNED_BYTE;
-        this._shadowmapAtlasStatic.texture.create();
+        this._shadowmapAtlasCache.texture.create();
 
 
-        this._shadowmapAtlasDynamic = new ShadowmapAtlas();
+        this._shadowmapAtlas = new ShadowmapAtlas();
         // todo: create atlas texture
-        this._shadowmapAtlasDynamic.texture = new Texture2D();
-        this._shadowmapAtlasDynamic.texture.width = 4096;
-        this._shadowmapAtlasDynamic.texture.height = 4096;
+        this._shadowmapAtlas.texture = new Texture2D();
+        this._shadowmapAtlas.texture.width = 4096;
+        this._shadowmapAtlas.texture.height = 4096;
         // this._shadowmapAtlasDynamic.texture.width = GLDevice.canvas.width;
         // this._shadowmapAtlasDynamic.texture.height = GLDevice.canvas.height;
-        this._shadowmapAtlasDynamic.texture.depth = 1;
+        this._shadowmapAtlas.texture.depth = 1;
         // this._shadowmapAtlasDynamic.texture.isShadowMap = true;
-        this._shadowmapAtlasDynamic.texture.isShadowMap = true; // debug draw
-        this._shadowmapAtlasDynamic.texture.format = gl.DEPTH_STENCIL;
-        this._shadowmapAtlasDynamic.texture.componentType = gl.UNSIGNED_INT_24_8;
+        this._shadowmapAtlas.texture.isShadowMap = true; // debug draw
+        this._shadowmapAtlas.texture.format = gl.DEPTH_STENCIL;
+        this._shadowmapAtlas.texture.componentType = gl.UNSIGNED_INT_24_8;
         // debug draw:
         // this._shadowmapAtlasDynamic.texture.format = gl.RGBA;
         // this._shadowmapAtlasDynamic.texture.componentType = gl.UNSIGNED_BYTE;
-        this._shadowmapAtlasDynamic.texture.create();
+        this._shadowmapAtlas.texture.create();
 
         this._decalAtlas = new TextureAtlas2D();
         this._envMapArray = null;
@@ -162,21 +161,21 @@ export class ClusteredForwardRenderer {
         this._debugDepthTexture.componentType = gl.UNSIGNED_BYTE;
         this._debugDepthTexture.create();
 
-        this._shadowmapFBOStatic = new FrameBuffer();
-        this._shadowmapFBOStatic.depthStencilTexture = this._shadowmapAtlasStatic.texture;
+        this._shadowmapCacheFBO = new FrameBuffer();
+        this._shadowmapCacheFBO.depthStencilTexture = this._shadowmapAtlasCache.texture;
         if (this._debugDepthTexture) {
-            this._shadowmapFBOStatic.setTexture(0, this._debugDepthTexture);
+            this._shadowmapCacheFBO.setTexture(0, this._debugDepthTexture);
         }
-        this._shadowmapFBOStatic.prepare();
+        this._shadowmapCacheFBO.prepare();
 
-        this._shadowmapFBODynamic = new FrameBuffer();
+        this._shadowmapFBO = new FrameBuffer();
         // shadowmaps only need depthstencil
-        this._shadowmapFBODynamic.depthStencilTexture = this._shadowmapAtlasDynamic.texture;
+        this._shadowmapFBO.depthStencilTexture = this._shadowmapAtlas.texture;
         // debug draw:
         if (this._drawDebugTexture) {
             // this._shadowmapFBODynamic.setTexture(0, this._debugDepthTexture);
         }
-        this._shadowmapFBODynamic.prepare();
+        this._shadowmapFBO.prepare();
 
 
         this.registerShaderCodes();
@@ -276,20 +275,20 @@ export class ClusteredForwardRenderer {
 
     // todo: system textures: shadowmap atlas, decal atlas, envMap array, irradiance volumes
     // todo: system texture unit numbers
-    private _shadowmapAtlasStaticUnit: GLenum;
-    private _shadowmapAtlasDynamicUnit: GLenum;
+    // private _shadowmapAtlasStaticUnit: GLenum;
+    private _shadowmapAtlasUnit: GLenum;
     private _decalAtlasUnit: GLenum;
     private _envMapArrayUnit: GLenum;
     private _irradianceVolumeAtlasUnit: GLenum;
 
-    private _shadowmapAtlasStatic: ShadowmapAtlas;  // static objects only
-    private _shadowmapAtlasDynamic: ShadowmapAtlas; // dynamic objects only
+    private _shadowmapAtlasCache: ShadowmapAtlas;  // static objects only
+    private _shadowmapAtlas: ShadowmapAtlas; // dynamic objects only
     private _decalAtlas: TextureAtlas2D;
     private _envMapArray: Texture2DArray|null;
     private _irradianceVolumeAtlas: TextureAtlas3D;
 
-    private _shadowmapFBOStatic: FrameBuffer;
-    private _shadowmapFBODynamic: FrameBuffer;
+    private _shadowmapCacheFBO: FrameBuffer;
+    private _shadowmapFBO: FrameBuffer;
     private _debugDepthTexture: Texture2D;        // debug use
     private _drawDebugTexture: boolean;
 
@@ -313,8 +312,8 @@ export class ClusteredForwardRenderer {
     public render(scene: Scene) {
         const gl = GLDevice.gl;
 
-        GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, null);
-        GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, null);
+        // GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, null);
+        GLTextures.setTextureAt(this._shadowmapAtlasUnit, null);
 
         let shadowmapUpdated = false;
 
@@ -363,15 +362,14 @@ export class ClusteredForwardRenderer {
             // check which light need update
             // frustum culling, distance
             if (!shadowmapUpdated) {
-
                 this.updateShadowmaps(true);
                 shadowmapUpdated = true;
             }
 
             GLDevice.renderTarget = null;
 
-            GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, this._shadowmapAtlasStatic.texture);
-            GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, this._shadowmapAtlasDynamic.texture);
+            // GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, this._shadowmapAtlasCache.texture);
+            GLTextures.setTextureAt(this._shadowmapAtlasUnit, this._shadowmapAtlas.texture);
 
             // Test code: set render target
             // GLDevice.renderTarget = this._shadowmapFBODynamic;
@@ -524,11 +522,11 @@ export class ClusteredForwardRenderer {
                         if (light.shadow.shadowMap === null || light.shadow.mapSizeChanged) {
                             if (light.isStatic) {
                                 // todo: alloc shadowmap atlas
-                                this._shadowmapAtlasStatic.alloc(light.shadow);
+                                this._shadowmapAtlasCache.alloc(light.shadow);
                                 // light.shadow.shadowMap = this._shadowmapAtlasStatic.texture;
                             } else {
                                 // todo: alloc shadowmap atlas
-                                this._shadowmapAtlasDynamic.alloc(light.shadow);
+                                this._shadowmapAtlas.alloc(light.shadow);
                                 // light.shadow.shadowMap = this._shadowmapAtlasDynamic.texture;
                             }
                         }
@@ -614,8 +612,8 @@ export class ClusteredForwardRenderer {
         if (material instanceof StandardPBRMaterial) {
             // todo: need to bind per scene texture units to uniforms too?
             if (this._samplerUniformsStdPBR) {
-                this._samplerUniformsStdPBR.setTextureUnit("s_shadowAtlasStatic", this._shadowmapAtlasStaticUnit);
-                this._samplerUniformsStdPBR.setTextureUnit("s_shadowAtlasDynamic", this._shadowmapAtlasDynamicUnit);
+                // this._samplerUniformsStdPBR.setTextureUnit("s_shadowAtlasStatic", this._shadowmapAtlasStaticUnit);
+                this._samplerUniformsStdPBR.setTextureUnit("s_shadowAtlas", this._shadowmapAtlasUnit);
                 this._samplerUniformsStdPBR.setTextureUnit("s_decalAtlas", this._decalAtlasUnit);
                 this._samplerUniformsStdPBR.setTextureUnit("s_envMapArray", this._envMapArrayUnit);
                 this._samplerUniformsStdPBR.setTextureUnit("s_irrVolAtlas", this._irradianceVolumeAtlasUnit);
@@ -745,7 +743,7 @@ export class ClusteredForwardRenderer {
         }
     }
 
-    private renderShadowItems(renderList: RenderList, light: BaseLight, drawStatics: boolean) {
+    private renderShadowItems(renderList: RenderList, light: BaseLight, drawStatics: boolean, drawDynamics: boolean, target: FrameBuffer, copyCache: boolean) {
         if (!light.shadow) {
             return;
         }
@@ -760,28 +758,39 @@ export class ClusteredForwardRenderer {
                 // fix me: should add a staic flag to object
                 // static objects never move
                 // dynamic objects may move, or not move.
-                // const isStatic = !item.object.moved;
-                if (item.object.isStatic !== drawStatics) {
-                    continue;
+                if (item.object.isStatic) {
+                    if (! drawStatics) {
+                        continue;
+                    }
+                } else {
+                    if (! drawDynamics) {
+                        continue;
+                    }
                 }
-                // todo: check frustum culling
+                
+                // check frustum culling
                 item.geometry.boundingSphere.transform(item.object.worldTransform, sphere);
                 if (light.shadow.frustum.intersectsSphere(sphere)) {
                     if (!inited) {
-                        if (drawStatics) {
-                            GLDevice.renderTarget = this._shadowmapFBOStatic;
-                        } else {
-                            GLDevice.renderTarget = this._shadowmapFBODynamic;
-                        }
+                        GLDevice.renderTarget = target;
+
                         gl.viewport(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
                         gl.scissor(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
+                        this.setRenderStateSet(this._renderStatesShadow);
+
+                        if (copyCache && (target !== this._shadowmapCacheFBO)) {
+                            this.copyShadowFromCache(light.shadow);
+                        }
 
                         this._renderContext.fillUniformBuffersPerLightView(light);
                         // disable color output
-                        this.setRenderStateSet(this._renderStatesShadow);
-                        GLDevice.clearColor = new vec4([1, 0, 0, 1]);
-                        GLDevice.clearDepth = 1.0;
-                        GLDevice.clear(true, true, true);
+
+                        if (!copyCache) {
+                            GLDevice.clearColor = new vec4([1, 0, 0, 1]);
+                            GLDevice.clearDepth = 1.0;
+                            GLDevice.clear(true, true, true);                            
+                        }
+
                         // render opaque objects which can drop shadow
                         GLPrograms.useProgram(this._shadowProgram);
                         inited = true;
@@ -797,6 +806,16 @@ export class ClusteredForwardRenderer {
                 }
             }
         }
+    }
+
+    private copyShadowFromCache(shadow: LightShadow) {
+        GLDevice.sourceFBO = this._shadowmapCacheFBO;
+        const x0 = shadow.mapRect.x;
+        const y0 = shadow.mapRect.y;
+        const x1 = shadow.mapRect.x + shadow.mapRect.z;
+        const y1 = shadow.mapRect.y + shadow.mapRect.w;
+        GLDevice.gl.blitFramebuffer(x0, y0, x1, y1, x0, y0, x1, y1, GLDevice.gl.DEPTH_BUFFER_BIT, GLDevice.gl.NEAREST);
+        GLDevice.sourceFBO = null;
     }
 
     private renderItemBoundingBoxes(renderList: RenderList, occlusionQuery: boolean = false) {
@@ -940,7 +959,6 @@ export class ClusteredForwardRenderer {
     }
 
     private updateShadowmaps(visibleLightsOnly: boolean) {
-        // iterate static lights
         if (visibleLightsOnly) {
             for (let i = 0; i < this._curNumVisibleLights; i++) {
                 const light = this._visibleLights[i];
@@ -949,6 +967,7 @@ export class ClusteredForwardRenderer {
                 }
             }
         } else {
+            // iterate static lights
             for (const light of this._renderContext.staticLights) {
                 if (light.shadow && light.castShadow) {
                     this.updateShadowMapFor(light);
@@ -976,19 +995,27 @@ export class ClusteredForwardRenderer {
             // if shadowmap not generated yet, generate
 
             light.shadow.updateShadowMatrices();
-            if (light.shadow.dirty) {
-                // render opaque objects which can drop shadow
-                // todo: point light's frustum is not a view frustum, but a bouding box
-                this.renderShadowItems(this._renderListOpaque, light, true);
-
-                // todo: point light's frustum is not a view frustum, but a bouding box
-                this.renderShadowItems(this._renderListOpaque, light, false);
-
-                light.shadow.dirty = false;
+            if (light.shadow.moved) {
+                // 如果光源移动或属性变化了，直接向 shadowmapAtlas 中绘制全部静态和动态物体
+                this.renderShadowItems(this._renderListOpaque, light, true, true, this._shadowmapFBO, false);
+                light.shadow.cached = false;
+                light.shadow.moved = false;
             } else {
                 // else (light did not move),
+                let cacheCopied = false;
+                if (!light.shadow.cached) {
+                    // todo: render all static meshes to cache
+                    this.renderShadowItems(this._renderListOpaque, light, true, false, this._shadowmapCacheFBO, false);
+                    light.shadow.cached = true;
+
+                    // copy from cache to shadowmap
+                    GLDevice.renderTarget = this._shadowmapFBO;
+                    this.copyShadowFromCache(light.shadow);
+                    cacheCopied = true;
+                }
+
                 // check moved meshes, if there is one can cast shadow moving in light view, update dynamic shadowmap
-                this.renderShadowItems(this._renderListOpaque, light, false);
+                this.renderShadowItems(this._renderListOpaque, light, false, true, this._shadowmapFBO, !cacheCopied);
             }
         }
     }

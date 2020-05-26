@@ -15,7 +15,8 @@ export class LightShadow {
         this.mapSize = new vec2([256, 256]);
         this.mapRect = new vec4([0, 0, 256, 256]);
         this.shadowMap = null;
-        this.dirty = true;
+        this.moved = true;
+        this.cached = false;
         this._matView = mat4.identity.copy();
         this._matProj = mat4.identity.copy();
         this.frustum = new Frustum();
@@ -49,8 +50,11 @@ export class LightShadow {
 
     /**
      * shadowmap needs update?
+     * maybe moved, also maybe light properties changed
      */
-    public dirty: boolean;
+    public moved: boolean;
+
+    public cached: boolean;
 
     protected _light: BaseLight;
 

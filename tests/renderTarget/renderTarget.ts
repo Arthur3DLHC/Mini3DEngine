@@ -54,7 +54,7 @@ window.onload = () => {
     boxMesh.name = "box01";
     boxMesh.geometry = new BoxGeometry(1, 1, 1);
     boxMesh.castShadow = true;
-    boxMesh.isStatic = true;
+    boxMesh.isStatic = false;
     // boxMesh.localTransform.fromTranslation(new vec3([0, 0, -5]));
     const boxMtl = new StandardPBRMaterial();
     boxMtl.color = new vec4([1.0, 1.0, 0.0, 1.0]);
@@ -63,8 +63,8 @@ window.onload = () => {
     boxMesh.materials.push(boxMtl);
 
     // auto rotate
-    // const boxAutoRot = new AutoRotateBehavior(boxMesh);
-    // boxMesh.behaviors.push(boxAutoRot);
+    const boxAutoRot = new AutoRotateBehavior(boxMesh);
+    boxMesh.behaviors.push(boxAutoRot);
 
     scene.attachChild(boxMesh);
 
@@ -73,7 +73,7 @@ window.onload = () => {
     sphereMesh.localTransform.fromTranslation(new vec3([0, 0, 3]));
     sphereMesh.geometry = new SphereGeometry(1, 16, 8);
     sphereMesh.castShadow = true;
-    sphereMesh.isStatic = true;
+    sphereMesh.isStatic = false;
     const sphereMtl = new StandardPBRMaterial();
     sphereMtl.color = new vec4([1.0, 0.0, 0.0, 1.0]);
     sphereMtl.metallic = 0.8;
