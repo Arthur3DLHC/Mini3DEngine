@@ -134,10 +134,10 @@ void main(void)
             if(shadow < 0.001) {
                 continue;
             }
-            shadow = texture(s_shadowAtlasDynamic, shadowCoord);
-            if(shadow < 0.001) {
-                continue;
-            }
+            //shadow = texture(s_shadowAtlasDynamic, shadowCoord);
+            //if(shadow < 0.001) {
+            //    continue;
+            //}
         }
 
         // test range attenuation
