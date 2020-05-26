@@ -140,8 +140,13 @@ TODO:       主要类结构
                         * 也按照和 depth prepass 类似的方法处理
 -----------------------------------------------------
                     Mesh, light 对相机 Frustum 的剔除；
-                    点光源的阴影；
                     优化：应该通过 gl.BlitFrameBuffer 将静态阴影图集中的子图拷贝到动态阴影图集；
+                    点光源的阴影；
+                        需要向阴影图集中渲染六次；占用六个连续子图；
+                        shader 中判断如果是点光源，需要计算像素处于哪个frustum并根据预置的投影矩阵计算投影坐标；
+
+            Instancing？
+
             间接光照
                 RenderTarget; 渲染到cubemap；
                 生成 envmap cube（64 x 64）

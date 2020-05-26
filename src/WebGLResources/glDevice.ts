@@ -1,6 +1,7 @@
 import { FrameBuffer } from "./frameBuffer.js";
 import { GLGeometryBuffers } from "./glGeometryBuffers.js";
 import vec4 from "../../lib/tsm/vec4.js";
+import { GLTextures } from "./glTextures.js";
 
 export class GLDevice {
     public static gl: WebGL2RenderingContext;
@@ -41,6 +42,22 @@ export class GLDevice {
         if (this._renderTarget !== renderTarget) {
             // if gl fbo not created, create it
             if (renderTarget) {
+                for (const tex of GLTextures.textures) {
+                    if (tex) {
+                        if (tex === renderTarget.depthStencilTexture) {
+                            throw new Error("Render target is using as texture");
+                        }
+
+                        for (let i = 0; i < 4; i++) {
+                            if (renderTarget.getTexture(i)) {
+                                if (tex === renderTarget.getTexture(i)) {
+                                    throw new Error("Render target is using as texture");
+                                }
+                            }
+                        }
+                    }
+                }
+
                 renderTarget.prepare();
                 GLDevice.gl.bindFramebuffer(GLDevice.gl.DRAW_FRAMEBUFFER, renderTarget.glFrameBuffer);
             } else {

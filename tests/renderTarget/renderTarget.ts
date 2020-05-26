@@ -54,6 +54,7 @@ window.onload = () => {
     boxMesh.name = "box01";
     boxMesh.geometry = new BoxGeometry(1, 1, 1);
     boxMesh.castShadow = true;
+    boxMesh.isStatic = true;
     // boxMesh.localTransform.fromTranslation(new vec3([0, 0, -5]));
     const boxMtl = new StandardPBRMaterial();
     boxMtl.color = new vec4([1.0, 1.0, 0.0, 1.0]);
@@ -62,8 +63,8 @@ window.onload = () => {
     boxMesh.materials.push(boxMtl);
 
     // auto rotate
-    const boxAutoRot = new AutoRotateBehavior(boxMesh);
-    boxMesh.behaviors.push(boxAutoRot);
+    // const boxAutoRot = new AutoRotateBehavior(boxMesh);
+    // boxMesh.behaviors.push(boxAutoRot);
 
     scene.attachChild(boxMesh);
 
@@ -72,6 +73,7 @@ window.onload = () => {
     sphereMesh.localTransform.fromTranslation(new vec3([0, 0, 3]));
     sphereMesh.geometry = new SphereGeometry(1, 16, 8);
     sphereMesh.castShadow = true;
+    sphereMesh.isStatic = true;
     const sphereMtl = new StandardPBRMaterial();
     sphereMtl.color = new vec4([1.0, 0.0, 0.0, 1.0]);
     sphereMtl.metallic = 0.8;
@@ -143,7 +145,7 @@ window.onload = () => {
 
     // 测试动态光源的阴影
     const spotLight01 = new SpotLight();
-    spotLight01.isStatic = false;
+    spotLight01.isStatic = true;
     spotLight01.on = true;
     spotLight01.color = new vec4([100, 100, 100, 1]);
     spotLight01.distance = 10;
@@ -158,7 +160,7 @@ window.onload = () => {
     scene.attachChild(spotLight01);
 
     const dirLight01 = new DirectionalLight();
-    dirLight01.isStatic = false;
+    dirLight01.isStatic = true;
     dirLight01.on = true;
     dirLight01.color = new vec4([3,3,3,1]);
     dirLight01.radius = 5;

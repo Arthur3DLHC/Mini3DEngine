@@ -626,7 +626,10 @@ export default class mat4 {
         return this;
     }
 
-    getTranslation(out: vec3): vec3 {
+    getTranslation(out?: vec3): vec3 {
+        if (!out) {
+            out = new vec3();
+        }
         out.x = this._values[12];
         out.y = this._values[13];
         out.z = this._values[14];

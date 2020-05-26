@@ -3,6 +3,7 @@ import { Texture } from "./textures/texture.js";
 import { Texture2D } from "./textures/texture2D.js";
 
 export class GLTextures {
+    public static textures: (Texture|null)[] = [];
     /**
      * 
      * @param format 
@@ -57,13 +58,25 @@ export class GLTextures {
     public static setTextureAt(unit: number, texture: Texture | null, target: GLenum = GLDevice.gl.TEXTURE_2D) {
         // fix me: optimize
         // 是否记录一下当前的所有unit的纹理对象，只有不同时才调用gl.bindTexture？
+
         GLDevice.gl.activeTexture(GLTextures.glUnitFrom(unit));
         if (texture) {
+            if (GLDevice.renderTarget) {
+                for(let i = 0; i < 4; i++) {
+                    if (GLDevice.renderTarget.getTexture(i) === texture) {
+                        throw new Error("texture is using as render target");
+                    }
+                }
+                if (GLDevice.renderTarget.depthStencilTexture === texture) {
+                    throw new Error("texture is using as render target");
+                }
+            }
             // todo: 2d or 3d or cube or array
             GLDevice.gl.bindTexture(texture.target, texture.glTexture);
         } else {
             GLDevice.gl.bindTexture(target, null);
         }
+        this.textures[unit] = texture;
     }
 
     public static setStartUnit(start: number) {

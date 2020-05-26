@@ -55,6 +55,9 @@ import { Frustum } from "../math/frustum.js"
 import { ShadowmapAtlas } from "./shadowmapAtlas.js";
 import { BoundingSphere } from "../math/boundingSphere.js";
 import { LightShadow } from "../scene/lights/lightShadow.js";
+import { PointLight } from "../scene/lights/pointLight.js";
+import { DirectionalLight } from "../scene/lights/directionalLight.js";
+import { SpotLight } from "../scene/lights/spotLight.js";
 
 export class ClusteredForwardRenderer {
 
@@ -75,6 +78,8 @@ export class ClusteredForwardRenderer {
         this._currentObject = null;
         this._objectsMoved = [];
         this._curNumMovedObjects = 0;
+        this._visibleLights = [];
+        this._curNumVisibleLights = 0;
 
         this._renderStatesShadow = new RenderStateSet();
         this._renderStatesDepthPrepass = new RenderStateSet();
@@ -169,9 +174,8 @@ export class ClusteredForwardRenderer {
         this._shadowmapFBODynamic.depthStencilTexture = this._shadowmapAtlasDynamic.texture;
         // debug draw:
         if (this._drawDebugTexture) {
-            this._shadowmapFBODynamic.setTexture(0, this._debugDepthTexture);
+            // this._shadowmapFBODynamic.setTexture(0, this._debugDepthTexture);
         }
-        // this._shadowmapFBODynamic.depthStencilTexture = this._debugDepthTexture;
         this._shadowmapFBODynamic.prepare();
 
 
@@ -251,6 +255,9 @@ export class ClusteredForwardRenderer {
     private _objectsMoved: Mesh[];
     private _curNumMovedObjects: number;
 
+    private _visibleLights: BaseLight[];
+    private _curNumVisibleLights: number;
+
     private _renderStatesShadow: RenderStateSet;
     private _renderStatesDepthPrepass: RenderStateSet;
     private _renderStatesOpaque: RenderStateSet;
@@ -305,6 +312,7 @@ export class ClusteredForwardRenderer {
 
     public render(scene: Scene) {
         const gl = GLDevice.gl;
+
         GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, null);
         GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, null);
 
@@ -315,7 +323,8 @@ export class ClusteredForwardRenderer {
             // dispatch static objects
             this.dispatchObjects(scene, true);
 
-            this.updateShadowmaps();
+
+            this.updateShadowmaps(false);
             shadowmapUpdated = true;
 
             this._renderContext.fillUniformBuffersPerScene();
@@ -337,17 +346,6 @@ export class ClusteredForwardRenderer {
         // dispatch dynamic objects
         this.dispatchObjects(scene, false);
 
-        // todo: update light shadowmaps
-        // check which light need update
-        // frustum culling, distance
-        if (!shadowmapUpdated) {
-            this.updateShadowmaps();
-            shadowmapUpdated = true;
-        }
-
-        GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, this._shadowmapAtlasStatic.texture);
-        GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, this._shadowmapAtlasDynamic.texture);
-
         const matViewProj = new mat4();
 
         // fix me: for simplicity, use only one camera; or occlusion query can not work.
@@ -357,6 +355,23 @@ export class ClusteredForwardRenderer {
             mat4.product(camera.projTransform, camera.viewTransform, matViewProj);
 
             this._frustum.setFromProjectionMatrix(matViewProj);
+
+            // todo: find lights in view then update shadowmaps only for them?
+            this.fetchVisibleLights();
+
+            // todo: update light shadowmaps
+            // check which light need update
+            // frustum culling, distance
+            if (!shadowmapUpdated) {
+
+                this.updateShadowmaps(true);
+                shadowmapUpdated = true;
+            }
+
+            GLDevice.renderTarget = null;
+
+            GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, this._shadowmapAtlasStatic.texture);
+            GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, this._shadowmapAtlasDynamic.texture);
 
             // Test code: set render target
             // GLDevice.renderTarget = this._shadowmapFBODynamic;
@@ -587,7 +602,7 @@ export class ClusteredForwardRenderer {
     }
     
     private bindTexturesPerScene() {
-        GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, this._shadowmapAtlasStatic.texture);
+        // GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, this._shadowmapAtlasStatic.texture);
         // GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, this._shadowmapAtlasDynamic.texture);
         GLTextures.setTextureAt(this._decalAtlasUnit, this._decalAtlas.texture);
         GLTextures.setTextureAt(this._envMapArrayUnit, this._envMapArray);
@@ -879,21 +894,75 @@ export class ClusteredForwardRenderer {
     private allocShadowmapAtlasLocations() {
         // todo: alloc shadowmap altas locaitons for static lights?
     }
-
-    private updateShadowmaps() {
-        // iterate static lights
+        
+    private fetchVisibleLights() {
+        this._curNumVisibleLights = 0;
         for (const light of this._renderContext.staticLights) {
-            if (light.shadow && light.castShadow) {
-                this.updateShadowMapFor(light);
+            if (light.on && this.lightIsInView(light)) {
+                this._visibleLights[this._curNumVisibleLights] = light;
+                this._curNumVisibleLights++;
+            }
+        }
+        for (const light of this._renderContext.dynamicLights) {
+            if (light.on && this.lightIsInView(light)) {
+                this._visibleLights[this._curNumVisibleLights] = light;
+                this._curNumVisibleLights++;
+            }
+        }
+    }
+
+    private lightIsInView(light: BaseLight): boolean {
+        if (light instanceof DirectionalLight) {
+            // if dir light, use object bounding box?
+            return true;            
+        } else if (light instanceof PointLight) {
+            // if point light or spot light, use bounding sphere?
+            const pointLight = light as PointLight;
+            if (light.distance <= 0) {
+                return true;                
+            } else {
+                const sphere = new BoundingSphere(light.worldTransform.getTranslation(), light.distance);
+                return this._frustum.intersectsSphere(sphere);
+            }
+        } else if (light instanceof SpotLight) {
+            const spotLight = light as SpotLight;
+            // fix me: use a cone or frustum for light?
+            if (light.distance <= 0) {
+                // todo: check light direction?
+                return true;
+            } else {
+                const sphere = new BoundingSphere(light.worldTransform.getTranslation(), light.distance);
+                // todo: check cone?
+                return this._frustum.intersectsSphere(sphere);
+            }
+        }
+        return false;
+    }
+
+    private updateShadowmaps(visibleLightsOnly: boolean) {
+        // iterate static lights
+        if (visibleLightsOnly) {
+            for (let i = 0; i < this._curNumVisibleLights; i++) {
+                const light = this._visibleLights[i];
+                if (light.shadow && light.castShadow) {
+                    this.updateShadowMapFor(light);
+                }
+            }
+        } else {
+            for (const light of this._renderContext.staticLights) {
+                if (light.shadow && light.castShadow) {
+                    this.updateShadowMapFor(light);
+                }
+            }
+    
+            // iterate dynamic lights
+            for (const light of this._renderContext.dynamicLights) {
+                if (light.shadow && light.castShadow) {
+                    this.updateShadowMapFor(light);
+                }
             }
         }
 
-        // iterate dynamic lights
-        for (const light of this._renderContext.dynamicLights) {
-            if (light.shadow && light.castShadow) {
-                this.updateShadowMapFor(light);
-            }
-        }
         GLDevice.renderTarget = null;
     }
 
@@ -901,6 +970,8 @@ export class ClusteredForwardRenderer {
         if (light.shadow && light.castShadow && light.on) {
 
             // todo: cull light outside view frustum
+            // use a bounding sphere for light? or use frustum?
+            // transform light frustum to NDC space, then cull against AABB?
 
             // if shadowmap not generated yet, generate
 
