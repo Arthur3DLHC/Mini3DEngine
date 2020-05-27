@@ -58,6 +58,9 @@ import { LightShadow } from "../scene/lights/lightShadow.js";
 import { PointLight } from "../scene/lights/pointLight.js";
 import { DirectionalLight } from "../scene/lights/directionalLight.js";
 import { SpotLight } from "../scene/lights/spotLight.js";
+import { BoundingBox } from "../math/boundingBox.js";
+import vec3 from "../../lib/tsm/vec3.js";
+import { DirectionalLightShadow } from "../scene/lights/directionalLightShadow.js";
 
 export class ClusteredForwardRenderer {
 
@@ -933,7 +936,18 @@ export class ClusteredForwardRenderer {
     private lightIsInView(light: BaseLight): boolean {
         if (light instanceof DirectionalLight) {
             // if dir light, use object bounding box?
-            return true;            
+            const dirLight = light as DirectionalLight;
+            const dirShadow = dirLight.shadow as DirectionalLightShadow;
+            let radius = dirLight.radius;
+            if (dirShadow.radius > 0) {
+                radius = dirShadow.radius;
+            }
+            let distance = 20;
+            if(dirShadow.distance > 0) distance = dirShadow.distance;
+            const box = new BoundingBox(new vec3([-radius, -radius, -distance]),
+                                        new vec3([radius, radius, 0]));
+
+            return this._frustum.intersectsTransformedBox(box, light.worldTransform);
         } else if (light instanceof PointLight) {
             // if point light or spot light, use bounding sphere?
             const pointLight = light as PointLight;

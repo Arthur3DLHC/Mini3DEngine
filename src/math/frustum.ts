@@ -60,6 +60,47 @@ export class Frustum {
         return true;
     }
 
+    /**
+     * 
+     * @param box 
+     * @param transform NOTE: can only have rotation, translation and uniform scaling
+     */
+    public intersectsTransformedBox(box: BoundingBox, transform: mat4): boolean {
+        // fix me: transform 8 points?
+        // or transform planes to local space of box?
+        // guess and test:
+        // if transform the plane normal from local to world, use the M.inverse().transpose() matrix
+        // so, if transform from world to local, use M.inverse().inverse().transpose() = M.transpose() ?
+        const matNormal = transform.copy();
+        matNormal.transpose();
+
+        const matPosition = transform.copy();
+        matPosition.inverse();
+
+        const normal = new vec3();
+        const coplanarPoint = new vec3();
+
+        const tmpPlane = new Plane();
+
+        for (let i = 0; i < this.planes.length; i++) {
+            const plane = this.planes[i];
+            matNormal.multiplyVec3Normal(plane.normal, normal);
+            plane.normal.scale(-plane.constant, coplanarPoint);
+            matPosition.multiplyVec3(coplanarPoint, coplanarPoint);
+
+            tmpPlane.setFromNormalAndPoint(normal, coplanarPoint);
+            // corner at max distance
+            Frustum._tmpVector.x = normal.x > 0 ? box.maxPoint.x : box.minPoint.x;
+            Frustum._tmpVector.y = normal.y > 0 ? box.maxPoint.y : box.minPoint.y;
+            Frustum._tmpVector.z = normal.z > 0 ? box.maxPoint.z : box.minPoint.z;
+
+            if (tmpPlane.distanceToPoint(Frustum._tmpVector) < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public containsPoint(point: vec3): boolean {
         for ( let i = 0; i < this.planes.length; i ++ ) {
 			if ( this.planes[ i ].distanceToPoint( point ) < 0 ) {

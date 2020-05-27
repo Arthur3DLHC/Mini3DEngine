@@ -52,6 +52,13 @@ export class Plane {
         return this;
     }
 
+    public setFromNormalAndPoint(normal: vec3, point: vec3): Plane {
+        this.normal = normal.copy();
+        this.normal.normalize();
+        this.constant = - vec3.dot( this.normal, point );
+        return this;
+    }
+
     public normalize(): Plane {
         // from babylon.js
         var norm = (Math.sqrt((this.normal.x * this.normal.x) + (this.normal.y * this.normal.y) + (this.normal.z * this.normal.z)));
@@ -88,9 +95,10 @@ export class Plane {
     }
 
     public static fromNormalAndPoint(normal: vec3, point: vec3): Plane {
-        normal.normalize();
-        const d = - vec3.dot( normal, point );
-        return new Plane(normal.x, normal.y, normal.z, d);
+        // normal.normalize();
+        // const d = - vec3.dot( normal, point );
+        // return new Plane(normal.x, normal.y, normal.z, d);
+        return new Plane().setFromNormalAndPoint(normal, point);
     }
 
     // todo: position check methods
