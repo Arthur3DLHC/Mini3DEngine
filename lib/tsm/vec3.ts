@@ -163,14 +163,14 @@ export default class vec3 {
         return this
     }
 
-    scale(value: number, dest?: vec3): vec3 {
-        if (!dest) { dest = this }
+    scale(value: number): vec3 {
+        // if (!dest) { dest = this }
 
-        dest.x = this.x * value
-        dest.y = this.y * value
-        dest.z = this.z * value
+        this.x = this.x * value
+        this.y = this.y * value
+        this.z = this.z * value
 
-        return dest
+        return this
     }
 
     normalize(dest?: vec3): vec3 {

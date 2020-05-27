@@ -85,7 +85,8 @@ export class Frustum {
         for (let i = 0; i < this.planes.length; i++) {
             const plane = this.planes[i];
             matNormal.multiplyVec3Normal(plane.normal, normal);
-            plane.normal.scale(-plane.constant, coplanarPoint);
+            plane.normal.copy(coplanarPoint);
+            coplanarPoint.scale(-plane.constant);
             matPosition.multiplyVec3(coplanarPoint, coplanarPoint);
 
             tmpPlane.setFromNormalAndPoint(normal, coplanarPoint);
