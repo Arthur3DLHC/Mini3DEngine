@@ -161,8 +161,27 @@ TODO:       主要类结构
 -----------------------------------------------------
 
                     点光源的阴影；
-                        需要向阴影图集中渲染六次；占用六个连续子图；
-                        shader 中判断如果是点光源，需要计算像素处于哪个frustum并根据预置的投影矩阵计算投影坐标；
+                        怎样为点光源阴影申请图集子图？
+                            需要向阴影图集中渲染六次；占用同一行的六个连续子图；如果本行不够六个的空间，则直接从下一行开始？
+                            将列表中的六个元素都记录为该 lightShadow 对象?
+                            lightShadow 对象中的矩形记录为第一个子图的矩形？或者在 pointLightShadow 对象中使用一个矩形列表？
+                            或者直接在 lightShadow 中使用一个列表来记录子图矩形？
+                            对 shadowmap 分辨率做限制，不能使用太高分辨率的？
+
+                        怎样在 Shader 中使用
+                            传入 shader 的不是投影矩阵；将第一个子图矩形的位置传入；
+                                或者由于点光源的变换矩阵不用完整传入，只传入一个中心点位置即可，
+                                能否利用 worldMatrix 和 projMatrix 余下的总共 7 个 vec4 传入所有子图的矩形位置？
+                                这样就不用约束六个子图必须在同一行上了；
+                            shader 中判断如果是点光源，需要计算像素处于哪个 frustum，获得 cubeface 编号；
+                            根据 cubeface 编号计算视空间的三个轴vx, vy, vz;
+                                posLightLocal = （像素位置 - 光源位置）;
+                                posView.x = dot(posLightLocal, vx);
+                                posView.y = dot(posLightLocal, vy);
+                                posView.z = dot(posLightLocal, vz); // 实际上这三步可以通过直接取该轴对应的分量完成，简化运算
+                                posProj = matShadowProj * posView;
+                                posNDC = posProj / w;
+                                uvw = posNDC 应用子图视口变换；
 
             Instancing？
 
