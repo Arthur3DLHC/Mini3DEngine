@@ -206,6 +206,10 @@ TODO:       主要类结构
                 Occlusion query object 分组；用 instancing 方式绘制？因为都是 box
 
             Clustered 光源、envmap、irradiance volume
+                fillItemsPerView
+                    加一个参数：checkClusters
+                        主画面渲染，设为true;
+                        Cubemap 或 Shadowmap 渲染，设为 false；分辨率较低，而且是类似 bake 阶段，无需 Clustered
 
             加载贴图
                 sampler state
