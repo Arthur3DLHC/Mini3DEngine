@@ -13,25 +13,15 @@ class shadowMapList {
 
     public alloc(shadow: LightShadow, texture: Texture2D) {
         if (shadow instanceof PointLightShadow) {
-            throw new Error("Not implemented");
+            // check if there are continue 6 ?
+            // or can add 6 faces saparated ?
+            // pay attention to removing;
+            for(let iface = 0; iface < 6; iface++) {
+                this.allocSingleFace(shadow, iface, texture);
+            }
+
         } else {
-            for (let i = 0; i < this.shadows.length; i++) {
-                const shadowmap = this.shadows[i];
-                if (shadowmap === null || shadowmap.shadowMap === null) {
-                    this.shadows[i] = shadow;
-                    shadow.shadowMap = texture;
-                    this.calcLocation(shadow, i, 0, texture);
-                    return;
-                }
-            }
-            // no unused locations found, alloc new one
-            // todo: calc locaiton rectangle
-            if (this.shadows.length >= this.maxCount) {
-                throw new Error("too much shadowmaps with size:" + shadow.mapSize.x);
-            }
-            this.shadows.push(shadow);
-            shadow.shadowMap = texture;
-            this.calcLocation(shadow, this.shadows.length - 1, 0, texture);
+            this.allocSingleFace(shadow, 0, texture);
         }
     }
 
@@ -39,8 +29,9 @@ class shadowMapList {
         for (let i = 0; i < this.shadows.length; i++) {
             const element = this.shadows[i];
             if (element === shadow) {
-                shadow.shadowMap = null;
+                shadow.shadowMap = null;    // mark the list as unused
                 this.shadows[i] = null;
+                // do not break because point lights may take 6 elements in list.
             }
         }
     }
@@ -56,6 +47,26 @@ class shadowMapList {
             mapRect.y = row * height + this.startY;
             mapRect.z = width;
             mapRect.w = height;
+    }
+
+    private allocSingleFace(shadow: LightShadow, iface: number, texture: Texture2D) {
+        for (let i = 0; i < this.shadows.length; i++) {
+            const shadowmap = this.shadows[i];
+            if (shadowmap === null || shadowmap.shadowMap === null) {
+                this.shadows[i] = shadow;
+                shadow.shadowMap = texture;
+                this.calcLocation(shadow, i, iface, texture);
+                return;
+            }
+        }
+        // no unused locations found, alloc new one
+        // todo: calc locaiton rectangle
+        if (this.shadows.length >= this.maxCount) {
+            throw new Error("too much shadowmaps with size:" + shadow.mapSize.x);
+        }
+        this.shadows.push(shadow);
+        shadow.shadowMap = texture;
+        this.calcLocation(shadow, this.shadows.length - 1, iface, texture);
     }
 }
 
