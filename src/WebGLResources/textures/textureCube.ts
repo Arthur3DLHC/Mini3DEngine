@@ -1,6 +1,7 @@
 import { Texture } from "./texture.js";
 import { GLDevice } from "../glDevice.js";
 import mat4 from "../../../lib/tsm/mat4.js";
+import vec3 from "../../../lib/tsm/vec3.js";
 
 export class TextureCube extends Texture {
     public constructor() {
@@ -42,27 +43,20 @@ export class TextureCube extends Texture {
     public static readonly face_positive_z = 4;
     public static readonly face_negative_z = 5;
 
+    public static readonly face_view_matrices: mat4[] = [
+        // +x, -x
+        mat4.lookAt(vec3.zero, new vec3([1, 0, 0]), new vec3([0, 1, 0])), mat4.lookAt(vec3.zero, new vec3([-1, 0, 0]), new vec3([0, 1, 0])),
+        // +y, -y
+        mat4.lookAt(vec3.zero, new vec3([0, 1, 0]), new vec3([0, 0, 1])), mat4.lookAt(vec3.zero, new vec3([0, -1, 0]), new vec3([0, 0, -1])),
+        // +z, -z
+        mat4.lookAt(vec3.zero, new vec3([0, 0, 1]), new vec3([0, 1, 0])), mat4.lookAt(vec3.zero, new vec3([0, 0, -1]), new vec3([0, 1, 0])),
+    ];
+
     public static glCubeFaceFromIndex(faceId: number): GLenum {
         return GLDevice.gl.TEXTURE_CUBE_MAP_POSITIVE_X + faceId;
     }
 
-    public static getFaceViewMatrix(faceId: number, result: mat4) {
-        switch (faceId) {
-            case this.face_positive_x:
-                break;
-            case this.face_negative_x:
-                break;
-            case this.face_positive_y:
-                break;
-            case this.face_negative_y:
-                break;
-            case this.face_positive_z:
-                break;
-            case this.face_negative_z:
-                break;
-            default:
-                break;
-        }
-        throw new Error("Not implemented.")
+    public static getFaceViewMatrix(faceId: number): mat4 {
+        return this.face_view_matrices[faceId];
     }
 }

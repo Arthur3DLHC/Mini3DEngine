@@ -471,8 +471,11 @@ export class ClusteredForwardRenderContext extends RenderContext {
         if (light.shadow && light.castShadow) {
             // todo: need special logic for point lights.
             if (light.type === LightType.Point) {
-                const matView = new mat4();
-                TextureCube.getFaceViewMatrix(viewIdx, matView);
+                const matView = TextureCube.getFaceViewMatrix(viewIdx).copy();
+                // need to translate to light local space first
+                const matWorldToLight: mat4 = new mat4();
+                matWorldToLight.fromTranslation(light.worldTransform.getTranslation().scale(-1));
+                mat4.product(matView, matWorldToLight, matView);
                 this._ubView.setMat4("matView", matView);
             } else {
                 this._ubView.setMat4("matView", light.shadow.matView);
