@@ -13,13 +13,13 @@ export class LightShadow {
         this._light = light;
         this.bias = -0.1;
         this.mapSize = new vec2([256, 256]);
-        this.mapRect = [new vec4([0, 0, 256, 256])];
+        this.mapRects = [new vec4([0, 0, 256, 256])];
         this.shadowMap = null;
         this.moved = true;
         this.cached = false;
         this._matView = mat4.identity.copy();
         this._matProj = mat4.identity.copy();
-        this.frustum = [new Frustum()];
+        this.frustums = [new Frustum()];
     }
     
     // fustum, bias, shadowmap resolution...
@@ -38,11 +38,11 @@ export class LightShadow {
      * directional light and spot light has 1 rect
      * point light has 6 rects
      */
-    public mapRect: vec4[];
+    public mapRects: vec4[];
 
     public get mapSizeChanged(): boolean
     {
-        return this.mapSize.x !== this.mapRect[0].z || this.mapSize.y !== this.mapRect[0].w;
+        return this.mapSize.x !== this.mapRects[0].z || this.mapSize.y !== this.mapRects[0].w;
     }
 
     /**
@@ -68,7 +68,7 @@ export class LightShadow {
      * directional and spot light have one frustum;
      * point light has 6 frustums;
      */
-    public frustum: Frustum[];
+    public frustums: Frustum[];
 
     public get matView(): mat4 {
         return this._matView;

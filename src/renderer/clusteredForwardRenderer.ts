@@ -752,9 +752,9 @@ export class ClusteredForwardRenderer {
         }
         const gl = GLDevice.gl;
         const sphere = new BoundingSphere();
-        for (let iFrustum = 0; iFrustum < light.shadow.frustum.length; iFrustum++) {
-            const frustum = light.shadow.frustum[iFrustum];
-            const rect = light.shadow.mapRect[iFrustum];
+        for (let iFrustum = 0; iFrustum < light.shadow.frustums.length; iFrustum++) {
+            const frustum = light.shadow.frustums[iFrustum];
+            const rect = light.shadow.mapRects[iFrustum];
             let inited = false;
             for (let i = 0; i < renderList.ItemCount; i++) {
                 const item = renderList.getItemAt(i);
@@ -820,7 +820,7 @@ export class ClusteredForwardRenderer {
 
     private copyShadowFromCache(shadow: LightShadow, rectIdx: number) {
         GLDevice.sourceFBO = this._shadowmapCacheFBO;
-        const rect = shadow.mapRect[rectIdx];
+        const rect = shadow.mapRects[rectIdx];
         const x0 = rect.x;
         const y0 = rect.y;
         const x1 = rect.x + rect.z;
@@ -1032,7 +1032,7 @@ export class ClusteredForwardRenderer {
 
                     // copy from cache to shadowmap
                     GLDevice.renderTarget = this._shadowmapFBO;
-                    for(let iRect = 0; iRect < light.shadow.mapRect.length; iRect++) {
+                    for(let iRect = 0; iRect < light.shadow.mapRects.length; iRect++) {
                         this.copyShadowFromCache(light.shadow, iRect);
                     }
                     cacheCopied = true;

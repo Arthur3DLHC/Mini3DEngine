@@ -22,6 +22,8 @@ import vec2 from "../../lib/tsm/vec2.js";
 import { DirectionalLight } from "../scene/lights/directionalLight.js";
 import { DirectionalLightShadow } from "../scene/lights/directionalLightShadow.js";
 import { Clock } from "../scene/clock.js";
+import { PointLightShadow } from "../scene/lights/pointLightShadow.js";
+import { TextureCube } from "../WebGLResources/textures/textureCube.js";
 
 export class ClusteredForwardRenderContext extends RenderContext {
     public constructor() {
@@ -271,15 +273,16 @@ export class ClusteredForwardRenderContext extends RenderContext {
             // todo: shadow bias matrix
             if (light.type === LightType.Point) {
                 // todo: fill light world position and 6 map rects in transform and shadow matrix
+                throw new Error("Not implemented");
             } else {
                 let matBias = new mat4();
                 matBias.fromTranslation(new vec3([0, 0, -light.shadow.bias]));
                 // todo: shadowmap atlas rect as viewport matrix
-                let w = light.shadow.mapRect[0].z / light.shadow.shadowMap.width;
-                let h = light.shadow.mapRect[0].w / light.shadow.shadowMap.height;
+                let w = light.shadow.mapRects[0].z / light.shadow.shadowMap.width;
+                let h = light.shadow.mapRects[0].w / light.shadow.shadowMap.height;
                 // todo: translation
-                let l = light.shadow.mapRect[0].x / light.shadow.shadowMap.width;
-                let b = light.shadow.mapRect[0].y / light.shadow.shadowMap.height;
+                let l = light.shadow.mapRects[0].x / light.shadow.shadowMap.width;
+                let b = light.shadow.mapRects[0].y / light.shadow.shadowMap.height;
                 // ndc space is [-1, 1]
                 // texcoord uv space is [0,1]
                 // depth range in depthbuffer is also [0,1]
@@ -468,12 +471,14 @@ export class ClusteredForwardRenderContext extends RenderContext {
         if (light.shadow && light.castShadow) {
             // todo: need special logic for point lights.
             if (light.type === LightType.Point) {
-                throw new Error("Not implemented.");
+                const matView = new mat4();
+                TextureCube.getFaceViewMatrix(viewIdx, matView);
+                this._ubView.setMat4("matView", matView);
             } else {
                 this._ubView.setMat4("matView", light.shadow.matView);
-                this._ubView.setMat4("matProj", light.shadow.matProj);
-                this._ubView.setFloat("time", Clock.instance.curTime);
             }
+            this._ubView.setMat4("matProj", light.shadow.matProj);
+            this._ubView.setFloat("time", Clock.instance.curTime);
             this._ubView.update();
         }
     }

@@ -1,5 +1,6 @@
 import { Texture } from "./texture.js";
 import { GLDevice } from "../glDevice.js";
+import mat4 from "../../../lib/tsm/mat4.js";
 
 export class TextureCube extends Texture {
     public constructor() {
@@ -31,5 +32,37 @@ export class TextureCube extends Texture {
     }
     public upload() {
         throw new Error("Not implemented.");
+    }
+
+    // todo: define cube face ids
+    public static readonly face_positive_x = 0;
+    public static readonly face_negative_x = 1;
+    public static readonly face_positive_y = 2;
+    public static readonly face_negative_y = 3;
+    public static readonly face_positive_z = 4;
+    public static readonly face_negative_z = 5;
+
+    public static glCubeFaceFromIndex(faceId: number): GLenum {
+        return GLDevice.gl.TEXTURE_CUBE_MAP_POSITIVE_X + faceId;
+    }
+
+    public static getFaceViewMatrix(faceId: number, result: mat4) {
+        switch (faceId) {
+            case this.face_positive_x:
+                break;
+            case this.face_negative_x:
+                break;
+            case this.face_positive_y:
+                break;
+            case this.face_negative_y:
+                break;
+            case this.face_positive_z:
+                break;
+            case this.face_negative_z:
+                break;
+            default:
+                break;
+        }
+        throw new Error("Not implemented.")
     }
 }

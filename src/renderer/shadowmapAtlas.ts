@@ -51,7 +51,7 @@ class shadowMapList {
             const maxCol = texture.width / width;
             const row = Math.floor(iAtlas / maxCol);
             const col = iAtlas - row * maxCol;
-            const mapRect = shadow.mapRect[iFace];
+            const mapRect = shadow.mapRects[iFace];
             mapRect.x = col * width;
             mapRect.y = row * height + this.startY;
             mapRect.z = width;
@@ -94,7 +94,7 @@ export class ShadowmapAtlas {
         // remove it from list firstly
         if (shadow.shadowMap !== null) {
             if (shadow.mapSizeChanged) {
-                const oldList = this.getListBySize(shadow.mapRect[0].z, shadow.mapRect[0].w);
+                const oldList = this.getListBySize(shadow.mapRects[0].z, shadow.mapRects[0].w);
                 oldList.release(shadow);
             }
         }
