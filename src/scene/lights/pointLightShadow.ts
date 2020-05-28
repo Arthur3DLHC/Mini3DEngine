@@ -12,6 +12,6 @@ export class PointLightShadow extends LightShadow {
             this.moved = true;
         }
 
-        // todo: point light's frustum is not a view frustum, but a bouding box
+        // todo: point light's 6 frustums
     }
 }

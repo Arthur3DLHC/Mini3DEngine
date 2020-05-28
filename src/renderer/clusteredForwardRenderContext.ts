@@ -269,28 +269,32 @@ export class ClusteredForwardRenderContext extends RenderContext {
         if (light.shadow && light.castShadow && light.shadow.shadowMap) {
             // NOTE: these matrices is for sample shadow map, not for render shadow map.
             // todo: shadow bias matrix
-            let matBias = new mat4();
-            matBias.fromTranslation(new vec3([0, 0, -light.shadow.bias]));
-            // todo: shadowmap atlas rect as viewport matrix
-            let w = light.shadow.mapRect.z / light.shadow.shadowMap.width;
-            let h = light.shadow.mapRect.w / light.shadow.shadowMap.height;
-            // todo: translation
-            let l = light.shadow.mapRect.x / light.shadow.shadowMap.width;
-            let b = light.shadow.mapRect.y / light.shadow.shadowMap.height;
-            // ndc space is [-1, 1]
-            // texcoord uv space is [0,1]
-            // depth range in depthbuffer is also [0,1]
-            // so need to apply * 0.5 + 0.5
-            // and shadowmap altas rectangle, same as viewport
-            let matLightViewport = new mat4([
-                w * 0.5,     0,           0,   0,
-                0,           h * 0.5,     0,   0,
-                0,           0,           0.5, 0,
-                w * 0.5 + l, h * 0.5 + b, 0.5, 1,
-            ]);
-            mat4.product(matBias, light.shadow.matView, matShadow);
-            mat4.product(light.shadow.matProj, matShadow, matShadow);
-            mat4.product(matLightViewport, matShadow, matShadow);
+            if (light.type === LightType.Point) {
+                // todo: fill light world position and 6 map rects in transform and shadow matrix
+            } else {
+                let matBias = new mat4();
+                matBias.fromTranslation(new vec3([0, 0, -light.shadow.bias]));
+                // todo: shadowmap atlas rect as viewport matrix
+                let w = light.shadow.mapRect[0].z / light.shadow.shadowMap.width;
+                let h = light.shadow.mapRect[0].w / light.shadow.shadowMap.height;
+                // todo: translation
+                let l = light.shadow.mapRect[0].x / light.shadow.shadowMap.width;
+                let b = light.shadow.mapRect[0].y / light.shadow.shadowMap.height;
+                // ndc space is [-1, 1]
+                // texcoord uv space is [0,1]
+                // depth range in depthbuffer is also [0,1]
+                // so need to apply * 0.5 + 0.5
+                // and shadowmap altas rectangle, same as viewport
+                let matLightViewport = new mat4([
+                    w * 0.5,     0,           0,   0,
+                    0,           h * 0.5,     0,   0,
+                    0,           0,           0.5, 0,
+                    w * 0.5 + l, h * 0.5 + b, 0.5, 1,
+                ]);
+                mat4.product(matBias, light.shadow.matView, matShadow);
+                mat4.product(light.shadow.matProj, matShadow, matShadow);
+                mat4.product(matLightViewport, matShadow, matShadow);
+            }
         }
         buffer.addArray(lightColor.values);
         buffer.addArray(light.worldTransform.values);
@@ -458,15 +462,18 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubClusters.updateByData(this._tmpClusterData, 0, 0, this._clusterBuffer.length);
     }
 
-    public fillUniformBuffersPerLightView(light: BaseLight) {
+    public fillUniformBuffersPerLightView(light: BaseLight, viewIdx: number) {
         // todo: calculate shadow view proj transform matrices
         // implement in light class?
         if (light.shadow && light.castShadow) {
-
-            // only need these params?
-            this._ubView.setMat4("matView", light.shadow.matView);
-            this._ubView.setMat4("matProj", light.shadow.matProj);
-            this._ubView.setFloat("time", Clock.instance.curTime);
+            // todo: need special logic for point lights.
+            if (light.type === LightType.Point) {
+                throw new Error("Not implemented.");
+            } else {
+                this._ubView.setMat4("matView", light.shadow.matView);
+                this._ubView.setMat4("matProj", light.shadow.matProj);
+                this._ubView.setFloat("time", Clock.instance.curTime);
+            }
             this._ubView.update();
         }
     }

@@ -751,72 +751,80 @@ export class ClusteredForwardRenderer {
             return;
         }
         const gl = GLDevice.gl;
-        let inited = false;
         const sphere = new BoundingSphere();
-        for (let i = 0; i < renderList.ItemCount; i++) {
-            const item = renderList.getItemAt(i);
-            if (item && item.object.castShadow) {
-                // check item moved?
-                // todo: check animated? or overwrite moved flag by skinnedMesh class.
-                // fix me: should add a staic flag to object
-                // static objects never move
-                // dynamic objects may move, or not move.
-                if (item.object.isStatic) {
-                    if (! drawStatics) {
-                        continue;
+        for (let iFrustum = 0; iFrustum < light.shadow.frustum.length; iFrustum++) {
+            const frustum = light.shadow.frustum[iFrustum];
+            const rect = light.shadow.mapRect[iFrustum];
+            let inited = false;
+            for (let i = 0; i < renderList.ItemCount; i++) {
+                const item = renderList.getItemAt(i);
+                if (item && item.object.castShadow) {
+                    // check item moved?
+                    // todo: check animated? or overwrite moved flag by skinnedMesh class.
+                    // fix me: should add a staic flag to object
+                    // static objects never move
+                    // dynamic objects may move, or not move.
+                    if (item.object.isStatic) {
+                        if (!drawStatics) {
+                            continue;
+                        }
+                    } else {
+                        if (!drawDynamics) {
+                            continue;
+                        }
                     }
-                } else {
-                    if (! drawDynamics) {
-                        continue;
-                    }
-                }
-                
-                // check frustum culling
-                item.geometry.boundingSphere.transform(item.object.worldTransform, sphere);
-                if (light.shadow.frustum.intersectsSphere(sphere)) {
-                    if (!inited) {
-                        GLDevice.renderTarget = target;
 
-                        gl.viewport(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
-                        gl.scissor(light.shadow.mapRect.x, light.shadow.mapRect.y, light.shadow.mapRect.z, light.shadow.mapRect.w);
-                        this.setRenderStateSet(this._renderStatesShadow);
+                    // check frustum culling
+                    item.geometry.boundingSphere.transform(item.object.worldTransform, sphere);
+                    // iterate all frustums
 
-                        if (copyCache && (target !== this._shadowmapCacheFBO)) {
-                            this.copyShadowFromCache(light.shadow);
+                    if (frustum.intersectsSphere(sphere)) {
+                        if (!inited) {
+                            GLDevice.renderTarget = target;
+
+                            gl.viewport(rect.x, rect.y, rect.z, rect.w);
+                            gl.scissor(rect.x, rect.y, rect.z, rect.w);
+                            this.setRenderStateSet(this._renderStatesShadow);
+
+                            if (copyCache && (target !== this._shadowmapCacheFBO)) {
+                                this.copyShadowFromCache(light.shadow, iFrustum);
+                            }
+
+                            // todo: support light view idx for point light
+                            this._renderContext.fillUniformBuffersPerLightView(light, iFrustum);
+                            // disable color output
+
+                            if (!copyCache) {
+                                GLDevice.clearColor = new vec4([1, 0, 0, 1]);
+                                GLDevice.clearDepth = 1.0;
+                                GLDevice.clear(true, true, true);
+                            }
+
+                            // render opaque objects which can drop shadow
+                            GLPrograms.useProgram(this._shadowProgram);
+                            inited = true;
                         }
 
-                        this._renderContext.fillUniformBuffersPerLightView(light);
-                        // disable color output
+                        this._renderContext.fillUniformBuffersPerObject(item);
 
-                        if (!copyCache) {
-                            GLDevice.clearColor = new vec4([1, 0, 0, 1]);
-                            GLDevice.clearDepth = 1.0;
-                            GLDevice.clear(true, true, true);                            
+                        // draw item geometry
+                        if (GLPrograms.currProgram) {
+                            item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
                         }
-
-                        // render opaque objects which can drop shadow
-                        GLPrograms.useProgram(this._shadowProgram);
-                        inited = true;
+                        this._currentObject = item.object;
                     }
-
-                    this._renderContext.fillUniformBuffersPerObject(item);
-
-                    // draw item geometry
-                    if (GLPrograms.currProgram) {
-                        item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
-                    }
-                    this._currentObject = item.object;
                 }
             }
         }
     }
 
-    private copyShadowFromCache(shadow: LightShadow) {
+    private copyShadowFromCache(shadow: LightShadow, rectIdx: number) {
         GLDevice.sourceFBO = this._shadowmapCacheFBO;
-        const x0 = shadow.mapRect.x;
-        const y0 = shadow.mapRect.y;
-        const x1 = shadow.mapRect.x + shadow.mapRect.z;
-        const y1 = shadow.mapRect.y + shadow.mapRect.w;
+        const rect = shadow.mapRect[rectIdx];
+        const x0 = rect.x;
+        const y0 = rect.y;
+        const x1 = rect.x + rect.z;
+        const y1 = rect.y + rect.w;
         GLDevice.gl.blitFramebuffer(x0, y0, x1, y1, x0, y0, x1, y1, GLDevice.gl.DEPTH_BUFFER_BIT, GLDevice.gl.NEAREST);
         GLDevice.sourceFBO = null;
     }
@@ -1024,7 +1032,9 @@ export class ClusteredForwardRenderer {
 
                     // copy from cache to shadowmap
                     GLDevice.renderTarget = this._shadowmapFBO;
-                    this.copyShadowFromCache(light.shadow);
+                    for(let iRect = 0; iRect < light.shadow.mapRect.length; iRect++) {
+                        this.copyShadowFromCache(light.shadow, iRect);
+                    }
                     cacheCopied = true;
                 }
 

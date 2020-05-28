@@ -1,5 +1,6 @@
 import { LightShadow } from "../scene/lights/lightShadow";
 import { Texture2D } from "../WebGLResources/textures/texture2D";
+import { PointLightShadow } from "../scene/lights/pointLightShadow";
 
 class shadowMapList {
     public constructor(maxCount: number, startY: number) {
@@ -11,23 +12,27 @@ class shadowMapList {
     public startY: number;
 
     public alloc(shadow: LightShadow, texture: Texture2D) {
-        for (let i = 0; i < this.shadows.length; i++) {
-            const shadowmap = this.shadows[i];
-            if (shadowmap === null || shadowmap.shadowMap === null) {
-                this.shadows[i] = shadow;
-                shadow.shadowMap = texture;
-                this.calcLocation(shadow, i, texture);
-                return;
+        if (shadow instanceof PointLightShadow) {
+            throw new Error("Not implemented");
+        } else {
+            for (let i = 0; i < this.shadows.length; i++) {
+                const shadowmap = this.shadows[i];
+                if (shadowmap === null || shadowmap.shadowMap === null) {
+                    this.shadows[i] = shadow;
+                    shadow.shadowMap = texture;
+                    this.calcLocation(shadow, i, 0, texture);
+                    return;
+                }
             }
+            // no unused locations found, alloc new one
+            // todo: calc locaiton rectangle
+            if (this.shadows.length >= this.maxCount) {
+                throw new Error("too much shadowmaps with size:" + shadow.mapSize.x);
+            }
+            this.shadows.push(shadow);
+            shadow.shadowMap = texture;
+            this.calcLocation(shadow, this.shadows.length - 1, 0, texture);
         }
-        // no unused locations found, alloc new one
-        // todo: calc locaiton rectangle
-        if (this.shadows.length >= this.maxCount) {
-            throw new Error("too much shadowmaps with size:" + shadow.mapSize.x);
-        }
-        this.shadows.push(shadow);
-        shadow.shadowMap = texture;
-        this.calcLocation(shadow, this.shadows.length - 1, texture);
     }
 
     release(shadow: LightShadow) {
@@ -40,16 +45,17 @@ class shadowMapList {
         }
     }
 
-    private calcLocation(shadow: LightShadow, i: number, texture: Texture2D) {
+    private calcLocation(shadow: LightShadow, iAtlas: number, iFace: number, texture: Texture2D) {
             const width = shadow.mapSize.x;
             const height = shadow.mapSize.y;
             const maxCol = texture.width / width;
-            const row = Math.floor(i / maxCol);
-            const col = i - row * maxCol;
-            shadow.mapRect.x = col * width;
-            shadow.mapRect.y = row * height + this.startY;
-            shadow.mapRect.z = width;
-            shadow.mapRect.w = height;
+            const row = Math.floor(iAtlas / maxCol);
+            const col = iAtlas - row * maxCol;
+            const mapRect = shadow.mapRect[iFace];
+            mapRect.x = col * width;
+            mapRect.y = row * height + this.startY;
+            mapRect.z = width;
+            mapRect.w = height;
     }
 }
 
@@ -88,7 +94,7 @@ export class ShadowmapAtlas {
         // remove it from list firstly
         if (shadow.shadowMap !== null) {
             if (shadow.mapSizeChanged) {
-                const oldList = this.getListBySize(shadow.mapRect.z, shadow.mapRect.w);
+                const oldList = this.getListBySize(shadow.mapRect[0].z, shadow.mapRect[0].w);
                 oldList.release(shadow);
             }
         }

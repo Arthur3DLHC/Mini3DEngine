@@ -37,7 +37,7 @@ export class DirectionalLightShadow extends LightShadow {
         if (this.moved) {
             const viewProj = new mat4();
             mat4.product(this._matProj, this._matView, viewProj);
-            this.frustum.setFromProjectionMatrix(viewProj);
+            this.frustum[0].setFromProjectionMatrix(viewProj);
         }
     }
 }
