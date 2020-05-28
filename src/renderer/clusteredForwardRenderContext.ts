@@ -253,6 +253,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         let radius = 0;
         let outerConeCos = 0;
         let innerConeCos = 0;
+
         let matWorld: mat4 = light.worldTransform.copy();
         let matShadow: mat4 = new mat4();
         // if light do not cast shadow, use a zero matrix
@@ -269,12 +270,14 @@ export class ClusteredForwardRenderContext extends RenderContext {
         }
         else if (light.type === LightType.Directional) {
         }
+
+        // shadow matrix
         if (light.shadow && light.castShadow && light.shadow.shadowMap) {
             // NOTE: these matrices is for sample shadow map, not for render shadow map.
             // todo: shadow bias matrix
             if (light.type === LightType.Point) {
 
-                // todo: fill light world position and 6 map rects in transform and shadow matrix
+                // fill light world position and 6 map rects in transform and shadow matrix
                 matWorld.setRow(0, light.worldTransform.row(3));
                 matWorld.setRow(1, light.shadow.mapRects[0]);
                 matWorld.setRow(2, light.shadow.mapRects[1]);
