@@ -61,6 +61,7 @@ import { SpotLight } from "../scene/lights/spotLight.js";
 import { BoundingBox } from "../math/boundingBox.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { DirectionalLightShadow } from "../scene/lights/directionalLightShadow.js";
+import { TextureCube } from "../WebGLResources/textures/textureCube.js";
 
 export class ClusteredForwardRenderer {
 
@@ -235,6 +236,8 @@ export class ClusteredForwardRenderer {
         this._renderContext.bindUniformBlocks(this._screenRectProgram);
 
         this._frustum = new Frustum();
+
+
     }
 
     private _renderListDepthPrepass: RenderList;

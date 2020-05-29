@@ -59,4 +59,22 @@ export class TextureCube extends Texture {
     public static getFaceViewMatrix(faceId: number): mat4 {
         return this.face_view_matrices[faceId];
     }
+
+    public static debugOuputAxes() {
+        // todo: output vectors in cubemap face view spaces
+        const v = new vec3([1, 2, 3]);  // 1, 2, 3 to distinguish x, y, z
+        const vv = new vec3();
+        TextureCube.getFaceViewMatrix(TextureCube.face_positive_x).multiplyVec3(v, vv);
+        console.log("+X: " + vv.x + ", " + vv.y + ", " + vv.z);
+        TextureCube.getFaceViewMatrix(TextureCube.face_negative_x).multiplyVec3(v, vv);
+        console.log("-X: " + vv.x + ", " + vv.y + ", " + vv.z);
+        TextureCube.getFaceViewMatrix(TextureCube.face_positive_y).multiplyVec3(v, vv);
+        console.log("+Y: " + vv.x + ", " + vv.y + ", " + vv.z);
+        TextureCube.getFaceViewMatrix(TextureCube.face_negative_y).multiplyVec3(v, vv);
+        console.log("-Y: " + vv.x + ", " + vv.y + ", " + vv.z);
+        TextureCube.getFaceViewMatrix(TextureCube.face_positive_z).multiplyVec3(v, vv);
+        console.log("+Z: " + vv.x + ", " + vv.y + ", " + vv.z);
+        TextureCube.getFaceViewMatrix(TextureCube.face_negative_z).multiplyVec3(v, vv);
+        console.log("-Z: " + vv.x + ", " + vv.y + ", " + vv.z);
+    }
 }
