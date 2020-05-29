@@ -125,6 +125,9 @@ window.onload = () => {
 
     // add some lights
     // test static lights first
+    // todo: test point light shadow
+    // and create a more complex scene which is more appropriate for test.
+
     // const pointLight01 = new PointLight();
     // pointLight01.isStatic = true;
     // pointLight01.on = true;
