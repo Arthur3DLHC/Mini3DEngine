@@ -18,7 +18,7 @@ export default /** glsl */`
      * @param matProj projection matrix with 90 degree fov and far plane set as light's max distance
      * @return projected coord in clip space, not devided by w
      */
-    vec4 getPointLightShadowProjCoord(vec3 pixelPos, Light light) {
+    vec4 getPointLightShadowProjCoord(vec3 pixelPos, Light light, out faceId) {
         vec3 lightPosition = getPointLightPosition(light);
         vec3 v = pixelPos - lightPosition;
 
@@ -38,12 +38,15 @@ export default /** glsl */`
 
         if(vAbs.z >= vAbs.x && vAbs.z >= vAbs.y) {
             // z axis.
+            faceId = v.z < 0.0 ? CUBE_FACE_NEGATIVE_Z : CUBE_FACE_POSITIVE_Z;
             posView = vec3(v.z < 0.0 ? v.x : -v.x, v.y, -v.z);
         } else if (vAbs.y >= vAbs.x) {
             // y axis.
+            faceId = v.y < 0.0 ? CUBE_FACE_NEGATIVE_Y : CUBE_FACE_POSITIVE_Y;
             posView = vec3(v.x, v.y < 0.0 ? -v.z : v.z, -v.y);
         } else {
             // x axis.
+            faceId = v.x < 0.0 ? CUBE_FACE_NEGATIVE_X : CUBE_FACE_POSITIVE_X;
             posView = vec3(v.x < 0.0 ? -v.z : v.z, v.y, -v.x);
         }
 

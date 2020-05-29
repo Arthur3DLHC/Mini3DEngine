@@ -10,8 +10,10 @@ export default /** glsl */`
 #include <uniforms_mtl_pbr>
 
 #include <function_cluster>
+#include <function_cubemap>
 #include <function_get_lights>
 #include <function_punctual_lights>
+#include <function_shadow>
 #include <function_brdf_pbr>
 
 #include <output_final>
@@ -118,25 +120,24 @@ void main(void)
             if (lightType != LightType_Point) {
                 // if spot or direction, project the pixel position to shadow map
                 matShadow = light.matShadow;
+                vec4 projPosition = matShadow * vec4(ex_worldPosition, 1.0);
+                vec3 shadowCoord = projPosition.xyz / projPosition.w;
+                // debug shadow texture
+                // float shadow = texture(s_shadowAtlas, projPosition.xy).r;
+                // f_diffuse.r += shadow;
+                // continue;
+                shadow = texture(s_shadowAtlas, shadowCoord);
+                if(shadow < 0.001) {
+                    continue;
+                }
             } else {
                 // if point light, need to du a custom cube shadow map sampling
-            }
-            vec4 projPosition = matShadow * vec4(ex_worldPosition, 1.0);
-            vec3 shadowCoord = projPosition.xyz / projPosition.w;
-            // debug shadow texture
-            // float shadow = texture(s_shadowAtlas, projPosition.xy).r;
-            // f_diffuse.r += shadow;
-            // continue;
-            //vec3 uvw = projPosition.xyz / projPosition.w;
-            //uvw.xyz = uvw.xyz * 0.5 + vec3(0.5);
-            //shadow = texture(s_shadowAtlas, uvw);
-            // shadow = texture(s_shadowAtlasStatic, shadowCoord);
-            // if(shadow < 0.001) {
-            //    continue;
-            //}
-            shadow = texture(s_shadowAtlas, shadowCoord);
-            if(shadow < 0.001) {
-                continue;
+                int faceId = 0;
+                vec4 projPosition = getPointLightShadowProjCoord(ex_worldPosition, light, faceId);
+                vec4 rect = getPointLightShadowmapRect(faceId, light);
+                // divide by w, then apply rect transform
+                vec3 shadowCoord = projPosition.xyz / projPosition.w;
+                
             }
         }
 
