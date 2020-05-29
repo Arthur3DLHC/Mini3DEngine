@@ -271,28 +271,41 @@ export class ClusteredForwardRenderContext extends RenderContext {
         if (light.shadow && light.castShadow && light.shadow.shadowMap) {
             // NOTE: these matrices is for sample shadow map, not for render shadow map.
             // todo: shadow bias matrix
+            const mapRects = light.shadow.mapRects;
+            const invSize: vec4 = new vec4([1.0/light.shadow.shadowMap.width, 1.0/light.shadow.shadowMap.height,
+                                            1.0/light.shadow.shadowMap.width, 1.0/light.shadow.shadowMap.height]);
+            
             if (light.type === LightType.Point) {
 
                 // fill light world position and 6 map rects in transform and shadow matrix
                 matWorld.setRow(0, light.worldTransform.row(3));
-                matWorld.setRow(1, light.shadow.mapRects[0]);
-                matWorld.setRow(2, light.shadow.mapRects[1]);
-                matWorld.setRow(3, light.shadow.mapRects[2]);
 
-                matShadow.setRow(0, light.shadow.mapRects[3]);
-                matShadow.setRow(1, light.shadow.mapRects[4]);
-                matShadow.setRow(2, light.shadow.mapRects[5]);
+                // todo: need to scale rect to [0, 1]
+                const normRect = new vec4();
+                matWorld.setRow(1, mapRects[0].copy(normRect).multiply(invSize));
+                matWorld.setRow(2, mapRects[1].copy(normRect).multiply(invSize));
+                matWorld.setRow(3, mapRects[2].copy(normRect).multiply(invSize));
+
+                matShadow.setRow(0, mapRects[3].copy(normRect).multiply(invSize));
+                matShadow.setRow(1, mapRects[4].copy(normRect).multiply(invSize));
+                matShadow.setRow(2, mapRects[5].copy(normRect).multiply(invSize));
 
             } else {
 
                 let matBias = new mat4();
                 matBias.fromTranslation(new vec3([0, 0, -light.shadow.bias]));
                 // todo: shadowmap atlas rect as viewport matrix
-                let w = light.shadow.mapRects[0].z / light.shadow.shadowMap.width;
-                let h = light.shadow.mapRects[0].w / light.shadow.shadowMap.height;
-                // todo: translation
-                let l = light.shadow.mapRects[0].x / light.shadow.shadowMap.width;
-                let b = light.shadow.mapRects[0].y / light.shadow.shadowMap.height;
+                const normRect = mapRects[0].copy();
+                normRect.multiply(invSize);
+                const l = normRect.x;
+                const b = normRect.y;
+                const w = normRect.z;
+                const h = normRect.w;
+                // let w = light.shadow.mapRects[0].z / light.shadow.shadowMap.width;
+                // let h = light.shadow.mapRects[0].w / light.shadow.shadowMap.height;
+                // // todo: translation
+                // let l = light.shadow.mapRects[0].x / light.shadow.shadowMap.width;
+                // let b = light.shadow.mapRects[0].y / light.shadow.shadowMap.height;
                 // ndc space is [-1, 1]
                 // texcoord uv space is [0,1]
                 // depth range in depthbuffer is also [0,1]

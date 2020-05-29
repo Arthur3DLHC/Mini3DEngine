@@ -4,7 +4,7 @@
 export default /** glsl */`
 
     vec4 getPointLightShadowmapRect(int faceId, Light light) {
-        if(faceId < 3) {
+        if (faceId < 3) {
             return light.transform[faceId + 1];
         } else {
             return light.matShadow[faceId - 3];
@@ -18,7 +18,7 @@ export default /** glsl */`
      * @param matProj projection matrix with 90 degree fov and far plane set as light's max distance
      * @return projected coord in clip space, not devided by w
      */
-    vec4 getPointLightShadowProjCoord(vec3 pixelPos, Light light, out faceId) {
+    vec4 getPointLightShadowProjCoord(vec3 pixelPos, Light light, out int faceId) {
         vec3 lightPosition = getPointLightPosition(light);
         vec3 v = pixelPos - lightPosition;
 
