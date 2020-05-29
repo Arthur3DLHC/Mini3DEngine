@@ -12,7 +12,13 @@ export default /** glsl */`
     }
 
     // get shadowmap coord for point light?
-    vec4 getPointLightShadowmapCoord(vec3 pixelPos, Light light) {
+    /**
+     * @param pixelPos pixel position in world space
+     * @param light
+     * @param matProj projection matrix with 90 degree fov and far plane set as light's max distance
+     * @return projected coord in clip space, not devided by w
+     */
+    vec4 getPointLightShadowProjCoord(vec3 pixelPos, Light light) {
         vec3 lightPosition = getPointLightPosition(light);
         vec3 v = pixelPos - lightPosition;
 
@@ -32,18 +38,21 @@ export default /** glsl */`
 
         if(vAbs.z >= vAbs.x && vAbs.z >= vAbs.y) {
             // z axis.
-            // positive or negative?
-            posView = vec3(v.z < 0.0 ? -v.x : v.x, -v.y, -vAbs.z);
+            posView = vec3(v.z < 0.0 ? v.x : -v.x, v.y, -v.z);
         } else if (vAbs.y >= vAbs.x) {
             // y axis.
-            posView = vec3(v.x, v.y < 0.0 ? -v.z: v.z, -vAbs.y);
+            posView = vec3(v.x, v.y < 0.0 ? -v.z : v.z, -v.y);
         } else {
-            posView = vec3(v.x < 0.0 ? v.z : -v.z, v.y, -vAbs.x);
+            // x axis.
+            posView = vec3(v.x < 0.0 ? -v.z : v.z, v.y, -v.x);
         }
 
-
-
-        // apply projection matrix
-
+        // todo: apply projection matrix
+        // must keep same with pointLightShadow.ts
+        float n = 0.01;
+        float f = getLightRadius(light);
+        float A = -(f + n)/(f - n);
+        float B = -2.0 * f * n / (f - n);
+        return vec4(posView.x, posView.y, posView.z * A + B, -posView.z);
     }
 `;
