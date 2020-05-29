@@ -1,6 +1,5 @@
 import { RenderContext } from "./renderContext.js";
 import { BufferHelper } from "../utils/bufferHelper.js";
-import { ClusteredForwardRenderer } from "./clusteredForwardRenderer.js";
 import { UniformBuffer } from "../WebGLResources/uniformBuffer.js";
 import { Decal } from "../scene/decal.js";
 import { BaseLight } from "../scene/lights/baseLight.js";
@@ -19,10 +18,7 @@ import mat4 from "../../lib/tsm/mat4.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec2 from "../../lib/tsm/vec2.js";
-import { DirectionalLight } from "../scene/lights/directionalLight.js";
-import { DirectionalLightShadow } from "../scene/lights/directionalLightShadow.js";
 import { Clock } from "../scene/clock.js";
-import { PointLightShadow } from "../scene/lights/pointLightShadow.js";
 import { TextureCube } from "../WebGLResources/textures/textureCube.js";
 
 export class ClusteredForwardRenderContext extends RenderContext {

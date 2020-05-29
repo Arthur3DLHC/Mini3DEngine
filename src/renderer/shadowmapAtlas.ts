@@ -1,6 +1,6 @@
-import { LightShadow } from "../scene/lights/lightShadow";
-import { Texture2D } from "../WebGLResources/textures/texture2D";
-import { PointLightShadow } from "../scene/lights/pointLightShadow";
+import { LightShadow } from "../scene/lights/lightShadow.js";
+import { Texture2D } from "../WebGLResources/textures/texture2D.js";
+import { PointLightShadow } from "../scene/lights/pointLightShadow.js";
 
 class shadowMapList {
     public constructor(maxCount: number, startY: number) {
