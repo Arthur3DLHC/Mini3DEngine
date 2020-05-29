@@ -214,6 +214,7 @@ TODO:       主要类结构
                 贴图的加载和绑定
             FileLoader
             GLTFLoader
+                从 Blender 导出测试用的模型
                 先直接引用 minimal gltf loader? 或者参考Khronos Group glTF Viewer
                 读取mesh, material, texture
                 File Cache
@@ -231,9 +232,12 @@ TODO:       主要类结构
             particle system; sprite;
 
             从GLTF加载组件信息？
-                    读取object的自定义属性：组件列表和组件属性？或者prefab文件名？
-                    或者使用命名规范、前缀来定义；
-                    使用json定义object prefab对象
+                读取object的自定义属性：组件列表和组件属性？或者prefab文件名？
+                或者使用命名规范、前缀来定义；
+                使用json定义object prefab对象；
+                区分哪些网格是 occluder，哪些网格需要 occlusion query；使用前缀？
+                Blender 中的光源属性是否齐全？怎样使用；导出光源场景测试
+                Blender 中能否导出 instancing 的网格？导出有 linked duplicate 网格场景测试
 
 LOG：
 
