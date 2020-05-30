@@ -6,6 +6,8 @@ export class VertexBufferAttribute {
         this.buffer = buffer;
         this.size = size;
         this.offset = offset;
+        this.locationOffset = 0;
+        this.divisor = 0;
     }
 
     public static readonly defaultNamePosition = "a_position";
@@ -28,9 +30,19 @@ export class VertexBufferAttribute {
     public size: number;
 
     /**
-     * offset in bytes?
+     * offset in bytes
      */
     public offset: number;
+
+    /**
+     * for mat4 like type attributes.
+     */
+    public locationOffset: number;
+
+    /**
+     * if not zero, instanced.
+     */
+    public divisor: number;
 
     /**
      * get a vertex part of this attribute from buffer

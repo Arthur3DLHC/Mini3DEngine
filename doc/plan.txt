@@ -181,6 +181,7 @@ TODO:       主要类结构
                                 uvw = posNDC 应用子图视口变换；
 
             Instancing？
+                can use in mat4 in vertex shader for attribute input;
 
             间接光照
                 RenderTarget; 渲染到cubemap；
