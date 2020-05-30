@@ -75,7 +75,6 @@ export class BufferGeometry {
 
         // don't forget bind vertex buffer of instanceAttribs
         for (const attr of instanceAttribs) {
-            // fix me: if attrib is matrix, need to bind 4 vectors
             GLGeometryBuffers.bindVertexBuffer(attr.buffer);
             GLGeometryBuffers.setVertexAttribute(attr, attribLocations);
         }
