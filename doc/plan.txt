@@ -184,6 +184,7 @@ TODO:       主要类结构
                             做一个比较适合检查点光源投影的场景
 
             Instancing？
+                can use in mat4 in vertex shader for attribute input;
 
             间接光照
                 RenderTarget; 渲染到cubemap；

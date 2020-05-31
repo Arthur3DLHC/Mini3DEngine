@@ -39,8 +39,8 @@ export class BufferGeometry {
         if (!this.vertexBuffer || !this.vertexBuffer.data || !this.vertexBuffer.glBuffer) {
             return;
         }
-        GLGeometryBuffers.bindVertexBuffer(this.vertexBuffer);
         GLGeometryBuffers.clearVertexAttributes();
+        GLGeometryBuffers.bindVertexBuffer(this.vertexBuffer);
         for (const attr of this.attributes) {
             GLGeometryBuffers.setVertexAttribute(attr, attribLocations);
         }
@@ -60,7 +60,40 @@ export class BufferGeometry {
         }
     }
 
-    // todo: instanced?
+    // todo: draw instanced?
+    // pass in attributes of instancing data?
+    public drawInstaces(start: number, count: number, attribLocations: Map<string, number>, instanceAttribs: VertexBufferAttribute[], instanceCount: number, mode: GLenum|null = null) {
+        if (!this.vertexBuffer || !this.vertexBuffer.data || !this.vertexBuffer.glBuffer || instanceAttribs.length <= 0) {
+            return;
+        }
+        GLGeometryBuffers.clearVertexAttributes();
+        // bind geometry vertex buffer
+        GLGeometryBuffers.bindVertexBuffer(this.vertexBuffer);
+        for (const attr of this.attributes) {
+            GLGeometryBuffers.setVertexAttribute(attr, attribLocations);
+        }
+
+        // don't forget bind vertex buffer of instanceAttribs
+        for (const attr of instanceAttribs) {
+            GLGeometryBuffers.bindVertexBuffer(attr.buffer);
+            GLGeometryBuffers.setVertexAttribute(attr, attribLocations);
+        }
+
+        GLGeometryBuffers.disableUnusedAttributes();
+
+        if (this.indexBuffer && this.indexBuffer.indices && this.indexBuffer.glBuffer) {
+            GLGeometryBuffers.bindIndexBuffer(this.indexBuffer);
+            const s = Math.max(0, start);
+            const c = Math.min(count, this.indexBuffer.indices.length - s);
+            // drawElements 时需要用 byte 偏移, int16 = 2 bytes
+            GLDevice.gl.drawElementsInstanced(mode?mode:this.drawMode, c, GLDevice.gl.UNSIGNED_SHORT, s * 2, instanceCount);
+        } else {
+            // draw array 时不用 byte 偏移
+            const s = Math.max(0, start);
+            const c = Math.min(count, this.vertexBuffer.data.length - s);
+            GLDevice.gl.drawArraysInstanced(mode?mode:this.drawMode, s, c, instanceCount);
+        }
+    }
 
     public destroy() {
         if (this.vertexBuffer) {

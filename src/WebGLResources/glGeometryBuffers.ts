@@ -9,11 +9,13 @@ export class GLGeometryBuffers {
     // learned form three.js
     private static _enabledAttributes: Uint8Array;
     private static _newAttributes: Uint8Array;
+    private static _attribDivisors: Uint8Array;
     
     public static initialize() {
         const maxAttribs = GLDevice.gl.getParameter(GLDevice.gl.MAX_VERTEX_ATTRIBS);
         GLGeometryBuffers._enabledAttributes = new Uint8Array(maxAttribs);
         GLGeometryBuffers._newAttributes = new Uint8Array(maxAttribs);
+        GLGeometryBuffers._attribDivisors = new Uint8Array(maxAttribs);
     }
 
     public static bindVertexBuffer(vertexBuffer: VertexBuffer|null) {
@@ -45,9 +47,15 @@ export class GLGeometryBuffers {
         }
     }
 
+    /**
+     * set attribute pointer for current binding vertex buffer (bound by bindVertexBuffer() call)
+     * @param attrib 
+     * @param attribLocations 
+     */
     public static setVertexAttribute(attrib: VertexBufferAttribute, attribLocations: Map<string, number>) {
-        const index = attribLocations.get(attrib.name);
+        let index = attribLocations.get(attrib.name);
         if (index !== undefined) {
+            index += attrib.locationOffset;
             this._newAttributes[index] = 1;
             if (this._enabledAttributes[index] === 0) {
                 GLDevice.gl.enableVertexAttribArray(index);
@@ -55,6 +63,10 @@ export class GLGeometryBuffers {
             }
 
             GLDevice.gl.vertexAttribPointer(index, attrib.size, GLDevice.gl.FLOAT, false, attrib.buffer.stride, attrib.offset);
+            if(this._attribDivisors[index] !== attrib.divisor) {
+                GLDevice.gl.vertexAttribDivisor(index, attrib.divisor);
+                this._attribDivisors[index] = attrib.divisor;
+            }
         }
     }
 
