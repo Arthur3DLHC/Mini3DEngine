@@ -180,6 +180,9 @@ TODO:       主要类结构
                                 posNDC = posProj / w;
                                 uvw = posNDC 应用子图视口变换；
 
+                        测试
+                            做一个比较适合检查点光源投影的场景
+
             Instancing？
 
             间接光照
