@@ -289,11 +289,15 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 matShadow.setRow(0, mapRects[3].copy(normRect).multiply(invSize));
                 matShadow.setRow(1, mapRects[4].copy(normRect).multiply(invSize));
                 matShadow.setRow(2, mapRects[5].copy(normRect).multiply(invSize));
+                // shadowmap bias
+                normRect.x = light.shadow.bias;
+                normRect.y = 0; normRect.z = 0; normRect.w = 1;
+                matShadow.setRow(3, normRect);
 
             } else {
 
                 let matBias = new mat4();
-                matBias.fromTranslation(new vec3([0, 0, -light.shadow.bias]));
+                matBias.fromTranslation(new vec3([0, 0, light.shadow.bias]));
                 // todo: shadowmap atlas rect as viewport matrix
                 const normRect = mapRects[0].copy();
                 normRect.multiply(invSize);
@@ -317,8 +321,9 @@ export class ClusteredForwardRenderContext extends RenderContext {
                     0,           0,           0.5, 0,
                     w * 0.5 + l, h * 0.5 + b, 0.5, 1,
                 ]);
-                mat4.product(matBias, light.shadow.matView, matShadow);
-                mat4.product(light.shadow.matProj, matShadow, matShadow);
+                // note: shadow bias should be add after projection
+                mat4.product(light.shadow.matProj, light.shadow.matView, matShadow);
+                mat4.product(matBias, matShadow, matShadow);
                 mat4.product(matLightViewport, matShadow, matShadow);
             }
         }

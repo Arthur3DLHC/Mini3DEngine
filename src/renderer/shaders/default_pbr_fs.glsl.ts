@@ -133,6 +133,7 @@ void main(void)
                 vec4 projPosition = getPointLightShadowProjCoord(ex_worldPosition, light, faceId);
                 vec4 rect = getPointLightShadowmapRect(faceId, light);
                 // divide by w, then apply rect transform
+                projPosition.z -= 0.01;
                 shadowCoord = projPosition.xyz / projPosition.w;
                 shadowCoord = shadowCoord * vec3(rect.z * 0.5, rect.w * 0.5, 0.5)
                                          + vec3(rect.z * 0.5 + rect.x, rect.w * 0.5 + rect.y, 0.5);

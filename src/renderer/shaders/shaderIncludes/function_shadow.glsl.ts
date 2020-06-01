@@ -11,6 +11,10 @@ export default /** glsl */`
         }
     }
 
+    float getPointLightShadowBias(Light light) {
+        return light.matShadow[3][0];
+    }
+
     // get shadowmap coord for point light?
     /**
      * @param pixelPos pixel position in world space
@@ -50,12 +54,15 @@ export default /** glsl */`
             posView = vec3(v.x < 0.0 ? -v.z : v.z, v.y, v.x < 0.0 ? v.x : -v.x);
         }
 
+        // shadow bias should apply after shadow projection
+        // posView.z -= getPointLightShadowBias(light);
+
         // todo: apply projection matrix
         // must keep same with pointLightShadow.ts
         float n = 0.01;
         float f = getLightRadius(light);
         float A = -(f + n)/(f - n);
         float B = -2.0 * f * n / (f - n);
-        return vec4(posView.x, posView.y, posView.z * A + B, -posView.z);
+        return vec4(posView.x, posView.y, (posView.z) * A + B, -posView.z);
     }
 `;
