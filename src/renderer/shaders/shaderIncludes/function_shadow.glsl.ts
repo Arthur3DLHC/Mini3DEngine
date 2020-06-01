@@ -39,15 +39,15 @@ export default /** glsl */`
         if(vAbs.z >= vAbs.x && vAbs.z >= vAbs.y) {
             // z axis.
             faceId = v.z < 0.0 ? CUBE_FACE_NEGATIVE_Z : CUBE_FACE_POSITIVE_Z;
-            posView = vec3(v.z < 0.0 ? v.x : -v.x, v.y, -v.z);
+            posView = vec3(v.z < 0.0 ? v.x : -v.x, v.y, v.z < 0.0 ? v.z : -v.z);
         } else if (vAbs.y >= vAbs.x) {
             // y axis.
             faceId = v.y < 0.0 ? CUBE_FACE_NEGATIVE_Y : CUBE_FACE_POSITIVE_Y;
-            posView = vec3(v.x, v.y < 0.0 ? -v.z : v.z, -v.y);
+            posView = vec3(v.x, v.y < 0.0 ? -v.z : v.z, v.y < 0.0 ? v.y : -v.y);
         } else {
             // x axis.
             faceId = v.x < 0.0 ? CUBE_FACE_NEGATIVE_X : CUBE_FACE_POSITIVE_X;
-            posView = vec3(v.x < 0.0 ? -v.z : v.z, v.y, -v.x);
+            posView = vec3(v.x < 0.0 ? -v.z : v.z, v.y, v.x < 0.0 ? v.x : -v.x);
         }
 
         // todo: apply projection matrix

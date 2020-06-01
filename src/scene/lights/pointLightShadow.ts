@@ -39,9 +39,9 @@ export class PointLightShadow extends LightShadow {
             for (let i = 0; i < 6; i++) {
                 // calc viewproj matrix
                 // 1. to light local space
-                matView.setTranslation(this._light.worldTransform.getTranslation().scale(-1));
+                matView.fromTranslation(this._light.worldTransform.getTranslation().scale(-1));
                 // 2. to light view space
-                mat4.product(TextureCube.face_view_matrices[i], matView, matView);
+                mat4.product(TextureCube.getFaceViewMatrix(i), matView, matView);
                 // 3. project
                 mat4.product(matProj, matView, matViewProj);
                 this.frustums[i].setFromProjectionMatrix(matViewProj);
