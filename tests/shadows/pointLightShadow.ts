@@ -143,18 +143,17 @@ window.onload = () => {
     addPlane("rightWall", matPlaneTran, matPlaneRot, new vec4([0.0, 1.0, 0.0, 1.0]), scene);
 
     // add some lights
-    // test static lights first
     // todo: test point light shadow
-    // and create a more complex scene which is more appropriate for test.
 
-    // const pointLight01 = new PointLight();
-    // pointLight01.isStatic = true;
-    // pointLight01.on = true;
-    // pointLight01.color = new vec4([5, 5, 5, 1]);
-    // pointLight01.distance = 10;
-    // pointLight01.localTransform.fromTranslation(new vec3([1, 3, 1]));
+    const pointLight01 = new PointLight();
+    pointLight01.isStatic = true;
+    pointLight01.on = true;
+    pointLight01.castShadow = false;
+    pointLight01.color = new vec4([40, 40, 40, 1]);
+    pointLight01.distance = 50;
+    pointLight01.localTransform.fromTranslation(new vec3([0, 3, 0]));
 
-    // scene.attachChild(pointLight01);
+    scene.attachChild(pointLight01);
     
     // const pointLight02 = new PointLight();
     // pointLight02.isStatic = true;
@@ -164,38 +163,7 @@ window.onload = () => {
     // pointLight02.localTransform.fromTranslation(new vec3([3, 3, 3]));
 
     // scene.attachChild(pointLight02);
-
-    // 测试动态光源的阴影
-    const spotLight01 = new SpotLight();
-    spotLight01.isStatic = true;
-    spotLight01.on = true;
-    spotLight01.color = new vec4([100, 100, 100, 1]);
-    spotLight01.distance = 10;
-    spotLight01.castShadow = true;
-    // spotLight01.localTransform.fromTranslation(new vec3([0, 1, 3]));
-    const spotLightLookAt = new LookatBehavior(spotLight01);
-    spotLight01.behaviors.push(spotLightLookAt);
-    spotLightLookAt.position = new vec3([-3, 3, 3]);
-    spotLightLookAt.target = new vec3([0, 0, 0]);
-    spotLightLookAt.up = new vec3([0, 1, 0]);
-
-    scene.attachChild(spotLight01);
-
-    const dirLight01 = new DirectionalLight();
-    dirLight01.isStatic = true;
-    dirLight01.on = true;
-    dirLight01.color = new vec4([3,3,3,1]);
-    dirLight01.radius = 5;
-    dirLight01.castShadow = true;
-    (dirLight01.shadow as DirectionalLightShadow).distance = 15;
-    const dirLightLookAt = new LookatBehavior(dirLight01);
-    dirLight01.behaviors.push(dirLightLookAt);
-    dirLightLookAt.position = new vec3([5, 5, 5]);
-    dirLightLookAt.target = new vec3([0, 0, 0]);
-    dirLightLookAt.up = new vec3([0, 1, 0]);
-
-    scene.attachChild(dirLight01);
-
+    
     Clock.instance.start();
 
     function gameLoop(now: number) {
