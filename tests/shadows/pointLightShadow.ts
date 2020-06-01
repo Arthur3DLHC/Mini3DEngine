@@ -4,6 +4,7 @@ import { AutoRotateBehavior } from "../common/behaviors/autoRotateBehavior.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
 import { FirstPersonViewBehavior } from "../common/behaviors/firstPersonViewBehavior.js";
+import mat4 from "../../lib/tsm/mat4.js";
 
 window.onload = () => {
     const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
@@ -109,19 +110,37 @@ window.onload = () => {
 
     scene.attachChild(cylinderMesh);
 
-    // plane
-    const planeMesh = new Mesh();
-    planeMesh.name = "plane01";
-    planeMesh.localTransform.fromTranslation(new vec3([0, -2, 0]));
-    planeMesh.geometry = new PlaneGeometry(20, 20, 1, 1);
-    planeMesh.castShadow = true;
-    planeMesh.isStatic = true;
-    const planeMtl = new StandardPBRMaterial();
-    planeMtl.color = new vec4([0.0, 0.0, 1.0, 1.0]);
-    planeMtl.metallic = 0.0;
-    planeMesh.materials.push(planeMtl);
+    const matPlaneRot = new mat4();
+    const matPlaneTran = new mat4();
 
-    scene.attachChild(planeMesh);
+    matPlaneRot.setIdentity();
+    matPlaneTran.fromTranslation(new vec3([0, -5, 0]));
+    
+    addPlane("floor", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), scene);
+
+    // ceiling
+    matPlaneRot.fromZRotation(Math.PI);
+    matPlaneTran.fromTranslation(new vec3([0, 5, 0]));
+
+    addPlane("ceiling", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), scene);
+
+    // back wall
+    matPlaneRot.fromXRotation(Math.PI * 0.5);
+    matPlaneTran.fromTranslation(new vec3([0, 0, -5]));
+
+    addPlane("backWall", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), scene);
+
+    // left wall
+    matPlaneRot.fromZRotation(-Math.PI * 0.5);
+    matPlaneTran.fromTranslation(new vec3([-5, 0, 0]));
+
+    addPlane("leftWall", matPlaneTran, matPlaneRot, new vec4([1.0, 0.0, 0.0, 1.0]), scene);
+
+    // right wall
+    matPlaneRot.fromZRotation(Math.PI * 0.5);
+    matPlaneTran.fromTranslation(new vec3([5, 0, 0]));
+    
+    addPlane("rightWall", matPlaneTran, matPlaneRot, new vec4([0.0, 1.0, 0.0, 1.0]), scene);
 
     // add some lights
     // test static lights first
@@ -189,4 +208,18 @@ window.onload = () => {
     }
 
     requestAnimationFrame(gameLoop);
+}
+
+function addPlane(name: string, matPlaneTran: mat4, matPlaneRot: mat4, wallColor: vec4, scene: Scene) {
+    const ceilingMesh = new Mesh();
+    ceilingMesh.name = name;
+    mat4.product(matPlaneTran, matPlaneRot, ceilingMesh.localTransform);
+    ceilingMesh.geometry = new PlaneGeometry(10, 10, 1, 1);
+    ceilingMesh.castShadow = true;
+    ceilingMesh.isStatic = true;
+    const ceilingMtl = new StandardPBRMaterial();
+    ceilingMtl.color = wallColor.copy();
+    ceilingMtl.metallic = 0.1;
+    ceilingMesh.materials.push(ceilingMtl);
+    scene.attachChild(ceilingMesh);
 }
