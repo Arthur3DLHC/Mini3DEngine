@@ -27,7 +27,7 @@ bool getLightCastShadow(Light light) {
     return light.matShadow != mat4(0.0);
 }
 
-float getRangeAttenuation(float range, float distance) {
+float getRangeAttenuation(float range, float distanceSq) {
     if (range <= 0.0)
     {
         return 1.0;
@@ -37,7 +37,11 @@ float getRangeAttenuation(float range, float distance) {
     // return clamp(pow(1.0 - pow(distance / range, 4.0), 2.0), 0.0, 1.0) / (distance * distance + 1.0);
 
     // modified formular used by Khronos group glTF Viewer:
-    return clamp(1.0 - pow(distance / range, 2.0), 0.0, 1.0) / (distance * distance + 1.0);
+
+    // google filament:
+    // is very similar with Unreal
+    float smoothFactor = 1.0 - distanceSq / (range * range);
+    return clamp(smoothFactor * smoothFactor, 0.0, 1.0) / max(distanceSq, 0.01);
 }
 
 float getSpotAttenuation(vec3 pointToLight, vec3 spotDirection, float outerConeCos, float innerConeCos) {

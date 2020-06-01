@@ -149,7 +149,7 @@ window.onload = () => {
     pointLight01.isStatic = true;
     pointLight01.on = true;
     pointLight01.castShadow = false;
-    pointLight01.color = new vec4([40, 40, 40, 1]);
+    pointLight01.color = new vec4([30, 30, 30, 1]);
     pointLight01.distance = 50;
     pointLight01.localTransform.fromTranslation(new vec3([0, 3, 0]));
 
@@ -179,15 +179,16 @@ window.onload = () => {
 }
 
 function addPlane(name: string, matPlaneTran: mat4, matPlaneRot: mat4, wallColor: vec4, scene: Scene) {
-    const ceilingMesh = new Mesh();
-    ceilingMesh.name = name;
-    mat4.product(matPlaneTran, matPlaneRot, ceilingMesh.localTransform);
-    ceilingMesh.geometry = new PlaneGeometry(10, 10, 1, 1);
-    ceilingMesh.castShadow = true;
-    ceilingMesh.isStatic = true;
-    const ceilingMtl = new StandardPBRMaterial();
-    ceilingMtl.color = wallColor.copy();
-    ceilingMtl.metallic = 0.1;
-    ceilingMesh.materials.push(ceilingMtl);
-    scene.attachChild(ceilingMesh);
+    const planeMesh = new Mesh();
+    planeMesh.name = name;
+    mat4.product(matPlaneTran, matPlaneRot, planeMesh.localTransform);
+    planeMesh.geometry = new PlaneGeometry(10, 10, 1, 1);
+    planeMesh.castShadow = true;
+    planeMesh.isStatic = true;
+    const planeMtl = new StandardPBRMaterial();
+    planeMtl.color = wallColor.copy();
+    planeMtl.metallic = 0.05;
+    planeMtl.roughness = 0.8;
+    planeMesh.materials.push(planeMtl);
+    scene.attachChild(planeMesh);
 }
