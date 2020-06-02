@@ -1098,6 +1098,8 @@ export class ClusteredForwardRenderer {
         GLTextures.setTextureAt(this._shadowmapAtlasUnit, this._shadowmapAtlas.texture);
         GLTextures.setTextureAt(this._envMapArrayUnit, null, gl.TEXTURE_2D_ARRAY);
 
+        const cubefaceCamera = new Camera();
+
         // todo: iterate all envprobes
         for (let ienvprobe = 0; ienvprobe < this._renderContext.envprobeCount; ienvprobe++) {
             const envprobe = this._renderContext.envProbes[ienvprobe];
@@ -1115,16 +1117,27 @@ export class ClusteredForwardRenderer {
                 const height = this._renderContext.envmapSize;
                 gl.viewport(x, y, width, height);
                 gl.scissor(x, y, width, height);
+
+                // set render state
+                this.setRenderStateSet(this._renderStatesOpaque);
+
                 // clear
                 GLDevice.clearColor = new vec4([0, 0, 0, 0]);
                 GLDevice.clearDepth = 1.0;
                 GLDevice.clear(true, true, false);
 
-                // set render state
+                // todo: setup cube face camera properties
 
                 // set uniforms per view
+                // will fill all visible lights, decals, envprobes;
+                // is that necessary to render decals ?
+                // should not add envprobes at this time?
+                this._renderContext.fillUniformBuffersPerView(cubefaceCamera);
 
                 // render items in renderlist
+                // fix me: is that necessary to use depth prepass and occlusion query?
+                // no after effects?
+                // is that necessary to render transparent objects?
             }
 
             // todo: downsample all cubemaps and generate mipmaps
