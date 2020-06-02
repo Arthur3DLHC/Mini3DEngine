@@ -194,6 +194,8 @@ TODO:       主要类结构
                     生成 mipmaps？如何进行卷积过滤？
 
                 image based lighting
+                    specular
+                    diffuse
 
                 生成 irradiance volume？或者尝试用low mipmap envmap cube 做间接光照？
                     为每个 envmap probe 生成一个 shadowmap，用以剔除影响范围外的物体

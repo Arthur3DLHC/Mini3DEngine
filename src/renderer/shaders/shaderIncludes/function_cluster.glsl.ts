@@ -5,6 +5,7 @@ export default /** glsl */`
     // todo: get cluster index from pixel H position
     uint clusterOfPixel(vec4 hPosition) {
         // need to divide by w?
+        // todo: use u_view.clusterRes
         return 0u;
     }
 

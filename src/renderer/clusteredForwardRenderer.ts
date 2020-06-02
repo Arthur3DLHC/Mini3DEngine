@@ -344,115 +344,6 @@ export class ClusteredForwardRenderer {
 
     private _frustum: Frustum;
 
-    public render(scene: Scene) {
-        const gl = GLDevice.gl;
-
-        // GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, null);
-        GLTextures.setTextureAt(this._shadowmapAtlasUnit, null);
-
-        let shadowmapUpdated = false;
-
-        // if scene changed, setup uniform buffers for scene.
-        if (this._currentScene !== scene) {
-            // dispatch static objects
-            this.dispatchObjects(scene, true);
-
-
-            this.updateShadowmaps(false);
-            shadowmapUpdated = true;
-
-            this._renderContext.fillUniformBuffersPerScene();
-            // todo: generate static light shadowmaps;
-            // if light is static, use static shadow or there are no moving dynamic objects in range,
-            // use shadow map of last frame;
-            // render to texture atlas; if scene changed, need to repack texture atlas.
-
-            this.bindTexturesPerScene();
-            // todo: bind texture samplers
-            // use some reserved texture units for system textures?
-            // shadowmap atlas (static);
-            // decal atlas;
-            // envProbes;
-            // irradiance volumes;
-            // GLTextures.setTextureAt(0, )
-            this._currentScene = scene;
-        }
-        // dispatch dynamic objects
-        this.dispatchObjects(scene, false);
-
-        const matViewProj = new mat4();
-
-        // fix me: for simplicity, use only one camera; or occlusion query can not work.
-        for (let icam = 0; icam < this._renderContext.cameras.length; icam++) {
-            const camera = this._renderContext.cameras[icam];
-            // todo: calculate frustum
-            mat4.product(camera.projTransform, camera.viewTransform, matViewProj);
-
-            this._frustum.setFromProjectionMatrix(matViewProj);
-
-            // todo: find lights in view then update shadowmaps only for them?
-            this.fetchVisibleLights();
-
-            // todo: update light shadowmaps
-            // check which light need update
-            // frustum culling, distance
-            if (!shadowmapUpdated) {
-                this.updateShadowmaps(true);
-                shadowmapUpdated = true;
-            }
-
-            GLDevice.renderTarget = null;
-
-            // GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, this._shadowmapAtlasCache.texture);
-            GLTextures.setTextureAt(this._shadowmapAtlasUnit, this._shadowmapAtlas.texture);
-
-            // Test code: set render target
-            // GLDevice.renderTarget = this._shadowmapFBODynamic;
-
-            // set viewport
-            if (camera.viewport) {
-                gl.viewport(camera.viewport.x, camera.viewport.y, camera.viewport.z, camera.viewport.w);    
-                gl.scissor(camera.viewport.x, camera.viewport.y, camera.viewport.z, camera.viewport.w);
-            } else {
-                gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
-                gl.scissor(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
-            }
-
-            // need to allow color write and depth write
-            this.setRenderStateSet(this._renderStatesOpaque);
-
-            // todo: camera's clear mode
-            GLDevice.clearColor = camera.backgroundColor;
-            GLDevice.clearDepth = camera.backgroundDepth;
-            GLDevice.clearStencil = camera.backgroundStencil;
-
-            GLDevice.clear(camera.clearColor, camera.clearDepth, camera.clearStencil);
-
-            this._renderContext.fillUniformBuffersPerView(camera);
-            this.getOcclusionQueryResults();
-
-            // todo: sort the renderlists first?
-
-           // gl.colorMask(false, false, false, false);
-            //gl.depthFunc(gl.LEQUAL);
-            //gl.disable(gl.BLEND);
-            this.renderDepthPrepass(this._frustum);
-            //gl.colorMask(true, true, true, true);
-            this.renderOpaque(this._frustum);
-            // this.renderTransparent();
-
-            // todo: render sprites
-
-            // Test code: apply render target texture to a screen space rectangle
-            // test drawing a screen space rectangle
-            // GLDevice.renderTarget = null;
-            if (this._drawDebugTexture) {
-                this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._debugDepthTexture, 1, false);
-            }
-            // this.renderScreenRect(0, 0, 0.5, 0.5, new vec4([1,1,1,1]), this._debugDepthTexture, 1, false);
-        }
-    }
-
     private createRenderStates() {
         const gl = GLDevice.gl;
         this._renderStatesShadow.depthState = RenderStateCache.instance.getDepthStencilState(true, true, gl.LEQUAL);
@@ -679,6 +570,121 @@ export class ClusteredForwardRenderer {
         this._curDefaultRenderStates = states;
         states.apply();
     }
+
+    
+    public render(scene: Scene) {
+        const gl = GLDevice.gl;
+
+        // GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, null);
+        GLTextures.setTextureAt(this._shadowmapAtlasUnit, null);
+
+        let shadowmapUpdated = false;
+
+        // if scene changed, setup uniform buffers for scene.
+        if (this._currentScene !== scene) {
+            // dispatch static objects
+            this.dispatchObjects(scene, true);
+
+            this.updateShadowmaps(false);
+            shadowmapUpdated = true;
+
+
+            this._renderContext.fillUniformBuffersPerScene();
+
+            // todo: bind shaddowmaps only, and render cubemaps
+            this.updateCubemaps();
+
+            // todo: generate static light shadowmaps;
+            // if light is static, use static shadow or there are no moving dynamic objects in range,
+            // use shadow map of last frame;
+            // render to texture atlas; if scene changed, need to repack texture atlas.
+
+            this.bindTexturesPerScene();
+            // todo: bind texture samplers
+            // use some reserved texture units for system textures?
+            // shadowmap atlas (static);
+            // decal atlas;
+            // envProbes;
+            // irradiance volumes;
+            // GLTextures.setTextureAt(0, )
+            this._currentScene = scene;
+        }
+        // dispatch dynamic objects
+        this.dispatchObjects(scene, false);
+
+        const matViewProj = new mat4();
+
+        // fix me: for simplicity, use only one camera; or occlusion query can not work.
+        for (let icam = 0; icam < this._renderContext.cameras.length; icam++) {
+            const camera = this._renderContext.cameras[icam];
+            // todo: calculate frustum
+            mat4.product(camera.projTransform, camera.viewTransform, matViewProj);
+
+            this._frustum.setFromProjectionMatrix(matViewProj);
+
+            // todo: find lights in view then update shadowmaps only for them?
+            this.fetchVisibleLights();
+
+            // todo: update light shadowmaps
+            // check which light need update
+            // frustum culling, distance
+            if (!shadowmapUpdated) {
+                this.updateShadowmaps(true);
+                shadowmapUpdated = true;
+            }
+
+            GLDevice.renderTarget = null;
+
+            // GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, this._shadowmapAtlasCache.texture);
+            GLTextures.setTextureAt(this._shadowmapAtlasUnit, this._shadowmapAtlas.texture);
+
+            // Test code: set render target
+            // GLDevice.renderTarget = this._shadowmapFBODynamic;
+
+            // set viewport
+            if (camera.viewport) {
+                gl.viewport(camera.viewport.x, camera.viewport.y, camera.viewport.z, camera.viewport.w);    
+                gl.scissor(camera.viewport.x, camera.viewport.y, camera.viewport.z, camera.viewport.w);
+            } else {
+                gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+                gl.scissor(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+            }
+
+            // need to allow color write and depth write
+            this.setRenderStateSet(this._renderStatesOpaque);
+
+            // todo: camera's clear mode
+            GLDevice.clearColor = camera.backgroundColor;
+            GLDevice.clearDepth = camera.backgroundDepth;
+            GLDevice.clearStencil = camera.backgroundStencil;
+
+            GLDevice.clear(camera.clearColor, camera.clearDepth, camera.clearStencil);
+
+            this._renderContext.fillUniformBuffersPerView(camera);
+            this.getOcclusionQueryResults();
+
+            // todo: sort the renderlists first?
+
+           // gl.colorMask(false, false, false, false);
+            //gl.depthFunc(gl.LEQUAL);
+            //gl.disable(gl.BLEND);
+            this.renderDepthPrepass(this._frustum);
+            //gl.colorMask(true, true, true, true);
+            this.renderOpaque(this._frustum);
+            // this.renderTransparent();
+
+            // todo: render sprites
+
+            // Test code: apply render target texture to a screen space rectangle
+            // test drawing a screen space rectangle
+            // GLDevice.renderTarget = null;
+            if (this._drawDebugTexture) {
+                this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._debugDepthTexture, 1, false);
+            }
+            // this.renderScreenRect(0, 0, 0.5, 0.5, new vec4([1,1,1,1]), this._debugDepthTexture, 1, false);
+        }
+    }
+
     private renderDepthPrepass(frustum: Frustum) {
         if (this._renderListDepthPrepass.ItemCount <= 0) {
             return;
@@ -1078,5 +1084,25 @@ export class ClusteredForwardRenderer {
                 this.renderShadowItems(this._renderListOpaque, light, false, true, this._shadowmapFBO, !cacheCopied);
             }
         }
+    }
+
+    private updateCubemaps() {
+        console.log("updating cubemaps...");
+        // todo: bind shadowmaps
+
+        // todo: iterate all envprobes
+
+        // todo: set the cubemap texture array layer as render target
+
+        // todo: set viewport and scissor, render 6 faces of cubemap
+
+        // todo: downsample all cubemaps and generate mipmaps
+
+        // the last level of mipmap can be used as ambient cube?
+
+        // todo: Spherical Harmonic?
+
+        console.log("done.");
+        // throw new Error("Method not implemented.");
     }
 }
