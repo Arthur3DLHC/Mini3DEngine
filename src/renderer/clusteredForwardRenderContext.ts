@@ -355,7 +355,12 @@ export class ClusteredForwardRenderContext extends RenderContext {
     //     this._ubFrame.update();
     // }
 
-    public fillUniformBuffersPerView(camera: Camera, useClusters: boolean = false) {
+    public fillUniformBuffersPerView(camera: Camera,
+                                    lights: boolean = true,
+                                    decals: boolean = true,
+                                    envprobes: boolean = true,
+                                    irrvols: boolean = true,
+                                    useClusters: boolean = false) {
         // todo: fill view and proj matrix
         this._ubView.setMat4("matView", camera.viewTransform);
         // todo: prev view matrix
@@ -421,30 +426,35 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
         // todo: fill dynamic lights and decals
         // check visibility?
-        this.fillItemsPerView(camera, clusterRes);
+        this.fillItemsPerView(camera, clusterRes, lights, decals, envprobes, irrvols);
     }
 
-    private fillItemsPerView(camera: Camera, clusterRes: vec4) {
-        if (this.dynamicLightCount > 0) {
-            this._buffer.seek(0);
-            // for (const light of this.dynamicLights) {
-            for(let i = 0; i < this.dynamicLightCount; i++) {
-                const light = this.dynamicLights[i];
-                this.addLightToBuffer(this._buffer, light);
+    private fillItemsPerView(camera: Camera, clusterRes: vec4, lights: boolean, decals: boolean, envprobes: boolean, irrvols: boolean) {
+        if (lights) {
+            if (this.dynamicLightCount > 0) {
+                this._buffer.seek(0);
+                // for (const light of this.dynamicLights) {
+                for(let i = 0; i < this.dynamicLightCount; i++) {
+                    const light = this.dynamicLights[i];
+                    this.addLightToBuffer(this._buffer, light);
+                }
+                // how to append to the end of the light ubo? or use another ubo?
+                // update from the static light count * one light size in ubo
+                this._ubLights.updateByData(this._tmpData, this.staticLightCount * ClusteredForwardRenderContext.LIGHT_SIZE_FLOAT * 4, 0, this._buffer.length);
             }
-            // how to append to the end of the light ubo? or use another ubo?
-            // update from the static light count * one light size in ubo
-            this._ubLights.updateByData(this._tmpData, this.staticLightCount * ClusteredForwardRenderContext.LIGHT_SIZE_FLOAT * 4, 0, this._buffer.length);
         }
  
-        if (this.dynamicDecalCount > 0) {
-            this._buffer.seek(0);
-            for (let i = 0; i < this.dynamicDecalCount; i++) {
-                const decal = this.dynamicDecals[i];
-                this.addDecalToBuffer(this._buffer, decal);
+        if (decals) {
+            if (this.dynamicDecalCount > 0) {
+                this._buffer.seek(0);
+                for (let i = 0; i < this.dynamicDecalCount; i++) {
+                    const decal = this.dynamicDecals[i];
+                    this.addDecalToBuffer(this._buffer, decal);
+                }
+                this._ubDecals.updateByData(this._tmpData, this.staticDecalCount * ClusteredForwardRenderContext.DECAL_SIZE_FLOAT * 4, 0, this._buffer.length);
             }
-            this._ubDecals.updateByData(this._tmpData, this.staticDecalCount * ClusteredForwardRenderContext.DECAL_SIZE_FLOAT * 4, 0, this._buffer.length);
         }
+
          // envprobes and irradiance volumes are always static
         // test: add all item indices, and assume only one cluster
         let start = 0;
@@ -458,52 +468,64 @@ export class ClusteredForwardRenderContext extends RenderContext {
             let decalCount = 0;
             let envProbeCount = 0;
             let irrVolCount = 0;
-            for (let iLight = 0; iLight < this.staticLightCount; iLight++) {
-                const light = this.staticLights[iLight];
-                if (light.on) {
-                    // todo: cull light against clusters
-                    // for test perpurse new, add them all:
-                    this._idxBuffer.addNumber(iLight);
-                    lightCount++;                    
+            if (lights) {
+                for (let iLight = 0; iLight < this.staticLightCount; iLight++) {
+                    const light = this.staticLights[iLight];
+                    if (light.on) {
+                        // todo: cull light against clusters
+                        // for test perpurse new, add them all:
+                        this._idxBuffer.addNumber(iLight);
+                        lightCount++;                    
+                    }
+                }
+                for (let iLight = 0; iLight < this.dynamicLightCount; iLight++) {
+                    const light = this.dynamicLights[iLight];
+                    if (light.on) {
+                        this._idxBuffer.addNumber(iLight + this.staticLightCount);
+                        lightCount++;                    
+                    }
                 }
             }
-            for (let iLight = 0; iLight < this.dynamicLightCount; iLight++) {
-                const light = this.dynamicLights[iLight];
-                if (light.on) {
-                    this._idxBuffer.addNumber(iLight + this.staticLightCount);
-                    lightCount++;                    
+
+            if (decals) {
+                for (let iDecal = 0; iDecal < this.staticDecalCount; iDecal++) {
+                    const decal = this.staticDecals[iDecal];
+                    // todo: check decal distance; cull against clusters
+                    if (decal.visible) {
+                        this._idxBuffer.addNumber(iDecal);
+                        decalCount++; 
+                    }
+                }
+                for (let iDecal = 0; iDecal < this.dynamicDecalCount; iDecal++) {
+                    const decal = this.dynamicDecals[iDecal];
+                    if (decal.visible) {
+                        this._idxBuffer.addNumber(iDecal + this.staticDecalCount);
+                        decalCount++; 
+                    }
                 }
             }
-            for (let iDecal = 0; iDecal < this.staticDecalCount; iDecal++) {
-                const decal = this.staticDecals[iDecal];
-                // todo: check decal distance; cull against clusters
-                if (decal.visible) {
-                    this._idxBuffer.addNumber(iDecal);
-                    decalCount++; 
+
+            if (envprobes) {
+                for (let iEnv = 0; iEnv < this.envprobeCount; iEnv++) {
+                    const envProbe = this.envProbes[iEnv];
+                    if (envProbe.visible) {
+                        this._idxBuffer.addNumber(iEnv);
+                        envProbeCount++;
+                    }
                 }
             }
-            for (let iDecal = 0; iDecal < this.dynamicDecalCount; iDecal++) {
-                const decal = this.dynamicDecals[iDecal];
-                if (decal.visible) {
-                    this._idxBuffer.addNumber(iDecal + this.staticDecalCount);
-                    decalCount++; 
+
+            if (irrvols) {
+                // pack envprobe and irrvolume count together
+                for (let iIrr = 0; iIrr < this.irradianceVolumeCount; iIrr++) {
+                    const irrVol = this.irradianceVolumes[iIrr];
+                    if (irrVol.visible) {
+                        this._idxBuffer.addNumber(iIrr);
+                        irrVolCount++;
+                    }
                 }
             }
-            for (let iEnv = 0; iEnv < this.envprobeCount; iEnv++) {
-                const envProbe = this.envProbes[iEnv];
-                if (envProbe.visible) {
-                    this._idxBuffer.addNumber(iEnv);
-                    envProbeCount++;
-                }
-            }
-            // pack envprobe and irrvolume count together
-            for (let iIrr = 0; iIrr < this.irradianceVolumeCount; iIrr++) {
-                const irrVol = this.irradianceVolumes[iIrr];
-                if (irrVol.visible) {
-                    this._idxBuffer.addNumber(iIrr);
-                    irrVolCount++; 
-                }
-            }
+
             this._clusterBuffer.addNumber(start);       // the start index of this cluster
             this._clusterBuffer.addNumber(lightCount);       // light count
             this._clusterBuffer.addNumber(decalCount);       // decal count

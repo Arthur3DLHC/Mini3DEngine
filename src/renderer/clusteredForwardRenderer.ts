@@ -1145,14 +1145,15 @@ export class ClusteredForwardRenderer {
                 this._frustum.setFromProjectionMatrix(matViewProj);
                 // set uniforms per view
                 // will fill all visible lights, decals, envprobes;
-                // is that necessary to render decals ?
-                // should not add envprobes at this time?
-                this._renderContext.fillUniformBuffersPerView(cubefaceCamera);
+                // is that necessary to render decals ? maybe not;
+                // should not add envprobes at this time? because can not read their textures in shader yet.
+                this._renderContext.fillUniformBuffersPerView(cubefaceCamera, true, false, false, false, false);
 
                 // render items in renderlist
+                // only render static items;
                 // fix me: is that necessary to use depth prepass and occlusion query?
                 // no after effects?
-                // is that necessary to render transparent objects?
+                // is that necessary to render transparent objects? yes, it is...
             }
 
             // todo: downsample all cubemaps and generate mipmaps
