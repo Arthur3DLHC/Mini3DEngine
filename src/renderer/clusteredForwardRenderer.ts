@@ -153,7 +153,15 @@ export class ClusteredForwardRenderer {
         this._shadowmapAtlas.texture.create();
 
         this._decalAtlas = new TextureAtlas2D();
-        this._envMapArray = null;
+
+        this._envMapArray = new Texture2DArray();
+        this._envMapArray.width = 64 * 6;
+        this._envMapArray.height = 64;
+        this._envMapArray.depth = ClusteredForwardRenderContext.MAX_ENVPROBES;              // 128 envmaps in whole scene?
+        this._envMapArray.format = gl.RGB;
+        this._envMapArray.componentType = gl.UNSIGNED_BYTE;
+        this._envMapArray.create();
+
         this._irradianceVolumeAtlas = new TextureAtlas3D();
 
         this._debugDepthTexture = new Texture2D();
@@ -182,6 +190,9 @@ export class ClusteredForwardRenderer {
             // this._shadowmapFBODynamic.setTexture(0, this._debugDepthTexture);
         }
         this._shadowmapFBO.prepare();
+
+        // envmap texture array and FBO
+        this._envmapFBO = new FrameBuffer();
 
 
         this.registerShaderCodes();
@@ -295,10 +306,12 @@ export class ClusteredForwardRenderer {
     private _envMapArray: Texture2DArray|null;
     private _irradianceVolumeAtlas: TextureAtlas3D;
 
+    // FOBs
     private _shadowmapCacheFBO: FrameBuffer;
     private _shadowmapFBO: FrameBuffer;
     private _debugDepthTexture: Texture2D;        // debug use
     private _drawDebugTexture: boolean;
+    private _envmapFBO: FrameBuffer;
 
     private _numReservedTextures: number;
     

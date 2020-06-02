@@ -93,22 +93,23 @@ export class ClusteredForwardRenderContext extends RenderContext {
     public static readonly NUM_CLUSTERS = 16 * 8 * 24;
     public static readonly CLUSTER_SIZE_INT = 4;
 
+    public static readonly MAX_LIGHTS = 256;
+    public static readonly MAX_DECALS = 512;
+    public static readonly MAX_ENVPROBES = 128;
+    public static readonly MAX_IRRVOLUMES = 512;
+    public static readonly MAX_ITEMS = 4096;
+    public static readonly MAX_BONES = 256;
+
     private setUniformBufferLayouts() {
-        const MAX_LIGHTS = 256;
-        const MAX_DECALS = 512;
-        const MAX_ENVPROBES = 512;
-        const MAX_IRRVOLUMES = 512;
-        const MAX_ITEMS = 4096;
-        const NUM_CLUSTERS = 16 * 8 * 24;
-        const MAX_BONES = 256;
+
         // per scene
 
         // TODO: 带结构和数组的 uniform buffer 怎么初始化和更新值？
         // 数组长度 * 对齐后的结构浮点数个数
-        this._ubLights.addUniform("lights", MAX_LIGHTS * ClusteredForwardRenderContext.LIGHT_SIZE_FLOAT);
-        this._ubDecals.addUniform("decals", MAX_DECALS * ClusteredForwardRenderContext.DECAL_SIZE_FLOAT);
-        this._ubEnvProbes.addUniform("probes", MAX_ENVPROBES * ClusteredForwardRenderContext.ENVPROBE_SIZE_FLOAT);
-        this._ubIrrVolumes.addUniform("volumes", MAX_IRRVOLUMES * ClusteredForwardRenderContext.IRRVOL_SIZE_FLOAT);
+        this._ubLights.addUniform("lights", ClusteredForwardRenderContext.MAX_LIGHTS * ClusteredForwardRenderContext.LIGHT_SIZE_FLOAT);
+        this._ubDecals.addUniform("decals", ClusteredForwardRenderContext.MAX_DECALS * ClusteredForwardRenderContext.DECAL_SIZE_FLOAT);
+        this._ubEnvProbes.addUniform("probes", ClusteredForwardRenderContext.MAX_ENVPROBES * ClusteredForwardRenderContext.ENVPROBE_SIZE_FLOAT);
+        this._ubIrrVolumes.addUniform("volumes", ClusteredForwardRenderContext.MAX_IRRVOLUMES * ClusteredForwardRenderContext.IRRVOL_SIZE_FLOAT);
 
         // per frame,
         // it's too small and webgl does not allow small uniform buffers,
@@ -128,17 +129,17 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubView.addVec2("rtSize", new vec2());
         this._ubView.addVec4("farRect", new vec4());
 
-        this._ubItemIndices.addUniform("indices", MAX_ITEMS);
+        this._ubItemIndices.addUniform("indices", ClusteredForwardRenderContext.MAX_ITEMS);
 
-        this._ubClusters.addUniform("clusters", NUM_CLUSTERS * 4);
+        this._ubClusters.addUniform("clusters", ClusteredForwardRenderContext.NUM_CLUSTERS * 4);
 
         // per obj
         this._ubObject.addMat4("matWorld", matIdentity);
         this._ubObject.addMat4("matWorldPrev", matIdentity);
         this._ubObject.addVec4("color", new vec4());
         // this._ubObject.addFloat("tag", 0);
-        this._ubObject.addUniform("matBones", MAX_BONES * 16);
-        this._ubObject.addUniform("matPrevBones", MAX_BONES * 16);
+        this._ubObject.addUniform("matBones", ClusteredForwardRenderContext.MAX_BONES * 16);
+        this._ubObject.addUniform("matPrevBones", ClusteredForwardRenderContext.MAX_BONES * 16);
 
         // per mtl
         // default pbr material

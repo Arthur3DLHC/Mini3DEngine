@@ -4,7 +4,7 @@
 export default /** glsl */`
     #define MAX_LIGHTS_PERSCENE  256
     #define MAX_DECALS_PERSCENE  512
-    #define MAX_ENVPROBES_PERSCENE  512
+    #define MAX_ENVPROBES_PERSCENE  128
     #define MAX_IRRADIANCE_VOLUMES_PERSCENE  512
     
     layout (std140, column_major) uniform; 
