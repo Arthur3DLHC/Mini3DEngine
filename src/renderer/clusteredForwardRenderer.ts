@@ -1093,19 +1093,42 @@ export class ClusteredForwardRenderer {
     private updateCubemaps() {
         console.log("updating cubemaps...");
 
+        const gl = GLDevice.gl;
+
         GLTextures.setTextureAt(this._shadowmapAtlasUnit, this._shadowmapAtlas.texture);
+        GLTextures.setTextureAt(this._envMapArrayUnit, null, gl.TEXTURE_2D_ARRAY);
 
         // todo: iterate all envprobes
         for (let ienvprobe = 0; ienvprobe < this._renderContext.envprobeCount; ienvprobe++) {
             const envprobe = this._renderContext.envProbes[ienvprobe];
-            
+
+            // todo: set the cubemap texture array layer as render target
+            this._envmapFBO.setTexture(0, this._envMapArray, 0, ienvprobe);
+            this._envmapFBO.prepare();
+            GLDevice.renderTarget = this._envmapFBO;
+
+            // todo: set viewport and scissor, render 6 faces of cubemap
+            for(let iface = 0; iface < 6; iface++) {
+                const x = iface * this._renderContext.envmapSize;
+                const y = 0;
+                const width = this._renderContext.envmapSize;
+                const height = this._renderContext.envmapSize;
+                gl.viewport(x, y, width, height);
+                gl.scissor(x, y, width, height);
+                // clear
+                GLDevice.clearColor = new vec4([0, 0, 0, 0]);
+                GLDevice.clearDepth = 1.0;
+                GLDevice.clear(true, true, false);
+
+                // set render state
+
+                // set uniforms per view
+
+                // render items in renderlist
+            }
+
+            // todo: downsample all cubemaps and generate mipmaps
         }
-
-        // todo: set the cubemap texture array layer as render target
-
-        // todo: set viewport and scissor, render 6 faces of cubemap
-
-        // todo: downsample all cubemaps and generate mipmaps
 
         // the last level of mipmap can be used as ambient cube?
 
