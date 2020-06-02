@@ -19,6 +19,7 @@ export default /** glsl */`
         vec2 zRange;            // near, far
         vec2 rtSize;            // render target full size, in pixels
         vec4 farRect;           // far plane left, bottom, right, top
+        vec4 clusterRes;        // x, y, z resolusion of clusters.
     } u_view;
 
 

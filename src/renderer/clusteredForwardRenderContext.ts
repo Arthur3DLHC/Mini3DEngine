@@ -90,6 +90,9 @@ export class ClusteredForwardRenderContext extends RenderContext {
     public static readonly ENVPROBE_SIZE_FLOAT = 4;
     public static readonly IRRVOL_SIZE_FLOAT = 24;
 
+    public static readonly NUM_CLUSTERS_X = 16;
+    public static readonly NUM_CLUSTERS_Y = 8;
+    public static readonly NUM_CLUSTERS_Z = 24;
     public static readonly NUM_CLUSTERS = 16 * 8 * 24;
     public static readonly CLUSTER_SIZE_INT = 4;
 
@@ -99,6 +102,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
     public static readonly MAX_IRRVOLUMES = 512;
     public static readonly MAX_ITEMS = 4096;
     public static readonly MAX_BONES = 256;
+
+    public envmapSize: number = 64;
 
     private setUniformBufferLayouts() {
 
@@ -128,6 +133,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubView.addVec2("zRange", new vec2());
         this._ubView.addVec2("rtSize", new vec2());
         this._ubView.addVec4("farRect", new vec4());
+        this._ubView.addVec4("clusterRes", new vec4());
 
         this._ubItemIndices.addUniform("indices", ClusteredForwardRenderContext.MAX_ITEMS);
 
@@ -345,7 +351,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
     //     this._ubFrame.update();
     // }
 
-    public fillUniformBuffersPerView(camera: Camera) {
+    public fillUniformBuffersPerView(camera: Camera, useClusters: boolean = false) {
         // todo: fill view and proj matrix
         this._ubView.setMat4("matView", camera.viewTransform);
         // todo: prev view matrix
@@ -399,14 +405,22 @@ export class ClusteredForwardRenderContext extends RenderContext {
         const farRect = new vec4([farLeftBottom.x / farLeftBottom.w, farLeftBottom.y / farLeftBottom.w, farRightTop.x / farRightTop.w, farRightTop.y / farRightTop.w]);
         this._ubView.setVec4("farRect", farRect);
 
+        const clusterRes = new vec4([1,1,1,1]);
+        if (useClusters) {
+            clusterRes.x = ClusteredForwardRenderContext.NUM_CLUSTERS_X;
+            clusterRes.y = ClusteredForwardRenderContext.NUM_CLUSTERS_Y;
+            clusterRes.z = ClusteredForwardRenderContext.NUM_CLUSTERS_Z;
+        }
+        this._ubView.setVec4("clusterRes", clusterRes);
+
         this._ubView.update();
 
         // todo: fill dynamic lights and decals
         // check visibility?
-        this.fillItemsPerView(camera);
+        this.fillItemsPerView(camera, clusterRes);
     }
 
-    private fillItemsPerView(camera: Camera) {
+    private fillItemsPerView(camera: Camera, clusterRes: vec4) {
         if (this.dynamicLights.length > 0) {
             this._buffer.seek(0);
             for (const light of this.dynamicLights) {

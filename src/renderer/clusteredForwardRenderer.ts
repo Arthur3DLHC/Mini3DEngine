@@ -154,13 +154,24 @@ export class ClusteredForwardRenderer {
 
         this._decalAtlas = new TextureAtlas2D();
 
+        // todo: should put sizes in a config object parameter?
         this._envMapArray = new Texture2DArray();
-        this._envMapArray.width = 64 * 6;
-        this._envMapArray.height = 64;
+        this._envMapArray.width = this._renderContext.envmapSize * 6;
+        this._envMapArray.height = this._renderContext.envmapSize;
         this._envMapArray.depth = ClusteredForwardRenderContext.MAX_ENVPROBES;              // 128 envmaps in whole scene?
         this._envMapArray.format = gl.RGB;
         this._envMapArray.componentType = gl.UNSIGNED_BYTE;
         this._envMapArray.create();
+
+        this._envMapDepthTexture = new Texture2D();
+        this._envMapDepthTexture.width = this._renderContext.envmapSize * 6;
+        this._envMapDepthTexture.height = this._renderContext.envmapSize;
+        this._envMapDepthTexture.depth = 1;
+        this._envMapDepthTexture.isShadowMap = true;
+        this._envMapDepthTexture.format = gl.DEPTH_COMPONENT;               // NOTE: not DEPTH but DEPTH_COMPONENT !!!!
+        this._envMapDepthTexture.componentType = gl.UNSIGNED_SHORT;         // use a 16 bit depth buffer for env cube
+
+        this._envMapDepthTexture.create();
 
         this._irradianceVolumeAtlas = new TextureAtlas3D();
 
@@ -193,7 +204,9 @@ export class ClusteredForwardRenderer {
 
         // envmap texture array and FBO
         this._envmapFBO = new FrameBuffer();
-
+        this._envmapFBO.setTexture(0, this._envMapArray, 0, 0);
+        this._envmapFBO.depthStencilTexture = this._envMapDepthTexture;
+        this._envmapFBO.prepare();
 
         this.registerShaderCodes();
 
@@ -303,7 +316,8 @@ export class ClusteredForwardRenderer {
     private _shadowmapAtlasCache: ShadowmapAtlas;  // static objects only
     private _shadowmapAtlas: ShadowmapAtlas; // dynamic objects only
     private _decalAtlas: TextureAtlas2D;
-    private _envMapArray: Texture2DArray|null;
+    private _envMapArray: Texture2DArray;
+    private _envMapDepthTexture: Texture2D;
     private _irradianceVolumeAtlas: TextureAtlas3D;
 
     // FOBs
