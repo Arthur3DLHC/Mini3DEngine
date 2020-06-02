@@ -1099,10 +1099,20 @@ export class ClusteredForwardRenderer {
         GLTextures.setTextureAt(this._envMapArrayUnit, null, gl.TEXTURE_2D_ARRAY);
 
         const cubefaceCamera = new Camera();
+        // because objects will be transformed to envprobe local space,
+        // and the envprobe's radius is represented by its scale transform,
+        // so we can use a unique projection frustum with far plane at 1
+        cubefaceCamera.projTransform = mat4.perspective(90, 1, 0.01, 1);
+        
+        const matWorldToProbe = new mat4();
+        const matViewProj = new mat4();
 
         // todo: iterate all envprobes
         for (let ienvprobe = 0; ienvprobe < this._renderContext.envprobeCount; ienvprobe++) {
             const envprobe = this._renderContext.envProbes[ienvprobe];
+
+            envprobe.worldTransform.copy(matWorldToProbe);
+            matWorldToProbe.inverse();
 
             // todo: set the cubemap texture array layer as render target
             this._envmapFBO.setTexture(0, this._envMapArray, 0, ienvprobe);
@@ -1127,7 +1137,12 @@ export class ClusteredForwardRenderer {
                 GLDevice.clear(true, true, false);
 
                 // todo: setup cube face camera properties
-
+                // transform objects to local space of envprobe first
+                // then apply cube face view matrix
+                const matFaceView = TextureCube.getFaceViewMatrix(iface);
+                mat4.product(matFaceView, matWorldToProbe, cubefaceCamera.viewTransform);
+                mat4.product(cubefaceCamera.projTransform, cubefaceCamera.viewTransform, matViewProj);
+                this._frustum.setFromProjectionMatrix(matViewProj);
                 // set uniforms per view
                 // will fill all visible lights, decals, envprobes;
                 // is that necessary to render decals ?
