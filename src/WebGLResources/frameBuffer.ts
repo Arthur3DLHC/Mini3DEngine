@@ -7,15 +7,24 @@ export class FrameBuffer {
         this.glFrameBuffer = null;
         this._needUpdate = true;
         this._textures = [];
+        this._textureLevels = [];
+        this._textureLayers = [];
         this._depthStencilBuffer = null;
         this._depthStencilTexture = null;
     }
     public glFrameBuffer: WebGLFramebuffer | null;
 
-    // 下列成员使用弱引用，使得可以多个 FrameBuffer 共享
-    public setTexture(index: number, texture: Texture | null) {
-        if (this._textures[index] !== texture) {
-            this._textures[index] = texture;            
+    /**
+     * 
+     * @param index 
+     * @param texture 
+     * @param layer if texture is array texture, this is the layer to bind. or should use -1
+     */
+    public setTexture(index: number, texture: Texture | null, level: number = 0, layer: number = -1) {
+        if (this._textures[index] !== texture || this._textureLevels[index] !== level || this._textureLayers[index] !== layer) {
+            this._textures[index] = texture;
+            this._textureLevels[index] = level;
+            this._textureLayers[index] = layer;
             this._needUpdate = true;
         }
     }
@@ -48,6 +57,8 @@ export class FrameBuffer {
     }
 
     private _textures: (Texture|null)[];
+    private _textureLevels: number[];
+    private _textureLayers: number[];
     private _depthStencilBuffer: RenderBuffer | null;
     private _depthStencilTexture: Texture | null;
     private _needUpdate: boolean;
@@ -81,7 +92,11 @@ export class FrameBuffer {
                         break;
                 }
                 // if texture not created, create it
+
+                // fix me: if not in array, the value is 0 or undefined?
                 let texture: Texture|null = this._textures[i];
+                let level: number = this._textureLevels[i];
+                let layer: number = this._textureLayers[i];
                 if (texture !== null) {
                     if (texture.samplerState !== null) {
                         if (texture.samplerState.minFilter !== gl.NEAREST || texture.samplerState.magFilter !== gl.NEAREST) {
@@ -93,10 +108,15 @@ export class FrameBuffer {
                         texture.create();
                     }
 
-                    gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, attachment, gl.TEXTURE_2D, texture.glTexture, 0);
+                    if (layer !== undefined && layer >= 0) {
+                        gl.framebufferTextureLayer(gl.DRAW_FRAMEBUFFER, attachment, texture.glTexture, level, layer);
+                    } else {
+                        gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, attachment, gl.TEXTURE_2D, texture.glTexture, level);
+                    }
                     attachments.push(attachment);
                 } else {
                     gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, attachment, gl.TEXTURE_2D, null, 0);
+                    gl.framebufferTextureLayer(gl.DRAW_FRAMEBUFFER, attachment, null, 0, 0);
                 }
             }
 
