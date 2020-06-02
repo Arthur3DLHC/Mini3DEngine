@@ -615,7 +615,7 @@ export class ClusteredForwardRenderer {
         const matViewProj = new mat4();
 
         // fix me: for simplicity, use only one camera; or occlusion query can not work.
-        for (let icam = 0; icam < this._renderContext.cameras.length; icam++) {
+        for (let icam = 0; icam < this._renderContext.cameraCount; icam++) {
             const camera = this._renderContext.cameras[icam];
             // todo: calculate frustum
             mat4.product(camera.projTransform, camera.viewTransform, matViewProj);
@@ -969,13 +969,15 @@ export class ClusteredForwardRenderer {
         
     private fetchVisibleLights() {
         this._curNumVisibleLights = 0;
-        for (const light of this._renderContext.staticLights) {
+        for (let i = 0; i < this._renderContext.staticLightCount; i++) {
+            const light = this._renderContext.staticLights[i];
             if (light.on && this.lightIsInView(light)) {
                 this._visibleLights[this._curNumVisibleLights] = light;
                 this._curNumVisibleLights++;
             }
         }
-        for (const light of this._renderContext.dynamicLights) {
+        for (let i = 0; i < this._renderContext.dynamicLightCount; i++) {
+            const light = this._renderContext.dynamicLights[i];
             if (light.on && this.lightIsInView(light)) {
                 this._visibleLights[this._curNumVisibleLights] = light;
                 this._curNumVisibleLights++;
@@ -1032,14 +1034,16 @@ export class ClusteredForwardRenderer {
             }
         } else {
             // iterate static lights
-            for (const light of this._renderContext.staticLights) {
+            for(let i = 0; i < this._renderContext.staticLightCount; i++) {
+                const light = this._renderContext.staticLights[i];
                 if (light.shadow && light.castShadow) {
                     this.updateShadowMapFor(light);
                 }
             }
     
             // iterate dynamic lights
-            for (const light of this._renderContext.dynamicLights) {
+            for( let i = 0; i < this._renderContext.dynamicLightCount; i++) {
+                const light = this._renderContext.dynamicLights[i];
                 if (light.shadow && light.castShadow) {
                     this.updateShadowMapFor(light);
                 }
@@ -1088,9 +1092,14 @@ export class ClusteredForwardRenderer {
 
     private updateCubemaps() {
         console.log("updating cubemaps...");
-        // todo: bind shadowmaps
+
+        GLTextures.setTextureAt(this._shadowmapAtlasUnit, this._shadowmapAtlas.texture);
 
         // todo: iterate all envprobes
+        for (let ienvprobe = 0; ienvprobe < this._renderContext.envprobeCount; ienvprobe++) {
+            const envprobe = this._renderContext.envProbes[ienvprobe];
+            
+        }
 
         // todo: set the cubemap texture array layer as render target
 

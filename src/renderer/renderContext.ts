@@ -17,13 +17,13 @@ export class RenderContext {
         this.envProbes = [];
         this.irradianceVolumes = [];
 
-        this.curCameraIndex = 0;
-        this.curStaticLightIndex = 0;
-        this.curStaticDecalIndex = 0;
-        this.curDynamicLightIndex = 0;
-        this.curDynamicDecalIndex = 0;
-        this.curEnvMapIndex = 0;
-        this.curIrradianceVolumeIndex = 0;
+        this._curCameraIndex = 0;
+        this._curStaticLightIndex = 0;
+        this._curStaticDecalIndex = 0;
+        this._curDynamicLightIndex = 0;
+        this._curDynamicDecalIndex = 0;
+        this._curEnvMapIndex = 0;
+        this._curIrradianceVolumeIndex = 0;
     }
     public cameras: Camera[];
     public staticLights: BaseLight[];
@@ -33,60 +33,68 @@ export class RenderContext {
     public envProbes: EnvironmentProbe[];
     public irradianceVolumes: IrradianceVolume[];
 
+    public get staticLightCount() { return this._curStaticLightIndex; }
+    public get dynamicLightCount() { return this._curDynamicLightIndex; }
+    public get staticDecalCount() { return this._curStaticDecalIndex; }
+    public get dynamicDecalCount() { return this._curDynamicDecalIndex; }
+    public get envprobeCount() { return this._curEnvMapIndex; }
+    public get irradianceVolumeCount() { return this._curIrradianceVolumeIndex; }
+    public get cameraCount() { return this._curCameraIndex; }
+
     public clear(statics: boolean, dynamics: boolean) {
-        this.curCameraIndex = 0;
+        this._curCameraIndex = 0;
         if (statics) {
-            this.curStaticLightIndex = 0;
-            this.curStaticDecalIndex = 0;
-            this.curEnvMapIndex = 0;
-            this.curIrradianceVolumeIndex = 0;
+            this._curStaticLightIndex = 0;
+            this._curStaticDecalIndex = 0;
+            this._curEnvMapIndex = 0;
+            this._curIrradianceVolumeIndex = 0;
         }
         if (dynamics) {
-            this.curDynamicLightIndex = 0;
-            this.curDynamicDecalIndex = 0;
+            this._curDynamicLightIndex = 0;
+            this._curDynamicDecalIndex = 0;
         }
     }
 
     public addCamera(camera: Camera) {
-        this.cameras[this.curCameraIndex] = camera;
-        this.curCameraIndex++;
+        this.cameras[this._curCameraIndex] = camera;
+        this._curCameraIndex++;
     }
 
     public addLight(light: BaseLight) {
         if (light.isStatic) {
-            this.staticLights[this.curStaticLightIndex] = light;
-            this.curStaticLightIndex++;
+            this.staticLights[this._curStaticLightIndex] = light;
+            this._curStaticLightIndex++;
         } else {
-            this.dynamicLights[this.curDynamicLightIndex] = light;
-            this.curDynamicLightIndex++;     
+            this.dynamicLights[this._curDynamicLightIndex] = light;
+            this._curDynamicLightIndex++;     
         }
     }
 
     public addDecal(decal: Decal) {
         if (decal.isStatic) {
-            this.staticDecals[this.curStaticDecalIndex] = decal;
-            this.curStaticDecalIndex++;
+            this.staticDecals[this._curStaticDecalIndex] = decal;
+            this._curStaticDecalIndex++;
         } else {
-            this.dynamicDecals[this.curDynamicDecalIndex] = decal;
-            this.curDynamicDecalIndex++;
+            this.dynamicDecals[this._curDynamicDecalIndex] = decal;
+            this._curDynamicDecalIndex++;
         }
     }
 
     public addEnvironmentProbe(envProbe: EnvironmentProbe) {
-        this.envProbes[this.curEnvMapIndex] = envProbe;
-        this.curEnvMapIndex++;
+        this.envProbes[this._curEnvMapIndex] = envProbe;
+        this._curEnvMapIndex++;
     }
 
     public addIrradianceVolume(irrVol: IrradianceVolume) {
-        this.irradianceVolumes[this.curIrradianceVolumeIndex] = irrVol;
-        this.curIrradianceVolumeIndex++;
+        this.irradianceVolumes[this._curIrradianceVolumeIndex] = irrVol;
+        this._curIrradianceVolumeIndex++;
     }
 
-    private curCameraIndex: number;
-    private curStaticLightIndex: number;
-    private curStaticDecalIndex: number;
-    private curDynamicLightIndex: number;
-    private curDynamicDecalIndex: number;
-    private curEnvMapIndex: number;
-    private curIrradianceVolumeIndex: number;
+    private _curCameraIndex: number;
+    private _curStaticLightIndex: number;
+    private _curStaticDecalIndex: number;
+    private _curDynamicLightIndex: number;
+    private _curDynamicDecalIndex: number;
+    private _curEnvMapIndex: number;
+    private _curIrradianceVolumeIndex: number;
 }

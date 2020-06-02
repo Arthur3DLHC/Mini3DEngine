@@ -210,21 +210,24 @@ export class ClusteredForwardRenderContext extends RenderContext {
         // pay attention to uniform alignment;
 
         this._buffer.seek(0);
-        for (const light of this.staticLights) {
-            this.addLightToBufer(this._buffer, light);
+        for (let i = 0; i < this.staticLightCount; i++) {
+            const light = this.staticLights[i];
+            this.addLightToBuffer(this._buffer, light);
         }
         this._ubLights.setUniform("lights", this._tmpData, this._buffer.length);
         this._ubLights.update();
 
         this._buffer.seek(0);
-        for (const decal of this.staticDecals) {
+        for (let i = 0; i < this.staticDecalCount; i++) {
+            const decal = this.staticDecals[i];
             this.addDecalToBuffer(this._buffer, decal);
         }
         this._ubDecals.setUniform("decals", this._tmpData, this._buffer.length);
         this._ubDecals.update();
 
         this._buffer.seek(0);
-        for (const probe of this.envProbes) {
+        for( let i = 0; i < this.envprobeCount; i++) {
+            const probe = this.envProbes[i];
             let position = new vec3();
             probe.worldTransform.getTranslation(position);
             this._buffer.addArray(position.values);
@@ -234,7 +237,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubEnvProbes.update();
 
         this._buffer.seek(0);
-        for (const vol of this.irradianceVolumes) {
+        for (let i = 0; i < this.irradianceVolumeCount; i++) {
+            const vol = this.irradianceVolumes[i];
             this._buffer.addArray(vol.worldTransform.values);
             const boxMin = vol.atlasLocation.minPoint.copy();
             const boxMax = vol.atlasLocation.maxPoint.copy();
@@ -250,7 +254,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         buffer.addArray(decal.atlasRect.values);
     }
 
-    private addLightToBufer(buffer: BufferHelper, light: BaseLight) {
+    private addLightToBuffer(buffer: BufferHelper, light: BaseLight) {
         const lightColor = light.color.copy();
 
         let radius = 0;
@@ -421,22 +425,25 @@ export class ClusteredForwardRenderContext extends RenderContext {
     }
 
     private fillItemsPerView(camera: Camera, clusterRes: vec4) {
-        if (this.dynamicLights.length > 0) {
+        if (this.dynamicLightCount > 0) {
             this._buffer.seek(0);
-            for (const light of this.dynamicLights) {
-                this.addLightToBufer(this._buffer, light);
+            // for (const light of this.dynamicLights) {
+            for(let i = 0; i < this.dynamicLightCount; i++) {
+                const light = this.dynamicLights[i];
+                this.addLightToBuffer(this._buffer, light);
             }
             // how to append to the end of the light ubo? or use another ubo?
             // update from the static light count * one light size in ubo
-            this._ubLights.updateByData(this._tmpData, this.staticLights.length * ClusteredForwardRenderContext.LIGHT_SIZE_FLOAT * 4, 0, this._buffer.length);
+            this._ubLights.updateByData(this._tmpData, this.staticLightCount * ClusteredForwardRenderContext.LIGHT_SIZE_FLOAT * 4, 0, this._buffer.length);
         }
  
-        if (this.dynamicDecals.length > 0) {
+        if (this.dynamicDecalCount > 0) {
             this._buffer.seek(0);
-            for (const decal of this.dynamicDecals) {
+            for (let i = 0; i < this.dynamicDecalCount; i++) {
+                const decal = this.dynamicDecals[i];
                 this.addDecalToBuffer(this._buffer, decal);
             }
-            this._ubDecals.updateByData(this._tmpData, this.staticDecals.length * ClusteredForwardRenderContext.DECAL_SIZE_FLOAT * 4, 0, this._buffer.length);
+            this._ubDecals.updateByData(this._tmpData, this.staticDecalCount * ClusteredForwardRenderContext.DECAL_SIZE_FLOAT * 4, 0, this._buffer.length);
         }
          // envprobes and irradiance volumes are always static
         // test: add all item indices, and assume only one cluster
@@ -451,7 +458,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
             let decalCount = 0;
             let envProbeCount = 0;
             let irrVolCount = 0;
-            for (let iLight = 0; iLight < this.staticLights.length; iLight++) {
+            for (let iLight = 0; iLight < this.staticLightCount; iLight++) {
                 const light = this.staticLights[iLight];
                 if (light.on) {
                     // todo: cull light against clusters
@@ -460,14 +467,14 @@ export class ClusteredForwardRenderContext extends RenderContext {
                     lightCount++;                    
                 }
             }
-            for (let iLight = 0; iLight < this.dynamicLights.length; iLight++) {
+            for (let iLight = 0; iLight < this.dynamicLightCount; iLight++) {
                 const light = this.dynamicLights[iLight];
                 if (light.on) {
-                    this._idxBuffer.addNumber(iLight + this.staticLights.length);
+                    this._idxBuffer.addNumber(iLight + this.staticLightCount);
                     lightCount++;                    
                 }
             }
-            for (let iDecal = 0; iDecal < this.staticDecals.length; iDecal++) {
+            for (let iDecal = 0; iDecal < this.staticDecalCount; iDecal++) {
                 const decal = this.staticDecals[iDecal];
                 // todo: check decal distance; cull against clusters
                 if (decal.visible) {
@@ -475,14 +482,14 @@ export class ClusteredForwardRenderContext extends RenderContext {
                     decalCount++; 
                 }
             }
-            for (let iDecal = 0; iDecal < this.dynamicDecals.length; iDecal++) {
+            for (let iDecal = 0; iDecal < this.dynamicDecalCount; iDecal++) {
                 const decal = this.dynamicDecals[iDecal];
                 if (decal.visible) {
-                    this._idxBuffer.addNumber(iDecal + this.staticDecals.length);
+                    this._idxBuffer.addNumber(iDecal + this.staticDecalCount);
                     decalCount++; 
                 }
             }
-            for (let iEnv = 0; iEnv < this.envProbes.length; iEnv++) {
+            for (let iEnv = 0; iEnv < this.envprobeCount; iEnv++) {
                 const envProbe = this.envProbes[iEnv];
                 if (envProbe.visible) {
                     this._idxBuffer.addNumber(iEnv);
@@ -490,7 +497,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 }
             }
             // pack envprobe and irrvolume count together
-            for (let iIrr = 0; iIrr < this.irradianceVolumes.length; iIrr++) {
+            for (let iIrr = 0; iIrr < this.irradianceVolumeCount; iIrr++) {
                 const irrVol = this.irradianceVolumes[iIrr];
                 if (irrVol.visible) {
                     this._idxBuffer.addNumber(iIrr);
