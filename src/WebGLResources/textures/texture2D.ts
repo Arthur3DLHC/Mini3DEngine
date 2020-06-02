@@ -9,7 +9,7 @@ export class Texture2D extends Texture {
     }
 
     /**
-     * is used as shadow map in the shader
+     * is used as shadow map in shaders
      */
     public isShadowMap: boolean;
 

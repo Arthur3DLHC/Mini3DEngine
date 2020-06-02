@@ -158,7 +158,6 @@ TODO:       主要类结构
                             如果光源中有动态物体，则
                                 如果 cacheCopied == false，拷贝；
                                 向 shadowmapAtlas 中渲染动态物体（不清深度缓冲）
------------------------------------------------------
 
                     点光源的阴影；
                         怎样为点光源阴影申请图集子图？
@@ -183,11 +182,14 @@ TODO:       主要类结构
                         测试
                             做一个比较适合检查点光源投影的场景
 
-            Instancing？
-                can use in mat4 in vertex shader for attribute input;
+-----------------------------------------------------
 
             间接光照
                 RenderTarget; 渲染到cubemap；
+                    使用一个 2D Texture atlas? 还是使用 Texture Array？
+                    因为 Cubemap 使用统一的尺寸，所以可以考虑使用 Texture Array
+                    怎样渲染到 texture array?
+                        使用 gl.framebufferTextureLayer
                 生成 envmap cube（64 x 64）
                     生成 mipmaps？如何进行卷积过滤？
 
@@ -201,7 +203,10 @@ TODO:       主要类结构
 
             Subsurface scattering
                 参考Khronos Group glTF Viewer; Blender;
-            
+
+            Instancing
+                can use in mat4 in vertex shader for attribute input;
+
             测试 Occlusion query?
                 调试绘制：Occlusion test 失败的，画一个不会被遮挡的线框 box？或者用不同颜色线框区分被遮挡/无遮挡的物体
                 Occlusion query object 分组；用 instancing 方式绘制？因为都是 box
@@ -242,7 +247,3 @@ TODO:       主要类结构
                 区分哪些网格是 occluder，哪些网格需要 occlusion query；使用前缀？
                 Blender 中的光源属性是否齐全？怎样使用；导出光源场景测试
                 Blender 中能否导出 instancing 的网格？导出有 linked duplicate 网格场景测试
-
-LOG：
-
-
