@@ -271,10 +271,10 @@ export default class vec4 {
     scale(value: number, dest?: vec4): vec4 {
         if (!dest) { dest = this }
 
-        dest.x *= value
-        dest.y *= value
-        dest.z *= value
-        dest.w *= value
+        dest.x = this.x * value
+        dest.y = this.y * value
+        dest.z = this.z * value
+        dest.w = this.w * value
 
         return dest
     }

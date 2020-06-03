@@ -34,6 +34,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._tmpClusterData = new Uint32Array(ClusteredForwardRenderContext.NUM_CLUSTERS * ClusteredForwardRenderContext.CLUSTER_SIZE_INT);
         this._clusterBuffer = new BufferHelper(this._tmpClusterData);
 
+        this._tmpColor = new vec4();
+
         this._ubLights = new UniformBuffer("lights");
         this._ubDecals = new UniformBuffer("decals");
         this._ubEnvProbes = new UniformBuffer("envprobes");
@@ -68,6 +70,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
     private _idxBuffer: BufferHelper;
     private _tmpClusterData: Uint32Array;
     private _clusterBuffer: BufferHelper;
+    private _tmpColor: vec4;
 
     // uniform buffers
     private _ubLights: UniformBuffer;
@@ -255,7 +258,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
     }
 
     private addLightToBuffer(buffer: BufferHelper, light: BaseLight) {
-        const lightColor = light.color.copy();
+        // const lightColor = light.color.copy();
 
         let radius = 0;
         let outerConeCos = 0;
@@ -338,7 +341,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 mat4.product(matLightViewport, matShadow, matShadow);
             }
         }
-        buffer.addArray(lightColor.values);
+        light.color.scale(light.intensity, this._tmpColor);
+        buffer.addArray(this._tmpColor.values);
         buffer.addArray(matWorld.values);
         buffer.addNumber(light.type);
         buffer.addNumber(radius);

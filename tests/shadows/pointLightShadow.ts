@@ -20,12 +20,12 @@ window.onload = () => {
     const camera = new PerspectiveCamera();
     camera.aspect = canvas.width / canvas.height;
     camera.far = 20;
-    camera.localTransform.fromTranslation(new vec3([0, 0, 8]));
+    camera.localTransform.fromTranslation(new vec3([0, 0, 2]));
 
     // first person view controller
     const fpsBehavior = new FirstPersonViewBehavior(camera);
     camera.behaviors.push(fpsBehavior);
-    fpsBehavior.position = new vec3([0, 0, 8]);
+    fpsBehavior.position = new vec3([0, 0, 2]);
     scene.attachChild(camera);
 
     window.onmousedown = (ev: MouseEvent) => {
@@ -53,7 +53,7 @@ window.onload = () => {
     // test box geometry
     const boxMesh = new Mesh();
     boxMesh.name = "box01";
-    boxMesh.geometry = new BoxGeometry(1, 1, 1);
+    boxMesh.geometry = new BoxGeometry(0.25, 0.25, 0.25);
     boxMesh.castShadow = true;
     boxMesh.isStatic = false;
     // boxMesh.localTransform.fromTranslation(new vec3([0, 0, -5]));
@@ -71,8 +71,8 @@ window.onload = () => {
 
     const sphereMesh = new Mesh();
     sphereMesh.name = "sphere01";
-    sphereMesh.localTransform.fromTranslation(new vec3([0, 0, 3]));
-    sphereMesh.geometry = new SphereGeometry(1, 16, 8);
+    sphereMesh.localTransform.fromTranslation(new vec3([0, 0, 0.75]));
+    sphereMesh.geometry = new SphereGeometry(0.2, 16, 8);
     sphereMesh.castShadow = true;
     sphereMesh.isStatic = false;
     const sphereMtl = new StandardPBRMaterial();
@@ -92,8 +92,8 @@ window.onload = () => {
 
     const cylinderMesh = new Mesh();
     cylinderMesh.name = "cylinder01";
-    cylinderMesh.localTransform.fromTranslation(new vec3([3, 0, 0]));
-    cylinderMesh.geometry = new CylinderGeometry(1, 2, 24);
+    cylinderMesh.localTransform.fromTranslation(new vec3([0.75, 0, 0]));
+    cylinderMesh.geometry = new CylinderGeometry(0.25, 0.5, 24);
     cylinderMesh.castShadow = true;
     cylinderMesh.isStatic = true;
     const cylinderMtl = new StandardPBRMaterial();
@@ -114,31 +114,31 @@ window.onload = () => {
     const matPlaneTran = new mat4();
 
     matPlaneRot.setIdentity();
-    matPlaneTran.fromTranslation(new vec3([0, -5, 0]));
+    matPlaneTran.fromTranslation(new vec3([0, -2, 0]));
     
     addPlane("floor", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), scene);
 
     // ceiling
     matPlaneRot.fromZRotation(Math.PI);
-    matPlaneTran.fromTranslation(new vec3([0, 5, 0]));
+    matPlaneTran.fromTranslation(new vec3([0, 2, 0]));
 
     addPlane("ceiling", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), scene);
 
     // back wall
     matPlaneRot.fromXRotation(Math.PI * 0.5);
-    matPlaneTran.fromTranslation(new vec3([0, 0, -5]));
+    matPlaneTran.fromTranslation(new vec3([0, 0, -2]));
 
     addPlane("backWall", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), scene);
 
     // left wall
     matPlaneRot.fromZRotation(-Math.PI * 0.5);
-    matPlaneTran.fromTranslation(new vec3([-5, 0, 0]));
+    matPlaneTran.fromTranslation(new vec3([-2, 0, 0]));
 
     addPlane("leftWall", matPlaneTran, matPlaneRot, new vec4([1.0, 0.0, 0.0, 1.0]), scene);
 
     // right wall
     matPlaneRot.fromZRotation(Math.PI * 0.5);
-    matPlaneTran.fromTranslation(new vec3([5, 0, 0]));
+    matPlaneTran.fromTranslation(new vec3([2, 0, 0]));
     
     addPlane("rightWall", matPlaneTran, matPlaneRot, new vec4([0.0, 1.0, 0.0, 1.0]), scene);
 
@@ -152,9 +152,10 @@ window.onload = () => {
     // if (pointLight01.shadow) {
     //     pointLight01.shadow.bias = 1;
     // }
-    pointLight01.color = new vec4([30, 30, 30, 1]);
-    pointLight01.distance = 20;
-    pointLight01.localTransform.fromTranslation(new vec3([0, 1.5, 0]));
+    pointLight01.color = new vec4([1, 1, 1, 1]);
+    pointLight01.intensity = 8;
+    pointLight01.distance = 10;
+    pointLight01.localTransform.fromTranslation(new vec3([0, 0.4, 0]));
 
     scene.attachChild(pointLight01);
     
@@ -185,7 +186,7 @@ function addPlane(name: string, matPlaneTran: mat4, matPlaneRot: mat4, wallColor
     const planeMesh = new Mesh();
     planeMesh.name = name;
     mat4.product(matPlaneTran, matPlaneRot, planeMesh.localTransform);
-    planeMesh.geometry = new PlaneGeometry(10, 10, 1, 1);
+    planeMesh.geometry = new PlaneGeometry(4, 4, 1, 1);
     planeMesh.castShadow = true;
     planeMesh.isStatic = true;
     const planeMtl = new StandardPBRMaterial();
