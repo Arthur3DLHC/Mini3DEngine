@@ -679,7 +679,7 @@ export class ClusteredForwardRenderer {
             // test drawing a screen space rectangle
             // GLDevice.renderTarget = null;
             if (this._drawDebugTexture) {
-                this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._debugDepthTexture, 1, false);
+                this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._debugDepthTexture, 1, 0, false);
             }
             // this.renderScreenRect(0, 0, 0.5, 0.5, new vec4([1,1,1,1]), this._debugDepthTexture, 1, false);
         }
@@ -911,7 +911,7 @@ export class ClusteredForwardRenderer {
      * @param texture 
      * @param textureAmount 
      */
-    public renderScreenRect(left: number, bottom: number, width: number, height: number, color: vec4, texture: Texture | null = null, textureAmount: number = 0.0, transparent: boolean = false) {
+    public renderScreenRect(left: number, bottom: number, width: number, height: number, color: vec4, texture: Texture | null = null, textureAmount: number = 0.0, textureLayer: number = 0.0, transparent: boolean = false) {
         // renderstate?
         // opaque or transparent?
         if (transparent) {
@@ -952,7 +952,7 @@ export class ClusteredForwardRenderer {
         // add a flag in shader for different texture types;
         let samplerName = "s_tex2D";
         if (this._screenRectProgram.glProgram !== null && texture !== null) {
-            const location = GLDevice.gl.getUniformLocation(this._screenRectProgram.glProgram, "u_textureType");
+            let location = GLDevice.gl.getUniformLocation(this._screenRectProgram.glProgram, "u_texType");
             if (location !== null) {
                 let targetType = 0;
                 switch(texture.target) {
@@ -974,7 +974,11 @@ export class ClusteredForwardRenderer {
                         break;
                 }
                 GLDevice.gl.uniform1i(location, targetType);
-            }  
+            }
+            location = GLDevice.gl.getUniformLocation(this._screenRectProgram.glProgram, "u_texlayer");
+            if (location !== null) {
+                GLDevice.gl.uniform1f(location, textureLayer);
+            }
         }
 
         // set uniform sampler

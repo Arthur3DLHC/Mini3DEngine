@@ -13,7 +13,8 @@ precision lowp sampler3D;
 // #include <uniforms_mtl_pbr>
 
 // support different sampler types
-uniform int                 u_textureType;  // 0: 2D, 1: 2DArray, 2: Cube, 3: 3D 
+uniform int                 u_texType;  // 0: 2D, 1: 2DArray, 2: Cube, 3: 3D 
+uniform float               u_texlayer; // tex layer for 2DArray or 3D
 
 uniform sampler2D           s_tex2D;
 uniform sampler2DArray      s_tex2DArray;
@@ -27,17 +28,17 @@ void main(void)
 {
     FinalOutput o = defaultFinalOutput();
     vec4 texColor = vec4(1.0);
-    if(u_textureType == 0) {    
+    if(u_texType == 0) {    
         texColor = texture(s_tex2D, ex_texcoord);
         // texColor = vec4(0, 0, 0, 1);
-    } else if(u_textureType == 1) {
-        texColor = texture(s_tex2DArray, vec3(ex_texcoord, 0));
+    } else if(u_texType == 1) {
+        texColor = texture(s_tex2DArray, vec3(ex_texcoord, u_texlayer));
         // texColor = vec4(1, 0, 0, 1);
-    } else if(u_textureType == 2) {
+    } else if(u_texType == 2) {
         // fix me: cube map
         texColor = vec4(0, 1, 0, 1);
-    } else if(u_textureType == 3) {
-        // texColor = texture(s_tex3D, vec3(ex_texcoord, 0));
+    } else if(u_texType == 3) {
+        // texColor = texture(s_tex3D, vec3(ex_texcoord, u_texlayer));
         texColor = vec4(0, 0, 1, 1);
     }
     o.color = texColor;
