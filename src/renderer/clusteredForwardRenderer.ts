@@ -679,9 +679,12 @@ export class ClusteredForwardRenderer {
             // test drawing a screen space rectangle
             // GLDevice.renderTarget = null;
             if (this._drawDebugTexture) {
-                this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._debugDepthTexture, 1, 0, false);
+                // shadowmap:
+                // this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._debugDepthTexture, 1, 0, false);
+                
+                // envmap:
+                this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 0, false);
             }
-            // this.renderScreenRect(0, 0, 0.5, 0.5, new vec4([1,1,1,1]), this._debugDepthTexture, 1, false);
         }
     }
 
