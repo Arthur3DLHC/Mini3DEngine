@@ -192,6 +192,8 @@ TODO:       主要类结构
                     因为 Cubemap 使用统一的尺寸，所以可以考虑使用 Texture Array
                     怎样渲染到 texture array?
                         使用 gl.framebufferTextureLayer
+                    调试输出渲染结果；
+
                 生成 envmap cube（64 x 64）
                     生成 mipmaps？如何进行卷积过滤？
 

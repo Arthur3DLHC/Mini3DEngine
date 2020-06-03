@@ -947,11 +947,36 @@ export class ClusteredForwardRenderer {
         this._renderContext.ubMaterialPBR.setFloat("colorMapAmount", textureAmount);
         this._renderContext.ubMaterialPBR.update();
 
-        // todo: set uniform sampler
+        // todo: support preview texture arrays and 3d textures
+
+        // add a flag in shader for different texture types;
+        if (this._screenRectProgram.glProgram !== null && texture !== null) {
+            const location = GLDevice.gl.getUniformLocation(this._screenRectProgram.glProgram, "u_textureType");
+            if (location !== null) {
+                let targetType = 0;
+                switch(texture.target) {
+                    case GLDevice.gl.TEXTURE_2D:
+                        targetType = 0;
+                        break;
+                    case GLDevice.gl.TEXTURE_2D_ARRAY:
+                        targetType = 1;
+                        break;
+                    case GLDevice.gl.TEXTURE_CUBE_MAP:
+                        targetType = 2;
+                        break;
+                    case GLDevice.gl.TEXTURE_3D:
+                        targetType = 3;
+                        break;
+                }
+                GLDevice.gl.uniform1i(location, targetType);
+            }  
+        }
+
+        // set uniform sampler
         if (this._samplerUniformsScreenRect) {
             // GLTextures.setStartUnit(this._numReservedTextures);
             GLTextures.setTextureAt(this._numReservedTextures, texture);
-            this._samplerUniformsScreenRect.setTextureUnit("s_baseColorMap", this._numReservedTextures);
+            this._samplerUniformsScreenRect.setTextureUnit("s_tex2D", this._numReservedTextures);
         }
 
         // draw geometry
@@ -963,10 +988,6 @@ export class ClusteredForwardRenderer {
         }
     }
 
-    private allocShadowmapAtlasLocations() {
-        // todo: alloc shadowmap altas locaitons for static lights?
-    }
-        
     private fetchVisibleLights() {
         this._curNumVisibleLights = 0;
         for (let i = 0; i < this._renderContext.staticLightCount; i++) {
@@ -1150,9 +1171,10 @@ export class ClusteredForwardRenderer {
                 this._renderContext.fillUniformBuffersPerView(cubefaceCamera, true, false, false, false, false);
 
                 // render items in renderlist
-                // only render static items;
+                // only render static items; (there should be only static meshes in renderlist now)
                 // fix me: is that necessary to use depth prepass and occlusion query?
                 // no after effects?
+                this.renderItems(this._renderListOpaque, this._frustum, false, false);
                 // is that necessary to render transparent objects? yes, it is...
             }
 

@@ -54,7 +54,7 @@ export class GLTextures {
         return unit + GLDevice.gl.TEXTURE0;
     }
 
-    // TODO: 设置绘制使用的纹理
+    // 设置绘制使用的纹理
     public static setTextureAt(unit: number, texture: Texture | null, target: GLenum = GLDevice.gl.TEXTURE_2D) {
         // fix me: optimize
         // 是否记录一下当前的所有unit的纹理对象，只有不同时才调用gl.bindTexture？
