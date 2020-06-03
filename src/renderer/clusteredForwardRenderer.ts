@@ -950,6 +950,7 @@ export class ClusteredForwardRenderer {
         // todo: support preview texture arrays and 3d textures
 
         // add a flag in shader for different texture types;
+        let samplerName = "s_tex2D";
         if (this._screenRectProgram.glProgram !== null && texture !== null) {
             const location = GLDevice.gl.getUniformLocation(this._screenRectProgram.glProgram, "u_textureType");
             if (location !== null) {
@@ -957,15 +958,19 @@ export class ClusteredForwardRenderer {
                 switch(texture.target) {
                     case GLDevice.gl.TEXTURE_2D:
                         targetType = 0;
+                        samplerName = "s_tex2D";
                         break;
                     case GLDevice.gl.TEXTURE_2D_ARRAY:
                         targetType = 1;
+                        samplerName = "s_tex2DArray";
                         break;
                     case GLDevice.gl.TEXTURE_CUBE_MAP:
                         targetType = 2;
+                        samplerName = "s_texCube";
                         break;
                     case GLDevice.gl.TEXTURE_3D:
                         targetType = 3;
+                        samplerName = "s_tex3D";
                         break;
                 }
                 GLDevice.gl.uniform1i(location, targetType);
@@ -976,15 +981,15 @@ export class ClusteredForwardRenderer {
         if (this._samplerUniformsScreenRect) {
             // GLTextures.setStartUnit(this._numReservedTextures);
             GLTextures.setTextureAt(this._numReservedTextures, texture);
-            this._samplerUniformsScreenRect.setTextureUnit("s_tex2D", this._numReservedTextures);
+            this._samplerUniformsScreenRect.setTextureUnit(samplerName, this._numReservedTextures);
         }
 
         // draw geometry
         this._rectGeom.draw(0, Infinity, this._screenRectProgram.attributes);
 
         // 纹理有可能是 render target，所以在这里取消绑定一下？
-        if (this._samplerUniformsScreenRect) {
-            GLTextures.setTextureAt(this._numReservedTextures, null);
+        if (this._samplerUniformsScreenRect && texture !== null) {
+            GLTextures.setTextureAt(this._numReservedTextures, null, texture.target);
         }
     }
 
