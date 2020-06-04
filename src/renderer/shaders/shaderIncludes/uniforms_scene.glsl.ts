@@ -37,7 +37,6 @@ export default /** glsl */`
     struct EnvProbe {
         vec3 position;      // always xyz axis aligned
         float cubeMapIndex;  // start index for 6 faces in texture array
-                            // Fix me: js中能把整数放在Float32Array中吗？如果不能，这里需要改为float类型
     };
     uniform EnvProbes
     {

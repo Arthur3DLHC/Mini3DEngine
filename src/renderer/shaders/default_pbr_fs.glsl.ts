@@ -11,7 +11,7 @@ export default /** glsl */`
 
 #include <function_cluster>
 #include <function_cubemap>
-#include <function_get_lights>
+#include <function_get_items>
 #include <function_punctual_lights>
 #include <function_shadow>
 #include <function_brdf_pbr>
@@ -78,6 +78,7 @@ void main(void)
     // todo: decals
 
     uint cluster = clusterOfPixel(ex_hPosition);
+
     uint lightCount = getLightCountInCluster(cluster);
     for(uint i = 0u; i < lightCount; i++) {
 
@@ -184,7 +185,25 @@ void main(void)
     // todo: irradiance volumes
 
     // todo: env maps: image based lighting
+    uint envmapStart = 0u;
+    uint envmapCount = 0u;
+    getEnvProbeIndicesInCluster(cluster, envmapStart, envmapCount);
+    for (uint i = envmapStart; i < envmapStart + envmapCount; i++) {
+        uint probeIdx = getItemIndexAt(i);
+        EnvProbe probe = u_envProbes.probes[probeIdx];
 
+        // todo: blend by distance to envprobe center position
+
+        // todo: calc cubemap texcoord
+        // vec3 cubeTexCoord
+
+        // sample envmap, 
+        // vec4 envmap = texture(s_envMapArray, )
+
+        // debug output envmap
+
+        // todo: sample different levels and filter by roughness
+    }
     outputFinal(o);
 }
 `;

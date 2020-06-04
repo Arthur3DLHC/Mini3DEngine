@@ -534,7 +534,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
             this._clusterBuffer.addNumber(start);       // the start index of this cluster
             this._clusterBuffer.addNumber(lightCount);       // light count
             this._clusterBuffer.addNumber(decalCount);       // decal count
-            this._clusterBuffer.addNumber(envProbeCount * 65536 + irrVolCount);        // envprobe (high 2 bytes) and irradiance volume count (low 2 bytes)
+            // this._clusterBuffer.addNumber(envProbeCount * 65536 + irrVolCount);        // envprobe (high 2 bytes) and irradiance volume count (low 2 bytes)
+            this._clusterBuffer.addNumber(envProbeCount);
             start += lightCount + decalCount + envProbeCount + irrVolCount;
         }
 

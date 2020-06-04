@@ -38,7 +38,7 @@ export default /** glsl */`
         uint start;
         uint lightCount;
         uint decalCount;
-        uint envProbeIrrVolCount;        // 为了凑vec4, packed, 高16位是 envProbe 数量，低 16 位是 irrvol 数量
+        uint envProbeIrrVolCount;        // 目前是只有 envProbe 数量; 以后可能会 packed, 高16位是 envProbe 数量，低 16 位是 irrvol 数量
     };
     uniform Clusters
     {
