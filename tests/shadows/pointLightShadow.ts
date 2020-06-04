@@ -154,7 +154,7 @@ window.onload = () => {
     // }
     pointLight01.color = new vec4([1, 1, 1, 1]);
     pointLight01.intensity = 8;
-    pointLight01.distance = 10;
+    pointLight01.range = 10;
     pointLight01.localTransform.fromTranslation(new vec3([0, 0.4, 0]));
 
     scene.attachChild(pointLight01);

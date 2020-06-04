@@ -96,13 +96,13 @@ void main(void)
         // check light type
         if (lightType != LightType_Directional) {
             pointToLight = lightPosition - ex_worldPosition;
-            float lightRadius = getLightRadius(light);
+            float lightRange = getLightRange(light);
             float lightDistSq = dot(pointToLight, pointToLight);
             // block out light early
-            if (lightRadius > 0.0 && lightDistSq > lightRadius * lightRadius) {
+            if (lightRange > 0.0 && lightDistSq > lightRange * lightRange) {
                 continue;
             }
-            rangeAttenuation = getRangeAttenuation(lightRadius, lightDistSq);
+            rangeAttenuation = getRangeAttenuation(lightRange, lightDistSq);
         }
         if (lightType == LightType_Spot) {
             spotAttenuation = getSpotAttenuation(pointToLight, lightDir, getLightOuterConeCos(light), getLightInnerConeCos(light));

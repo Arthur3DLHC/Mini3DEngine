@@ -25,7 +25,7 @@ export class PointLightShadow extends LightShadow {
         // it will be used when render item shadowmaps
         const pointLight = this._light as PointLight;
         // fix me: optimize: don't calc matrix every frame; only when properties changed;
-        const matProj = mat4.perspective(90, 1, 0.01, pointLight.distance > 0 ? pointLight.distance : 100);
+        const matProj = mat4.perspective(90, 1, 0.01, pointLight.range > 0 ? pointLight.range : 100);
         if (! matProj.equals(this._matProj)) {
             this.moved = true;
             matProj.copy(this._matProj);

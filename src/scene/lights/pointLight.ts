@@ -7,7 +7,7 @@ import { LightType } from "./lightType.js";
 export class PointLight extends BaseLight {
     public constructor() {
         super();
-        this.distance = 0;
+        this.range = 0;
         this.shadow = new PointLightShadow(this);
         this._debugGeometry = null;
     }
@@ -19,7 +19,7 @@ export class PointLight extends BaseLight {
     /**
      * if 0, infinity; or the intensity will fade out to zero at the distance.
      */
-    public distance: number;
+    public range: number;
 
     private _debugGeometry: BufferGeometry | null;
 

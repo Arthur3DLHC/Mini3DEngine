@@ -1036,20 +1036,20 @@ export class ClusteredForwardRenderer {
         } else if (light instanceof PointLight) {
             // if point light or spot light, use bounding sphere?
             const pointLight = light as PointLight;
-            if (light.distance <= 0) {
+            if (light.range <= 0) {
                 return true;                
             } else {
-                const sphere = new BoundingSphere(light.worldTransform.getTranslation(), light.distance);
+                const sphere = new BoundingSphere(light.worldTransform.getTranslation(), light.range);
                 return this._frustum.intersectsSphere(sphere);
             }
         } else if (light instanceof SpotLight) {
             const spotLight = light as SpotLight;
             // fix me: use a cone or frustum for light?
-            if (light.distance <= 0) {
+            if (light.range <= 0) {
                 // todo: check light direction?
                 return true;
             } else {
-                const sphere = new BoundingSphere(light.worldTransform.getTranslation(), light.distance);
+                const sphere = new BoundingSphere(light.worldTransform.getTranslation(), light.range);
                 // todo: check cone?
                 return this._frustum.intersectsSphere(sphere);
             }

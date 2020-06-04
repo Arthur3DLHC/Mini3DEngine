@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow } from "../../src/miniEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe } from "../../src/miniEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "../common/behaviors/autoRotateBehavior.js";
 import vec4 from "../../lib/tsm/vec4.js";
@@ -154,7 +154,7 @@ window.onload = () => {
     // }
     pointLight01.color = new vec4([1, 1, 1, 1]);
     pointLight01.intensity = 8;
-    pointLight01.distance = 10;
+    pointLight01.range = 10;
     pointLight01.localTransform.fromTranslation(new vec3([0, 0.4, 0]));
 
     scene.attachChild(pointLight01);
@@ -168,6 +168,10 @@ window.onload = () => {
 
     // scene.attachChild(pointLight02);
     
+    // test environment probe
+    const probe01 = new EnvironmentProbe();
+    
+
     Clock.instance.start();
 
     function gameLoop(now: number) {

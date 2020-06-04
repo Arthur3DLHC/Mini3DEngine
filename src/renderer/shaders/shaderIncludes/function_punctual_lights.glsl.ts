@@ -11,7 +11,7 @@ uint getLightType(Light light) {
     return uint(light.properties.x);
 }
 
-float getLightRadius(Light light) {
+float getLightRange(Light light) {
     return light.properties.y;
 }
 

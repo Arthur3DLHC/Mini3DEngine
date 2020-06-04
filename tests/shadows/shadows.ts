@@ -151,7 +151,7 @@ window.onload = () => {
     spotLight01.isStatic = true;
     spotLight01.on = true;
     spotLight01.color = new vec4([100, 100, 100, 1]);
-    spotLight01.distance = 10;
+    spotLight01.range = 10;
     spotLight01.castShadow = true;
     // spotLight01.localTransform.fromTranslation(new vec3([0, 1, 3]));
     const spotLightLookAt = new LookatBehavior(spotLight01);

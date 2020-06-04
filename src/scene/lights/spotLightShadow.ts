@@ -16,7 +16,7 @@ export class SpotLightShadow extends LightShadow {
         this._matView.inverse();
 
         const spotLight = this._light as SpotLight;
-        const matProj = mat4.perspective(Math.min(spotLight.outerConeAngle * 2, 3.10) * 180.0 / Math.PI, 1, 0.01, spotLight.distance > 0 ? spotLight.distance : 20);
+        const matProj = mat4.perspective(Math.min(spotLight.outerConeAngle * 2, 3.10) * 180.0 / Math.PI, 1, 0.01, spotLight.range > 0 ? spotLight.range : 20);
         if (! matProj.equals(this._matProj)) {
             this.moved = true;
             matProj.copy(this._matProj);

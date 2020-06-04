@@ -270,11 +270,11 @@ export class ClusteredForwardRenderContext extends RenderContext {
         // matShadow.setIdentity();
         matShadow.reset();
         if (light.type === LightType.Point) {
-            radius = (light as PointLight).distance;
+            radius = (light as PointLight).range;
         }
         else if (light.type === LightType.Spot) {
             const spot: SpotLight = (light as SpotLight);
-            radius = spot.distance;
+            radius = spot.range;
             outerConeCos = Math.cos(spot.outerConeAngle);
             innerConeCos = Math.cos(spot.innerConeAngle);
         }

@@ -60,7 +60,7 @@ export default /** glsl */`
         // todo: apply projection matrix
         // must keep same with pointLightShadow.ts
         float n = 0.01;
-        float f = getLightRadius(light);
+        float f = getLightRange(light);
         float A = -(f + n)/(f - n);
         float B = -2.0 * f * n / (f - n);
         return vec4(posView.x, posView.y, (posView.z) * A + B, -posView.z);

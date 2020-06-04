@@ -9,7 +9,7 @@ export class SpotLight extends BaseLight {
         super();
         this.outerConeAngle = Math.PI * 0.25;
         this.innerConeAngle = Math.PI * 0.2;
-        this.distance = 0;
+        this.range = 0;
         this.shadow = new SpotLightShadow(this);
         this._debugGeometry = null;
     }
@@ -28,7 +28,7 @@ export class SpotLight extends BaseLight {
      */
     public innerConeAngle: number;
 
-    public distance: number;
+    public range: number;
 
     private _debugGeometry: BufferGeometry | null;
 
