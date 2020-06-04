@@ -24,9 +24,9 @@ export class SRTTransform {
 
     public update() {
         SRTTransform._matScale.fromScaling(this.scaling);
-        SRTTransform._matRotX.fromXRotation(this.scaling.x);
-        SRTTransform._matRotY.fromYRotation(this.scaling.y);
-        SRTTransform._matRotZ.fromZRotation(this.scaling.z);
+        SRTTransform._matRotX.fromXRotation(this.rotationXYZ.x);
+        SRTTransform._matRotY.fromYRotation(this.rotationXYZ.y);
+        SRTTransform._matRotZ.fromZRotation(this.rotationXYZ.z);
         SRTTransform._matTran.fromTranslation(this.translation);
 
         mat4.product(SRTTransform._matRotX, SRTTransform._matRotZ, SRTTransform._matRot);

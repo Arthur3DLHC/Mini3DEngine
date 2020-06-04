@@ -594,10 +594,7 @@ export class ClusteredForwardRenderer {
             // todo: bind shaddowmaps only, and render cubemaps
             this.updateCubemaps();
 
-            // todo: generate static light shadowmaps;
-            // if light is static, use static shadow or there are no moving dynamic objects in range,
-            // use shadow map of last frame;
-            // render to texture atlas; if scene changed, need to repack texture atlas.
+            GLDevice.renderTarget = null;
 
             this.bindTexturesPerScene();
             // todo: bind texture samplers
@@ -737,13 +734,22 @@ export class ClusteredForwardRenderer {
             this.renderItems(this._renderListTransparentOcclusionQuery, frustum, false, true);
         }
     }
-    private renderItems(renderList: RenderList, frustum: Frustum, ignoreMaterial: boolean = false, checkOcclusionResults: boolean = false) {
+    private renderItems(renderList: RenderList, frustum: Frustum, ignoreMaterial: boolean = false, checkOcclusionResults: boolean = false, dynamics: boolean = true, statics: boolean = true) {
         
         const sphere = new BoundingSphere();
 
         for (let i = 0; i < renderList.ItemCount; i++) {
             const item = renderList.getItemAt(i);
             if (item) {
+                if (item.object.isStatic) {
+                    if (!statics) {
+                        continue;
+                    }
+                } else {
+                    if (!dynamics) {
+                        continue;
+                    }
+                }
                 
                 if (checkOcclusionResults && !item.object.occlusionQueryResult) {
                     continue;
@@ -1086,6 +1092,10 @@ export class ClusteredForwardRenderer {
         GLDevice.renderTarget = null;
     }
 
+    /**
+     * todo: should add a mask for dynamic and static objects
+     * @param light 
+     */
     private updateShadowMapFor(light: BaseLight) {
         if (light.shadow && light.castShadow && light.on) {
 
@@ -1136,6 +1146,7 @@ export class ClusteredForwardRenderer {
         // and the envprobe's radius is represented by its scale transform,
         // so we can use a unique projection frustum with far plane at 1
         cubefaceCamera.projTransform = mat4.perspective(90, 1, 0.01, 1);
+        cubefaceCamera.viewport = new vec4([0, 0, this._renderContext.envmapSize, this._renderContext.envmapSize]);
         
         const matWorldToProbe = new mat4();
         const matViewProj = new mat4();
@@ -1186,7 +1197,7 @@ export class ClusteredForwardRenderer {
                 // only render static items; (there should be only static meshes in renderlist now)
                 // fix me: is that necessary to use depth prepass and occlusion query?
                 // no after effects?
-                this.renderItems(this._renderListOpaque, this._frustum, false, false);
+                this.renderItems(this._renderListOpaque, this._frustum, false, false, false, true);
                 // is that necessary to render transparent objects? yes, it is...
             }
 
