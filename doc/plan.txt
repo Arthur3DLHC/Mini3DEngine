@@ -185,6 +185,7 @@ TODO:       主要类结构
 -----------------------------------------------------
             现在的 renderer 类代码有点长了 是否应该重构一下？
                 将功能分散在 shadowmaprenderer, cubemaprenderer里？
+            优化 PBR shader，将重复计算 F 的代码去掉
 
             间接光照
                 RenderTarget; 渲染到cubemap；
@@ -197,10 +198,12 @@ TODO:       主要类结构
 
                 生成 envmap cube（64 x 64）
                     生成 mipmaps？如何进行卷积过滤？
+                    由于没有 compute shader，可能需要两个纹理交替作为 source texture 和 RT，多个 pass downsample
+                    封装若干个类干这个事，不要把功能都放在 clusteredForwardRenderer 里
 
                 image based lighting
-                    specular
                     diffuse
+                    specular
 
                 生成 irradiance volume？或者尝试用low mipmap envmap cube 做间接光照？
                     为每个 envmap probe 生成一个 shadowmap，用以剔除影响范围外的物体

@@ -1093,7 +1093,7 @@ export class ClusteredForwardRenderer {
     }
 
     /**
-     * todo: should add a mask for dynamic and static objects
+     * todo: should add a mask for dynamic and static objects?
      * @param light 
      */
     private updateShadowMapFor(light: BaseLight) {
