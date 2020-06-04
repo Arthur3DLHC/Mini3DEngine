@@ -1,4 +1,4 @@
-import { Behavior, Object3D, KeyCodes, Clock } from "../../../src/miniEngine.js";
+import { Behavior, Object3D, KeyCodes, Clock } from "../../../src/mini3DEngine.js";
 import vec2 from "../../../lib/tsm/vec2.js";
 import vec3 from "../../../lib/tsm/vec3.js";
 import mat4 from "../../../lib/tsm/mat4.js";

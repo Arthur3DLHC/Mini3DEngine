@@ -234,6 +234,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
             let position = new vec3();
             probe.worldTransform.getTranslation(position);
             this._buffer.addArray(position.values);
+            // todo: pass in size? no need for texture index, because it == probe index
             this._buffer.addNumber(probe.textureIndex);
         }
         this._ubEnvProbes.setUniform("probes", this._tmpData, this._buffer.length);

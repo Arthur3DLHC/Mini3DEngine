@@ -11,6 +11,7 @@ export * from "./math/boundingSphere.js";
 export * from "./math/colorHelper.js";
 export * from "./math/frustum.js";
 export * from "./math/rectanglePacker.js";
+export * from "./math/srtTransform.js";
 export * from "./renderer/clusteredForwardRenderer.js";
 export * from "./renderer/renderItem.js";
 export * from "./renderer/renderList.js";

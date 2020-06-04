@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow } from "../../src/miniEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "../common/behaviors/autoRotateBehavior.js";
 import vec4 from "../../lib/tsm/vec4.js";
