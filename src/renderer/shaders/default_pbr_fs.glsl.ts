@@ -187,6 +187,7 @@ void main(void)
     // todo: env maps: image based lighting
     uint envmapStart = 0u;
     uint envmapCount = 0u;
+    float cubeUVScale = 1.0 / 6.0;
     getEnvProbeIndicesInCluster(cluster, envmapStart, envmapCount);
     for (uint i = envmapStart; i < envmapStart + envmapCount; i++) {
         uint probeIdx = getItemIndexAt(i);
@@ -195,12 +196,16 @@ void main(void)
         // todo: blend by distance to envprobe center position
 
         // todo: calc cubemap texcoord
-        // vec3 cubeTexCoord
+        int faceId = 0;
+        vec3 cubeTexCoord = vec3(getCubemapTexcoord(n, faceId), float(i - envmapStart));
+        
+        cubeTexCoord.x = cubeTexCoord.x * cubeUVScale + float(faceId) * cubeUVScale;
 
         // sample envmap, 
-        // vec4 envmap = texture(s_envMapArray, )
+        vec4 envmap = texture(s_envMapArray, cubeTexCoord);
 
         // debug output envmap
+        o.color = envmap;
 
         // todo: sample different levels and filter by roughness
     }
