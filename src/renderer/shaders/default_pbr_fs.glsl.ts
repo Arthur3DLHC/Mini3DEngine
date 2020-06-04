@@ -188,6 +188,10 @@ void main(void)
     uint envmapStart = 0u;
     uint envmapCount = 0u;
     float cubeUVScale = 1.0 / 6.0;
+
+    // reflection vector, in world space
+    vec3 reflV = reflect(-v, n);
+
     getEnvProbeIndicesInCluster(cluster, envmapStart, envmapCount);
     for (uint i = envmapStart; i < envmapStart + envmapCount; i++) {
         uint probeIdx = getItemIndexAt(i);
@@ -197,7 +201,7 @@ void main(void)
 
         // todo: calc cubemap texcoord
         int faceId = 0;
-        vec3 cubeTexCoord = vec3(getCubemapTexcoord(n, faceId), float(i - envmapStart));
+        vec3 cubeTexCoord = vec3(getCubemapTexcoord(reflV, faceId), float(i - envmapStart));
         
         cubeTexCoord.x = cubeTexCoord.x * cubeUVScale + float(faceId) * cubeUVScale;
 
