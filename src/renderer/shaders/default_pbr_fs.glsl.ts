@@ -160,9 +160,10 @@ void main(void)
             float LdotH = clampedDot(l, h);
             float VdotH = clampedDot(v, h);
             vec3 illuminance = intensity * NdotL;
+            vec3 F = F_Schlick(f0, f90, VdotH);
 
-            f_diffuse += illuminance * BRDF_lambertian(f0, f90, albedoColor, VdotH);
-            f_specular += illuminance * BRDF_specularGGX(f0, f90, alphaRoughness, VdotH, NdotL, NdotV, NdotH);
+            f_diffuse += illuminance * BRDF_lambertian(F, albedoColor);
+            f_specular += illuminance * BRDF_specularGGX(F, alphaRoughness, NdotL, NdotV, NdotH);
         }
 
         // test color
@@ -191,6 +192,7 @@ void main(void)
 
     // reflection vector, in world space
     vec3 reflV = reflect(-v, n);
+    // vec3 reflection = vec3(0.0);
 
     getEnvProbeIndicesInCluster(cluster, envmapStart, envmapCount);
     for (uint i = envmapStart; i < envmapStart + envmapCount; i++) {
@@ -209,7 +211,7 @@ void main(void)
         vec4 envmap = texture(s_envMapArray, cubeTexCoord);
 
         // debug output envmap
-        o.color = envmap;
+        o.color += envmap * 0.5;
 
         // todo: sample different levels and filter by roughness
     }

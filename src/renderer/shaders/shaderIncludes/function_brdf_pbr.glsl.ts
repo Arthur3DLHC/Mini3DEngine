@@ -43,20 +43,21 @@ float D_GGX(float NdotH, float alphaRoughness)
 }
 
 //https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
-vec3 BRDF_lambertian(vec3 f0, vec3 f90, vec3 diffuseColor, float VdotH)
+vec3 BRDF_lambertian(vec3 F, vec3 diffuseColor)
 {
     // see https://seblagarde.wordpress.com/2012/01/08/pi-or-not-to-pi-in-game-lighting-equation/
     // 假设一束光线照射表面上一点 p，由于漫反射出的光线是近似均匀分布在以 p 为中心的半球面上的，所以这些光线的能量在
     // 这个半球上的总和应该小于等于这一点漫反射出的光的总能量，而相机在透过半球面观察这个点时，则只会取半球表面上和这个点面积
     // 相近的一小部分。在数学上，半球积分系数为 π，也就是P点和半球上一点能量的比例为 π，所以为了求出通过半球到达相机的
     // 光的能量，需要用 p 点漫反射的总能量除以 π
-    return (1.0 - F_Schlick(f0, f90, VdotH)) * (diffuseColor / M_PI);
+    // vec3 F = F_Schlick(f0, f90, VdotH);
+    return (vec3(1.0) - F) * (diffuseColor / M_PI);
 }
 
 //  https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
-vec3 BRDF_specularGGX(vec3 f0, vec3 f90, float alphaRoughness, float VdotH, float NdotL, float NdotV, float NdotH)
+vec3 BRDF_specularGGX(vec3 F, float alphaRoughness, float NdotL, float NdotV, float NdotH)
 {
-    vec3 F = F_Schlick(f0, f90, VdotH);
+    // vec3 F = F_Schlick(f0, f90, VdotH);
     float Vis = V_GGX(NdotL, NdotV, alphaRoughness);
     float D = D_GGX(NdotH, alphaRoughness);
 
