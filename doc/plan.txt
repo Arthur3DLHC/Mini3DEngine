@@ -182,10 +182,10 @@ TODO:       主要类结构
                         测试
                             做一个比较适合检查点光源投影的场景
 
+            优化 PBR shader，将重复计算 F 的代码去掉
 -----------------------------------------------------
             现在的 renderer 类代码有点长了 是否应该重构一下？
                 将功能分散在 shadowmaprenderer, cubemaprenderer里？
-            优化 PBR shader，将重复计算 F 的代码去掉
 
             间接光照
                 RenderTarget; 渲染到cubemap；
@@ -203,7 +203,13 @@ TODO:       主要类结构
 
                 image based lighting
                     diffuse
+                        通过黎曼和生成 Diffuse 使用的低分辨率环境贴图，只需要一个mip level
+                        参考：https://blog.csdn.net/i_dovelemon/article/details/79091105
                     specular
+                        通过 importance sampling  生成 mipmap，每个 level 对应一个 Roughness 下的 LD 项
+                        DFG 项是一个预渲染的通用贴图，可以直接加载使用；
+                        参考：https://blog.csdn.net/i_dovelemon/article/details/79598921
+                            https://blog.csdn.net/i_dovelemon/article/details/79251920
 
                 生成 irradiance volume？或者尝试用low mipmap envmap cube 做间接光照？
                     为每个 envmap probe 生成一个 shadowmap，用以剔除影响范围外的物体
