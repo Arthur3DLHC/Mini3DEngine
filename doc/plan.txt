@@ -196,6 +196,7 @@ TODO:       主要类结构
                         使用 gl.framebufferTextureLayer
                     调试输出渲染结果；
                     渲染时应该保证足够远的远裁剪面距离；否则远处的物体无法渲到环境贴图上；
+                    尝试能否在 shader 中给 RenderTarget 贴图使用 linear 过滤？
 
                 生成 envmap cube（64 x 64）
                     生成 mipmaps？如何进行卷积过滤？
@@ -253,6 +254,10 @@ TODO:       主要类结构
                 Texture cache
                     用纹理文件 url 作为 key
                 读取light, decal, envprobe, irradiance volume;
+            
+            骨骼皮肤动画
+                从 glTF 加载
+                shader 绘制
 
             资源加载器
                 资源列表和资源计数？

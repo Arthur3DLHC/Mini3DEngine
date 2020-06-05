@@ -41,31 +41,34 @@ export class GLDevice {
     public static set renderTarget(renderTarget: FrameBuffer | null) {
         // set only when changed
         if (this._renderTarget !== renderTarget) {
-            // if gl fbo not created, create it
-            if (renderTarget) {
-                for (const tex of GLTextures.textures) {
-                    if (tex) {
-                        if (tex === renderTarget.depthStencilTexture) {
-                            throw new Error("Render target is using as texture");
-                        }
+            this.forceSetRenderTarget(renderTarget);
+        }
+    }
 
-                        for (let i = 0; i < 4; i++) {
-                            if (renderTarget.getTexture(i)) {
-                                if (tex === renderTarget.getTexture(i)) {
-                                    throw new Error("Render target is using as texture");
-                                }
+    public static forceSetRenderTarget(renderTarget: FrameBuffer | null) {
+        if (renderTarget) {
+            for (const tex of GLTextures.textures) {
+                if (tex) {
+                    if (tex === renderTarget.depthStencilTexture) {
+                        throw new Error("Render target is using as texture");
+                    }
+
+                    for (let i = 0; i < 4; i++) {
+                        if (renderTarget.getTexture(i)) {
+                            if (tex === renderTarget.getTexture(i)) {
+                                throw new Error("Render target is using as texture");
                             }
                         }
                     }
                 }
-
-                renderTarget.prepare();
-                GLDevice.gl.bindFramebuffer(GLDevice.gl.DRAW_FRAMEBUFFER, renderTarget.glFrameBuffer);
-            } else {
-                GLDevice.gl.bindFramebuffer(GLDevice.gl.DRAW_FRAMEBUFFER, null);
             }
-            this._renderTarget = renderTarget;            
+
+            renderTarget.prepare();
+            GLDevice.gl.bindFramebuffer(GLDevice.gl.DRAW_FRAMEBUFFER, renderTarget.glFrameBuffer);
+        } else {
+            GLDevice.gl.bindFramebuffer(GLDevice.gl.DRAW_FRAMEBUFFER, null);
         }
+        this._renderTarget = renderTarget;
     }
 
     public static get renderTarget(): FrameBuffer | null {

@@ -192,7 +192,8 @@ void main(void)
 
     // reflection vector, in world space
     vec3 reflV = reflect(-v, n);
-    // vec3 reflection = vec3(0.0);
+    vec3 reflection = vec3(0.0);
+    float totalWeight = 0.0;
 
     getEnvProbeIndicesInCluster(cluster, envmapStart, envmapCount);
     for (uint i = envmapStart; i < envmapStart + envmapCount; i++) {
@@ -200,6 +201,8 @@ void main(void)
         EnvProbe probe = u_envProbes.probes[probeIdx];
 
         // todo: blend by distance to envprobe center position
+        float dist = length(probe.position - ex_worldPosition);
+        float weight = 1.0 / (dist + 1.0);
 
         // todo: calc cubemap texcoord
         int faceId = 0;
@@ -209,11 +212,14 @@ void main(void)
 
         // sample envmap, 
         vec4 envmap = texture(s_envMapArray, cubeTexCoord);
-
-        // debug output envmap
-        o.color += envmap * 0.5;
+        reflection += envmap.rgb * weight;
+        totalWeight += weight;        
 
         // todo: sample different levels and filter by roughness
+    }
+    // debug output envmap
+    if (totalWeight > 0.0) {
+        o.color.rgb += reflection * 0.5 / totalWeight;
     }
     outputFinal(o);
 }

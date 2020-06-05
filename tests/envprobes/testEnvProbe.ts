@@ -168,15 +168,15 @@ window.onload = () => {
 
     // scene.attachChild(pointLight02);
     
-    // test environment probe
-    const probe01 = new EnvironmentProbe();
-    const srt = new SRTTransform();
-    srt.scaling.x = 5; srt.scaling.y = 5; srt.scaling.z = 5;
-    // srt.translation.y = 0.2;
-    srt.update();
-    srt.transform.copy(probe01.localTransform);
-
-    scene.attachChild(probe01);
+    // test environment probes
+    addEnvProbe("envProbe01", 5, new vec3([ -1, -1, -1]), scene);
+    addEnvProbe("envProbe02", 5, new vec3([ -1, -1,  1]), scene);
+    addEnvProbe("envProbe03", 5, new vec3([ -1,  1, -1]), scene);
+    addEnvProbe("envProbe04", 5, new vec3([ -1,  1,  1]), scene);
+    addEnvProbe("envProbe05", 5, new vec3([  1, -1, -1]), scene);
+    addEnvProbe("envProbe06", 5, new vec3([  1, -1,  1]), scene);
+    addEnvProbe("envProbe07", 5, new vec3([  1,  1, -1]), scene);
+    addEnvProbe("envProbe08", 5, new vec3([  1,  1,  1]), scene);
 
     Clock.instance.start();
 
@@ -190,6 +190,18 @@ window.onload = () => {
     }
 
     requestAnimationFrame(gameLoop);
+}
+
+function addEnvProbe(name: string, size: number, position: vec3, scene: Scene) {
+    const probe = new EnvironmentProbe();
+    probe.name = name;
+    const probesrt = new SRTTransform();
+    probesrt.scaling.x = size; probesrt.scaling.y = size; probesrt.scaling.z = size;
+    position.copy(probesrt.translation);
+    probesrt.update();
+    probesrt.transform.copy(probe.localTransform);
+
+    scene.attachChild(probe);
 }
 
 function addPlane(name: string, matPlaneTran: mat4, matPlaneRot: mat4, wallColor: vec4, scene: Scene) {

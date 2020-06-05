@@ -680,7 +680,7 @@ export class ClusteredForwardRenderer {
                 // this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._debugDepthTexture, 1, 0, false);
                 
                 // envmap:
-                this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 0, false);
+                this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, false);
             }
         }
     }
@@ -1161,7 +1161,9 @@ export class ClusteredForwardRenderer {
             // todo: set the cubemap texture array layer as render target
             this._envmapFBO.setTexture(0, this._envMapArray, 0, ienvprobe);
             this._envmapFBO.prepare();
-            GLDevice.renderTarget = this._envmapFBO;
+            // need to force set, or the target will be set to null in prepare() function
+            // GLDevice.renderTarget = this._envmapFBO;
+            GLDevice.forceSetRenderTarget(this._envmapFBO);
 
             // todo: set viewport and scissor, render 6 faces of cubemap
             for(let iface = 0; iface < 6; iface++) {
