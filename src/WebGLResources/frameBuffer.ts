@@ -63,6 +63,9 @@ export class FrameBuffer {
     private _depthStencilTexture: Texture | null;
     private _needUpdate: boolean;
 
+    /**
+     * fix me: this will disturb the current render target of GLDevice
+     */
     public prepare() {
         const gl = GLDevice.gl;
         if (!this.glFrameBuffer) {
@@ -98,11 +101,11 @@ export class FrameBuffer {
                 let level: number = this._textureLevels[i];
                 let layer: number = this._textureLayers[i];
                 if (texture !== null) {
-                    if (texture.samplerState !== null) {
-                        if (texture.samplerState.minFilter !== gl.NEAREST || texture.samplerState.magFilter !== gl.NEAREST) {
-                            throw new Error("Texture as rendertarget muse has nearest filter");
-                        }    
-                    }
+                    // if (texture.samplerState !== null) {
+                    //     if (texture.samplerState.minFilter !== gl.NEAREST || texture.samplerState.magFilter !== gl.NEAREST) {
+                    //         throw new Error("Texture as rendertarget muse has nearest filter");
+                    //     }    
+                    // }
                     
                     if (!texture.glTexture) {
                         texture.create();

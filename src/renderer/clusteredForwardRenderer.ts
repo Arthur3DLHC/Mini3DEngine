@@ -64,6 +64,7 @@ import { BoundingBox } from "../math/boundingBox.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { DirectionalLightShadow } from "../scene/lights/directionalLightShadow.js";
 import { TextureCube } from "../WebGLResources/textures/textureCube.js";
+import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 
 export class ClusteredForwardRenderer {
 
@@ -161,6 +162,7 @@ export class ClusteredForwardRenderer {
         this._envMapArray.depth = ClusteredForwardRenderContext.MAX_ENVPROBES;              // 128 envmaps in whole scene?
         this._envMapArray.format = gl.RGB;
         this._envMapArray.componentType = gl.UNSIGNED_BYTE;
+        this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
         this._envMapArray.create();
 
         this._envMapDepthTexture = new Texture2D();
