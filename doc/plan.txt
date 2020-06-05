@@ -197,6 +197,7 @@ TODO:       主要类结构
                     调试输出渲染结果；
                     渲染时应该保证足够远的远裁剪面距离；否则远处的物体无法渲到环境贴图上；
                     尝试能否在 shader 中给 RenderTarget 贴图使用 linear 过滤？
+                怎样处理 FBO.prepare() 最后将 FBO 绑定为空而 GLDevice 不知道问题？
 
                 生成 envmap cube（64 x 64）
                     生成 mipmaps？如何进行卷积过滤？
