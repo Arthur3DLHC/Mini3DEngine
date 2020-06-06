@@ -196,8 +196,8 @@ TODO:       主要类结构
                         使用 gl.framebufferTextureLayer
                     调试输出渲染结果；
                     渲染时应该保证足够远的远裁剪面距离；否则远处的物体无法渲到环境贴图上；
+                    应该可以设置 envprobe 的背景颜色或天空盒；
                     尝试能否在 shader 中给 RenderTarget 贴图使用 linear 过滤？
-                怎样处理 FBO.prepare() 最后将 FBO 绑定为空而 GLDevice 不知道问题？
 
                 生成 envmap cube（64 x 64）
                     生成 mipmaps？如何进行卷积过滤？
@@ -214,6 +214,8 @@ TODO:       主要类结构
 
                 image based lighting
                     shader 中使用的时候，在取样边缘点时从其它面取样过滤？能否预先处理一下 cubemap，将边缘处扩展一下，填充其它面的对应像素？
+                    多个 envprobe 的混合
+                        权重：距离和尺寸？
 
                 生成 irradiance volume？或者尝试用low mipmap envmap cube 做间接光照？
                     为每个 envmap probe 生成一个 shadowmap，用以剔除影响范围外的物体

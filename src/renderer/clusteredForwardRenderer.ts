@@ -1164,8 +1164,8 @@ export class ClusteredForwardRenderer {
             this._envmapFBO.setTexture(0, this._envMapArray, 0, ienvprobe);
             this._envmapFBO.prepare();
             // need to force set, or the target will be set to null in prepare() function
-            // GLDevice.renderTarget = this._envmapFBO;
-            GLDevice.forceSetRenderTarget(this._envmapFBO);
+            GLDevice.renderTarget = this._envmapFBO;
+            // GLDevice.forceSetRenderTarget(this._envmapFBO);
 
             // todo: set viewport and scissor, render 6 faces of cubemap
             for(let iface = 0; iface < 6; iface++) {

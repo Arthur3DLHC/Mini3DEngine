@@ -2,6 +2,7 @@ import { Object3D } from "./object3D.js";
 import { Texture2DArray } from "../WebGLResources/textures/texture2DArray.js";
 import { BufferGeometry } from "../geometry/bufferGeometry.js";
 import { RenderList } from "../renderer/renderList.js";
+import vec3 from "../../lib/tsm/vec3.js";
 
 export class EnvironmentProbe extends Object3D {
     public constructor() {
@@ -21,6 +22,11 @@ export class EnvironmentProbe extends Object3D {
 
     // 在blender中用sphere定义EnvironmentProbe的位置和影响范围？
     // 使用统一的cubemap size？
+    public get radius(): number {
+        this.worldTransform.getScaling(this.scaling);
+        return Math.max(this.scaling.x, Math.max(this.scaling.y, this.scaling.z));
+    }
+    private scaling: vec3 = new vec3([1,1,1]);
 
     /**
      * multiple cubemaps passed in shader by texture 2d array; cube texture array is not supported now by WebGL2.0

@@ -175,7 +175,8 @@ export class FrameBuffer {
             // drawbuffers 设置会保存在 GL 的 frame buffer object 中
             gl.drawBuffers(attachments);
             this._needUpdate = false;
-            gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
+            GLDevice.renderTarget = null;
+            // gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
         }
     }
 

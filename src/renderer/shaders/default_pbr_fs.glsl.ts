@@ -201,8 +201,11 @@ void main(void)
         EnvProbe probe = u_envProbes.probes[probeIdx];
 
         // todo: blend by distance to envprobe center position
-        float dist = length(probe.position - ex_worldPosition);
-        float weight = 1.0 / (dist + 1.0);
+        // todo: should also add radius weight: the smaller the probe, the stronger the weight.
+        // https://www.xmswiki.com/wiki/SMS:Inverse_Distance_Weighted_Interpolation
+        float dist = length(probe.position - ex_worldPosition) + 0.1;
+        float distxradius = dist * probe.radius;
+        float weight = 1.0 / (distxradius * distxradius);
 
         // todo: calc cubemap texcoord
         int faceId = 0;

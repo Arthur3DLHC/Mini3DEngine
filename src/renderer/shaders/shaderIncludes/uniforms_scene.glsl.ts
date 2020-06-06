@@ -36,7 +36,7 @@ export default /** glsl */`
 
     struct EnvProbe {
         vec3 position;      // always xyz axis aligned
-        float cubeMapIndex;  // start index for 6 faces in texture array
+        float radius;  // radius
     };
     uniform EnvProbes
     {

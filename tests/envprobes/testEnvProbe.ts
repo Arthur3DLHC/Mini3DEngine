@@ -169,14 +169,15 @@ window.onload = () => {
     // scene.attachChild(pointLight02);
     
     // test environment probes
-    addEnvProbe("envProbe01", 5, new vec3([ -1, -1, -1]), scene);
-    addEnvProbe("envProbe02", 5, new vec3([ -1, -1,  1]), scene);
-    addEnvProbe("envProbe03", 5, new vec3([ -1,  1, -1]), scene);
-    addEnvProbe("envProbe04", 5, new vec3([ -1,  1,  1]), scene);
-    addEnvProbe("envProbe05", 5, new vec3([  1, -1, -1]), scene);
-    addEnvProbe("envProbe06", 5, new vec3([  1, -1,  1]), scene);
-    addEnvProbe("envProbe07", 5, new vec3([  1,  1, -1]), scene);
-    addEnvProbe("envProbe08", 5, new vec3([  1,  1,  1]), scene);
+    addEnvProbe("envProbe01", 6, new vec3([ 0, 0, 0]), scene);
+    addEnvProbe("envProbe01", 2, new vec3([ -1, -1, -1]), scene);
+    addEnvProbe("envProbe02", 2, new vec3([ -1, -1,  1]), scene);
+    addEnvProbe("envProbe03", 2, new vec3([ -1,  1, -1]), scene);
+    addEnvProbe("envProbe04", 2, new vec3([ -1,  1,  1]), scene);
+    addEnvProbe("envProbe05", 2, new vec3([  1, -1, -1]), scene);
+    addEnvProbe("envProbe06", 2, new vec3([  1, -1,  1]), scene);
+    addEnvProbe("envProbe07", 2, new vec3([  1,  1, -1]), scene);
+    addEnvProbe("envProbe08", 2, new vec3([  1,  1,  1]), scene);
 
     Clock.instance.start();
 
