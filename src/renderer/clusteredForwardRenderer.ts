@@ -1180,7 +1180,7 @@ export class ClusteredForwardRenderer {
                 this.setRenderStateSet(this._renderStatesOpaque);
 
                 // clear
-                GLDevice.clearColor = new vec4([0, 0, 0, 0]);
+                GLDevice.clearColor = envprobe.backgroundColor;
                 GLDevice.clearDepth = 1.0;
                 GLDevice.clear(true, true, false);
 

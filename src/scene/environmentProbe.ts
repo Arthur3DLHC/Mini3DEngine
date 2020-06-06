@@ -3,11 +3,13 @@ import { Texture2DArray } from "../WebGLResources/textures/texture2DArray.js";
 import { BufferGeometry } from "../geometry/bufferGeometry.js";
 import { RenderList } from "../renderer/renderList.js";
 import vec3 from "../../lib/tsm/vec3.js";
+import vec4 from "../../lib/tsm/vec4.js";
 
 export class EnvironmentProbe extends Object3D {
     public constructor() {
         super();
         this.visibleDistance = 20;
+        this.backgroundColor = new vec4([0, 0, 0, 1]);
         this.texture = null;
         this.textureIndex = 0;
 
@@ -19,6 +21,8 @@ export class EnvironmentProbe extends Object3D {
      * the max visible distance of decal
      */
     public visibleDistance: number;
+
+    public backgroundColor: vec4;
 
     // 在blender中用sphere定义EnvironmentProbe的位置和影响范围？
     // 使用统一的cubemap size？

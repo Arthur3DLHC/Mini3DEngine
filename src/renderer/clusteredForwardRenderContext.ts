@@ -432,10 +432,10 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
         // todo: fill dynamic lights and decals
         // check visibility?
-        this.fillItemsPerView(camera, clusterRes, lights, decals, envprobes, irrvols);
+        this.fillItemsPerView(camera, camPosition, clusterRes, lights, decals, envprobes, irrvols);
     }
 
-    private fillItemsPerView(camera: Camera, clusterRes: vec4, lights: boolean, decals: boolean, envprobes: boolean, irrvols: boolean) {
+    private fillItemsPerView(camera: Camera, camPosition: vec3, clusterRes: vec4, lights: boolean, decals: boolean, envprobes: boolean, irrvols: boolean) {
         if (lights) {
             if (this.dynamicLightCount > 0) {
                 this._buffer.seek(0);
@@ -515,8 +515,14 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 for (let iEnv = 0; iEnv < this.envprobeCount; iEnv++) {
                     const envProbe = this.envProbes[iEnv];
                     if (envProbe.visible) {
-                        this._idxBuffer.addNumber(iEnv);
-                        envProbeCount++;
+                        // check visible distance
+                        const position = new vec3();
+                        envProbe.worldTransform.getTranslation(position);
+                        const dist = vec3.distance(position, camPosition);
+                        if (dist < envProbe.visibleDistance) {
+                            this._idxBuffer.addNumber(iEnv);
+                            envProbeCount++;
+                        }
                     }
                 }
             }
