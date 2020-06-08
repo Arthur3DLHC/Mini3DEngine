@@ -1,6 +1,7 @@
 import { Texture } from "./texture.js";
 import { GLDevice } from "../glDevice.js";
 import { GLTextures } from "../glTextures.js";
+import vec3 from "../../../lib/tsm/vec3.js";
 
 export class Texture2D extends Texture {
     public constructor() {
@@ -75,6 +76,9 @@ export class Texture2D extends Texture {
 
         // anisotropy not supported by webgl?
         // gl.texParameteri(gl.TEXTURE_2D, gl.texture_max_)
+        if (this.mipLevels > 1) {
+            gl.generateMipmap(gl.TEXTURE_2D);
+        }
 
         gl.bindTexture(gl.TEXTURE_2D, null);
     }

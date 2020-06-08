@@ -161,6 +161,7 @@ export class ClusteredForwardRenderer {
         this._envMapArray.height = this._renderContext.envmapSize;
         this._envMapArray.depth = ClusteredForwardRenderContext.MAX_ENVPROBES;              // 128 envmaps in whole scene?
         this._envMapArray.format = gl.RGB;
+        this._envMapArray.mipLevels = 1024;
         this._envMapArray.componentType = gl.UNSIGNED_BYTE;
         this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
         this._envMapArray.create();

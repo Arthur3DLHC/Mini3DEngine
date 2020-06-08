@@ -1,6 +1,7 @@
 import { GLDevice } from "../glDevice.js";
 import { DataArray } from "../dataArray.js";
 import { SamplerState } from "../renderStates/samplerState.js";
+import vec3 from "../../../lib/tsm/vec3.js";
 
 /**
  * Base class for textures
@@ -12,6 +13,7 @@ export class Texture {
         this.width = 0;
         this.height = 0;
         this.depth = 0;
+        this.mipLevels = 1;
         this.format = GLDevice.gl.RGBA;
         this.componentType = GLDevice.gl.UNSIGNED_BYTE;
         this.samplerState = null;
@@ -41,6 +43,8 @@ export class Texture {
     public height: number;
     public depth: number;
 
+    public mipLevels: number;
+
     public format: GLenum;
     public componentType: GLenum;
 
@@ -54,6 +58,22 @@ export class Texture {
      * if texture is in cache, must set to true
      */
     public cached: boolean;
+
+    /**
+     * get width, height, depth of a mipmap level
+     * @param level mipmap level
+     */
+    public getLevelSize(level: number): vec3 {
+        let w = this.width;
+        let h = this.height;
+        let d = this.depth
+        for(let i = 0; i < level; i++) {
+            w = w / 2;
+            h = h / 2;
+            d = d / 2;
+        }
+        return new vec3([w, h, d]);
+    }
 
     public create() {
         // create gl texture

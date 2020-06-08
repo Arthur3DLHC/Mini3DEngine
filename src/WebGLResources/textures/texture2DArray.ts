@@ -74,6 +74,10 @@ export class Texture2DArray extends Texture {
             }
         }
 
+        if (this.mipLevels > 1) {
+            gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
+        }
+
         gl.bindTexture(gl.TEXTURE_2D_ARRAY, null);
     }
     
