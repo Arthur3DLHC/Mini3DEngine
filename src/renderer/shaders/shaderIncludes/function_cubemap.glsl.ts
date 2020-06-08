@@ -37,4 +37,35 @@ export default /** glsl */`
         }
         return uv * ma + 0.5;
     }
+
+    vec3 calcNormal(int face, vec2 uv) {
+    // 6 faces (+x, -x, +y, -y, +z, -z) from 0 to 5
+    // from [0, 1] to [-1, 1]
+    uv = uv * 2.0 - vec2(1.0);
+    vec3 n = vec3(0.0);
+    if (face == CUBE_FACE_POSITIVE_X) {
+        n.x = 1.0;
+        n.zy = uv;
+    } else if (face == CUBE_FACE_NEGATIVE_X) {
+        n.x = -1.0;
+        n.y = uv.y;
+        n.z = -uv.x;
+    } else if (face == CUBE_FACE_POSITIVE_Y) {
+        n.y = 1.0;
+        n.xz = uv;
+    } else if (face == CUBE_FACE_NEGATIVE_Y) {
+        n.x = uv.x;
+        n.y = -1.0;
+        n.z = -uv.y;
+    } else if (face == CUBE_FACE_POSITIVE_Z) {
+        n.x = -uv.x;
+        n.y = uv.y;
+        n.z = 1.0;
+    } else if (face == CUBE_FACE_NEGATIVE_Z) {
+        n.xy = uv;
+        n.z = -1.0;
+    }
+    return n;
+}
+
 `;
