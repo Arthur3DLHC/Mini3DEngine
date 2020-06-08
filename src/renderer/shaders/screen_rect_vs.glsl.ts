@@ -24,7 +24,7 @@ void main(void)
 {
     // todo: transform the rectangle by world matrix only (to set the size and position on screen)
     // use a plane geometry ( x 0 z plane ), so need to swap y and z
-    gl_Position.xyzw = localToWorld(vec4(a_position.xzy, 1));
+    gl_Position.xyzw = localToWorld(vec4(a_position.xzy, 1.0));
     ex_color = u_object.color;
     ex_texcoord = a_texcoord0;
 }
