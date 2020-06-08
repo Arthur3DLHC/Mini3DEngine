@@ -331,6 +331,9 @@ export class ClusteredForwardRenderer {
     private _envmapFBO: FrameBuffer;
 
     private _numReservedTextures: number;
+    public get numReservedTextures(): number {
+        return this._numReservedTextures;
+    }
     
     // default shader programs
     // or put them into render phases?

@@ -11,6 +11,10 @@ import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
 import { RenderStateSet } from "./renderStateSet.js";
 import { RenderStateCache } from "../WebGLResources/renderStateCache.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
+import { GLTextures } from "../WebGLResources/glTextures.js";
+import { ClusteredForwardRenderContext } from "./clusteredForwardRenderContext.js";
+import { PlaneGeometry } from "../geometry/common/planeGeometry.js";
+import mat4 from "../../lib/tsm/mat4.js";
 
 /**
  * generate specular mipmaps of cubemaps (texture2darray)
@@ -38,20 +42,32 @@ export class CubemapProcessor {
         this._renderStates.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
         this._renderStates.cullState = RenderStateCache.instance.getCullState(false, GLDevice.gl.BACK);
         this._renderStates.depthState = RenderStateCache.instance.getDepthStencilState(false, false, GLDevice.gl.ALWAYS);
+
+        this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
+        this._rectTransform = new mat4();
+    }
+
+    public release() {
+        this._rectGeom.destroy();
     }
 
     private _renderStates: RenderStateSet;
+    private _rectGeom: PlaneGeometry;
+    private _rectTransform: mat4;
 
-    public processSpecular(source: Texture2DArray, dest: Texture2DArray, cubemapCount: number) {
+    public processSpecular(source: Texture2DArray, dest: Texture2DArray, cubemapCount: number, textureUnit: number) {
         // create a temp shader program?
         const program = new ShaderProgram();
         program.name = "cubemap_filter_diffuse";
-        program.vertexShaderCode = GLPrograms.shaderCodes["cubemap_filter_vs"];
-        program.fragmentShaderCode = GLPrograms.shaderCodes["cubemap_filter_specular_fs"];
+        program.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_vs"]);
+        program.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_specular_fs"]);
         program.build();
 
         // create a temp FBO?
         const frameBuffer = new FrameBuffer();
+
+        // use shader program
+        GLPrograms.useProgram(program);
 
         // iterate all cubemaps
         for (let ilayer = 0; ilayer < cubemapCount; ilayer++) {
@@ -72,16 +88,24 @@ export class CubemapProcessor {
                 const size = dest.getLevelSize(ilevel);
                 GLDevice.gl.viewport(0, 0, size.x, size.y);
 
-                // use shader program
-
-
-                // set textures
+                // set textures. because framebuffer.prepare will bind texture,
+                // need set textures here.
+                GLTextures.setTextureAt(textureUnit, source, GLDevice.gl.TEXTURE_2D_ARRAY);
 
                 // set uniform params and samplers
+                const sourceTexLocation = GLDevice.gl.getUniformLocation(program, "s_source");
+                GLDevice.gl.uniform1i(sourceTexLocation, textureUnit);
 
-                // draw a full screen quad
+                const roughness = ilevel / 5.0;
+                const roughnessLocation = GLDevice.gl.getUniformLocation(program, "u_roughness");
+                GLDevice.gl.uniform1f(roughnessLocation, roughness);
+
+                // todo: draw a full screen quad
+                this._rectGeom.draw(0, Infinity, program.attributes);
             }
         }
+
+        GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D_ARRAY);
 
         // delete temp FBO
         frameBuffer.release();
