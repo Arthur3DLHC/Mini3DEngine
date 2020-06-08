@@ -58,16 +58,16 @@ export class CubemapProcessor {
     public processSpecular(source: Texture2DArray, dest: Texture2DArray, cubemapCount: number, textureUnit: number) {
         // create a temp shader program?
         const program = new ShaderProgram();
-        program.name = "cubemap_filter_diffuse";
+        program.name = "cubemap_filter_specular";
         program.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_vs"]);
         program.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_specular_fs"]);
         program.build();
 
-        // create a temp FBO?
-        const frameBuffer = new FrameBuffer();
-
         // use shader program
         GLPrograms.useProgram(program);
+
+        // create a temp FBO?
+        const frameBuffer = new FrameBuffer();
 
         // iterate all cubemaps
         for (let ilayer = 0; ilayer < cubemapCount; ilayer++) {
@@ -100,7 +100,11 @@ export class CubemapProcessor {
                 const roughnessLocation = GLDevice.gl.getUniformLocation(program, "u_roughness");
                 GLDevice.gl.uniform1f(roughnessLocation, roughness);
 
-                // todo: draw a full screen quad
+                // source texture layer index
+                const layerLocation = GLDevice.gl.getUniformLocation(program, "u_layer");
+                GLDevice.gl.uniform1i(layerLocation, ilayer);
+
+                // draw a full screen quad
                 this._rectGeom.draw(0, Infinity, program.attributes);
             }
         }
@@ -113,33 +117,55 @@ export class CubemapProcessor {
         program.release();
     }
 
-    public processDiffuse(source: Texture2DArray, dest: Texture2DArray, cubemapCount: number) {
+    public processDiffuse(source: Texture2DArray, dest: Texture2DArray, cubemapCount: number, textureUnit: number) {
         // create a temp shader program?
         const program = new ShaderProgram();
-
-        // create a temp FBO?
-        const fbo = new FrameBuffer();
-
-        // iterate all cubemaps
-
-        // use a specific mipmap level as diffuse
-        // level 6, 2x2？
-
-        // set render state
-
-        // set viewport
+        program.name = "cubemap_filter_diffuse";
+        program.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_vs"]);
+        program.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_specular_fs"]);
+        program.build();
 
         // use shader program
+        GLPrograms.useProgram(program);
 
-        // set textures
+        // create a temp FBO?
+        const frameBuffer = new FrameBuffer();
 
-        // set uniform params and samplers
+        // iterate all cubemaps
+        for (let ilayer = 0; ilayer < cubemapCount; ilayer++) {
+            // use a specific mipmap level as diffuse
+            // level 6, 2x2？
+            frameBuffer.setTexture(0, dest, 6, ilayer);
+            frameBuffer.prepare();
 
-        // draw a full screen quad
+            GLDevice.renderTarget = frameBuffer;
 
+            // set render state
+            this._renderStates.apply();
+
+            // set viewport
+            const size = dest.getLevelSize(6);
+            GLDevice.gl.viewport(0, 0, size.x, size.y);
+
+            // set textures
+            GLTextures.setTextureAt(textureUnit, source, GLDevice.gl.TEXTURE_2D_ARRAY);
+
+            // set uniform params and samplers
+            const sourceTexLocation = GLDevice.gl.getUniformLocation(program, "s_source");
+            GLDevice.gl.uniform1i(sourceTexLocation, textureUnit);
+
+            // source texture layer index
+            const layerLocation = GLDevice.gl.getUniformLocation(program, "u_layer");
+            GLDevice.gl.uniform1i(layerLocation, ilayer);
+
+            // draw a full screen quad
+            this._rectGeom.draw(0, Infinity, program.attributes);
+        }
+
+        GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D_ARRAY);
         
         // delete temp FBO
-        fbo.release();
+        frameBuffer.release();
         // delete shader program
         program.release();
     }
