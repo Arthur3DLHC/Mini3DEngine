@@ -44,7 +44,7 @@ export class CubemapProcessor {
         this._renderStates.depthState = RenderStateCache.instance.getDepthStencilState(false, false, GLDevice.gl.ALWAYS);
 
         this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
-        this._rectTransform = new mat4();
+        // this._rectTransform = new mat4();
     }
 
     public release() {
@@ -53,7 +53,10 @@ export class CubemapProcessor {
 
     private _renderStates: RenderStateSet;
     private _rectGeom: PlaneGeometry;
-    private _rectTransform: mat4;
+    // private _rectTransform: mat4;
+
+    private static readonly _maxSpecularMipLevel = 4;
+    private static readonly _diffuseMipLevel = 5;
 
     public processSpecular(source: Texture2DArray, dest: Texture2DArray, cubemapCount: number, textureUnit: number) {
         // create a temp shader program?
@@ -71,9 +74,9 @@ export class CubemapProcessor {
 
         // iterate all cubemaps
         for (let ilayer = 0; ilayer < cubemapCount; ilayer++) {
-            // use 0 ~ 5 level as specular (64x64 to 4x4)
+            // use 0 ~ 4 level as specular (64x64 to 8x8)
             // with different roughness
-            for (let ilevel = 0; ilevel < 6; ilevel++) {
+            for (let ilevel = 0; ilevel <= CubemapProcessor._maxSpecularMipLevel; ilevel++) {
                 // bind texture layer to fbo
                 frameBuffer.setTexture(0, dest, ilevel, ilayer);
                 frameBuffer.prepare();
@@ -96,7 +99,7 @@ export class CubemapProcessor {
                 const sourceTexLocation = GLDevice.gl.getUniformLocation(program, "s_source");
                 GLDevice.gl.uniform1i(sourceTexLocation, textureUnit);
 
-                const roughness = ilevel / 5.0;
+                const roughness = ilevel / CubemapProcessor._maxSpecularMipLevel;
                 const roughnessLocation = GLDevice.gl.getUniformLocation(program, "u_roughness");
                 GLDevice.gl.uniform1f(roughnessLocation, roughness);
 
@@ -134,8 +137,8 @@ export class CubemapProcessor {
         // iterate all cubemaps
         for (let ilayer = 0; ilayer < cubemapCount; ilayer++) {
             // use a specific mipmap level as diffuse
-            // level 6, 2x2？
-            frameBuffer.setTexture(0, dest, 6, ilayer);
+            // level 5, 4x4？
+            frameBuffer.setTexture(0, dest, CubemapProcessor._diffuseMipLevel, ilayer);
             frameBuffer.prepare();
 
             GLDevice.renderTarget = frameBuffer;
@@ -144,7 +147,7 @@ export class CubemapProcessor {
             this._renderStates.apply();
 
             // set viewport
-            const size = dest.getLevelSize(6);
+            const size = dest.getLevelSize(CubemapProcessor._diffuseMipLevel);
             GLDevice.gl.viewport(0, 0, size.x, size.y);
 
             // set textures

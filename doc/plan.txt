@@ -217,8 +217,8 @@ TODO:       主要类结构
                         diffuse 放在分辨率较低的一个 level 里
                         specular 放在其他 level 里
                         64x64，7 mip levels
-                        0, 1, 2, 3, 4 : specular
-                        5: 2x2, diffuse；或者用 1x1 ambient cube? 取样时算法简单一些
+                        0, 1, 2, 3 : specular
+                        4: 4x4, diffuse；或者用 1x1 ambient cube? 取样时算法简单一些
 
                 image based lighting
                     shader 中使用的时候，在取样边缘点时从其它面取样过滤？能否预先处理一下 cubemap，将边缘处扩展一下，填充其它面的对应像素？
