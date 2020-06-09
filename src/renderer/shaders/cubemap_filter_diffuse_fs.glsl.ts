@@ -60,14 +60,8 @@ void main(void)
     int faceIdx = int(u);
     uv.x -= u;
 
-    // calculate normal from UV
-
-
-    // sample cubemap face; use linear filter;
-
-    // aware border pixels; filter with adj face;
-
-
+    vec3 color = convolurionCubeMap(faceIdx, uv);
+    o_color = vec4(color, 1.0);
 }
 
 `;
