@@ -65,6 +65,7 @@ import vec3 from "../../lib/tsm/vec3.js";
 import { DirectionalLightShadow } from "../scene/lights/directionalLightShadow.js";
 import { TextureCube } from "../WebGLResources/textures/textureCube.js";
 import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
+import { CubemapProcessor } from "./cubemapProcessor.js";
 
 export class ClusteredForwardRenderer {
 
@@ -166,15 +167,15 @@ export class ClusteredForwardRenderer {
         this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
         this._envMapArray.create();
 
-        this._envMapDepthTexture = new Texture2D();
-        this._envMapDepthTexture.width = this._renderContext.envmapSize * 6;
-        this._envMapDepthTexture.height = this._renderContext.envmapSize;
-        this._envMapDepthTexture.depth = 1;
-        this._envMapDepthTexture.isShadowMap = true;
-        this._envMapDepthTexture.format = gl.DEPTH_COMPONENT;               // NOTE: not DEPTH but DEPTH_COMPONENT !!!!
-        this._envMapDepthTexture.componentType = gl.UNSIGNED_SHORT;         // use a 16 bit depth buffer for env cube
+        // this._envMapDepthTexture = new Texture2D();
+        // this._envMapDepthTexture.width = this._renderContext.envmapSize * 6;
+        // this._envMapDepthTexture.height = this._renderContext.envmapSize;
+        // this._envMapDepthTexture.depth = 1;
+        // this._envMapDepthTexture.isShadowMap = true;
+        // this._envMapDepthTexture.format = gl.DEPTH_COMPONENT;               // NOTE: not DEPTH but DEPTH_COMPONENT !!!!
+        // this._envMapDepthTexture.componentType = gl.UNSIGNED_SHORT;         // use a 16 bit depth buffer for env cube
 
-        this._envMapDepthTexture.create();
+        // this._envMapDepthTexture.create();
 
         this._irradianceVolumeAtlas = new TextureAtlas3D();
 
@@ -206,10 +207,10 @@ export class ClusteredForwardRenderer {
         this._shadowmapFBO.prepare();
 
         // envmap texture array and FBO
-        this._envmapFBO = new FrameBuffer();
-        this._envmapFBO.setTexture(0, this._envMapArray, 0, 0);
-        this._envmapFBO.depthStencilTexture = this._envMapDepthTexture;
-        this._envmapFBO.prepare();
+        // this._envmapFBO = new FrameBuffer();
+        // this._envmapFBO.setTexture(0, this._envMapArray, 0, 0);
+        // this._envmapFBO.depthStencilTexture = this._envMapDepthTexture;
+        // this._envmapFBO.prepare();
 
         this.registerShaderCodes();
 
@@ -320,7 +321,7 @@ export class ClusteredForwardRenderer {
     private _shadowmapAtlas: ShadowmapAtlas; // dynamic objects only
     private _decalAtlas: TextureAtlas2D;
     private _envMapArray: Texture2DArray;
-    private _envMapDepthTexture: Texture2D;
+    // private _envMapDepthTexture: Texture2D;
     private _irradianceVolumeAtlas: TextureAtlas3D;
 
     // FOBs
@@ -328,7 +329,7 @@ export class ClusteredForwardRenderer {
     private _shadowmapFBO: FrameBuffer;
     private _debugDepthTexture: Texture2D;        // debug use
     private _drawDebugTexture: boolean;
-    private _envmapFBO: FrameBuffer;
+    // private _envmapFBO: FrameBuffer;
 
     private _numReservedTextures: number;
     public get numReservedTextures(): number {
@@ -1157,6 +1158,32 @@ export class ClusteredForwardRenderer {
         const matWorldToProbe = new mat4();
         const matViewProj = new mat4();
 
+        // use a temp texturearray and fbo to render cubemaps?
+        const envMapArray = new Texture2DArray();
+
+        envMapArray.width = this._renderContext.envmapSize * 6;
+        envMapArray.height = this._renderContext.envmapSize;
+        envMapArray.depth = this._renderContext.envprobeCount;
+        envMapArray.mipLevels = 1;
+        envMapArray.format = gl.RGB;
+        envMapArray.componentType = gl.UNSIGNED_BYTE;
+        envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
+        envMapArray.create();
+
+        const envMapDepthTexture = new Texture2D();
+        
+        envMapDepthTexture.width = this._renderContext.envmapSize * 6;
+        envMapDepthTexture.height = this._renderContext.envmapSize;
+        envMapDepthTexture.depth = 1;
+        envMapDepthTexture.isShadowMap = true;
+        envMapDepthTexture.format = gl.DEPTH_COMPONENT;               // NOTE: not DEPTH but DEPTH_COMPONENT !!!!
+        envMapDepthTexture.componentType = gl.UNSIGNED_SHORT;         // use a 16 bit depth buffer for env cube
+
+        envMapDepthTexture.create();
+
+        const envMapFBO = new FrameBuffer();
+        envMapFBO.depthStencilTexture = envMapDepthTexture;
+
         // todo: iterate all envprobes
         for (let ienvprobe = 0; ienvprobe < this._renderContext.envprobeCount; ienvprobe++) {
             const envprobe = this._renderContext.envProbes[ienvprobe];
@@ -1165,10 +1192,10 @@ export class ClusteredForwardRenderer {
             matWorldToProbe.inverse();
 
             // todo: set the cubemap texture array layer as render target
-            this._envmapFBO.setTexture(0, this._envMapArray, 0, ienvprobe);
-            this._envmapFBO.prepare();
+            envMapFBO.setTexture(0, envMapArray, 0, ienvprobe);
+            envMapFBO.prepare();
             // need to force set, or the target will be set to null in prepare() function
-            GLDevice.renderTarget = this._envmapFBO;
+            GLDevice.renderTarget = envMapFBO;
             // GLDevice.forceSetRenderTarget(this._envmapFBO);
 
             // todo: set viewport and scissor, render 6 faces of cubemap
@@ -1213,10 +1240,18 @@ export class ClusteredForwardRenderer {
         }
 
         // the last level of mipmap can be used as ambient cube?
+        const cubeProc = new CubemapProcessor();
 
+        cubeProc.processSpecular(envMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
+        cubeProc.processDiffuse(envMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
         // todo: Spherical Harmonic?
 
+        cubeProc.release();
+
+        envMapFBO.release();
+        envMapArray.release();
+        envMapDepthTexture.release();
+
         console.log("done.");
-        // throw new Error("Method not implemented.");
     }
 }

@@ -80,6 +80,13 @@ export class ShaderProgram {
         return this._attributes;
     }
 
+    public getUniformLocation(name: string): WebGLUniformLocation | null {
+        if (this.glProgram === null) {
+            return null;
+        }
+        return GLDevice.gl.getUniformLocation(this.glProgram, name);
+    }
+
     private compile(code: string, type: GLenum): WebGLShader | null {
         const shader = GLDevice.gl.createShader(type);
         if (shader) {
