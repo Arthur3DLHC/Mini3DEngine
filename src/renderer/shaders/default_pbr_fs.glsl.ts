@@ -188,7 +188,7 @@ void main(void)
     // todo: env maps: image based lighting
     uint envmapStart = 0u;
     uint envmapCount = 0u;
-    float cubeUVScale = 1.0 / 6.0;
+    // float cubeUVScale = 1.0 / 6.0;
 
     // reflection vector, in world space
     vec3 reflV = reflect(-v, n);
@@ -208,13 +208,14 @@ void main(void)
         float weight = 1.0 / (distxradius * distxradius);
 
         // todo: calc cubemap texcoord
-        int faceId = 0;
-        vec3 cubeTexCoord = vec3(getCubemapTexcoord(reflV, faceId), float(i - envmapStart));
+        // int faceId = 0;
+        // vec3 cubeTexCoord = vec3(getCubemapTexcoord(reflV, faceId), float(i - envmapStart));
         
-        cubeTexCoord.x = cubeTexCoord.x * cubeUVScale + float(faceId) * cubeUVScale;
+        // cubeTexCoord.x = cubeTexCoord.x * cubeUVScale + float(faceId) * cubeUVScale;
 
         // sample envmap, 
-        vec4 envmap = texture(s_envMapArray, cubeTexCoord);
+        // vec4 envmap = texture(s_envMapArray, cubeTexCoord);
+        vec4 envmap = textureCubeArray(s_envMapArray, reflV, int(i - envmapStart));
         reflection += envmap.rgb * weight;
         totalWeight += weight;        
 
