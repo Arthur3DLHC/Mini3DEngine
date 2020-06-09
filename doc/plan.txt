@@ -224,11 +224,14 @@ TODO:       主要类结构
                     shader 中使用的时候，在取样边缘点时从其它面取样过滤？能否预先处理一下 cubemap，将边缘处扩展一下，填充其它面的对应像素？
                     多个 envprobe 的混合
                         权重：距离和尺寸？
+                    分别使用 diffuse 和 specular cubemap
 
                 生成 irradiance volume？或者尝试用low mipmap envmap cube 做间接光照？
                     为每个 envmap probe 生成一个 shadowmap，用以剔除影响范围外的物体
                         该 shadowmap 中只绘制开启了 occlusion query 的静态物体；这样房间内的细节物体的背向 probe 中心点的面不会被剔除，也可以有环境光照。
 
+            Dithered soft shadow?
+            
             SSAO，屏幕空间反射, 屏幕空间 GI？；
 
             Subsurface scattering
