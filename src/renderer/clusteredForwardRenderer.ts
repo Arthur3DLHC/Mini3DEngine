@@ -164,7 +164,7 @@ export class ClusteredForwardRenderer {
         this._envMapArray.format = gl.RGB;
         this._envMapArray.mipLevels = 1024;
         this._envMapArray.componentType = gl.UNSIGNED_BYTE;
-        this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
+        this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.LINEAR_MIPMAP_LINEAR, gl.LINEAR_MIPMAP_LINEAR);
         this._envMapArray.create();
 
         // this._envMapDepthTexture = new Texture2D();
@@ -687,6 +687,7 @@ export class ClusteredForwardRenderer {
                 // this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._debugDepthTexture, 1, 0, false);
                 
                 // envmap:
+                // todo: debug outpu diffuse Riemann sum result
                 this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, false);
             }
         }
@@ -1184,7 +1185,9 @@ export class ClusteredForwardRenderer {
         const envMapFBO = new FrameBuffer();
         envMapFBO.depthStencilTexture = envMapDepthTexture;
 
-        // todo: iterate all envprobes
+        // todo: repeat several times to simulate multiple bounces
+
+        // iterate all envprobes
         for (let ienvprobe = 0; ienvprobe < this._renderContext.envprobeCount; ienvprobe++) {
             const envprobe = this._renderContext.envProbes[ienvprobe];
 
@@ -1225,7 +1228,7 @@ export class ClusteredForwardRenderer {
                 // set uniforms per view
                 // will fill all visible lights, decals, envprobes;
                 // is that necessary to render decals ? maybe not;
-                // should not add envprobes at this time? because can not read their textures in shader yet.
+                // todo: if not first time, fill envprobes, and set env texture
                 this._renderContext.fillUniformBuffersPerView(cubefaceCamera, true, false, false, false, false);
 
                 // render items in renderlist
@@ -1239,7 +1242,8 @@ export class ClusteredForwardRenderer {
             // todo: downsample all cubemaps and generate mipmaps
         }
 
-        // the last level of mipmap can be used as ambient cube?
+        GLTextures.setTextureAt(this._envMapArrayUnit, null, gl.TEXTURE_2D_ARRAY);
+
         const cubeProc = new CubemapProcessor();
 
         cubeProc.processSpecular(envMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
