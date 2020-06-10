@@ -53,8 +53,8 @@ export class CubemapProcessor {
     private _rectGeom: PlaneGeometry;
     // private _rectTransform: mat4;
 
-    private static readonly _maxSpecularMipLevel = 4;
-    private static readonly _diffuseMipLevel = 5;
+    public static readonly maxSpecularMipLevel = 4;
+    public static readonly diffuseMipLevel = 5;
 
     public processSpecular(source: Texture2DArray, dest: Texture2DArray, cubemapCount: number, textureUnit: number) {
         // create a temp shader program?
@@ -74,7 +74,7 @@ export class CubemapProcessor {
         for (let ilayer = 0; ilayer < cubemapCount; ilayer++) {
             // use 0 ~ 4 level as specular (64x64 to 8x8)
             // with different roughness
-            for (let ilevel = 0; ilevel <= CubemapProcessor._maxSpecularMipLevel; ilevel++) {
+            for (let ilevel = 0; ilevel <= CubemapProcessor.maxSpecularMipLevel; ilevel++) {
                 // bind texture layer to fbo
                 frameBuffer.setTexture(0, dest, ilevel, ilayer);
                 frameBuffer.prepare();
@@ -98,7 +98,7 @@ export class CubemapProcessor {
                 const sourceTexLocation = program.getUniformLocation("s_source");
                 GLDevice.gl.uniform1i(sourceTexLocation, textureUnit);
 
-                const roughness = ilevel / CubemapProcessor._maxSpecularMipLevel;
+                const roughness = ilevel / CubemapProcessor.maxSpecularMipLevel;
                 const roughnessLocation = program.getUniformLocation("u_roughness");
                 GLDevice.gl.uniform1f(roughnessLocation, roughness);
 
@@ -137,7 +137,7 @@ export class CubemapProcessor {
         for (let ilayer = 0; ilayer < cubemapCount; ilayer++) {
             // use a specific mipmap level as diffuse
             // level 5, 4x4？
-            frameBuffer.setTexture(0, dest, CubemapProcessor._diffuseMipLevel, ilayer);
+            frameBuffer.setTexture(0, dest, CubemapProcessor.diffuseMipLevel, ilayer);
             frameBuffer.prepare();
 
             GLDevice.renderTarget = frameBuffer;
@@ -146,7 +146,7 @@ export class CubemapProcessor {
             this._renderStates.apply();
 
             // set viewport
-            const size = dest.getLevelSize(CubemapProcessor._diffuseMipLevel);
+            const size = dest.getLevelSize(CubemapProcessor.diffuseMipLevel);
             GLDevice.gl.viewport(0, 0, size.x, size.y);
             GLDevice.gl.scissor(0, 0, size.x, size.y);
 
