@@ -74,11 +74,24 @@ export default /** glsl */`
         return texture(s, vec3(uv, float(layer)));
     }
 
+    vec4 sampleCubeMapArrayLod(sampler2DArray s, vec2 uv, int faceIdx, int layer, float lod) {
+        const float cubeUVScale = 1.0 / 6.0;
+        uv.x = uv.x * cubeUVScale + float(faceIdx) * cubeUVScale;
+        return textureLod(s, vec3(uv, float(layer)), lod);
+    }
+
     vec4 textureCubeArray(sampler2DArray s, vec3 v, int layer) {
         int sampleFaceIdx = 0;
         vec2 cubeUV = getCubemapTexcoord(v, sampleFaceIdx);
         // fix me: how to implement seamless filter?
         return sampleCubeMapArray(s, cubeUV, sampleFaceIdx, layer);
+    }
+
+    vec4 textureCubeArrayLod(sampler2DArray s, vec3 v, int layer, float lod) {
+        int sampleFaceIdx = 0;
+        vec2 cubeUV = getCubemapTexcoord(v, sampleFaceIdx);
+        // fix me: how to implement seamless filter?
+        return sampleCubeMapArrayLod(s, cubeUV, sampleFaceIdx, layer, lod);
     }
 
 `;

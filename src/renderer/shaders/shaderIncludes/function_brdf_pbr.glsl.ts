@@ -1,5 +1,5 @@
 /**
- * common pbr function
+ * common pbr functions
  */
 export default /** glsl */`
     // todo: pbr lighting brdf

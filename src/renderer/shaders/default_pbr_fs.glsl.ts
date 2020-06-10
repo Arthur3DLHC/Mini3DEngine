@@ -15,6 +15,7 @@ export default /** glsl */`
 #include <function_punctual_lights>
 #include <function_shadow>
 #include <function_brdf_pbr>
+#include <function_ibl>
 
 #include <output_final>
 in vec4 ex_hPosition;
@@ -172,8 +173,7 @@ void main(void)
 
     f_emissive = getEmissive();
 
-    // todo: opacity for transparent surfaces;
-    o.color = vec4(f_diffuse + f_specular + f_emissive, getOpacity());
+
 
     // test normal
     // vec3 normal = normalize(ex_worldNormal);
@@ -190,6 +190,7 @@ void main(void)
     uint envmapCount = 0u;
     // float cubeUVScale = 1.0 / 6.0;
 
+    vec3 iblDiffuse = vec3(0.0);
     // reflection vector, in world space
     vec3 reflV = reflect(-v, n);
     vec3 reflection = vec3(0.0);
@@ -215,16 +216,23 @@ void main(void)
 
         // sample envmap, 
         // vec4 envmap = texture(s_envMapArray, cubeTexCoord);
+        // todo: real IBL diffuse part
+        iblDiffuse += getIBLRadianceLambertian(s_envMapArray, int(i - envmapStart), n, albedoColor) * weight;
+        // todo: real IBL specular part
         vec4 envmap = textureCubeArray(s_envMapArray, reflV, int(i - envmapStart));
         reflection += envmap.rgb * weight;
-        totalWeight += weight;        
+        totalWeight += weight;
 
         // todo: sample different levels and filter by roughness
     }
     // debug output envmap
     if (totalWeight > 0.0) {
-        o.color.rgb += reflection * 0.5 / totalWeight;
+        // o.color.rgb += reflection * 0.5 / totalWeight;
+        f_diffuse += iblDiffuse / totalWeight;
     }
+    // todo: opacity for transparent surfaces;
+    o.color = vec4(f_diffuse + f_specular + f_emissive, getOpacity());
+
     outputFinal(o);
 }
 `;

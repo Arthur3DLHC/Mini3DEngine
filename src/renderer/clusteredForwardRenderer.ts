@@ -7,6 +7,7 @@ import uniforms_view from "./shaders/shaderIncludes/uniforms_view.glsl.js";
 import function_cluster from "./shaders/shaderIncludes/function_cluster.glsl.js";
 import function_cubemap from "./shaders/shaderIncludes/function_cubemap.glsl.js";
 import function_get_items from "./shaders/shaderIncludes/function_get_items.glsl.js";
+import function_ibl from "./shaders/shaderIncludes/function_ibl.glsl.js";
 import function_punctual_lights from "./shaders/shaderIncludes/function_punctual_lights.glsl.js";
 import function_shadow from "./shaders/shaderIncludes/function_shadow.glsl.js";
 import function_brdf_pbr from "./shaders/shaderIncludes/function_brdf_pbr.glsl.js";
@@ -412,6 +413,7 @@ export class ClusteredForwardRenderer {
         GLPrograms.shaderCodes["function_cluster"] = function_cluster;
         GLPrograms.shaderCodes["function_cubemap"] = function_cubemap;
         GLPrograms.shaderCodes["function_get_items"] = function_get_items;
+        GLPrograms.shaderCodes["function_ibl"] = function_ibl;
         GLPrograms.shaderCodes["function_punctual_lights"] = function_punctual_lights;
         GLPrograms.shaderCodes["function_shadow"] = function_shadow;
         GLPrograms.shaderCodes["function_brdf_pbr"] = function_brdf_pbr;
