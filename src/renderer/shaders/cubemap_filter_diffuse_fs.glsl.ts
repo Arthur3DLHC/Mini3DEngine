@@ -52,7 +52,7 @@ vec3 convolurionCubeMap(int faceIndex, vec2 uv) {
 
 void main(void)
 {
-    // todo: sample source and do a Riemann Sum
+    // sample source and do a Riemann Sum
 
     // get face index from UV
     vec2 uv = ex_texcoord * vec2(6.0, 1.0);
