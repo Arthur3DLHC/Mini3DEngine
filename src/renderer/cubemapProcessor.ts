@@ -1,7 +1,8 @@
 // shader codes
 import cubemap_filter_vs from "./shaders/cubemap_filter_vs.glsl.js";
 import cubemap_filter_diffuse_fs from "./shaders/cubemap_filter_diffuse_fs.glsl.js";
-import cubemap_filter_specular_fs from "./shaders/cubemap_filter_specular_fs.glsl.js";
+import cubemap_filter_specular_LD_fs from "./shaders/cubemap_filter_specular_LD_fs.glsl.js";
+import cubemap_filter_specular_DFG_fs from "./shaders/cubemap_filter_specular_DFG_fs.glsl.js";
 
 // modules
 import { Texture2DArray } from "../WebGLResources/textures/texture2DArray.js";
@@ -13,6 +14,7 @@ import { RenderStateCache } from "../WebGLResources/renderStateCache.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { GLTextures } from "../WebGLResources/glTextures.js";
 import { PlaneGeometry } from "../geometry/common/planeGeometry.js";
+import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 
 /**
  * generate specular mipmaps of cubemaps (texture2darray)
@@ -31,8 +33,12 @@ export class CubemapProcessor {
             GLPrograms.shaderCodes["cubemap_filter_diffuse_fs"] = cubemap_filter_diffuse_fs;
         }
 
-        if (GLPrograms.shaderCodes["cubemap_filter_specular_fs"] === undefined) {
-            GLPrograms.shaderCodes["cubemap_filter_specular_fs"] = cubemap_filter_specular_fs;
+        if (GLPrograms.shaderCodes["cubemap_filter_specular_LD_fs"] === undefined) {
+            GLPrograms.shaderCodes["cubemap_filter_specular_LD_fs"] = cubemap_filter_specular_LD_fs;
+        }
+
+        if (GLPrograms.shaderCodes["cubemap_filter_specular_DFG_fs"] === undefined) {
+            GLPrograms.shaderCodes["cubemap_filter_specular_DFG_fs"] = cubemap_filter_specular_DFG_fs;
         }
 
         this._renderStates = new RenderStateSet();
@@ -56,12 +62,12 @@ export class CubemapProcessor {
     public static readonly maxSpecularMipLevel = 4;
     public static readonly diffuseMipLevel = 5;
 
-    public processSpecular(source: Texture2DArray, dest: Texture2DArray, cubemapCount: number, textureUnit: number) {
-        // create a temp shader program?
+    public processSpecularLD(source: Texture2DArray, dest: Texture2DArray, cubemapCount: number, textureUnit: number) {
+        // create a temp shader program
         const program = new ShaderProgram();
-        program.name = "cubemap_filter_specular";
+        program.name = "cubemap_filter_specular_LD";
         program.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_vs"]);
-        program.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_specular_fs"]);
+        program.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_specular_LD_fs"]);
         program.build();
 
         // use shader program
@@ -119,12 +125,39 @@ export class CubemapProcessor {
         program.release();
     }
 
+    public processSpecularDFG(dest: Texture2D, textureUnit: number) {
+        // todo: generate DFG lut texture
+        // need to add a texture in renderer.
+        const program = new ShaderProgram();
+        program.name = "cubemap_filter_specular_DFG";
+        program.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_vs"]);
+        program.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_specular_DFG_fs"]);
+        program.build();
+
+        GLPrograms.useProgram(program);
+
+        const frameBuffer = new FrameBuffer();
+        frameBuffer.setTexture(0, dest);
+        frameBuffer.prepare();
+
+        GLDevice.renderTarget = frameBuffer;
+        // render one rect
+        const size = dest.getLevelSize(0);
+        GLDevice.gl.viewport(0, 0, size.x, size.y);
+        GLDevice.gl.scissor(0, 0, size.x, size.y);
+
+        this._rectGeom.draw(0, Infinity, program.attributes);
+
+        frameBuffer.release();
+        program.release();
+    }
+
     public processDiffuse(source: Texture2DArray, dest: Texture2DArray, cubemapCount: number, textureUnit: number) {
         // create a temp shader program?
         const program = new ShaderProgram();
         program.name = "cubemap_filter_diffuse";
         program.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_vs"]);
-        program.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_specular_fs"]);
+        program.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_specular_LD_fs"]);
         program.build();
 
         // use shader program

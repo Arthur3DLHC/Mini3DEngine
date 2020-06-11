@@ -1254,7 +1254,7 @@ export class ClusteredForwardRenderer {
 
         const cubeProc = new CubemapProcessor();
 
-        cubeProc.processSpecular(envMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
+        cubeProc.processSpecularLD(envMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
         cubeProc.processDiffuse(envMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
         // todo: Spherical Harmonic?
 
