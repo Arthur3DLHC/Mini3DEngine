@@ -193,7 +193,7 @@ void main(void)
     vec3 iblDiffuse = vec3(0.0);
     // reflection vector, in world space
     vec3 reflV = reflect(-v, n);
-    vec3 reflection = vec3(0.0);
+    vec3 iblSpecular = vec3(0.0);
     float totalWeight = 0.0;
 
     getEnvProbeIndicesInCluster(cluster, envmapStart, envmapCount);
@@ -216,11 +216,17 @@ void main(void)
 
         // sample envmap, 
         // vec4 envmap = texture(s_envMapArray, cubeTexCoord);
-        // todo: real IBL diffuse part
-        iblDiffuse += getIBLRadianceLambertian(s_envMapArray, int(i - envmapStart), n, albedoColor) * weight;
-        // todo: real IBL specular part
-        vec4 envmap = textureCubeArray(s_envMapArray, reflV, int(i - envmapStart));
-        reflection += envmap.rgb * weight;
+        // IBL diffuse part
+        int layer = int(i - envmapStart);
+        iblDiffuse += getIBLRadianceLambertian(s_envMapArray, layer, n, albedoColor) * weight;
+        
+        // todo: IBL specular part
+        vec3 ld = textureCubeArrayLod(s_envMapArray, reflV, layer, roughness * MAX_SPECULAR_MIP_LEVEL).rgb;
+        vec2 dfg = texture(s_specularDFG, vec2(NdotV, roughness)).rg;
+        iblSpecular += ld * (f0 * dfg.x + dfg.y) * weight;
+        // vec4 envmap = textureCubeArray(s_envMapArray, reflV, int(i - envmapStart));
+        // reflection += envmap.rgb * weight;
+        
         totalWeight += weight;
 
         // todo: sample different levels and filter by roughness
@@ -229,6 +235,7 @@ void main(void)
     if (totalWeight > 0.0) {
         // o.color.rgb += reflection * 0.5 / totalWeight;
         f_diffuse += iblDiffuse / totalWeight;
+        f_specular += iblSpecular / totalWeight;
     }
     // todo: opacity for transparent surfaces;
     o.color = vec4(f_diffuse + f_specular + f_emissive, getOpacity());

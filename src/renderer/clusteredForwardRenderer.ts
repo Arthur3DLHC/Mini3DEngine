@@ -708,7 +708,7 @@ export class ClusteredForwardRenderer {
                 // debug outpu diffuse Riemann sum result
                 // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, CubemapProcessor.diffuseMipLevel, false);
                 // todo: debug outpu specular LD parts and DFG parts
-                this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, 0, false);
+                this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, 4, false);
             }
         }
     }
