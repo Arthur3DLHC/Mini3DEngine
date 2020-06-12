@@ -5,14 +5,17 @@
  */
 export default /** glsl */`
 
+#include <function_cubemap>
+#include <function_ibl>
+
 in vec2 ex_texcoord;
 layout(location = 0) out vec4 o_color;
 
 void main(void)
 {
     vec3 n = vec3(0.0, 0.0, 1.0);
-    float roughness = uv.y;
-    float ndotv = uv.x;
+    float roughness = ex_texcoord.y;
+    float ndotv = ex_texcoord.x;
 
     vec3 v = vec3(0.0, 0.0, 0.0);
     v.x = sqrt(1.0 - ndotv * ndotv);
@@ -44,7 +47,7 @@ void main(void)
     }
 
     vec3 color = vec3(scalar, bias, 0.0);
-    color = color / samples;
+    color = color / float(samples);
     o_color = vec4(color, 1.0);
 }
 `;

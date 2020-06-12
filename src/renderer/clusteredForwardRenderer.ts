@@ -111,9 +111,10 @@ export class ClusteredForwardRenderer {
         this._shadowmapAtlasUnit = 1;
         this._decalAtlasUnit = 2;
         this._envMapArrayUnit = 3;
-        this._irradianceVolumeAtlasUnit = 4;
+        this._specularDFGUnit = 4;
+        this._irradianceVolumeAtlasUnit = 5;
 
-        this._numReservedTextures = 5;
+        this._numReservedTextures = 6;
 
 
         // todo: 静态shadowmap和动态shadowmap需要分开
@@ -177,6 +178,16 @@ export class ClusteredForwardRenderer {
         // this._envMapDepthTexture.componentType = gl.UNSIGNED_SHORT;         // use a 16 bit depth buffer for env cube
 
         // this._envMapDepthTexture.create();
+
+        this._specularDFG = new Texture2D();
+        this._specularDFG.width = 128;
+        this._specularDFG.height = 128;
+        this._specularDFG.depth = 1;
+        this._specularDFG.mipLevels = 1;
+        this._specularDFG.format = gl.RGB;
+        this._specularDFG.componentType = gl.UNSIGNED_BYTE;
+        this._specularDFG.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.LINEAR, gl.LINEAR);
+        this._specularDFG.create();
 
         this._irradianceVolumeAtlas = new TextureAtlas3D();
 
@@ -316,16 +327,18 @@ export class ClusteredForwardRenderer {
     private _shadowmapAtlasUnit: GLenum;
     private _decalAtlasUnit: GLenum;
     private _envMapArrayUnit: GLenum;
+    private _specularDFGUnit: GLenum;
     private _irradianceVolumeAtlasUnit: GLenum;
 
     private _shadowmapAtlasCache: ShadowmapAtlas;  // static objects only
     private _shadowmapAtlas: ShadowmapAtlas; // dynamic objects only
     private _decalAtlas: TextureAtlas2D;
     private _envMapArray: Texture2DArray;
+    private _specularDFG: Texture2D;
     // private _envMapDepthTexture: Texture2D;
     private _irradianceVolumeAtlas: TextureAtlas3D;
 
-    // FOBs
+    // FBOs
     private _shadowmapCacheFBO: FrameBuffer;
     private _shadowmapFBO: FrameBuffer;
     private _debugDepthTexture: Texture2D;        // debug use
@@ -543,6 +556,7 @@ export class ClusteredForwardRenderer {
         // GLTextures.setTextureAt(this._shadowmapAtlasDynamicUnit, this._shadowmapAtlasDynamic.texture);
         GLTextures.setTextureAt(this._decalAtlasUnit, this._decalAtlas.texture);
         GLTextures.setTextureAt(this._envMapArrayUnit, this._envMapArray);
+        GLTextures.setTextureAt(this._specularDFGUnit, this._specularDFG);
         GLTextures.setTextureAt(this._irradianceVolumeAtlasUnit, this._irradianceVolumeAtlas.texture);
     }
 
@@ -555,6 +569,7 @@ export class ClusteredForwardRenderer {
                 this._samplerUniformsStdPBR.setTextureUnit("s_shadowAtlas", this._shadowmapAtlasUnit);
                 this._samplerUniformsStdPBR.setTextureUnit("s_decalAtlas", this._decalAtlasUnit);
                 this._samplerUniformsStdPBR.setTextureUnit("s_envMapArray", this._envMapArrayUnit);
+                this._samplerUniformsStdPBR.setTextureUnit("s_specularDFG", this._specularDFGUnit);
                 this._samplerUniformsStdPBR.setTextureUnit("s_irrVolAtlas", this._irradianceVolumeAtlasUnit);
 
                 GLTextures.setStartUnit(this._numReservedTextures);
@@ -690,8 +705,10 @@ export class ClusteredForwardRenderer {
                 
                 // envmap:
                 // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, false);
-                // todo: debug outpu diffuse Riemann sum result
-                this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, CubemapProcessor.diffuseMipLevel, false);
+                // debug outpu diffuse Riemann sum result
+                // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, CubemapProcessor.diffuseMipLevel, false);
+                // todo: debug outpu specular LD parts and DFG parts
+                this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, 0, false);
             }
         }
     }
@@ -1257,6 +1274,8 @@ export class ClusteredForwardRenderer {
         cubeProc.processSpecularLD(envMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
         cubeProc.processDiffuse(envMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
         // todo: Spherical Harmonic?
+
+        cubeProc.processSpecularDFG(this._specularDFG);
 
         cubeProc.release();
 

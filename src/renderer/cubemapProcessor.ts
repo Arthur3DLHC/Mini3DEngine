@@ -1,4 +1,5 @@
 // shader codes
+import function_ibl from "./shaders/shaderIncludes/function_ibl.glsl.js";
 import cubemap_filter_vs from "./shaders/cubemap_filter_vs.glsl.js";
 import cubemap_filter_diffuse_fs from "./shaders/cubemap_filter_diffuse_fs.glsl.js";
 import cubemap_filter_specular_LD_fs from "./shaders/cubemap_filter_specular_LD_fs.glsl.js";
@@ -24,6 +25,10 @@ export class CubemapProcessor {
     public constructor() {
         // register shader code, if not registered?
         // use which vertex shader?
+        if (GLPrograms.shaderCodes["function_ibl"] === undefined) {
+            GLPrograms.shaderCodes["function_ibl"] = function_ibl;
+        }
+
         if (GLPrograms.shaderCodes["cubemap_filter_vs"] === undefined) {
             GLPrograms.shaderCodes["cubemap_filter_vs"] = cubemap_filter_vs;
         }
@@ -125,7 +130,7 @@ export class CubemapProcessor {
         program.release();
     }
 
-    public processSpecularDFG(dest: Texture2D, textureUnit: number) {
+    public processSpecularDFG(dest: Texture2D) {
         // todo: generate DFG lut texture
         // need to add a texture in renderer.
         const program = new ShaderProgram();

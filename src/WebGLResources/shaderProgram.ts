@@ -46,7 +46,7 @@ export class ShaderProgram {
         let linkLog = GLDevice.gl.getProgramInfoLog(this.glProgram);
         if (linkLog) {
             if (linkLog.length > 0) {
-                throw linkLog;
+                throw this.name + ":" + linkLog;
             }
         }
         // clean up

@@ -7,6 +7,7 @@ export default /** glsl */`
 precision lowp sampler2DArray;
 
 #include <function_cubemap>
+#include <function_ibl>
 
 uniform sampler2DArray      s_source;
 uniform int                 u_layer;
@@ -33,7 +34,7 @@ vec3 convolutionCubeMap(sampler2DArray s, int faceIndex, vec2 uv) {
         vec3 h = importanceSamplingGGX(xi, u_roughness, n);
         vec3 l = 2.0 * dot(v, h) * h - v;
 
-        float ndotl = max(0, dot(n, l));
+        float ndotl = max(0.0, dot(n, l));
         if (ndotl > 0.0) {
             color = color + textureCubeArray(s, l, u_layer).xyz * ndotl;
             weight = weight + ndotl;
