@@ -240,6 +240,8 @@ void main(void)
     // todo: opacity for transparent surfaces;
     o.color = vec4(f_diffuse + f_specular + f_emissive, getOpacity());
 
+    // todo: tone mapping? linear space to sRGB space?
+
     outputFinal(o);
 }
 `;
