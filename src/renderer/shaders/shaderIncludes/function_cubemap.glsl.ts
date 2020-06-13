@@ -71,6 +71,9 @@ export default /** glsl */`
     vec4 sampleCubeMapArray(sampler2DArray s, vec2 uv, int faceIdx, int layer) {
         const float cubeUVScale = 1.0 / 6.0;
         uv.x = uv.x * cubeUVScale + float(faceIdx) * cubeUVScale;
+        // fix me: filter border texels; how?
+        // pre process? add one pixel at the border?
+        // or wait for cubemap array support by webgl?
         return texture(s, vec3(uv, float(layer)));
     }
 

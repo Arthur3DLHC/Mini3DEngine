@@ -183,7 +183,6 @@ TODO:       主要类结构
                         测试
                             做一个比较适合检查点光源投影的场景
 
------------------------------------------------------
             现在的 renderer 类代码有点长了 是否应该重构一下？
                 将功能分散在 shadowmaprenderer, cubemaprenderer里？
 
@@ -218,24 +217,28 @@ TODO:       主要类结构
                         64x64，7 mip levels
                         0, 1, 2, 3 : specular
                         4: 4x4, diffuse；或者用 1x1 ambient cube? 取样时算法简单一些
+-----------------------------------------------------
+                    能否/是否有必要多次渲染envmap，模拟光线多次反射的机制？
 
                 image based lighting
                     shader 中使用的时候，在取样边缘点时从其它面取样过滤？能否预先处理一下 cubemap，将边缘处扩展一下，填充其它面的对应像素？
-                        
+
                     多个 envprobe 的混合
                         权重：距离和尺寸？
                     分别使用 diffuse 和 specular cubemap
 
-                生成 irradiance volume？或者尝试用low mipmap envmap cube 做间接光照？
-                    为每个 envmap probe 生成一个 shadowmap，用以剔除影响范围外的物体
-                        该 shadowmap 中只绘制开启了 occlusion query 的静态物体；这样房间内的细节物体的背向 probe 中心点的面不会被剔除，也可以有环境光照。
-
-            Dithered soft shadow?
+                // 生成 irradiance volume？或者尝试用low mipmap envmap cube 做间接光照？
+                //    为每个 envmap probe 生成一个 shadowmap，用以剔除影响范围外的物体
+                //        该 shadowmap 中只绘制开启了 occlusion query 的静态物体；这样房间内的细节物体的背向 probe 中心点的面不会被剔除，也可以有环境光照。
             
             SSAO，屏幕空间反射, 屏幕空间 GI？；
+                需要输出一个 thin G-buffer；在 Depth prepass 时输出？
+                    深度：能否直接使用 depth buffer? 需要恢复出屏幕空间 z
+                    roughness / specular (F) ?
 
             Subsurface scattering
-                参考Khronos Group glTF Viewer; Blender;
+                参考 Khronos Group glTF Viewer; Blender;
+                使用近似的实现方式，还是 screen space subsurface scattering?
 
             Instancing
                 can use in mat4 in vertex shader for attribute input;
@@ -245,6 +248,8 @@ TODO:       主要类结构
                 Occlusion query object 分组；
                     用 instancing 方式绘制组内每个 box？还是绘制组的总 AABB？
                         绘制每个 box 是否精确一些；
+
+            半透明物体的绘制？
 
             Clustered 光源、envmap、irradiance volume
                 fillItemsPerView
@@ -256,6 +261,10 @@ TODO:       主要类结构
                 sampler state
                 贴图的属性
                 贴图的加载和绑定
+                
+            Dithered soft shadow?
+                使用一个 blue noise dither texture；在做 shadowmap 取样时根据像素屏幕坐标取 dither 偏移量，应用到 shadowmap uv 上？
+
             FileLoader
             GLTFLoader
                 从 Blender 导出测试用的模型
