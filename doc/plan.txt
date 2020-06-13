@@ -236,27 +236,13 @@ TODO:       主要类结构
                     深度：能否直接使用 depth buffer? 需要恢复出屏幕空间 z
                     normal / roughness / specular (F) ?
                 需要将主画面输出改为到一个 RT 上？
-
-            Instancing
-                can use in mat4 in vertex shader for attribute input;
-
-            测试 Occlusion query?
-                调试绘制：Occlusion test 失败的，画一个不会被遮挡的线框 box？或者用不同颜色线框区分被遮挡/无遮挡的物体
-                Occlusion query object 分组；
-                    用 instancing 方式绘制组内每个 box？还是绘制组的总 AABB？
-                        绘制每个 box 是否精确一些；
+                SSAO shader;
 
             半透明物体的绘制？
 
             Subsurface scattering
                 参考 Khronos Group glTF Viewer; Blender;
-                使用近似的实现方式，还是 screen space subsurface scattering?
-
-            Clustered 光源、envmap、irradiance volume
-                fillItemsPerView
-                    加一个参数：checkClusters
-                        主画面渲染，设为true;
-                        Cubemap 或 Shadowmap 渲染，设为 false；分辨率较低，而且是类似 bake 阶段，无需 Clustered
+                使用神海近似的实现方式，还是 screen space subsurface scattering?
 
             加载贴图
                 sampler state
@@ -286,6 +272,23 @@ TODO:       主要类结构
             资源加载器
                 资源列表和资源计数？
                 所有资源加载完后再开始逻辑循环？
+                
+        大场景相关
+
+            Clustered 光源、envmap、irradiance volume
+                fillItemsPerView
+                    加一个参数：checkClusters
+                        主画面渲染，设为true;
+                        Cubemap 或 Shadowmap 渲染，设为 false；分辨率较低，而且是类似 bake 阶段，无需 Clustered
+
+            Instancing
+                can use in mat4 in vertex shader for attribute input;
+
+            测试 Occlusion query?
+                调试绘制：Occlusion test 失败的，画一个不会被遮挡的线框 box？或者用不同颜色线框区分被遮挡/无遮挡的物体
+                Occlusion query object 分组；
+                    用 instancing 方式绘制组内每个 box？还是绘制组的总 AABB？
+                        绘制每个 box 是否精确一些；
 
             particle system; sprite;
 
