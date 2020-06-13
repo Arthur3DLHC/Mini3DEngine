@@ -230,15 +230,12 @@ TODO:       主要类结构
                 // 生成 irradiance volume？或者尝试用low mipmap envmap cube 做间接光照？
                 //    为每个 envmap probe 生成一个 shadowmap，用以剔除影响范围外的物体
                 //        该 shadowmap 中只绘制开启了 occlusion query 的静态物体；这样房间内的细节物体的背向 probe 中心点的面不会被剔除，也可以有环境光照。
-            
+
             SSAO，屏幕空间反射, 屏幕空间 GI？；
                 需要输出一个 thin G-buffer；在 Depth prepass 时输出？
                     深度：能否直接使用 depth buffer? 需要恢复出屏幕空间 z
-                    roughness / specular (F) ?
-
-            Subsurface scattering
-                参考 Khronos Group glTF Viewer; Blender;
-                使用近似的实现方式，还是 screen space subsurface scattering?
+                    normal / roughness / specular (F) ?
+                需要将主画面输出改为到一个 RT 上？
 
             Instancing
                 can use in mat4 in vertex shader for attribute input;
@@ -250,6 +247,10 @@ TODO:       主要类结构
                         绘制每个 box 是否精确一些；
 
             半透明物体的绘制？
+
+            Subsurface scattering
+                参考 Khronos Group glTF Viewer; Blender;
+                使用近似的实现方式，还是 screen space subsurface scattering?
 
             Clustered 光源、envmap、irradiance volume
                 fillItemsPerView
