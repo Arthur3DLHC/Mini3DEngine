@@ -183,7 +183,6 @@ TODO:       主要类结构
                         测试
                             做一个比较适合检查点光源投影的场景
 
-            优化 PBR shader，将重复计算 F 的代码去掉
 -----------------------------------------------------
             现在的 renderer 类代码有点长了 是否应该重构一下？
                 将功能分散在 shadowmaprenderer, cubemaprenderer里？
@@ -222,6 +221,7 @@ TODO:       主要类结构
 
                 image based lighting
                     shader 中使用的时候，在取样边缘点时从其它面取样过滤？能否预先处理一下 cubemap，将边缘处扩展一下，填充其它面的对应像素？
+                        
                     多个 envprobe 的混合
                         权重：距离和尺寸？
                     分别使用 diffuse 和 specular cubemap
