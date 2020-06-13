@@ -1,6 +1,6 @@
 /**
  * all post processes supported
  */
-export class PostProcess {
+export class PostProcessor {
     // todo: apply all enabled processes together
 }
