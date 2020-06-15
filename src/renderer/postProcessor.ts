@@ -1,3 +1,4 @@
+import samplers_postprocess from "./shaders/shaderIncludes/samplers_postprocess.glsl.js";
 import fullscreen_rect_vs from "./shaders/fullscreen_rect_vs.glsl.js";
 import postprocess_ssao_fs from "./shaders/postprocess_ssao_fs.glsl.js";
 import postprocess_ssao_combine_fs from "./shaders/postprocess_ssao_combine_fs.glsl.js";
@@ -12,8 +13,6 @@ import { RenderStateSet } from "./renderStateSet.js";
 import { PlaneGeometry } from "../geometry/common/planeGeometry.js";
 import { RenderStateCache } from "../WebGLResources/renderStateCache.js";
 import { GLTextures } from "../WebGLResources/glTextures.js";
-import { ClusteredForwardRenderContext } from "./clusteredForwardRenderContext.js";
-import { ClusteredForwardRenderer } from "./clusteredForwardRenderer.js";
 import { SamplerUniforms } from "../WebGLResources/samplerUniforms.js";
 
 /**
@@ -30,6 +29,10 @@ export class PostProcessor {
         }
         if (GLPrograms.shaderCodes["postprocess_ssao_combine_fs"] === undefined) {
             GLPrograms.shaderCodes["postprocess_ssao_combine_fs"] = postprocess_ssao_combine_fs;
+        }
+
+        if (GLPrograms.shaderCodes["samplers_postprocess"] === undefined) {
+            GLPrograms.shaderCodes["samplers_postprocess"] = samplers_postprocess;
         }
 
         // create shaders
@@ -95,16 +98,16 @@ export class PostProcessor {
     private _renderStates: RenderStateSet;
     private _rectGeom: PlaneGeometry;
 
-    public process(sourceImage: Texture2D, depthMap: Texture2D, normalGlossSpec: Texture2D, startTexUnit: number, output: FrameBuffer) {
+    public process(sourceImage: Texture2D, depthMap: Texture2D, normalRoughSpec: Texture2D, startTexUnit: number, output: FrameBuffer) {
         // todo: apply all enabled processes together
         if (this.enableSSAO) {
-            this.applySSAO(sourceImage, depthMap, normalGlossSpec, startTexUnit, output);
+            this.applySSAO(sourceImage, depthMap, normalRoughSpec, startTexUnit, output);
         }
 
 
     }
 
-    private applySSAO(sourceImage: Texture2D, depthMap: Texture2D, normalGlossSpec: Texture2D, startTexUnit: number, output: FrameBuffer) {
+    private applySSAO(sourceImage: Texture2D, depthMap: Texture2D, normalRoughSpec: Texture2D, startTexUnit: number, output: FrameBuffer) {
         const gl = GLDevice.gl;
         
         // 1. render ssao to half res result texture
@@ -123,8 +126,8 @@ export class PostProcessor {
         // textures
         GLTextures.setStartUnit(startTexUnit);
 
-        this._samplerUniformsSSAO.setTexture("s_depth", depthMap);
-        this._samplerUniformsSSAO.setTexture("s_normal", normalGlossSpec);
+        this._samplerUniformsSSAO.setTexture("s_sceneDepth", depthMap);
+        this._samplerUniformsSSAO.setTexture("s_sceneNormalRoughSpec", normalRoughSpec);
 
         // uniforms (blocks? how many uniforms can be shared by post processes?)
         // what params ssao need?

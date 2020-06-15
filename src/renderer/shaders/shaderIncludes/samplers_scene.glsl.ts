@@ -1,5 +1,5 @@
 /**
- * uniform blocks per scene
+ * samplers per scene
  */
 export default /** glsl */`
 precision mediump sampler2DShadow;
