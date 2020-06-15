@@ -345,6 +345,8 @@ export class ClusteredForwardRenderer {
     private _shadowmapFBO: FrameBuffer;
     private _debugDepthTexture: Texture2D;        // debug use
     private _drawDebugTexture: boolean;
+    // todo: output to a main texture fbo for post processing
+
     // private _envmapFBO: FrameBuffer;
 
     private _numReservedTextures: number;
