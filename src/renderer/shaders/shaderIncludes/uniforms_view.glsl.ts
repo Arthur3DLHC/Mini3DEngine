@@ -12,7 +12,7 @@ export default /** glsl */`
         mat4 matView;
         mat4 matViewPrev;
         mat4 matProj;
-        mat4 matProjPrev;
+        mat4 matInvProj;
         vec4 viewport;          // x, y, width, height
         vec3 position;
         float time;             // perframe buffer is too small, so put in there               
