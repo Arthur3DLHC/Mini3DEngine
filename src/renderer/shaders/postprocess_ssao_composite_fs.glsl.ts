@@ -26,7 +26,7 @@ layout(location = 0) out vec4 o_color;
 
 void main(void) {
     // hardcode the gaussian blur weights for left top 3x3 kernels of a 5x5 kernel matrix
-    // because the weights are symmertry
+    // because the weights are symmertrical
 
     mat3 kernel = mat3(
         0.003765, 0.015019, 0.023792,
@@ -66,6 +66,10 @@ void main(void) {
     }
 
     sumColor /= sumWeight;
+    sumColor = vec3(1.0) - sumColor;    // invert
+    sumColor = pow(sumColor, u_power);  // sharppen
+    sumColor = vec3(1.0) - sumColor * u_intensity;  // contrast and invert back
+
     vec3 sourceColor = texture(s_sceneColor, ex_texcoord).rgb;
     o_color = vec4(sumColor * sourceColor, 1.0);
 }
