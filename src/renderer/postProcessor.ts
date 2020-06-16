@@ -38,7 +38,9 @@ export class PostProcessor {
         // create shaders
         this._ssaoProgram = new ShaderProgram();
         this._ssaoProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
-        this._ssaoProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssao_fs"]);
+        this._ssaoProgram.fragmentShaderCode = GLPrograms.processSourceCode(
+            "#define NUM_KERNELS " + PostProcessor._numSSAOKernels + "\n"
+            + GLPrograms.shaderCodes["postprocess_ssao_fs"]);
         this._ssaoProgram.build();
 
         this._combineSSAOProgram = new ShaderProgram();
@@ -72,6 +74,13 @@ export class PostProcessor {
 
         this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
 
+        // generate noise texture? by upload image data to texture?
+        // generation method is in three.js SSAOPass.js generateRandomKernelRotations() function
+        this._ssaoNoiseTexture = new Texture2D();
+        this._ssaoNoiseTexture.width = 4;
+        this._ssaoNoiseTexture.height = 4;
+
+        this._ssaoNoiseTexture.create();
     }
 
     public enableSSAO: boolean = true;
@@ -82,12 +91,15 @@ export class PostProcessor {
     // todo: other post processing effects: color grading, glow...
 
     // todo: shaders
+    private static readonly _numSSAOKernels = 32;
+
     private _ssaoProgram: ShaderProgram;
     private _combineSSAOProgram: ShaderProgram;
     private _samplerUniformsSSAO: SamplerUniforms;
     private _samplerUniformsSSAOCombine: SamplerUniforms;
 
     // todo: temp textures and framebuffers
+    private _ssaoNoiseTexture: Texture2D;
     /**
      * half res temp result image
      * can be used to store unblurred SSAO/SSR, brightpass and so on
@@ -128,13 +140,24 @@ export class PostProcessor {
 
         this._samplerUniformsSSAO.setTexture("s_sceneDepth", depthMap);
         this._samplerUniformsSSAO.setTexture("s_sceneNormalRoughSpec", normalRoughSpec);
+        // todo: noise texture
+        // fix me: how to load noise texture? or generate it?
 
         // uniforms (blocks? how many uniforms can be shared by post processes?)
         // what params ssao need?
+        // get uniform locations here, or get them when init?
+        
+        // calc texel size
+
+        // kernel weights
+
+        // radius
+
+        // min and max distance
 
         // draw fullscr rect
         this._rectGeom.draw(0, Infinity, this._ssaoProgram.attributes);
 
-        // 2. combine half res ssao and source image together?
+        // 2. composite half res ssao and source image together?
     }
 }

@@ -80,6 +80,7 @@ export class ShaderProgram {
         return this._attributes;
     }
 
+    // todo: cache the uniform locations to prevent low level gl call? Is that necessary?
     public getUniformLocation(name: string): WebGLUniformLocation | null {
         if (this.glProgram === null) {
             return null;
