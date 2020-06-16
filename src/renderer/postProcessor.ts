@@ -1,7 +1,7 @@
 import samplers_postprocess from "./shaders/shaderIncludes/samplers_postprocess.glsl.js";
 import fullscreen_rect_vs from "./shaders/fullscreen_rect_vs.glsl.js";
 import postprocess_ssao_fs from "./shaders/postprocess_ssao_fs.glsl.js";
-import postprocess_ssao_combine_fs from "./shaders/postprocess_ssao_combine_fs.glsl.js";
+import postprocess_ssao_composite_fs from "./shaders/postprocess_ssao_composite_fs.glsl.js";
 
 import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { FrameBuffer } from "../WebGLResources/frameBuffer.js";
@@ -27,8 +27,8 @@ export class PostProcessor {
         if (GLPrograms.shaderCodes["postprocess_ssao_fs"] === undefined) {
             GLPrograms.shaderCodes["postprocess_ssao_fs"] = postprocess_ssao_fs;
         }
-        if (GLPrograms.shaderCodes["postprocess_ssao_combine_fs"] === undefined) {
-            GLPrograms.shaderCodes["postprocess_ssao_combine_fs"] = postprocess_ssao_combine_fs;
+        if (GLPrograms.shaderCodes["postprocess_ssao_composite_fs"] === undefined) {
+            GLPrograms.shaderCodes["postprocess_ssao_composite_fs"] = postprocess_ssao_composite_fs;
         }
 
         if (GLPrograms.shaderCodes["samplers_postprocess"] === undefined) {
@@ -43,7 +43,7 @@ export class PostProcessor {
 
         this._combineSSAOProgram = new ShaderProgram();
         this._combineSSAOProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
-        this._combineSSAOProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssao_combine_fs"]);
+        this._combineSSAOProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssao_composite_fs"]);
         this._combineSSAOProgram.build();
 
         this._samplerUniformsSSAO = new SamplerUniforms(this._ssaoProgram);

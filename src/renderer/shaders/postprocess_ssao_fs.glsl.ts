@@ -13,20 +13,19 @@ uniform vec2 u_noiseTexelSize;          // 1.0 / noise texture size
 
 uniform vec3 u_kernel[NUM_KERNELS];     // NUM_KERNELS will be defined by postprocessor.js?
 uniform float u_radius;
-uniform float u_power;
 uniform float u_minDistance;            // in linear orthographic depth space range.
 uniform float u_maxDistance;
-uniform float u_intensity;
 
 uniform sampler2D s_noiseTex;
 // fix me: use world or view space normal?
 // output view space normal when rendering scene?
 #include <samplers_postprocess>
 
-#include <function_depth>
 
 in vec2 ex_texcoord;
 layout(location = 0) out vec4 o_color;
+
+#include <function_depth>
 
 float getLinearDepth(vec2 scrUV) {
     // now only have perspective camera
