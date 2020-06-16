@@ -35,6 +35,9 @@ float getLinearDepth(vec2 scrUV) {
     return viewZToOrthoDepth(viewZ, u_view.zRange.x, u_view.zRange.y);
 }
 
+/**
+ * get view z from depth value in depth texture
+ */
 float getViewZ(float depth) {
     return perspectiveDepthToViewZ(depth, u_view.zRange.x, u_view.zRange.y);
 }

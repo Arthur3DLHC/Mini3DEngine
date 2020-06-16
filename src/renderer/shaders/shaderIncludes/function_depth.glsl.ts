@@ -5,10 +5,16 @@ export default /** glsl */`
     // this is from three.js. why these formulars are different, and which one is right?
     // -- this formular is simplfied version of the one in depthToLinearZ funciton.
     // three.js is a great API.
+    /*
+     * from perspective depth buffer value to view space Z
+     */
     float perspectiveDepthToViewZ(float depth, float near, float far) {
         return ( near * far ) / ( ( far - near ) * depth - far );
     }
 
+    /*
+     * from view space Z to a orthographic linear depth
+     */
     float viewZToOrthoDepth(float viewZ, float near, float far) {
         return ( viewZ + near ) / ( near - far );
     }
