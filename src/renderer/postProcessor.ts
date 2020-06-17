@@ -79,6 +79,18 @@ export class PostProcessor {
         this._ssaoNoiseTexture = new Texture2D();
         this._ssaoNoiseTexture.width = 4;
         this._ssaoNoiseTexture.height = 4;
+        this._ssaoNoiseTexture.depth = 1;
+        this._ssaoNoiseTexture.mipLevels = 1;
+        this._ssaoNoiseTexture.componentType = GLDevice.gl.FLOAT;
+        this._ssaoNoiseTexture.format = GLDevice.gl.RGB;
+        this._ssaoNoiseTexture.samplerState = new SamplerState(GLDevice.gl.REPEAT, GLDevice.gl.REPEAT, GLDevice.gl.LINEAR, GLDevice.gl.LINEAR);
+
+        // todo: try and compare different methods to generate noise texture:
+        // plain random number
+        // simplex noise
+        // blue noise?
+        // rotation disk (sin and cos values)
+
 
         this._ssaoNoiseTexture.create();
     }
