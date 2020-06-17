@@ -43,7 +43,7 @@ export class PostProcessor {
         this._ssaoProgram = new ShaderProgram();
         this._ssaoProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
         this._ssaoProgram.fragmentShaderCode = GLPrograms.processSourceCode(
-            "#define NUM_KERNELS " + PostProcessor._numSSAOKernels + "\n"
+            "#define NUM_KERNELS " + SSAOParams.numKernels + "\n"
             + GLPrograms.shaderCodes["postprocess_ssao_fs"]);
         this._ssaoProgram.build();
 
@@ -80,34 +80,7 @@ export class PostProcessor {
 
         // generate noise texture? by upload image data to texture?
         // generation method is in three.js SSAOPass.js generateRandomKernelRotations() function
-        this._ssaoNoiseTexture = new Texture2D();
-        this._ssaoNoiseTexture.width = 4;
-        this._ssaoNoiseTexture.height = 4;
-        this._ssaoNoiseTexture.depth = 1;
-        this._ssaoNoiseTexture.mipLevels = 1;
-        this._ssaoNoiseTexture.componentType = GLDevice.gl.FLOAT;
-        this._ssaoNoiseTexture.format = GLDevice.gl.RGB;
-        this._ssaoNoiseTexture.samplerState = new SamplerState(GLDevice.gl.REPEAT, GLDevice.gl.REPEAT, GLDevice.gl.LINEAR, GLDevice.gl.LINEAR);
-
-        this._ssaoNoiseTexture.create();
-        const numPixels = this._ssaoNoiseTexture.width * this._ssaoNoiseTexture.height;
-        const data = new Float32Array(numPixels * 3);
-        // todo: try and compare different methods to generate noise texture:
-        // plain random number
-        for(let i = 0; i < numPixels * 3; i++) {
-            data[i] = Math.random() * 2.0 - 1.0;
-        }
-        // simplex noise
-        // blue noise?
-        // rotation disk (sin and cos values)
-
-        this._ssaoNoiseTexture.image = data;
-
-        this._ssaoNoiseTexture.upload();
-
-        this._ssaoKernels = new Float32Array(PostProcessor._numSSAOKernels * 3);
-
-        this.generateSSAOKernels();
+        
 
         this.ssao = new SSAOParams();
     }
@@ -121,7 +94,6 @@ export class PostProcessor {
     public ssao: SSAOParams;
 
     // todo: shaders
-    private static readonly _numSSAOKernels = 32;
 
     private _ssaoProgram: ShaderProgram;
     private _compositeSSAOProgram: ShaderProgram;
@@ -129,8 +101,7 @@ export class PostProcessor {
     private _samplerUniformsSSAOComposite: SamplerUniforms;
 
     // todo: temp textures and framebuffers
-    private _ssaoNoiseTexture: Texture2D;
-    private _ssaoKernels: Float32Array;
+
     /**
      * half res temp result image
      * can be used to store unblurred SSAO/SSR, brightpass and so on
@@ -171,7 +142,7 @@ export class PostProcessor {
 
         this._samplerUniformsSSAO.setTexture("s_sceneDepth", depthMap);
         this._samplerUniformsSSAO.setTexture("s_sceneNormalRoughSpec", normalRoughSpec);
-        this._samplerUniformsSSAO.setTexture("s_noiseTex", this._ssaoNoiseTexture);
+        this._samplerUniformsSSAO.setTexture("s_noiseTex", this.ssao.noiseTexture);
 
         // uniforms (blocks? how many uniforms can be shared by post processes?)
         // what params ssao need?
@@ -180,10 +151,10 @@ export class PostProcessor {
         
         // calc texel size
         gl.uniform2f(this._ssaoProgram.getUniformLocation("u_texelSize"), texelW, texelH);
-        gl.uniform2f(this._ssaoProgram.getUniformLocation("u_noiseTexelSize"), 1.0 / this._ssaoNoiseTexture.width, 1.0 / this._ssaoNoiseTexture.height);
+        gl.uniform2f(this._ssaoProgram.getUniformLocation("u_noiseTexelSize"), 1.0 / this.ssao.noiseTexture.width, 1.0 / this.ssao.noiseTexture.height);
 
         // 3d sample kernels
-        gl.uniform3fv(this._ssaoProgram.getUniformLocation("u_kernel"), this._ssaoKernels);
+        gl.uniform3fv(this._ssaoProgram.getUniformLocation("u_kernel"), this.ssao.kernels);
 
         // params
         // fix me: pack these together to a vec3? call gl api only 1 time
@@ -220,37 +191,5 @@ export class PostProcessor {
         this._rectGeom.draw(0, Infinity, this._compositeSSAOProgram.attributes);
     }
 
-    private generateSSAOKernels() {
-        // use random vectors in a hemisphere
-        // use halton sequence?
-
-        // https://github.com/pissang/claygl-advanced-renderer/blob/master/src/SSAOPass.js
-        // NOTE: in that code they use temporal filter for SSAO, so they generate 30 kernel arrays for 30 frames.
-
-        const offset = 0;
-        let sample = new vec3();
-
-        for(let i = 0; i < PostProcessor._numSSAOKernels; i++) {
-            // let phi = Halton.get(i + offset, 2) * Math.PI;      // hemisphere
-            // let theta = Halton.get(i + offset, 3) * 
-
-            // test: use plain random values, same as three.js
-            // hemisphere
-            sample.x = Math.random() * 2 - 1;
-            sample.y = Math.random() * 2 - 1;
-            sample.z = Math.random();
-
-            sample.normalize();
-
-            // vary length
-            let scale = i / PostProcessor._numSSAOKernels;
-            scale *= scale;
-            scale = 0.1 + 0.9 * scale;      // lerp(0.1, 1, scale)
-            sample.scale(scale);
-
-            this._ssaoKernels[i * 3] = sample.x;
-            this._ssaoKernels[i * 3 + 1] = sample.y;
-            this._ssaoKernels[i * 3 + 2] = sample.z;
-        }
-    }
+    
 }
