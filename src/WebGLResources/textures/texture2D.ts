@@ -1,3 +1,4 @@
+import { DataArray } from "../dataArray.js";
 import { Texture } from "./texture.js";
 import { GLDevice } from "../glDevice.js";
 import { GLTextures } from "../glTextures.js";
@@ -85,16 +86,31 @@ export class Texture2D extends Texture {
 
     public upload() {
         // todo: 检查 image source 是否合法
+        if (this.image === null) {
+            return;
+        }
+
+        const gl = GLDevice.gl;
 
         if (!this.glTexture) {
-            this.glTexture = GLDevice.gl.createTexture();
+            this.glTexture = gl.createTexture();
         }
-        GLDevice.gl.bindTexture(GLDevice.gl.TEXTURE_2D, this.glTexture);
-
-        // TODO: 向贴图中提交数据
+        gl.bindTexture(gl.TEXTURE_2D, this.glTexture);
 
         // initialize tex by gl.TexImage2D
+        const internalFmt = GLTextures.internalFormatFrom(this.format, this.componentType);
+        if (this.image instanceof HTMLImageElement
+            || this.image instanceof HTMLCanvasElement
+            || this.image instanceof ImageData) {
+                // todo: check image formats?
+            gl.texImage2D(gl.TEXTURE_2D, 0, internalFmt, this.image.width, this.image.height, 0, this.format, this.componentType, this.image);
+        } else {
+            // todo: check data format match?
+            gl.texImage2D(gl.TEXTURE_2D, 0, internalFmt, this.width, this.height, 0, this.format, this.componentType, this.image);
+        }
+
+        // todo: upload mipmaps
+
         GLDevice.gl.bindTexture(GLDevice.gl.TEXTURE_2D, null);
-        throw new Error("Not implemented.");
     }
 }

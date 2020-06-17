@@ -85,14 +85,21 @@ export class PostProcessor {
         this._ssaoNoiseTexture.format = GLDevice.gl.RGB;
         this._ssaoNoiseTexture.samplerState = new SamplerState(GLDevice.gl.REPEAT, GLDevice.gl.REPEAT, GLDevice.gl.LINEAR, GLDevice.gl.LINEAR);
 
+        this._ssaoNoiseTexture.create();
+        const numPixels = this._ssaoNoiseTexture.width * this._ssaoNoiseTexture.height;
+        const data = new Float32Array(numPixels);
         // todo: try and compare different methods to generate noise texture:
         // plain random number
+        for(let i = 0; i < numPixels; i++) {
+            data[i] = Math.random() * 2.0 - 1.0;
+        }
         // simplex noise
         // blue noise?
         // rotation disk (sin and cos values)
 
+        this._ssaoNoiseTexture.image = data;
 
-        this._ssaoNoiseTexture.create();
+        this._ssaoNoiseTexture.upload();
     }
 
     public enableSSAO: boolean = true;

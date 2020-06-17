@@ -1,5 +1,5 @@
 /**
- * borrow from three.js
+ * from three.js
  */
 export type DataArray = 
         | Int8Array
