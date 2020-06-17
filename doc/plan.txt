@@ -232,7 +232,7 @@ TODO:       主要类结构
                 //        该 shadowmap 中只绘制开启了 occlusion query 的静态物体；这样房间内的细节物体的背向 probe 中心点的面不会被剔除，也可以有环境光照。
 
             SSAO，屏幕空间反射, 屏幕空间 GI？；
-                需要输出一个 thin G-buffer；在 Depth prepass 时输出？
+                需要输出一个 thin G-buffer；在 Depth prepass 时输出？还是使用MRT，在绘制不透明时输出？参考一下DOOM
                     深度：能否直接使用 depth buffer? 需要恢复出屏幕空间 z
                     normal / roughness / specular (F) ?
                 需要将主画面输出改为到一个 RT 上？
