@@ -5,7 +5,7 @@
 export default /** glsl */`
 
 // uniforms
-uniform float u_offset;
+uniform vec2 u_offset;
 uniform float u_intensity;
 uniform float u_power;
 

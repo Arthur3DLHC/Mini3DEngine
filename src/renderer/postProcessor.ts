@@ -53,7 +53,7 @@ export class PostProcessor {
         this._compositeSSAOProgram.build();
 
         this._samplerUniformsSSAO = new SamplerUniforms(this._ssaoProgram);
-        this._samplerUniformsSSAOCombine = new SamplerUniforms(this._compositeSSAOProgram);
+        this._samplerUniformsSSAOComposite = new SamplerUniforms(this._compositeSSAOProgram);
 
         // create temp textures and framebuffers
         this._tempResultHalfTexture = new Texture2D();
@@ -126,7 +126,7 @@ export class PostProcessor {
     private _ssaoProgram: ShaderProgram;
     private _compositeSSAOProgram: ShaderProgram;
     private _samplerUniformsSSAO: SamplerUniforms;
-    private _samplerUniformsSSAOCombine: SamplerUniforms;
+    private _samplerUniformsSSAOComposite: SamplerUniforms;
 
     // todo: temp textures and framebuffers
     private _ssaoNoiseTexture: Texture2D;
@@ -175,9 +175,11 @@ export class PostProcessor {
 
         // uniforms (blocks? how many uniforms can be shared by post processes?)
         // what params ssao need?
+        const texelW = 1.0 / depthMap.width;
+        const texelH = 1.0 / depthMap.height;
         
         // calc texel size
-        gl.uniform2f(this._ssaoProgram.getUniformLocation("u_texelSize"), 1.0 / depthMap.width, 1.0 / depthMap.height);
+        gl.uniform2f(this._ssaoProgram.getUniformLocation("u_texelSize"), texelW, texelH);
         gl.uniform2f(this._ssaoProgram.getUniformLocation("u_noiseTexelSize"), 1.0 / this._ssaoNoiseTexture.width, 1.0 / this._ssaoNoiseTexture.height);
 
         // 3d sample kernels
@@ -201,14 +203,19 @@ export class PostProcessor {
 
         GLTextures.setStartUnit(startTexUnit);
 
-        this._samplerUniformsSSAO.setTexture("s_sceneDepth", depthMap);
-        this._samplerUniformsSSAO.setTexture("s_sceneNormalRoughSpec", normalRoughSpec);
-        this._samplerUniformsSSAOCombine.setTexture("s_aoTex", this._tempResultHalfTexture);
+        this._samplerUniformsSSAOComposite.setTexture("s_sceneDepth", depthMap);
+        this._samplerUniformsSSAOComposite.setTexture("s_sceneNormalRoughSpec", normalRoughSpec);
+        this._samplerUniformsSSAOComposite.setTexture("s_aoTex", this._tempResultHalfTexture);
 
         // todo: uniforms
         // uniform float u_offset;
+        gl.uniform2f(this._compositeSSAOProgram.getUniformLocation("u_offset"), this.ssao.blurSize * texelW, this.ssao.blurSize * texelH);
+
         // uniform float u_intensity;
+        gl.uniform1f(this._compositeSSAOProgram.getUniformLocation("u_intensity"), this.ssao.intensiy);
+
         // uniform float u_power;
+        gl.uniform1f(this._compositeSSAOProgram.getUniformLocation("u_power"), this.ssao.power);
 
         this._rectGeom.draw(0, Infinity, this._compositeSSAOProgram.attributes);
     }
