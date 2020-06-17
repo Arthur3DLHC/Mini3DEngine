@@ -87,10 +87,10 @@ export class PostProcessor {
 
         this._ssaoNoiseTexture.create();
         const numPixels = this._ssaoNoiseTexture.width * this._ssaoNoiseTexture.height;
-        const data = new Float32Array(numPixels);
+        const data = new Float32Array(numPixels * 3);
         // todo: try and compare different methods to generate noise texture:
         // plain random number
-        for(let i = 0; i < numPixels; i++) {
+        for(let i = 0; i < numPixels * 3; i++) {
             data[i] = Math.random() * 2.0 - 1.0;
         }
         // simplex noise
