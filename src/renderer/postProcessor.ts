@@ -47,13 +47,13 @@ export class PostProcessor {
             + GLPrograms.shaderCodes["postprocess_ssao_fs"]);
         this._ssaoProgram.build();
 
-        this._combineSSAOProgram = new ShaderProgram();
-        this._combineSSAOProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
-        this._combineSSAOProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssao_composite_fs"]);
-        this._combineSSAOProgram.build();
+        this._compositeSSAOProgram = new ShaderProgram();
+        this._compositeSSAOProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
+        this._compositeSSAOProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssao_composite_fs"]);
+        this._compositeSSAOProgram.build();
 
         this._samplerUniformsSSAO = new SamplerUniforms(this._ssaoProgram);
-        this._samplerUniformsSSAOCombine = new SamplerUniforms(this._combineSSAOProgram);
+        this._samplerUniformsSSAOCombine = new SamplerUniforms(this._compositeSSAOProgram);
 
         // create temp textures and framebuffers
         this._tempResultHalfTexture = new Texture2D();
@@ -124,7 +124,7 @@ export class PostProcessor {
     private static readonly _numSSAOKernels = 32;
 
     private _ssaoProgram: ShaderProgram;
-    private _combineSSAOProgram: ShaderProgram;
+    private _compositeSSAOProgram: ShaderProgram;
     private _samplerUniformsSSAO: SamplerUniforms;
     private _samplerUniformsSSAOCombine: SamplerUniforms;
 
@@ -193,6 +193,24 @@ export class PostProcessor {
         this._rectGeom.draw(0, Infinity, this._ssaoProgram.attributes);
 
         // 2. composite half res ssao and source image together?
+        GLDevice.renderTarget = output;
+        gl.viewport(0, 0, sourceImage.width, sourceImage.height);
+        gl.scissor(0, 0, sourceImage.width, sourceImage.height);
+
+        GLPrograms.useProgram(this._compositeSSAOProgram);
+
+        GLTextures.setStartUnit(startTexUnit);
+
+        this._samplerUniformsSSAO.setTexture("s_sceneDepth", depthMap);
+        this._samplerUniformsSSAO.setTexture("s_sceneNormalRoughSpec", normalRoughSpec);
+        this._samplerUniformsSSAOCombine.setTexture("s_aoTex", this._tempResultHalfTexture);
+
+        // todo: uniforms
+        // uniform float u_offset;
+        // uniform float u_intensity;
+        // uniform float u_power;
+
+        this._rectGeom.draw(0, Infinity, this._compositeSSAOProgram.attributes);
     }
 
     private generateSSAOKernels() {
