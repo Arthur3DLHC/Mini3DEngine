@@ -32,7 +32,7 @@ export class SSAOParams {
 
         this.kernels = new Float32Array(SSAOParams.numKernels * 3);
 
-        this.generateSSAOKernels();
+        this.generateKernels();
     }
     public static readonly numKernels = 32;
     public noiseTexture: Texture2D;
@@ -46,7 +46,7 @@ export class SSAOParams {
     public intensiy: number = 1.0;
     public power: number = 2.0;
 
-    private generateSSAOKernels() {
+    private generateKernels() {
         // use random vectors in a hemisphere
         // use halton sequence?
 
