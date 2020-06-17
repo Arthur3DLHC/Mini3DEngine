@@ -7,6 +7,7 @@ export class ShaderProgram {
         this.vertexShaderCode = "";
         this.fragmentShaderCode = "";
         this._attributes = null;
+        this._uniformLocations = new Map<string, WebGLUniformLocation>();
     }
 
     public name: string;
@@ -17,6 +18,7 @@ export class ShaderProgram {
     public fragmentShaderCode: string;
 
     private _attributes: Map<string, number>|null;
+    private _uniformLocations: Map<string, WebGLUniformLocation>;
 
     public build() {
         if (this.vertexShaderCode === "" || this.fragmentShaderCode === "") {
@@ -49,6 +51,9 @@ export class ShaderProgram {
                 throw this.name + ":" + linkLog;
             }
         }
+
+        // todo: cache uniform locations?
+
         // clean up
         GLDevice.gl.deleteShader(vs);
         GLDevice.gl.deleteShader(fs);
@@ -60,6 +65,7 @@ export class ShaderProgram {
             this.glProgram = null;
         }
         this._attributes = null;
+        this._uniformLocations.clear();
     }
 
     public get attributes(): Map<string, number> {
@@ -80,12 +86,22 @@ export class ShaderProgram {
         return this._attributes;
     }
 
-    // todo: cache the uniform locations to prevent low level gl call? Is that necessary?
     public getUniformLocation(name: string): WebGLUniformLocation | null {
         if (this.glProgram === null) {
             return null;
         }
-        return GLDevice.gl.getUniformLocation(this.glProgram, name);
+        // find in cache
+        let location = this._uniformLocations.get(name); 
+        if ( location !== undefined) {
+            return location;
+        }
+
+        // not found, get from gl
+        let ret = GLDevice.gl.getUniformLocation(this.glProgram, name);
+        if (ret !== null) {
+            this._uniformLocations.set(name, ret);
+        }
+        return ret;
     }
 
     private compile(code: string, type: GLenum): WebGLShader | null {

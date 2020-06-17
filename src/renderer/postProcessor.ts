@@ -14,11 +14,15 @@ import { PlaneGeometry } from "../geometry/common/planeGeometry.js";
 import { RenderStateCache } from "../WebGLResources/renderStateCache.js";
 import { GLTextures } from "../WebGLResources/glTextures.js";
 import { SamplerUniforms } from "../WebGLResources/samplerUniforms.js";
+import vec3 from "../../lib/tsm/vec3.js";
+import { Halton } from "../math/halton.js";
+import { SSAOParams } from "./postprocess/ssaoParams.js";
 
 /**
  * all post processes supported
  */
 export class PostProcessor {
+
     public constructor(width: number, height: number) {
         // register shader codes
         if (GLPrograms.shaderCodes["fullscreen_rect_vs"] === undefined) {
@@ -100,14 +104,21 @@ export class PostProcessor {
         this._ssaoNoiseTexture.image = data;
 
         this._ssaoNoiseTexture.upload();
+
+        this._ssaoKernels = new Float32Array(PostProcessor._numSSAOKernels * 3);
+
+        this.generateSSAOKernels();
+
+        this.ssao = new SSAOParams();
     }
 
-    public enableSSAO: boolean = true;
     public enableSSR: boolean = true;
     public enableFXAA: boolean = true;
     public enableGlow: boolean = true;
     public enableToneMapping: boolean = true;
     // todo: other post processing effects: color grading, glow...
+
+    public ssao: SSAOParams;
 
     // todo: shaders
     private static readonly _numSSAOKernels = 32;
@@ -119,6 +130,7 @@ export class PostProcessor {
 
     // todo: temp textures and framebuffers
     private _ssaoNoiseTexture: Texture2D;
+    private _ssaoKernels: Float32Array;
     /**
      * half res temp result image
      * can be used to store unblurred SSAO/SSR, brightpass and so on
@@ -131,7 +143,7 @@ export class PostProcessor {
 
     public process(sourceImage: Texture2D, depthMap: Texture2D, normalRoughSpec: Texture2D, startTexUnit: number, output: FrameBuffer) {
         // todo: apply all enabled processes together
-        if (this.enableSSAO) {
+        if (this.ssao.enable) {
             this.applySSAO(sourceImage, depthMap, normalRoughSpec, startTexUnit, output);
         }
 
@@ -159,24 +171,61 @@ export class PostProcessor {
 
         this._samplerUniformsSSAO.setTexture("s_sceneDepth", depthMap);
         this._samplerUniformsSSAO.setTexture("s_sceneNormalRoughSpec", normalRoughSpec);
-        // todo: noise texture
-        // fix me: how to load noise texture? or generate it?
+        this._samplerUniformsSSAO.setTexture("s_noiseTex", this._ssaoNoiseTexture);
 
         // uniforms (blocks? how many uniforms can be shared by post processes?)
         // what params ssao need?
-        // get uniform locations here, or get them when init?
         
         // calc texel size
+        gl.uniform2f(this._ssaoProgram.getUniformLocation("u_texelSize"), 1.0 / depthMap.width, 1.0 / depthMap.height);
+        gl.uniform2f(this._ssaoProgram.getUniformLocation("u_noiseTexelSize"), 1.0 / this._ssaoNoiseTexture.width, 1.0 / this._ssaoNoiseTexture.height);
 
-        // kernel weights
+        // 3d sample kernels
+        gl.uniform3fv(this._ssaoProgram.getUniformLocation("u_kernel"), this._ssaoKernels);
 
-        // radius
-
-        // min and max distance
+        // params
+        // fix me: pack these together to a vec3? call gl api only 1 time
+        gl.uniform1f(this._ssaoProgram.getUniformLocation("u_radius"), this.ssao.radius);
+        gl.uniform1f(this._ssaoProgram.getUniformLocation("u_minDistance"), this.ssao.minDistance);
+        gl.uniform1f(this._ssaoProgram.getUniformLocation("u_maxDistance"), this.ssao.maxDistance);
 
         // draw fullscr rect
         this._rectGeom.draw(0, Infinity, this._ssaoProgram.attributes);
 
         // 2. composite half res ssao and source image together?
+    }
+
+    private generateSSAOKernels() {
+        // use random vectors in a hemisphere
+        // use halton sequence?
+
+        // https://github.com/pissang/claygl-advanced-renderer/blob/master/src/SSAOPass.js
+        // NOTE: in that code they use temporal filter for SSAO, so they generate 30 kernel arrays for 30 frames.
+
+        const offset = 0;
+        let sample = new vec3();
+
+        for(let i = 0; i < PostProcessor._numSSAOKernels; i++) {
+            // let phi = Halton.get(i + offset, 2) * Math.PI;      // hemisphere
+            // let theta = Halton.get(i + offset, 3) * 
+
+            // test: use plain random values, same as three.js
+            // hemisphere
+            sample.x = Math.random() * 2 - 1;
+            sample.y = Math.random() * 2 - 1;
+            sample.z = Math.random();
+
+            sample.normalize();
+
+            // vary length
+            let scale = i / PostProcessor._numSSAOKernels;
+            scale *= scale;
+            scale = 0.1 + 0.9 * scale;      // lerp(0.1, 1, scale)
+            sample.scale(scale);
+
+            this._ssaoKernels[i * 3] = sample.x;
+            this._ssaoKernels[i * 3 + 1] = sample.y;
+            this._ssaoKernels[i * 3 + 2] = sample.z;
+        }
     }
 }

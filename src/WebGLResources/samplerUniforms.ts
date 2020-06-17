@@ -25,7 +25,7 @@ export class SamplerUniforms {
                     || info.type === gl.SAMPLER_2D_ARRAY_SHADOW
                     || info.type === gl.SAMPLER_CUBE_SHADOW ) {
                         const location = gl.getUniformLocation(program.glProgram, info.name);
-                        if (location) {
+                        if (location !== null) {
                             this._uniformInfos[info.name] = info;
                             this._uniformLocations[info.name] = location;
                         }
