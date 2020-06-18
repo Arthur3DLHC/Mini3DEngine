@@ -47,6 +47,7 @@ export class SamplerUniforms {
                 }
             }
             // query a new texture unit
+            // fix me: if set another texture to replace curr one on uniform sampler, this is wrong
             const unit = GLTextures.queryUnit();
             GLTextures.setTextureAt(unit, texture);
             GLDevice.gl.uniform1i(this._uniformLocations[uniformName], unit);
