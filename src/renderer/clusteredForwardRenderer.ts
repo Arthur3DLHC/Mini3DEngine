@@ -744,6 +744,9 @@ export class ClusteredForwardRenderer {
 
             // todo: render sprites
 
+            // todo: do post process
+            
+
             // Test code: apply render target texture to a screen space rectangle
             // test drawing a screen space rectangle
             // GLDevice.renderTarget = null;

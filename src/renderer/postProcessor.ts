@@ -71,6 +71,30 @@ export class PostProcessor {
         this._tempResultHalfFBO.setTexture(0, this._tempResultHalfTexture);
         this._tempResultHalfFBO.prepare();
 
+        this._tempFullSwapFBO = [];
+
+        for(let i = 0; i < 2; i++)
+        {
+            const swapFBO = new FrameBuffer();
+
+            const swapTexture = new Texture2D();
+            swapTexture.width = width;
+            swapTexture.height = height;
+            swapTexture.depth = 1;
+            swapTexture.mipLevels = 1;
+            swapTexture.format = GLDevice.gl.RGBA;
+            swapTexture.componentType = GLDevice.gl.HALF_FLOAT;
+            swapTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
+            swapTexture.create();
+
+            swapFBO.setTexture(0, swapTexture);
+            swapFBO.prepare();
+    
+            this._tempFullSwapFBO.push(swapFBO);
+        }
+
+        this._curOutputFBOIdx = 0;
+
         this._renderStates = new RenderStateSet();
         this._renderStates.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
         this._renderStates.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
@@ -78,10 +102,6 @@ export class PostProcessor {
         this._renderStates.depthState = RenderStateCache.instance.getDepthStencilState(false, false, GLDevice.gl.ALWAYS);
 
         this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
-
-        // generate noise texture? by upload image data to texture?
-        // generation method is in three.js SSAOPass.js generateRandomKernelRotations() function
-        
 
         this.ssao = new SSAOParams();
     }
@@ -110,6 +130,10 @@ export class PostProcessor {
     private _tempResultHalfTexture: Texture2D;
     private _tempResultHalfFBO: FrameBuffer;
 
+    // todo: add 2 full res temp buffers, to use as postprocess output and swap between them?
+    private _tempFullSwapFBO: FrameBuffer[];
+    private _curOutputFBOIdx: number;
+
     private _renderStates: RenderStateSet;
     private _rectGeom: PlaneGeometry;
 
@@ -121,7 +145,7 @@ export class PostProcessor {
     // start unit for custom textures of every effects
     private _customTexStartUnit: number = 0;
 
-    public process(source: FrameBuffer, depthMap: Texture2D, normalRoughSpec: Texture2D, startTexUnit: number, output: FrameBuffer) {
+    public process(source: FrameBuffer, depthMap: Texture2D, normalRoughSpec: Texture2D, startTexUnit: number, output: FrameBuffer | null) {
         // todo: bind general texturess for once
         this._sceneColorTexUnit = startTexUnit;
         this._sceneDepthTexUnit = startTexUnit + 1;
@@ -135,11 +159,37 @@ export class PostProcessor {
         // todo: apply all enabled processes together
 
         if (this.ssao.enable) {
-            this.applySSAO(source, output);
+            this.applySSAO(source, this.currTempOutputFBO);
         }
+        // todo: copy final result to output
 
-        // todo: need to swap source and output?
+        throw new Error("Not implemented.");
 
+        // todo: need to swap temp output fbos if there is other effects
+        this.swapTempFBO();
+    }
+    
+    private setTexture(location: WebGLUniformLocation | null, unit: number, texture: Texture) {
+        if (location !== null) {
+            GLDevice.gl.uniform1i(location, unit);
+            GLTextures.setTextureAt(unit, texture);
+        }
+    }
+
+    private swapTempFBO() {
+        if (this._curOutputFBOIdx === 0) {
+            this._curOutputFBOIdx = 1;
+        } else {
+            this._curOutputFBOIdx = 0;
+        }
+    }
+
+    private get currTempOutputFBO(): FrameBuffer {
+        return this._tempFullSwapFBO[this._curOutputFBOIdx];
+    }
+
+    private get currTempSourceFBO(): FrameBuffer {
+        return this._tempFullSwapFBO[1 - this._curOutputFBOIdx];
     }
 
     private applySSAO(source: FrameBuffer, output: FrameBuffer) {
@@ -234,10 +284,4 @@ export class PostProcessor {
         GLTextures.setTextureAt(this._customTexStartUnit, null);
     }
 
-    private setTexture(location: WebGLUniformLocation | null, unit: number, texture: Texture) {
-        if (location !== null) {
-            GLDevice.gl.uniform1i(location, unit);
-            GLTextures.setTextureAt(unit, texture);
-        }
-    }
 }
