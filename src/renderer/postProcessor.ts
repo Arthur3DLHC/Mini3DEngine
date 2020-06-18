@@ -128,6 +128,7 @@ export class PostProcessor {
         this._normalRoughSpecTexUnit = startTexUnit + 2;
         this._customTexStartUnit = startTexUnit + 3;
 
+        // set these textures for all effects
         GLTextures.setTextureAt(this._sceneDepthTexUnit, depthMap);
         GLTextures.setTextureAt(this._normalRoughSpecTexUnit, normalRoughSpec);
 
@@ -228,7 +229,7 @@ export class PostProcessor {
 
         this._rectGeom.draw(0, Infinity, this._compositeSSAOProgram.attributes);
 
-        // don't set depth and normalroughspec to null
+        // don't touch depth and normalroughspec
         GLTextures.setTextureAt(this._sceneColorTexUnit, null);
         GLTextures.setTextureAt(this._customTexStartUnit, null);
     }

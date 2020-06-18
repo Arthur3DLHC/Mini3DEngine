@@ -18,6 +18,11 @@ export class GLTextures {
                 if (type === gl.HALF_FLOAT) internalFormat = gl.R16F;
                 if (type === gl.UNSIGNED_BYTE) internalFormat = gl.R8;
                 break;
+            case gl.RG:
+                if (type === gl.FLOAT) internalFormat = gl.RG32F;
+                if (type === gl.HALF_FLOAT) internalFormat = gl.RG16F;
+                if (type === gl.UNSIGNED_BYTE) internalFormat = gl.RG8;
+                break;
             case gl.RGB:
                 if (type === gl.FLOAT) internalFormat = gl.RGB32F;
                 if (type === gl.HALF_FLOAT) internalFormat = gl.RGB16F;

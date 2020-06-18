@@ -110,6 +110,41 @@ export class ClusteredForwardRenderer {
         this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
         this._rectTransform = new mat4();
 
+        // main output
+        this._sceneColorTexture = new Texture2D();
+        // todo: handle size change
+        this._sceneColorTexture.width = GLDevice.canvas.width;
+        this._sceneColorTexture.height = GLDevice.canvas.height;
+        this._sceneColorTexture.depth = 1;
+        this._sceneColorTexture.mipLevels = 1;
+        this._sceneColorTexture.format = gl.RGBA;
+        this._sceneColorTexture.componentType = gl.HALF_FLOAT;  // HDR
+        this._sceneColorTexture.create();
+
+        this._sceneNormalRoughSpecTexture = new Texture2D();
+        this._sceneNormalRoughSpecTexture.width = GLDevice.canvas.width;
+        this._sceneNormalRoughSpecTexture.height = GLDevice.canvas.height;
+        this._sceneNormalRoughSpecTexture.depth = 1;
+        this._sceneNormalRoughSpecTexture.mipLevels = 1;
+        this._sceneNormalRoughSpecTexture.format = gl.RGBA; // rg: normalxy b: roughness a: specular
+        this._sceneNormalRoughSpecTexture.componentType = gl.HALF_FLOAT;  // HDR
+        this._sceneNormalRoughSpecTexture.create();
+
+        this._sceneDepthTexture = new Texture2D();
+        this._sceneDepthTexture.width = GLDevice.canvas.width;
+        this._sceneDepthTexture.height = GLDevice.canvas.height;
+        this._sceneDepthTexture.depth = 1;
+        this._sceneDepthTexture.mipLevels = 1;
+        this._sceneDepthTexture.format = gl.DEPTH_STENCIL;
+        this._sceneDepthTexture.componentType = gl.UNSIGNED_INT_24_8;
+        this._sceneDepthTexture.create();
+
+        this._mainFBO = new FrameBuffer();
+        this._mainFBO.setTexture(0, this._sceneColorTexture);
+        this._mainFBO.setTexture(1, this._sceneNormalRoughSpecTexture);
+        this._mainFBO.depthStencilTexture = this._sceneDepthTexture;
+        this._mainFBO.prepare();
+
         this._shadowmapAtlasUnit = 1;
         this._decalAtlasUnit = 2;
         this._envMapArrayUnit = 3;
@@ -332,6 +367,10 @@ export class ClusteredForwardRenderer {
     private _specularDFGUnit: GLenum;
     private _irradianceVolumeAtlasUnit: GLenum;
 
+    private _sceneColorTexture: Texture2D;      // main color output
+    private _sceneNormalRoughSpecTexture: Texture2D;
+    private _sceneDepthTexture: Texture2D;             // main depth texture
+
     private _shadowmapAtlasCache: ShadowmapAtlas;  // static objects only
     private _shadowmapAtlas: ShadowmapAtlas; // dynamic objects only
     private _decalAtlas: TextureAtlas2D;
@@ -341,6 +380,9 @@ export class ClusteredForwardRenderer {
     private _irradianceVolumeAtlas: TextureAtlas3D;
 
     // FBOs
+    private _mainFBO: FrameBuffer;                // MRT: color, normal_roughness_specular
+    // private _postProcessFBO: FrameBuffer;         // post process output; fix me: use null?
+
     private _shadowmapCacheFBO: FrameBuffer;
     private _shadowmapFBO: FrameBuffer;
     private _debugDepthTexture: Texture2D;        // debug use
