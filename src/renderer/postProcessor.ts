@@ -151,7 +151,7 @@ export class PostProcessor {
     // start unit for custom textures of every effects
     private _customTexStartUnit: number = 0;
 
-    public process(source: FrameBuffer, depthMap: Texture2D, normalRoughSpec: Texture2D, startTexUnit: number, output: FrameBuffer | null) {
+    public processOpaque(source: FrameBuffer, depthMap: Texture2D, normalRoughSpec: Texture2D, startTexUnit: number) {
         // todo: bind general texturess for once
         this._sceneColorTexUnit = startTexUnit;
         this._sceneDepthTexUnit = startTexUnit + 1;
@@ -163,6 +163,9 @@ export class PostProcessor {
         GLTextures.setTextureAt(this._normalRoughSpecTexUnit, normalRoughSpec);
 
         // todo: apply all enabled processes together
+        // fix me: 应该分别在不同的阶段分开应用不同的后期特效
+        // SSAO: 不透明之后，半透明之前
+        // SSR: 也是不透明之后，半透明之前？
 
         if (this.ssao.enable) {
             this.applySSAO(source);
