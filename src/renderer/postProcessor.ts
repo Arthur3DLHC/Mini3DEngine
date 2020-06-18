@@ -261,6 +261,9 @@ export class PostProcessor {
         // these two textures has already bound before
         // this._samplerUniformsSSAOComposite.setTexture("s_sceneDepth", depthMap);
         // this._samplerUniformsSSAOComposite.setTexture("s_sceneNormalRoughSpec", normalRoughSpec);
+
+        // TODO: 优化：可以不用传入 sceneColor 纹理，而是通过 alphablend 做相乘混合
+        // TODO: 需要注意在半透明之前做
         this.setTexture(this._compositeSSAOProgram.getUniformLocation("s_sceneColor"), this._sceneColorTexUnit, sourceImage);
         gl.uniform1i(this._compositeSSAOProgram.getUniformLocation("s_sceneDepth"), this._sceneDepthTexUnit);
         gl.uniform1i(this._compositeSSAOProgram.getUniformLocation("s_sceneNormalRoughSpec"), this._normalRoughSpecTexUnit);
