@@ -7,15 +7,15 @@ import vec3 from "../../../lib/tsm/vec3.js";
  * Base class for textures
  */
 export class Texture {
-    public constructor() {
+    public constructor(width: number = 0, height: number = 0, depth: number = 1, mipLevels: number = 1, format: GLenum = GLDevice.gl.RGBA, compType: GLenum = GLDevice.gl.UNSIGNED_BYTE) {
         this.glTexture = null;
         this.image = null;
-        this.width = 0;
-        this.height = 0;
-        this.depth = 0;
-        this.mipLevels = 1;
-        this.format = GLDevice.gl.RGBA;
-        this.componentType = GLDevice.gl.UNSIGNED_BYTE;
+        this.width = width;
+        this.height = height;
+        this.depth = depth;
+        this.mipLevels = mipLevels;
+        this.format = format;
+        this.componentType = compType;
         this.samplerState = null;
         this.cached = false;
     }

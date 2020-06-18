@@ -111,32 +111,14 @@ export class ClusteredForwardRenderer {
         this._rectTransform = new mat4();
 
         // main output
-        this._sceneColorTexture = new Texture2D();
         // todo: handle size change
-        this._sceneColorTexture.width = GLDevice.canvas.width;
-        this._sceneColorTexture.height = GLDevice.canvas.height;
-        this._sceneColorTexture.depth = 1;
-        this._sceneColorTexture.mipLevels = 1;
-        this._sceneColorTexture.format = gl.RGBA;
-        this._sceneColorTexture.componentType = gl.HALF_FLOAT;  // HDR
+        this._sceneColorTexture = new Texture2D(GLDevice.canvas.width, GLDevice.canvas.height, 1, 1, gl.RGBA, gl.HALF_FLOAT);
         this._sceneColorTexture.create();
 
-        this._sceneNormalRoughSpecTexture = new Texture2D();
-        this._sceneNormalRoughSpecTexture.width = GLDevice.canvas.width;
-        this._sceneNormalRoughSpecTexture.height = GLDevice.canvas.height;
-        this._sceneNormalRoughSpecTexture.depth = 1;
-        this._sceneNormalRoughSpecTexture.mipLevels = 1;
-        this._sceneNormalRoughSpecTexture.format = gl.RGBA; // rg: normalxy b: roughness a: specular
-        this._sceneNormalRoughSpecTexture.componentType = gl.HALF_FLOAT;  // HDR
+        this._sceneNormalRoughSpecTexture = new Texture2D(GLDevice.canvas.width, GLDevice.canvas.height, 1, 1, gl.RGBA, gl.HALF_FLOAT);
         this._sceneNormalRoughSpecTexture.create();
 
-        this._sceneDepthTexture = new Texture2D();
-        this._sceneDepthTexture.width = GLDevice.canvas.width;
-        this._sceneDepthTexture.height = GLDevice.canvas.height;
-        this._sceneDepthTexture.depth = 1;
-        this._sceneDepthTexture.mipLevels = 1;
-        this._sceneDepthTexture.format = gl.DEPTH_STENCIL;
-        this._sceneDepthTexture.componentType = gl.UNSIGNED_INT_24_8;
+        this._sceneDepthTexture = new Texture2D(GLDevice.canvas.width, GLDevice.canvas.height, 1, 1, gl.DEPTH_STENCIL, gl.UNSIGNED_INT_24_8);
         this._sceneDepthTexture.create();
 
         this._mainFBO = new FrameBuffer();
@@ -160,16 +142,8 @@ export class ClusteredForwardRenderer {
         // 绘制对象时需要同时从这两张 shadowmap 中查询
         // 能否用同一张纹理的两个通道呢？用 colorwritemask 实现分别绘制？
         this._shadowmapAtlasCache = new ShadowmapAtlas();
-        this._shadowmapAtlasCache.texture = new Texture2D();
-        this._shadowmapAtlasCache.texture.width = 4096;
-        this._shadowmapAtlasCache.texture.height = 4096;
-        // this._shadowmapAtlasDynamic.texture.width = GLDevice.canvas.width;
-        // this._shadowmapAtlasDynamic.texture.height = GLDevice.canvas.height;
-        this._shadowmapAtlasCache.texture.depth = 1;
-        // this._shadowmapAtlasDynamic.texture.isShadowMap = true;
+        this._shadowmapAtlasCache.texture = new Texture2D(4096, 4096, 1, 1, gl.DEPTH_STENCIL, gl.UNSIGNED_INT_24_8, true);
         this._shadowmapAtlasCache.texture.isShadowMap = true; // debug draw
-        this._shadowmapAtlasCache.texture.format = gl.DEPTH_STENCIL;
-        this._shadowmapAtlasCache.texture.componentType = gl.UNSIGNED_INT_24_8;
         // debug draw:
         // this._shadowmapAtlasDynamic.texture.format = gl.RGBA;
         // this._shadowmapAtlasDynamic.texture.componentType = gl.UNSIGNED_BYTE;
@@ -178,16 +152,7 @@ export class ClusteredForwardRenderer {
 
         this._shadowmapAtlas = new ShadowmapAtlas();
         // todo: create atlas texture
-        this._shadowmapAtlas.texture = new Texture2D();
-        this._shadowmapAtlas.texture.width = 4096;
-        this._shadowmapAtlas.texture.height = 4096;
-        // this._shadowmapAtlasDynamic.texture.width = GLDevice.canvas.width;
-        // this._shadowmapAtlasDynamic.texture.height = GLDevice.canvas.height;
-        this._shadowmapAtlas.texture.depth = 1;
-        // this._shadowmapAtlasDynamic.texture.isShadowMap = true;
-        this._shadowmapAtlas.texture.isShadowMap = true; // debug draw
-        this._shadowmapAtlas.texture.format = gl.DEPTH_STENCIL;
-        this._shadowmapAtlas.texture.componentType = gl.UNSIGNED_INT_24_8;
+        this._shadowmapAtlas.texture = new Texture2D(4096, 4096, 1, 1, gl.DEPTH_STENCIL, gl.UNSIGNED_INT_24_8, true);
         // debug draw:
         // this._shadowmapAtlasDynamic.texture.format = gl.RGBA;
         // this._shadowmapAtlasDynamic.texture.componentType = gl.UNSIGNED_BYTE;
@@ -196,13 +161,8 @@ export class ClusteredForwardRenderer {
         this._decalAtlas = new TextureAtlas2D();
 
         // todo: should put sizes in a config object parameter?
-        this._envMapArray = new Texture2DArray();
-        this._envMapArray.width = this._renderContext.envmapSize * 6;
-        this._envMapArray.height = this._renderContext.envmapSize;
-        this._envMapArray.depth = ClusteredForwardRenderContext.MAX_ENVPROBES;              // 128 envmaps in whole scene?
-        this._envMapArray.format = gl.RGB;
-        this._envMapArray.mipLevels = 1024;
-        this._envMapArray.componentType = gl.UNSIGNED_BYTE;
+        this._envMapArray = new Texture2DArray(this._renderContext.envmapSize * 6, this._renderContext.envmapSize,
+            ClusteredForwardRenderContext.MAX_ENVPROBES, 1024, gl.RGB, gl.UNSIGNED_BYTE, false);
         this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.LINEAR_MIPMAP_LINEAR, gl.LINEAR_MIPMAP_LINEAR);
         this._envMapArray.create();
 
@@ -216,27 +176,13 @@ export class ClusteredForwardRenderer {
 
         // this._envMapDepthTexture.create();
 
-        this._specularDFG = new Texture2D();
-        this._specularDFG.width = 128;
-        this._specularDFG.height = 128;
-        this._specularDFG.depth = 1;
-        this._specularDFG.mipLevels = 1;
-        this._specularDFG.format = gl.RGB;
-        this._specularDFG.componentType = gl.UNSIGNED_BYTE;
+        this._specularDFG = new Texture2D(128, 128, 1, 1, gl.RGB, gl.UNSIGNED_BYTE);
         this._specularDFG.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.LINEAR, gl.LINEAR);
         this._specularDFG.create();
 
         this._irradianceVolumeAtlas = new TextureAtlas3D();
 
-        this._debugDepthTexture = new Texture2D();
-        this._debugDepthTexture.width = 4096;
-        this._debugDepthTexture.height = 4096;
-        // this._debugDepthTexture.width = GLDevice.canvas.width;
-        // this._debugDepthTexture.height = GLDevice.canvas.height;
-        this._debugDepthTexture.depth = 1;
-        this._debugDepthTexture.isShadowMap = false;
-        this._debugDepthTexture.format = gl.RGBA;
-        this._debugDepthTexture.componentType = gl.UNSIGNED_BYTE;
+        this._debugDepthTexture = new Texture2D(4096, 4096, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, false);
         this._debugDepthTexture.create();
 
         this._shadowmapCacheFBO = new FrameBuffer();

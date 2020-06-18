@@ -3,8 +3,8 @@ import { GLDevice } from "../glDevice.js";
 import { GLTextures } from "../glTextures.js";
 
 export class Texture2DArray extends Texture {
-    public constructor() {
-        super();
+    public constructor(width: number = 0, height: number = 0, depth: number = 1, mipLevels: number = 1, format: GLenum = GLDevice.gl.RGBA, compType: GLenum = GLDevice.gl.UNSIGNED_BYTE, isShadowMap: boolean = false) {
+        super(width, height, depth, mipLevels, format, compType);
         this.isShadowMap = false;
     }
 

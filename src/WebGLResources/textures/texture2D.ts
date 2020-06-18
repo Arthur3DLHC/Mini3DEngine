@@ -5,9 +5,9 @@ import { GLTextures } from "../glTextures.js";
 import vec3 from "../../../lib/tsm/vec3.js";
 
 export class Texture2D extends Texture {
-    public constructor() {
-        super();
-        this.isShadowMap = false;
+    public constructor(width: number = 0, height: number = 0, depth: number = 1, mipLevels: number = 1, format: GLenum = GLDevice.gl.RGBA, compType: GLenum = GLDevice.gl.UNSIGNED_BYTE, isShadowMap: boolean = false) {
+        super(width, height, depth, mipLevels, format, compType);
+        this.isShadowMap = isShadowMap;
     }
 
     /**

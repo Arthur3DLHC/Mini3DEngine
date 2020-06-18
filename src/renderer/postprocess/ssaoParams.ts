@@ -5,13 +5,7 @@ import vec3 from "../../../lib/tsm/vec3.js";
 
 export class SSAOParams {
     public constructor() {
-        this.noiseTexture = new Texture2D();
-        this.noiseTexture.width = 4;
-        this.noiseTexture.height = 4;
-        this.noiseTexture.depth = 1;
-        this.noiseTexture.mipLevels = 1;
-        this.noiseTexture.componentType = GLDevice.gl.FLOAT;
-        this.noiseTexture.format = GLDevice.gl.RGB;
+        this.noiseTexture = new Texture2D(4, 4, 1, 1, GLDevice.gl.RGB, GLDevice.gl.FLOAT);
         this.noiseTexture.samplerState = new SamplerState(GLDevice.gl.REPEAT, GLDevice.gl.REPEAT, GLDevice.gl.LINEAR, GLDevice.gl.LINEAR);
 
         this.noiseTexture.create();

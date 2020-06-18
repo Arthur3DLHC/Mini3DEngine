@@ -59,13 +59,7 @@ export class PostProcessor {
         // this._samplerUniformsSSAOComposite = new SamplerUniforms(this._compositeSSAOProgram);
 
         // create temp textures and framebuffers
-        this._tempResultHalfTexture = new Texture2D();
-        this._tempResultHalfTexture.width = width / 2;
-        this._tempResultHalfTexture.height = height / 2;
-        this._tempResultHalfTexture.depth = 1;
-        this._tempResultHalfTexture.mipLevels = 1;
-        this._tempResultHalfTexture.format = GLDevice.gl.RGBA;
-        this._tempResultHalfTexture.componentType = GLDevice.gl.HALF_FLOAT;
+        this._tempResultHalfTexture = new Texture2D(width / 2, height / 2, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
         this._tempResultHalfTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
         this._tempResultHalfTexture.create();
 
@@ -170,9 +164,10 @@ export class PostProcessor {
         if (this.ssao.enable) {
             this.applySSAO(source);
         }
-        // todo: copy final result to output
+        // todo: copy final result to output？
+        // if not using souce as texture, can set source fbo as rendertarget directly
 
-        throw new Error("Not implemented.");
+        // throw new Error("Not implemented.");
 
         // todo: need to swap temp output fbos if there is other effects
         // this.swapTempFBO();
