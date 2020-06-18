@@ -1,7 +1,7 @@
 import samplers_postprocess from "./shaders/shaderIncludes/samplers_postprocess.glsl.js";
 import fullscreen_rect_vs from "./shaders/fullscreen_rect_vs.glsl.js";
 import postprocess_ssao_fs from "./shaders/postprocess_ssao_fs.glsl.js";
-import postprocess_ssao_composite_fs from "./shaders/postprocess_ssao_composite_fs.glsl.js";
+import postprocess_ssao_blur_fs from "./shaders/postprocess_ssao_blur_fs.glsl.js";
 
 import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { FrameBuffer } from "../WebGLResources/frameBuffer.js";
@@ -18,6 +18,8 @@ import vec3 from "../../lib/tsm/vec3.js";
 import { Halton } from "../math/halton.js";
 import { SSAOParams } from "./postprocess/ssaoParams.js";
 import { Texture } from "../WebGLResources/textures/texture.js";
+import { BlendState } from "../WebGLResources/renderStates/blendState.js";
+import { GLRenderStates } from "../WebGLResources/glRenderStates.js";
 
 /**
  * all post processes supported
@@ -32,8 +34,8 @@ export class PostProcessor {
         if (GLPrograms.shaderCodes["postprocess_ssao_fs"] === undefined) {
             GLPrograms.shaderCodes["postprocess_ssao_fs"] = postprocess_ssao_fs;
         }
-        if (GLPrograms.shaderCodes["postprocess_ssao_composite_fs"] === undefined) {
-            GLPrograms.shaderCodes["postprocess_ssao_composite_fs"] = postprocess_ssao_composite_fs;
+        if (GLPrograms.shaderCodes["postprocess_ssao_blur_fs"] === undefined) {
+            GLPrograms.shaderCodes["postprocess_ssao_blur_fs"] = postprocess_ssao_blur_fs;
         }
 
         if (GLPrograms.shaderCodes["samplers_postprocess"] === undefined) {
@@ -48,10 +50,10 @@ export class PostProcessor {
             + GLPrograms.shaderCodes["postprocess_ssao_fs"]);
         this._ssaoProgram.build();
 
-        this._compositeSSAOProgram = new ShaderProgram();
-        this._compositeSSAOProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
-        this._compositeSSAOProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssao_composite_fs"]);
-        this._compositeSSAOProgram.build();
+        this._ssaoBlurProgram = new ShaderProgram();
+        this._ssaoBlurProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
+        this._ssaoBlurProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssao_blur_fs"]);
+        this._ssaoBlurProgram.build();
 
         // this._samplerUniformsSSAO = new SamplerUniforms(this._ssaoProgram);
         // this._samplerUniformsSSAOComposite = new SamplerUniforms(this._compositeSSAOProgram);
@@ -71,35 +73,37 @@ export class PostProcessor {
         this._tempResultHalfFBO.setTexture(0, this._tempResultHalfTexture);
         this._tempResultHalfFBO.prepare();
 
-        this._tempFullSwapFBO = [];
+        // this._tempFullSwapFBO = [];
 
-        for(let i = 0; i < 2; i++)
-        {
-            const swapFBO = new FrameBuffer();
+        // for(let i = 0; i < 2; i++)
+        // {
+        //     const swapFBO = new FrameBuffer();
 
-            const swapTexture = new Texture2D();
-            swapTexture.width = width;
-            swapTexture.height = height;
-            swapTexture.depth = 1;
-            swapTexture.mipLevels = 1;
-            swapTexture.format = GLDevice.gl.RGBA;
-            swapTexture.componentType = GLDevice.gl.HALF_FLOAT;
-            swapTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
-            swapTexture.create();
+        //     const swapTexture = new Texture2D();
+        //     swapTexture.width = width;
+        //     swapTexture.height = height;
+        //     swapTexture.depth = 1;
+        //     swapTexture.mipLevels = 1;
+        //     swapTexture.format = GLDevice.gl.RGBA;
+        //     swapTexture.componentType = GLDevice.gl.HALF_FLOAT;
+        //     swapTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
+        //     swapTexture.create();
 
-            swapFBO.setTexture(0, swapTexture);
-            swapFBO.prepare();
+        //     swapFBO.setTexture(0, swapTexture);
+        //     swapFBO.prepare();
     
-            this._tempFullSwapFBO.push(swapFBO);
-        }
+        //     this._tempFullSwapFBO.push(swapFBO);
+        // }
 
-        this._curOutputFBOIdx = 0;
+        // this._curOutputFBOIdx = 0;
 
         this._renderStates = new RenderStateSet();
         this._renderStates.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
         this._renderStates.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
         this._renderStates.cullState = RenderStateCache.instance.getCullState(false, GLDevice.gl.BACK);
         this._renderStates.depthState = RenderStateCache.instance.getDepthStencilState(false, false, GLDevice.gl.ALWAYS);
+
+        this._ssaoBlurBlendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.DST_COLOR, GLDevice.gl.ZERO);
 
         this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
 
@@ -117,7 +121,7 @@ export class PostProcessor {
     // todo: shaders
 
     private _ssaoProgram: ShaderProgram;
-    private _compositeSSAOProgram: ShaderProgram;
+    private _ssaoBlurProgram: ShaderProgram;
     // private _samplerUniformsSSAO: SamplerUniforms;
     // private _samplerUniformsSSAOComposite: SamplerUniforms;
 
@@ -131,10 +135,12 @@ export class PostProcessor {
     private _tempResultHalfFBO: FrameBuffer;
 
     // todo: add 2 full res temp buffers, to use as postprocess output and swap between them?
-    private _tempFullSwapFBO: FrameBuffer[];
-    private _curOutputFBOIdx: number;
+    // private _tempFullSwapFBO: FrameBuffer[];
+    // private _curOutputFBOIdx: number;
 
     private _renderStates: RenderStateSet;
+    private _ssaoBlurBlendState: BlendState;
+
     private _rectGeom: PlaneGeometry;
 
     // common texture units
@@ -159,14 +165,14 @@ export class PostProcessor {
         // todo: apply all enabled processes together
 
         if (this.ssao.enable) {
-            this.applySSAO(source, this.currTempOutputFBO);
+            this.applySSAO(source);
         }
         // todo: copy final result to output
 
         throw new Error("Not implemented.");
 
         // todo: need to swap temp output fbos if there is other effects
-        this.swapTempFBO();
+        // this.swapTempFBO();
     }
     
     private setTexture(location: WebGLUniformLocation | null, unit: number, texture: Texture) {
@@ -176,27 +182,26 @@ export class PostProcessor {
         }
     }
 
-    private swapTempFBO() {
-        if (this._curOutputFBOIdx === 0) {
-            this._curOutputFBOIdx = 1;
-        } else {
-            this._curOutputFBOIdx = 0;
-        }
-    }
+    // private swapTempFBO() {
+    //     if (this._curOutputFBOIdx === 0) {
+    //         this._curOutputFBOIdx = 1;
+    //     } else {
+    //         this._curOutputFBOIdx = 0;
+    //     }
+    // }
 
-    private get currTempOutputFBO(): FrameBuffer {
-        return this._tempFullSwapFBO[this._curOutputFBOIdx];
-    }
+    // private get currTempOutputFBO(): FrameBuffer {
+    //     return this._tempFullSwapFBO[this._curOutputFBOIdx];
+    // }
 
-    private get currTempSourceFBO(): FrameBuffer {
-        return this._tempFullSwapFBO[1 - this._curOutputFBOIdx];
-    }
+    // private get currTempSourceFBO(): FrameBuffer {
+    //     return this._tempFullSwapFBO[1 - this._curOutputFBOIdx];
+    // }
 
-    private applySSAO(source: FrameBuffer, output: FrameBuffer) {
+    private applySSAO(source: FrameBuffer) {
         const gl = GLDevice.gl;
         const sourceImage = source.getTexture(0);
-        const outputImage = output.getTexture(0);
-        if (sourceImage === null || outputImage === null) {
+        if (sourceImage === null) {
             return;
         }
         
@@ -248,12 +253,15 @@ export class PostProcessor {
 
         //----------------------------------------------------------------------
 
-        // 2. composite half res ssao and source image together?
-        GLDevice.renderTarget = output;
-        gl.viewport(0, 0, outputImage.width, outputImage.height);
-        gl.scissor(0, 0, outputImage.width, outputImage.height);
+        // 2. composite half res ssao to source image
+        GLDevice.renderTarget = source;
+        gl.viewport(0, 0, sourceImage.width, sourceImage.height);
+        gl.scissor(0, 0, sourceImage.width, sourceImage.height);
 
-        GLPrograms.useProgram(this._compositeSSAOProgram);
+        // render state: multiply blend
+        GLRenderStates.setBlendState(this._ssaoBlurBlendState);
+
+        GLPrograms.useProgram(this._ssaoBlurProgram);
 
         // GLTextures.setStartUnit(startTexUnit);
 
@@ -263,24 +271,24 @@ export class PostProcessor {
         // this._samplerUniformsSSAOComposite.setTexture("s_sceneNormalRoughSpec", normalRoughSpec);
 
         // TODO: 优化：可以不用传入 sceneColor 纹理，而是通过 alphablend 做相乘混合
-        // TODO: 需要注意在半透明之前做
-        this.setTexture(this._compositeSSAOProgram.getUniformLocation("s_sceneColor"), this._sceneColorTexUnit, sourceImage);
-        gl.uniform1i(this._compositeSSAOProgram.getUniformLocation("s_sceneDepth"), this._sceneDepthTexUnit);
-        gl.uniform1i(this._compositeSSAOProgram.getUniformLocation("s_sceneNormalRoughSpec"), this._normalRoughSpecTexUnit);
-        this.setTexture(this._compositeSSAOProgram.getUniformLocation("s_aoTex"), this._customTexStartUnit, this._tempResultHalfTexture);
+        // TODO: 需要注意 SSAO 在半透明之前做；如何实现？
+        // this.setTexture(this._compositeSSAOProgram.getUniformLocation("s_sceneColor"), this._sceneColorTexUnit, sourceImage);
+        gl.uniform1i(this._ssaoBlurProgram.getUniformLocation("s_sceneDepth"), this._sceneDepthTexUnit);
+        gl.uniform1i(this._ssaoBlurProgram.getUniformLocation("s_sceneNormalRoughSpec"), this._normalRoughSpecTexUnit);
+        this.setTexture(this._ssaoBlurProgram.getUniformLocation("s_aoTex"), this._customTexStartUnit, this._tempResultHalfTexture);
         // this._samplerUniformsSSAOComposite.setTexture("s_aoTex", this._tempResultHalfTexture);
 
         // todo: uniforms
         // uniform float u_offset;
-        gl.uniform2f(this._compositeSSAOProgram.getUniformLocation("u_offset"), this.ssao.blurSize * texelW, this.ssao.blurSize * texelH);
+        gl.uniform2f(this._ssaoBlurProgram.getUniformLocation("u_offset"), this.ssao.blurSize * texelW, this.ssao.blurSize * texelH);
 
         // uniform float u_intensity;
-        gl.uniform1f(this._compositeSSAOProgram.getUniformLocation("u_intensity"), this.ssao.intensiy);
+        gl.uniform1f(this._ssaoBlurProgram.getUniformLocation("u_intensity"), this.ssao.intensiy);
 
         // uniform float u_power;
-        gl.uniform1f(this._compositeSSAOProgram.getUniformLocation("u_power"), this.ssao.power);
+        gl.uniform1f(this._ssaoBlurProgram.getUniformLocation("u_power"), this.ssao.power);
 
-        this._rectGeom.draw(0, Infinity, this._compositeSSAOProgram.attributes);
+        this._rectGeom.draw(0, Infinity, this._ssaoBlurProgram.attributes);
 
         // don't touch depth and normalroughspec
         GLTextures.setTextureAt(this._sceneColorTexUnit, null);
