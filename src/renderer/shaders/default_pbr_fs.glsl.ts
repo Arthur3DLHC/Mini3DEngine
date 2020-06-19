@@ -27,7 +27,7 @@ in vec2 ex_texcoord;
 
 vec3 getNormal() {
     // todo: check if normalmap have been present
-    // todo: return tangent and binormal
+    // todo: return tangent and binormal for anisotropic lighting in future
     return normalize(ex_worldNormal);
 }
 
@@ -239,11 +239,14 @@ void main(void)
         f_specular += iblSpecular / totalWeight;
     }
     // todo: opacity for transparent surfaces;
+    // todo: tone mapping? linear space to sRGB space?
     vec3 color = f_diffuse + f_specular + f_emissive;
     color = ACESToneMapping(color, 1.0);
     o.color = vec4(color, getOpacity());
+    o.normal = (u_view.matView * vec4(n, 0)).xyz;  // output world normal or view normal?
+    o.roughness = roughness;
+    o.specular = f0;
 
-    // todo: tone mapping? linear space to sRGB space?
     outputFinal(o);
 }
 `;

@@ -217,7 +217,6 @@ TODO:       主要类结构
                         64x64，7 mip levels
                         0, 1, 2, 3 : specular
                         4: 4x4, diffuse；或者用 1x1 ambient cube? 取样时算法简单一些
------------------------------------------------------
                     能否/是否有必要多次渲染envmap，模拟光线多次反射的机制？
 
                 image based lighting
@@ -227,6 +226,12 @@ TODO:       主要类结构
                         权重：距离和尺寸？
                     分别使用 diffuse 和 specular cubemap
 
+-----------------------------------------------------
+                    使用HDR Cubemaps？
+                        使用浮点格式 cubemap;
+                        渲染cubemap时，不做 tonemapping；
+                        渲染cubemap时，不使用 MRT
+
                 // 生成 irradiance volume？或者尝试用low mipmap envmap cube 做间接光照？
                 //    为每个 envmap probe 生成一个 shadowmap，用以剔除影响范围外的物体
                 //        该 shadowmap 中只绘制开启了 occlusion query 的静态物体；这样房间内的细节物体的背向 probe 中心点的面不会被剔除，也可以有环境光照。
@@ -234,8 +239,10 @@ TODO:       主要类结构
             SSAO，屏幕空间反射, 屏幕空间 GI？；
                 需要输出一个 thin G-buffer；在 Depth prepass 时输出？还是使用MRT，在绘制不透明时输出？参考一下DOOM
                     深度：能否直接使用 depth buffer? 需要恢复出屏幕空间 z
-                    normal / roughness / specular (F) ?
+                    normal                                  R16G16
+                    specular color (F)  roughness           RGBA8
                 需要将主画面输出改为到一个 MRT 上？
+                    注意将各 shader 输出也改为 MRT 的
                 需要保留上帧（最终?)画面
                 SSAO shader;
                     需要生成噪声纹理；使用 simplex noise 还是 blue noise?
@@ -243,6 +250,10 @@ TODO:       主要类结构
 
                 SSR
                     优化：使用上一帧的画面作为输入，这样就可以以本帧画面为输出了？
+
+            Tone mapping and Bloom
+                作为一个后期特效。这样保证在之前的整个渲染流程都是 HDR 线性空间的。
+                default pbr shader 中不再做 tonemapping；
 
             半透明物体的绘制？
 

@@ -115,17 +115,26 @@ export class ClusteredForwardRenderer {
         this._sceneColorTexture = new Texture2D(GLDevice.canvas.width, GLDevice.canvas.height, 1, 1, gl.RGBA, gl.HALF_FLOAT);
         this._sceneColorTexture.create();
 
-        this._sceneNormalRoughSpecTexture = new Texture2D(GLDevice.canvas.width, GLDevice.canvas.height, 1, 1, gl.RGBA, gl.HALF_FLOAT);
-        this._sceneNormalRoughSpecTexture.create();
+        this._sceneNormalTexture = new Texture2D(GLDevice.canvas.width, GLDevice.canvas.height, 1, 1, gl.RG, gl.HALF_FLOAT);
+        this._sceneNormalTexture.create();
+
+        this._sceneSpecularRoughnessTexture = new Texture2D(GLDevice.canvas.width, GLDevice.canvas.height, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE);
+        this._sceneSpecularRoughnessTexture.create();
 
         this._sceneDepthTexture = new Texture2D(GLDevice.canvas.width, GLDevice.canvas.height, 1, 1, gl.DEPTH_STENCIL, gl.UNSIGNED_INT_24_8);
         this._sceneDepthTexture.create();
 
         this._mainFBO = new FrameBuffer();
         this._mainFBO.setTexture(0, this._sceneColorTexture);
-        this._mainFBO.setTexture(1, this._sceneNormalRoughSpecTexture);
+        this._mainFBO.setTexture(1, this._sceneNormalTexture);
+        this._mainFBO.setTexture(2, this._sceneSpecularRoughnessTexture);
         this._mainFBO.depthStencilTexture = this._sceneDepthTexture;
         this._mainFBO.prepare();
+
+        this._postProcessFBO = new FrameBuffer();
+        this._postProcessFBO.setTexture(0, this._sceneColorTexture);
+        // no depth stencil needed
+        this._postProcessFBO.prepare();
 
         this._shadowmapAtlasUnit = 1;
         this._decalAtlasUnit = 2;
@@ -314,7 +323,8 @@ export class ClusteredForwardRenderer {
     private _irradianceVolumeAtlasUnit: GLenum;
 
     private _sceneColorTexture: Texture2D;      // main color output
-    private _sceneNormalRoughSpecTexture: Texture2D;
+    private _sceneNormalTexture: Texture2D;
+    private _sceneSpecularRoughnessTexture: Texture2D;
     private _sceneDepthTexture: Texture2D;             // main depth texture
 
     private _shadowmapAtlasCache: ShadowmapAtlas;  // static objects only
@@ -327,7 +337,7 @@ export class ClusteredForwardRenderer {
 
     // FBOs
     private _mainFBO: FrameBuffer;                // MRT: color, normal_roughness_specular
-    // private _postProcessFBO: FrameBuffer;         // post process output; fix me: use null?
+    private _postProcessFBO: FrameBuffer;         // only contains scene color texture
 
     private _shadowmapCacheFBO: FrameBuffer;
     private _shadowmapFBO: FrameBuffer;
@@ -648,7 +658,7 @@ export class ClusteredForwardRenderer {
                 shadowmapUpdated = true;
             }
 
-            GLDevice.renderTarget = null;
+            GLDevice.renderTarget = this._mainFBO;
 
             // GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, this._shadowmapAtlasCache.texture);
             GLTextures.setTextureAt(this._shadowmapAtlasUnit, this._shadowmapAtlas.texture);
@@ -708,6 +718,11 @@ export class ClusteredForwardRenderer {
                 this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, 4, false);
             }
         }
+
+        // todo: copy scene image to main backbuffer
+        // use blitFramebuffer, or draw a full screen rect?
+        GLDevice.renderTarget = null;
+        this.renderScreenRect(0, 0, GLDevice.canvas.width, GLDevice.canvas.height, new vec4([1,1,1,1]), this._sceneColorTexture, 1, 0, 0, false);
     }
 
     private renderDepthPrepass(frustum: Frustum) {

@@ -19,6 +19,10 @@ export class GLDevice {
         const maxUBSize = GLDevice.gl.getParameter(GLDevice.gl.MAX_UNIFORM_BLOCK_SIZE);
         console.log("max uniform block size: " + maxUBSize);
 
+        // extensions needed
+        const extColorBufferFloat = gl2.getExtension("EXT_color_buffer_float");
+        const extColorBufferHalfFloat = gl2.getExtension("EXT_color_buffer_half_float");
+
         // todo: 在这里初始化所有 gl 相关模块？
         GLGeometryBuffers.initialize();
     }
