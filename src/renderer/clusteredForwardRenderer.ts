@@ -73,7 +73,7 @@ import { CubemapProcessor } from "./cubemapProcessor.js";
 export class ClusteredForwardRenderer {
 
     public constructor() {
-        this._drawDebugTexture = true;
+        this._drawDebugTexture = false;
         const gl = GLDevice.gl;
         gl.enable(gl.SCISSOR_TEST);
 
@@ -622,7 +622,7 @@ export class ClusteredForwardRenderer {
             // todo: bind shaddowmaps only, and render cubemaps
             this.updateCubemaps();
 
-            GLDevice.renderTarget = null;
+            GLDevice.renderTarget = this._mainFBO;
 
             this.bindTexturesPerScene();
             // todo: bind texture samplers
@@ -722,7 +722,9 @@ export class ClusteredForwardRenderer {
         // todo: copy scene image to main backbuffer
         // use blitFramebuffer, or draw a full screen rect?
         GLDevice.renderTarget = null;
-        this.renderScreenRect(0, 0, GLDevice.canvas.width, GLDevice.canvas.height, new vec4([1,1,1,1]), this._sceneColorTexture, 1, 0, 0, false);
+        gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+        gl.scissor(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+        this.renderScreenRect(0, 0, 1, 1, new vec4([1,1,1,1]), this._sceneColorTexture, 1, 0, 0, false);
     }
 
     private renderDepthPrepass(frustum: Frustum) {
@@ -1134,7 +1136,7 @@ export class ClusteredForwardRenderer {
             }
         }
 
-        GLDevice.renderTarget = null;
+        GLDevice.renderTarget = this._mainFBO;
     }
 
     /**
