@@ -112,6 +112,7 @@ export class ShaderProgram {
             let compileLog = GLDevice.gl.getShaderInfoLog(shader);
             if (compileLog) {
                 if (compileLog.length > 0) {
+                    console.error("failed compiling shader:" + this.name + " :\n" + code + "\nerror: " + compileLog);
                     throw compileLog;
                 }
             }

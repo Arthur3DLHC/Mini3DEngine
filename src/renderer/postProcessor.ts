@@ -26,7 +26,7 @@ import { GLRenderStates } from "../WebGLResources/glRenderStates.js";
  */
 export class PostProcessor {
 
-    public constructor(width: number, height: number, startTextureUnit: number) {
+    public constructor(sceneColorTex: Texture2D, sceneDepthTex: Texture2D, sceneNormalTex: Texture2D, specRoughTex: Texture2D) {
         // register shader codes
         if (GLPrograms.shaderCodes["fullscreen_rect_vs"] === undefined) {
             GLPrograms.shaderCodes["fullscreen_rect_vs"] = fullscreen_rect_vs;
@@ -57,9 +57,18 @@ export class PostProcessor {
 
         // this._samplerUniformsSSAO = new SamplerUniforms(this._ssaoProgram);
         // this._samplerUniformsSSAOComposite = new SamplerUniforms(this._compositeSSAOProgram);
+        
+        this._postProcessFBO = new FrameBuffer();
+        this._postProcessFBO.setTexture(0, sceneColorTex);
+        // no depth stencil needed
+        this._postProcessFBO.prepare();
+
+        this._sceneNormalTexture = sceneNormalTex;
+        this._sceneDepthTexture = sceneDepthTex;
+        this._sceneSpecRoughTexture = specRoughTex;
 
         // create temp textures and framebuffers
-        this._tempResultHalfTexture = new Texture2D(width / 2, height / 2, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
+        this._tempResultHalfTexture = new Texture2D(sceneColorTex.width / 2, sceneColorTex.height / 2, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
         this._tempResultHalfTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
         this._tempResultHalfTexture.create();
 
@@ -104,6 +113,27 @@ export class PostProcessor {
         this.ssao = new SSAOParams();
     }
 
+    public release() {
+        if (this._ssaoProgram) {
+            this._ssaoProgram.release();
+        }
+        if (this._ssaoBlurProgram) {
+            this._ssaoBlurProgram.release();
+        }
+        if (this._postProcessFBO) {
+            this._postProcessFBO.release();
+        }
+        if (this._tempResultHalfFBO) {
+            this._tempResultHalfFBO.release();
+        }
+        if (this._tempResultHalfTexture) {
+            this._tempResultHalfTexture.release();
+        }
+        if (this._rectGeom) {
+            this._rectGeom.destroy();
+        }
+    }
+
     public enableSSR: boolean = true;
     public enableFXAA: boolean = true;
     public enableGlow: boolean = true;
@@ -120,6 +150,7 @@ export class PostProcessor {
     // private _samplerUniformsSSAOComposite: SamplerUniforms;
 
     // todo: temp textures and framebuffers
+    private _postProcessFBO: FrameBuffer;         // only contains scene color texture
 
     /**
      * half res temp result image
@@ -138,23 +169,32 @@ export class PostProcessor {
     private _rectGeom: PlaneGeometry;
 
     // common texture units
+    private _sceneDepthTexture: Texture2D;
+    private _sceneNormalTexture: Texture2D;
+    private _sceneSpecRoughTexture: Texture2D;
+
     private _sceneColorTexUnit: number = 0;
     private _sceneDepthTexUnit: number = 0;
-    private _normalRoughSpecTexUnit: number = 0;
+    private _sceneNormalTexUnit: number = 0;
+    private _sceneSpecRoughTexUnit: number = 0;
 
     // start unit for custom textures of every effects
     private _customTexStartUnit: number = 0;
 
-    public processOpaque(source: FrameBuffer, depthMap: Texture2D, normalRoughSpec: Texture2D, startTexUnit: number) {
+    public processOpaque(startTexUnit: number) {
         // todo: bind general texturess for once
         this._sceneColorTexUnit = startTexUnit;
         this._sceneDepthTexUnit = startTexUnit + 1;
-        this._normalRoughSpecTexUnit = startTexUnit + 2;
-        this._customTexStartUnit = startTexUnit + 3;
+        this._sceneNormalTexUnit = startTexUnit + 2;
+        this._sceneSpecRoughTexUnit = startTexUnit + 3;
+        this._customTexStartUnit = startTexUnit + 4;
+
+        GLDevice.renderTarget = this._postProcessFBO;
 
         // set these textures for all effects
-        GLTextures.setTextureAt(this._sceneDepthTexUnit, depthMap);
-        GLTextures.setTextureAt(this._normalRoughSpecTexUnit, normalRoughSpec);
+        GLTextures.setTextureAt(this._sceneDepthTexUnit, this._sceneDepthTexture);
+        GLTextures.setTextureAt(this._sceneNormalTexUnit, this._sceneNormalTexture);
+        GLTextures.setTextureAt(this._sceneSpecRoughTexUnit, this._sceneSpecRoughTexture);
 
         // todo: apply all enabled processes together
         // fix me: 应该分别在不同的阶段分开应用不同的后期特效
@@ -162,7 +202,7 @@ export class PostProcessor {
         // SSR: 也是不透明之后，半透明之前？
 
         if (this.ssao.enable) {
-            this.applySSAO(source);
+            this.applySSAO();
         }
         // todo: copy final result to output？
         // if not using souce as texture, can set source fbo as rendertarget directly
@@ -171,6 +211,11 @@ export class PostProcessor {
 
         // todo: need to swap temp output fbos if there is other effects
         // this.swapTempFBO();
+
+        // unbind textrues to allow them use as rendertarget next frame
+        GLTextures.setTextureAt(this._sceneDepthTexUnit, null);
+        GLTextures.setTextureAt(this._sceneNormalTexUnit, null);
+        GLTextures.setTextureAt(this._sceneSpecRoughTexUnit, null);
     }
     
     private setTexture(location: WebGLUniformLocation | null, unit: number, texture: Texture) {
@@ -196,9 +241,9 @@ export class PostProcessor {
     //     return this._tempFullSwapFBO[1 - this._curOutputFBOIdx];
     // }
 
-    private applySSAO(source: FrameBuffer) {
+    private applySSAO() {
         const gl = GLDevice.gl;
-        const sourceImage = source.getTexture(0);
+        const sourceImage = this._postProcessFBO.getTexture(0);
         if (sourceImage === null) {
             return;
         }
@@ -223,7 +268,8 @@ export class PostProcessor {
         // this._samplerUniformsSSAO.setTexture("s_sceneDepth", depthMap);
         // this._samplerUniformsSSAO.setTexture("s_sceneNormalRoughSpec", normalRoughSpec);
         gl.uniform1i(this._ssaoProgram.getUniformLocation("s_sceneDepth"), this._sceneDepthTexUnit);
-        gl.uniform1i(this._ssaoProgram.getUniformLocation("s_sceneNormalRoughSpec"), this._normalRoughSpecTexUnit);
+        gl.uniform1i(this._ssaoProgram.getUniformLocation("s_sceneNormal"), this._sceneNormalTexUnit);
+        // gl.uniform1i(this._ssaoProgram.getUniformLocation("s_sceneSpecRough"), this._sceneSpecRoughTexUnit);
 
         // this._samplerUniformsSSAO.setTexture("s_noiseTex", this.ssao.noiseTexture);
         this.setTexture(this._ssaoProgram.getUniformLocation("s_noiseTex"), this._customTexStartUnit, this.ssao.noiseTexture);
@@ -252,7 +298,7 @@ export class PostProcessor {
         //----------------------------------------------------------------------
 
         // 2. composite half res ssao to source image
-        GLDevice.renderTarget = source;
+        GLDevice.renderTarget = this._postProcessFBO;
         gl.viewport(0, 0, sourceImage.width, sourceImage.height);
         gl.scissor(0, 0, sourceImage.width, sourceImage.height);
 
@@ -272,7 +318,7 @@ export class PostProcessor {
         // TODO: 需要注意 SSAO 在半透明之前做；如何实现？
         // this.setTexture(this._compositeSSAOProgram.getUniformLocation("s_sceneColor"), this._sceneColorTexUnit, sourceImage);
         gl.uniform1i(this._ssaoBlurProgram.getUniformLocation("s_sceneDepth"), this._sceneDepthTexUnit);
-        gl.uniform1i(this._ssaoBlurProgram.getUniformLocation("s_sceneNormalRoughSpec"), this._normalRoughSpecTexUnit);
+        gl.uniform1i(this._ssaoBlurProgram.getUniformLocation("s_sceneNormal"), this._sceneNormalTexUnit);
         this.setTexture(this._ssaoBlurProgram.getUniformLocation("s_aoTex"), this._customTexStartUnit, this._tempResultHalfTexture);
         // this._samplerUniformsSSAOComposite.setTexture("s_aoTex", this._tempResultHalfTexture);
 

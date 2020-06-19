@@ -56,18 +56,18 @@ vec3 getViewNormal(vec2 screenPosition) {
 }
 
 void main(void) {
-    float depth = texture(s_sceneDepth, ex_texcoord);
+    float depth = texture(s_sceneDepth, ex_texcoord).r;
     float viewZ = getViewZ(depth);
 
     vec3 viewPosition = getViewPosition(ex_texcoord, depth, viewZ);
     vec3 viewNormal = getViewNormal(ex_texcoord);
 
     vec2 noiseScale = u_noiseTexelSize / u_texelSize;   // == texture res / noisetexture res
-    vec3 random = texture(s_noiseTex, ex_texcoord * noiseScale);
+    vec3 random = texture(s_noiseTex, ex_texcoord * noiseScale).rgb;
 
 	// compute matrix used to reorient a kernel vector
     vec3 tangent = normalize(random - viewNormal * dot(random, viewNormal));
-    vec3 bitangent = corss(viewNormal, tangent);
+    vec3 bitangent = cross(viewNormal, tangent);
     mat3 kernelMatrix = mat3(tangent, bitangent, viewNormal);
 
     float occlusion = 0.0;

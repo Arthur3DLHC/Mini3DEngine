@@ -4,6 +4,8 @@
  */
 export default /** glsl */`
 
+#include <uniforms_view>
+
 // uniforms
 uniform vec2 u_offset;
 uniform float u_intensity;
@@ -67,8 +69,8 @@ void main(void) {
 
     sumColor /= sumWeight;
     sumColor = vec3(1.0) - sumColor;    // invert
-    sumColor = pow(sumColor, u_power);  // sharppen
-    sumColor = vec3(1.0) - sumColor * u_intensity;  // contrast and invert back
+    sumColor = pow(abs(sumColor), vec3(u_power));  // sharppen
+    sumColor = clamp(vec3(1.0) - sumColor * u_intensity, vec3(0.0), vec3(1.0));  // contrast and invert back
 
     // 改为用 alpha 混合实现与场景画面相乘了
     // vec3 sourceColor = texture(s_sceneColor, ex_texcoord).rgb;

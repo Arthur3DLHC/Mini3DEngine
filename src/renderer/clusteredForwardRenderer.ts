@@ -69,6 +69,7 @@ import { DirectionalLightShadow } from "../scene/lights/directionalLightShadow.j
 import { TextureCube } from "../WebGLResources/textures/textureCube.js";
 import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 import { CubemapProcessor } from "./cubemapProcessor.js";
+import { PostProcessor } from "./postProcessor.js";
 
 export class ClusteredForwardRenderer {
 
@@ -131,10 +132,6 @@ export class ClusteredForwardRenderer {
         this._mainFBO.depthStencilTexture = this._sceneDepthTexture;
         this._mainFBO.prepare();
 
-        this._postProcessFBO = new FrameBuffer();
-        this._postProcessFBO.setTexture(0, this._sceneColorTexture);
-        // no depth stencil needed
-        this._postProcessFBO.prepare();
 
         this._shadowmapAtlasUnit = 1;
         this._decalAtlasUnit = 2;
@@ -271,7 +268,7 @@ export class ClusteredForwardRenderer {
 
         this._frustum = new Frustum();
 
-
+        this._postprocessor = new PostProcessor(this._sceneColorTexture, this._sceneDepthTexture, this._sceneNormalTexture, this._sceneSpecularRoughnessTexture);
     }
 
     private _renderListDepthPrepass: RenderList;
@@ -337,7 +334,6 @@ export class ClusteredForwardRenderer {
 
     // FBOs
     private _mainFBO: FrameBuffer;                // MRT: color, normal_roughness_specular
-    private _postProcessFBO: FrameBuffer;         // only contains scene color texture
 
     private _shadowmapCacheFBO: FrameBuffer;
     private _shadowmapFBO: FrameBuffer;
@@ -366,6 +362,8 @@ export class ClusteredForwardRenderer {
     private _samplerUniformsScreenRect: SamplerUniforms | null;
 
     private _frustum: Frustum;
+
+    private _postprocessor: PostProcessor;
 
     private createRenderStates() {
         const gl = GLDevice.gl;
@@ -701,7 +699,7 @@ export class ClusteredForwardRenderer {
             // todo: render sprites
 
             // todo: do post process
-            
+            this._postprocessor.processOpaque(this.numReservedTextures);
 
             // Test code: apply render target texture to a screen space rectangle
             // test drawing a screen space rectangle
