@@ -20,13 +20,15 @@ import { SSAOParams } from "./postprocess/ssaoParams.js";
 import { Texture } from "../WebGLResources/textures/texture.js";
 import { BlendState } from "../WebGLResources/renderStates/blendState.js";
 import { GLRenderStates } from "../WebGLResources/glRenderStates.js";
+import { GLUniformBuffers } from "../WebGLResources/glUnifomBuffers.js";
+import { ClusteredForwardRenderContext } from "./clusteredForwardRenderContext.js";
 
 /**
  * all post processes supported
  */
 export class PostProcessor {
 
-    public constructor(sceneColorTex: Texture2D, sceneDepthTex: Texture2D, sceneNormalTex: Texture2D, specRoughTex: Texture2D) {
+    public constructor(context: ClusteredForwardRenderContext, sceneColorTex: Texture2D, sceneDepthTex: Texture2D, sceneNormalTex: Texture2D, specRoughTex: Texture2D) {
         // register shader codes
         if (GLPrograms.shaderCodes["fullscreen_rect_vs"] === undefined) {
             GLPrograms.shaderCodes["fullscreen_rect_vs"] = fullscreen_rect_vs;
@@ -54,6 +56,13 @@ export class PostProcessor {
         this._ssaoBlurProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
         this._ssaoBlurProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssao_blur_fs"]);
         this._ssaoBlurProgram.build();
+
+        // don't foget to bind the uniform blocks used.
+        //GLUniformBuffers.bindUniformBlock(this._ssaoProgram, "View");
+        //GLUniformBuffers.bindUniformBlock(this._ssaoBlurProgram, "View");
+
+        context.bindUniformBlocks(this._ssaoProgram);
+        context.bindUniformBlocks(this._ssaoBlurProgram);
 
         // this._samplerUniformsSSAO = new SamplerUniforms(this._ssaoProgram);
         // this._samplerUniformsSSAOComposite = new SamplerUniforms(this._compositeSSAOProgram);

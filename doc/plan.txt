@@ -247,6 +247,7 @@ TODO:       主要类结构
                 SSAO shader;
                     需要生成噪声纹理；使用 simplex noise 还是 blue noise?
                     优化；在组合结果时，可以不用传入 sceneColor 纹理，而是通过 alphablend 做乘法混合
+                    调试输出 normal, depth 和 specular roughness
 
                 SSR
                     优化：使用上一帧的画面作为输入，这样就可以以本帧画面为输出了？

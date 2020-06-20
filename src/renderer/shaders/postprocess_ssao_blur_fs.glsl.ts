@@ -74,7 +74,10 @@ void main(void) {
 
     // 改为用 alpha 混合实现与场景画面相乘了
     // vec3 sourceColor = texture(s_sceneColor, ex_texcoord).rgb;
-    o_color = vec4(sumColor, 1.0);
+    // o_color = vec4(sumColor, 1.0);
+
+    // debug
+    o_color = vec4(1.0, 0.0, 0.0, 1.0);
 }
 
 `;
