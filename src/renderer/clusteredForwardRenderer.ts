@@ -168,6 +168,7 @@ export class ClusteredForwardRenderer {
         this._decalAtlas = new TextureAtlas2D();
 
         // todo: should put sizes in a config object parameter?
+        // is 16 bit float textures too big?
         this._envMapArray = new Texture2DArray(this._renderContext.envmapSize * 6, this._renderContext.envmapSize,
             ClusteredForwardRenderContext.MAX_ENVPROBES, 1024, gl.RGB, gl.UNSIGNED_BYTE, false);
         this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.LINEAR_MIPMAP_LINEAR, gl.LINEAR_MIPMAP_LINEAR);
