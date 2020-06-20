@@ -285,8 +285,8 @@ export class PostProcessor {
 
         // uniforms (blocks? how many uniforms can be shared by post processes?)
         // what params ssao need?
-        const texelW = 1.0 / sourceImage.width;
-        const texelH = 1.0 / sourceImage.height;
+        let texelW = 1.0 / sourceImage.width;
+        let texelH = 1.0 / sourceImage.height;
         
         // calc texel size
         gl.uniform2f(this._ssaoProgram.getUniformLocation("u_texelSize"), texelW, texelH);
@@ -333,6 +333,8 @@ export class PostProcessor {
 
         // todo: uniforms
         // uniform float u_offset;
+        texelW = 1.0 / this._tempResultHalfTexture.width;
+        texelH = 1.0 / this._tempResultHalfTexture.height;
         gl.uniform2f(this._ssaoBlurProgram.getUniformLocation("u_offset"), this.ssao.blurSize * texelW, this.ssao.blurSize * texelH);
 
         // uniform float u_intensity;

@@ -33,12 +33,12 @@ export class SSAOParams {
     public kernels: Float32Array;
 
     public enable: boolean = true;
-    public radius: number = 8;              // meters
+    public radius: number = 0.5;              // meters
     public minDistance: number = 0.005;     // -1, 1 range
-    public maxDistance: number = 0.1;       // -1, 1 range
+    public maxDistance: number = 0.01;       // -1, 1 range
     public blurSize: number = 1.0;          // px
     public intensiy: number = 1.0;
-    public power: number = 2.0;
+    public power: number = 1.0;
 
     private generateKernels() {
         // use random vectors in a hemisphere
