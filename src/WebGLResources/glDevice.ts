@@ -22,6 +22,8 @@ export class GLDevice {
         // extensions needed
         const extColorBufferFloat = gl2.getExtension("EXT_color_buffer_float");
         const extColorBufferHalfFloat = gl2.getExtension("EXT_color_buffer_half_float");
+        const extFloatTex = gl2.getExtension('OES_texture_float');
+        const extFloatTexLinear = gl2.getExtension('OES_texture_float_linear');
 
         // todo: 在这里初始化所有 gl 相关模块？
         GLGeometryBuffers.initialize();
