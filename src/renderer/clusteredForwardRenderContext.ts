@@ -127,9 +127,9 @@ export class ClusteredForwardRenderContext extends RenderContext {
         // per view,
         const matIdentity = mat4.identity;
         this._ubView.addMat4("matView", matIdentity);
-        this._ubView.addMat4("matViewPrev", matIdentity);
         this._ubView.addMat4("matProj", matIdentity);
         this._ubView.addMat4("matInvProj", matIdentity);
+        this._ubView.addMat4("matViewProjPrev", matIdentity);
         this._ubView.addVec4("viewport", new vec4());
         this._ubView.addVec3("position", new vec3());
         this._ubView.addFloat("time", 0);
@@ -373,11 +373,11 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
         // todo: fill view and proj matrix
         this._ubView.setMat4("matView", camera.viewTransform);
-        // todo: prev view matrix
-        this._ubView.setMat4("matViewPrev", camera.viewTransformPrev);
 
         this._ubView.setMat4("matProj", camera.projTransform);
         this._ubView.setMat4("matInvProj", invProj);
+
+        this._ubView.setMat4("matViewProjPrev", camera.viewTransformPrev);
 
         const viewport: Int32Array = GLDevice.gl.getParameter(GLDevice.gl.VIEWPORT);
         const vpVec = new vec4([viewport[0], viewport[1], viewport[2], viewport[3]]);

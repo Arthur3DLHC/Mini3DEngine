@@ -56,8 +56,8 @@ export class SSAOParams {
 
             // test: use plain random values, same as three.js
             // hemisphere
-            sample.x = Math.random() * 2 - 1;
-            sample.y = Math.random() * 2 - 1;
+            sample.x = Math.random() * 2.0 - 1.0;
+            sample.y = Math.random() * 2.0 - 1.0;
             sample.z = Math.random();
 
             sample.normalize();

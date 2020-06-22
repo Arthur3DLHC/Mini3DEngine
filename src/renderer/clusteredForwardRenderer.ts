@@ -169,8 +169,12 @@ export class ClusteredForwardRenderer {
 
         // todo: should put sizes in a config object parameter?
         // is 16 bit float textures too big?
+        // fix me: firefox do not support RGB 16F rendertarget, only RGBA 16F
+        // this._envMapArray = new Texture2DArray(this._renderContext.envmapSize * 6, this._renderContext.envmapSize,
+        //     ClusteredForwardRenderContext.MAX_ENVPROBES, 1024, gl.RGB, gl.UNSIGNED_BYTE, false);
         this._envMapArray = new Texture2DArray(this._renderContext.envmapSize * 6, this._renderContext.envmapSize,
-            ClusteredForwardRenderContext.MAX_ENVPROBES, 1024, gl.RGB, gl.UNSIGNED_BYTE, false);
+            ClusteredForwardRenderContext.MAX_ENVPROBES, 1024, gl.RGBA, gl.HALF_FLOAT, false);
+    
         this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.LINEAR_MIPMAP_LINEAR, gl.LINEAR_MIPMAP_LINEAR);
         this._envMapArray.create();
 

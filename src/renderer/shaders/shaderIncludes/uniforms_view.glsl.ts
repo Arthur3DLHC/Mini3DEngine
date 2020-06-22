@@ -10,9 +10,9 @@ export default /** glsl */`
     uniform View
     {
         mat4 matView;
-        mat4 matViewPrev;
         mat4 matProj;
         mat4 matInvProj;
+        mat4 matViewProjPrev;
         vec4 viewport;          // x, y, width, height
         vec3 position;
         float time;             // perframe buffer is too small, so put in there               
@@ -20,6 +20,7 @@ export default /** glsl */`
         vec2 rtSize;            // render target full size, in pixels
         vec4 farRect;           // far plane left, bottom, right, top
         vec4 clusterRes;        // x, y, z resolusion of clusters.
+        // fix me: 是否加一个亮度系数？
     } u_view;
 
 
