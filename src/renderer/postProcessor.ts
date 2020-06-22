@@ -2,6 +2,7 @@ import samplers_postprocess from "./shaders/shaderIncludes/samplers_postprocess.
 import fullscreen_rect_vs from "./shaders/fullscreen_rect_vs.glsl.js";
 import postprocess_ssao_fs from "./shaders/postprocess_ssao_fs.glsl.js";
 import postprocess_ssao_blur_fs from "./shaders/postprocess_ssao_blur_fs.glsl.js";
+import postprocess_tonemapping_fs from "./shaders/postprocess_tonemapping_fs.glsl.js";
 
 import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { FrameBuffer } from "../WebGLResources/frameBuffer.js";
@@ -39,6 +40,9 @@ export class PostProcessor {
         if (GLPrograms.shaderCodes["postprocess_ssao_blur_fs"] === undefined) {
             GLPrograms.shaderCodes["postprocess_ssao_blur_fs"] = postprocess_ssao_blur_fs;
         }
+        if (GLPrograms.shaderCodes["postprocess_tonemapping_fs"] === undefined) {
+            GLPrograms.shaderCodes["postprocess_tonemapping_fs"] = postprocess_tonemapping_fs;
+        }
 
         if (GLPrograms.shaderCodes["samplers_postprocess"] === undefined) {
             GLPrograms.shaderCodes["samplers_postprocess"] = samplers_postprocess;
@@ -57,12 +61,18 @@ export class PostProcessor {
         this._ssaoBlurProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssao_blur_fs"]);
         this._ssaoBlurProgram.build();
 
+        this._toneMappingProgram = new ShaderProgram();
+        this._toneMappingProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
+        this._toneMappingProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_tonemapping_fs"]);
+        this._toneMappingProgram.build();
+
         // don't foget to bind the uniform blocks used.
         //GLUniformBuffers.bindUniformBlock(this._ssaoProgram, "View");
         //GLUniformBuffers.bindUniformBlock(this._ssaoBlurProgram, "View");
 
         context.bindUniformBlocks(this._ssaoProgram);
         context.bindUniformBlocks(this._ssaoBlurProgram);
+        context.bindUniformBlocks(this._toneMappingProgram);
 
         // this._samplerUniformsSSAO = new SamplerUniforms(this._ssaoProgram);
         // this._samplerUniformsSSAOComposite = new SamplerUniforms(this._compositeSSAOProgram);
@@ -155,6 +165,7 @@ export class PostProcessor {
 
     private _ssaoProgram: ShaderProgram;
     private _ssaoBlurProgram: ShaderProgram;
+    private _toneMappingProgram: ShaderProgram;
     // private _samplerUniformsSSAO: SamplerUniforms;
     // private _samplerUniformsSSAOComposite: SamplerUniforms;
 
@@ -225,6 +236,16 @@ export class PostProcessor {
         GLTextures.setTextureAt(this._sceneDepthTexUnit, null);
         GLTextures.setTextureAt(this._sceneNormalTexUnit, null);
         GLTextures.setTextureAt(this._sceneSpecRoughTexUnit, null);
+    }
+
+    public processFinal(startTexUnit: number) {
+        this._sceneColorTexUnit = startTexUnit;
+        this._sceneDepthTexUnit = startTexUnit + 1;
+        this._sceneNormalTexUnit = startTexUnit + 2;
+        this._sceneSpecRoughTexUnit = startTexUnit + 3;
+        this._customTexStartUnit = startTexUnit + 4;
+
+        this.applyToneMapping();
     }
     
     private setTexture(location: WebGLUniformLocation | null, unit: number, texture: Texture) {
@@ -350,4 +371,27 @@ export class PostProcessor {
         GLTextures.setTextureAt(this._customTexStartUnit, null);
     }
 
+    private applyToneMapping() {
+        // Fix me: 由于不能将 sourceImage 同时作为纹理和 render target，所以需要一个临时的纹理？
+        // 或者直接在向主屏幕输出时做 tone mapping？
+        const gl = GLDevice.gl;
+        const sourceImage = this._postProcessFBO.getTexture(0);
+        if (sourceImage === null) {
+            return;
+        }
+
+        // 在整个渲染流程的最后向主屏幕输出
+        // 在场景画面输出之后再绘制 UI等
+        GLDevice.renderTarget = null;
+        gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+        gl.scissor(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+
+        this._renderStates.apply();
+
+        // 暂时先只做 tonemapping，将来再加 bloom
+        GLPrograms.useProgram(this._toneMappingProgram);
+        this.setTexture(this._toneMappingProgram.getUniformLocation("s_sceneColor"), this._customTexStartUnit, sourceImage);
+        this._rectGeom.draw(0, Infinity, this._toneMappingProgram.attributes);
+        GLTextures.setTextureAt(this._customTexStartUnit, null);
+    }
 }

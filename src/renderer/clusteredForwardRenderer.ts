@@ -725,10 +725,14 @@ export class ClusteredForwardRenderer {
 
         // todo: copy scene image to main backbuffer
         // use blitFramebuffer, or draw a full screen rect?
-        GLDevice.renderTarget = null;
-        gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
-        gl.scissor(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
-        this.renderScreenRect(0, 0, 1, 1, new vec4([1,1,1,1]), this._sceneColorTexture, 1, 0, 0, false);
+        // or do the tone mapping and bloom here?
+
+        // GLDevice.renderTarget = null;
+        // gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+        // gl.scissor(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+        // this.renderScreenRect(0, 0, 1, 1, new vec4([1,1,1,1]), this._sceneColorTexture, 1, 0, 0, false);
+
+        this._postprocessor.processFinal(this.numReservedTextures);
     }
 
     private renderDepthPrepass(frustum: Frustum) {

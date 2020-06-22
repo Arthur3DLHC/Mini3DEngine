@@ -259,6 +259,7 @@ TODO:       主要类结构
 
             Tone mapping and Bloom
                 作为一个后期特效。这样保证在之前的整个渲染流程都是 HDR 线性空间的。
+                Tone mapping shader 同时输出画面中高亮度部分和 tone mapping 结果？
                 default pbr shader 中不再做 tonemapping；
 
             半透明物体的绘制？

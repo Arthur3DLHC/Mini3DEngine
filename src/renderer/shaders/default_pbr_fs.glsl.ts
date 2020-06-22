@@ -241,7 +241,8 @@ void main(void)
     // todo: opacity for transparent surfaces;
     // todo: tone mapping? linear space to sRGB space?
     vec3 color = f_diffuse + f_specular + f_emissive;
-    color = ACESToneMapping(color, 1.0);
+    // put tone mapping in post process
+    // color = ACESToneMapping(color, 1.0);
     o.color = vec4(color, getOpacity());
     o.normal = (u_view.matView * vec4(n, 0)).xyz;  // output world normal or view normal?
     o.roughness = roughness;
