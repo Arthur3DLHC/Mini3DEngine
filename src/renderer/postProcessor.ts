@@ -179,9 +179,9 @@ export class PostProcessor {
     private _tempResultHalfTexture: Texture2D;
     private _tempResultHalfFBO: FrameBuffer;
 
-    // todo: add 2 full res temp buffers, to use as postprocess output and swap between them?
-    // private _tempFullSwapFBO: FrameBuffer[];
-    // private _curOutputFBOIdx: number;
+    // todo: last frame image
+    // 使用两个交替的 framebuffer，还是每帧最后拷贝一下？
+    // 交替的开销更小一些？由 renderer 维护，负责每帧交替地传进来？
 
     private _renderStates: RenderStateSet;
     private _ssaoBlurBlendState: BlendState;
@@ -224,8 +224,6 @@ export class PostProcessor {
         if (this.ssao.enable) {
             this.applySSAO();
         }
-        // todo: copy final result to output？
-        // if not using souce as texture, can set source fbo as rendertarget directly
 
         // throw new Error("Not implemented.");
 
