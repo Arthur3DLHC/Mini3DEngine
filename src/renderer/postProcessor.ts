@@ -163,36 +163,15 @@ export class PostProcessor {
     }
 
     public release() {
-        if (this._ssaoProgram) {
-            this._ssaoProgram.release();
-        }
-        if (this._ssaoBlurProgram) {
-            this._ssaoBlurProgram.release();
-        }
-        if (this._ssrProgram) {
-            this._ssrProgram.release();
-        }
-        if (this._compositeProgram) {
-            this._compositeProgram.release();
-        }
-        // if (this._postProcessFBO) {
-        //     this._postProcessFBO.release();
-        // }
-        if (this._ssaoFBO) {
-            this._ssaoFBO.release();
-        }
-        if (this._ssaoTexture) {
-            this._ssaoTexture.release();
-        }
-        if (this._ssrFBO) {
-            this._ssrFBO.release();
-        }
-        if (this._ssrTexture) {
-            this._ssrTexture.release();
-        }
-        if (this._rectGeom) {
-            this._rectGeom.destroy();
-        }
+        if (this._ssaoProgram) { this._ssaoProgram.release(); }
+        if (this._ssaoBlurProgram) { this._ssaoBlurProgram.release(); }
+        if (this._ssrProgram) { this._ssrProgram.release(); }
+        if (this._compositeProgram) { this._compositeProgram.release(); }
+        if (this._ssaoFBO) { this._ssaoFBO.release(); }
+        if (this._ssaoTexture) { this._ssaoTexture.release(); }
+        if (this._ssrFBO) { this._ssrFBO.release(); }
+        if (this._ssrTexture) { this._ssrTexture.release(); }
+        if (this._rectGeom) { this._rectGeom.destroy(); }
     }
 
     public enableSSR: boolean = true;
