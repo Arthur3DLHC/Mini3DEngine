@@ -113,8 +113,7 @@ export class ClusteredForwardRenderer {
 
         // main output
         // todo: handle size change
-        this._sceneColorTexture = new Texture2D(GLDevice.canvas.width, GLDevice.canvas.height, 1, 1, gl.RGBA, gl.HALF_FLOAT);
-        this._sceneColorTexture.create();
+
 
         this._sceneNormalTexture = new Texture2D(GLDevice.canvas.width, GLDevice.canvas.height, 1, 1, gl.RG, gl.HALF_FLOAT);
         this._sceneNormalTexture.create();
@@ -126,13 +125,25 @@ export class ClusteredForwardRenderer {
         this._sceneDepthTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.NEAREST, GLDevice.gl.NEAREST);
         this._sceneDepthTexture.create();
 
-        this._mainFBO = new FrameBuffer();
-        this._mainFBO.setTexture(0, this._sceneColorTexture);
-        this._mainFBO.setTexture(1, this._sceneNormalTexture);
-        this._mainFBO.setTexture(2, this._sceneSpecularRoughnessTexture);
-        this._mainFBO.depthStencilTexture = this._sceneDepthTexture;
-        this._mainFBO.prepare();
+        this._sceneColorTexture = [];
+        this._mainFBO = [];
+        this._postprocessFBO = [];
+        for( let i = 0; i < 2; i++) {
+            this._sceneColorTexture[i] = new Texture2D(GLDevice.canvas.width, GLDevice.canvas.height, 1, 1, gl.RGBA, gl.HALF_FLOAT);
+            this._sceneColorTexture[i].create();
 
+            this._mainFBO[i] = new FrameBuffer();
+            this._mainFBO[i].setTexture(0, this._sceneColorTexture[i]);
+            this._mainFBO[i].setTexture(1, this._sceneNormalTexture);
+            this._mainFBO[i].setTexture(2, this._sceneSpecularRoughnessTexture);
+            this._mainFBO[i].depthStencilTexture = this._sceneDepthTexture;
+            this._mainFBO[i].prepare();
+
+            this._postprocessFBO[i] = new FrameBuffer();
+            this._postprocessFBO[i].setTexture(0, this._sceneColorTexture[i]);
+            this._postprocessFBO[i].prepare();
+        }
+        this._currFrameFBOIdx = 0;
 
         this._shadowmapAtlasUnit = 1;
         this._decalAtlasUnit = 2;
@@ -274,7 +285,7 @@ export class ClusteredForwardRenderer {
 
         this._frustum = new Frustum();
 
-        this._postprocessor = new PostProcessor(this._renderContext, this._sceneColorTexture, this._sceneDepthTexture, this._sceneNormalTexture, this._sceneSpecularRoughnessTexture);
+        this._postprocessor = new PostProcessor(this._renderContext, this._sceneDepthTexture, this._sceneNormalTexture, this._sceneSpecularRoughnessTexture);
     }
 
     private _renderListDepthPrepass: RenderList;
@@ -325,7 +336,7 @@ export class ClusteredForwardRenderer {
     private _specularDFGUnit: GLenum;
     private _irradianceVolumeAtlasUnit: GLenum;
 
-    private _sceneColorTexture: Texture2D;      // main color output
+    private _sceneColorTexture: Texture2D[];      // main color output
     private _sceneNormalTexture: Texture2D;
     private _sceneSpecularRoughnessTexture: Texture2D;
     private _sceneDepthTexture: Texture2D;             // main depth texture
@@ -339,7 +350,11 @@ export class ClusteredForwardRenderer {
     private _irradianceVolumeAtlas: TextureAtlas3D;
 
     // FBOs
-    private _mainFBO: FrameBuffer;                // MRT: color, normal_roughness_specular
+
+    // todo: Two FBOs, swap between curr frame and prev frame
+    private _mainFBO: FrameBuffer[];                 // MRT: color, normal_roughness_specular
+    private _postprocessFBO: FrameBuffer[];
+    private _currFrameFBOIdx: number;
 
     private _shadowmapCacheFBO: FrameBuffer;
     private _shadowmapFBO: FrameBuffer;
@@ -626,7 +641,7 @@ export class ClusteredForwardRenderer {
             // todo: bind shaddowmaps only, and render cubemaps
             this.updateCubemaps();
 
-            GLDevice.renderTarget = this._mainFBO;
+            GLDevice.renderTarget = this._mainFBO[this._currFrameFBOIdx];
 
             this.bindTexturesPerScene();
             // todo: bind texture samplers
@@ -662,7 +677,7 @@ export class ClusteredForwardRenderer {
                 shadowmapUpdated = true;
             }
 
-            GLDevice.renderTarget = this._mainFBO;
+            GLDevice.renderTarget = this._mainFBO[this._currFrameFBOIdx];
 
             // GLTextures.setTextureAt(this._shadowmapAtlasStaticUnit, this._shadowmapAtlasCache.texture);
             GLTextures.setTextureAt(this._shadowmapAtlasUnit, this._shadowmapAtlas.texture);
@@ -705,7 +720,7 @@ export class ClusteredForwardRenderer {
             // todo: render sprites
 
             // todo: do post process
-            this._postprocessor.processOpaque(this.numReservedTextures);
+            this._postprocessor.processOpaque(this.numReservedTextures, this._postprocessFBO[this._currFrameFBOIdx], this._sceneColorTexture[1 - this._currFrameFBOIdx]);
 
             // Test code: apply render target texture to a screen space rectangle
             // test drawing a screen space rectangle
@@ -733,6 +748,13 @@ export class ClusteredForwardRenderer {
         // this.renderScreenRect(0, 0, 1, 1, new vec4([1,1,1,1]), this._sceneColorTexture, 1, 0, 0, false);
 
         this._postprocessor.processFinal(this.numReservedTextures);
+
+        // swap between curr and prev frame
+        if (this._currFrameFBOIdx === 0) {
+            this._currFrameFBOIdx = 1;
+        } else {
+            this._currFrameFBOIdx = 0;
+        }
     }
 
     private renderDepthPrepass(frustum: Frustum) {
@@ -1144,7 +1166,7 @@ export class ClusteredForwardRenderer {
             }
         }
 
-        GLDevice.renderTarget = this._mainFBO;
+        GLDevice.renderTarget = this._mainFBO[this._currFrameFBOIdx];
     }
 
     /**
