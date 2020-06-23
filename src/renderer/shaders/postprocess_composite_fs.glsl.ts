@@ -1,19 +1,19 @@
 /**
- * composite ssao, ssr, fog... to scene image
- * upsample and do a 2d bilateral blur
+ * composite ssr, envmap, fog... to scene image
  */
 export default /** glsl */`
 
 #include <uniforms_view>
 
 // uniforms
-uniform vec2 u_offset;
-uniform float u_intensity;
-uniform float u_power;
+// uniform vec2 u_offset;
+// uniform float u_intensity;
+// uniform float u_power;
 
 // samplers
 #include <samplers_postprocess>
-uniform sampler2D s_aoTex;
+uniform sampler2D s_aoTex;          // for specular occlusion
+uniform sampler2D s_reflTex;        // ssr result texture, will be blurred
 
 #include <function_depth>
 float getLinearDepth(vec2 scrUV) {

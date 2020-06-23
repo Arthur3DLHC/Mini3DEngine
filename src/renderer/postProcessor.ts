@@ -2,6 +2,7 @@ import samplers_postprocess from "./shaders/shaderIncludes/samplers_postprocess.
 import fullscreen_rect_vs from "./shaders/fullscreen_rect_vs.glsl.js";
 import postprocess_ssao_fs from "./shaders/postprocess_ssao_fs.glsl.js";
 import postprocess_ssao_blur_fs from "./shaders/postprocess_ssao_blur_fs.glsl.js";
+import postprocess_ssr_fs from "./shaders/postprocess_ssr_fs.glsl.js";
 import postprocess_composite_fs from "./shaders/postprocess_composite_fs.glsl.js";
 import postprocess_tonemapping_fs from "./shaders/postprocess_tonemapping_fs.glsl.js";
 
@@ -42,6 +43,9 @@ export class PostProcessor {
         if (GLPrograms.shaderCodes["postprocess_ssao_blur_fs"] === undefined) {
             GLPrograms.shaderCodes["postprocess_ssao_blur_fs"] = postprocess_ssao_blur_fs;
         }
+        if (GLPrograms.shaderCodes["postprocess_ssr_fs"] === undefined) {
+            GLPrograms.shaderCodes["postprocess_ssr_fs"] = postprocess_ssr_fs;
+        }
         if (GLPrograms.shaderCodes["postprocess_composite_fs"] === undefined) {
             GLPrograms.shaderCodes["postprocess_composite_fs"] = postprocess_composite_fs;
         }
@@ -65,6 +69,11 @@ export class PostProcessor {
         this._ssaoBlurProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
         this._ssaoBlurProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssao_blur_fs"]);
         this._ssaoBlurProgram.build();
+
+        this._ssrProgram = new ShaderProgram();
+        this._ssrProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
+        this._ssrProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssr_fs"]);
+        this._ssrProgram.build();
 
         this._compositeProgram = new ShaderProgram();
         this._compositeProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
@@ -99,13 +108,21 @@ export class PostProcessor {
         this._sceneSpecRoughTexture = specRoughTex;
 
         // create temp textures and framebuffers
-        this._tempResultHalfTexture = new Texture2D(sceneDepthTex.width / 2, sceneDepthTex.height / 2, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
-        this._tempResultHalfTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
-        this._tempResultHalfTexture.create();
+        this._ssaoTexture = new Texture2D(sceneDepthTex.width / 2, sceneDepthTex.height / 2, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
+        this._ssaoTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
+        this._ssaoTexture.create();
 
-        this._tempResultHalfFBO = new FrameBuffer();
-        this._tempResultHalfFBO.setTexture(0, this._tempResultHalfTexture);
-        this._tempResultHalfFBO.prepare();
+        this._ssaoFBO = new FrameBuffer();
+        this._ssaoFBO.setTexture(0, this._ssaoTexture);
+        this._ssaoFBO.prepare();
+
+        this._ssrTexture = new Texture2D(sceneDepthTex.width / 2, sceneDepthTex.height / 2, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
+        this._ssrTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
+        this._ssrTexture.create();
+
+        this._ssrFBO = new FrameBuffer();
+        this._ssrFBO.setTexture(0, this._ssrTexture);
+        this._ssrFBO.prepare();
 
         // this._tempFullSwapFBO = [];
 
@@ -152,14 +169,26 @@ export class PostProcessor {
         if (this._ssaoBlurProgram) {
             this._ssaoBlurProgram.release();
         }
+        if (this._ssrProgram) {
+            this._ssrProgram.release();
+        }
+        if (this._compositeProgram) {
+            this._compositeProgram.release();
+        }
         // if (this._postProcessFBO) {
         //     this._postProcessFBO.release();
         // }
-        if (this._tempResultHalfFBO) {
-            this._tempResultHalfFBO.release();
+        if (this._ssaoFBO) {
+            this._ssaoFBO.release();
         }
-        if (this._tempResultHalfTexture) {
-            this._tempResultHalfTexture.release();
+        if (this._ssaoTexture) {
+            this._ssaoTexture.release();
+        }
+        if (this._ssrFBO) {
+            this._ssrFBO.release();
+        }
+        if (this._ssrTexture) {
+            this._ssrTexture.release();
         }
         if (this._rectGeom) {
             this._rectGeom.destroy();
@@ -179,6 +208,7 @@ export class PostProcessor {
 
     private _ssaoProgram: ShaderProgram;
     private _ssaoBlurProgram: ShaderProgram;
+    private _ssrProgram: ShaderProgram;
     private _compositeProgram: ShaderProgram;
     private _toneMappingProgram: ShaderProgram;
     // private _samplerUniformsSSAO: SamplerUniforms;
@@ -188,11 +218,16 @@ export class PostProcessor {
     private _prevFrame: Texture2D | null;
 
     /**
-     * half res temp result image
-     * can be used to store unblurred SSAO/SSR, brightpass and so on
+     * half resolution ssao result image
      */
-    private _tempResultHalfTexture: Texture2D;
-    private _tempResultHalfFBO: FrameBuffer;
+    private _ssaoTexture: Texture2D;
+    private _ssaoFBO: FrameBuffer;
+
+    /**
+     * half resolution ssr result image
+     */
+    private _ssrTexture: Texture2D;
+    private _ssrFBO: FrameBuffer;
 
     // todo: last frame image
     // 使用两个交替的 framebuffer，还是每帧最后拷贝一下？
@@ -244,15 +279,16 @@ export class PostProcessor {
         }
 
         if (this.ssr.enable) {
-            this.applySSR();
+            this.generateSSR();
         }
+
+        this.composite();
 
         // unbind textrues to allow them use as rendertarget next frame
         GLTextures.setTextureAt(this._sceneDepthTexUnit, null);
         GLTextures.setTextureAt(this._sceneNormalTexUnit, null);
         GLTextures.setTextureAt(this._sceneSpecRoughTexUnit, null);
     }
-
 
     public processFinal(startTexUnit: number) {
         this._sceneColorTexUnit = startTexUnit;
@@ -293,9 +329,9 @@ export class PostProcessor {
         // 1. render ssao to half res result texture
 
         // render target and viewport
-        GLDevice.renderTarget = this._tempResultHalfFBO;
-        gl.viewport(0, 0, this._tempResultHalfTexture.width, this._tempResultHalfTexture.height);
-        gl.scissor(0, 0, this._tempResultHalfTexture.width, this._tempResultHalfTexture.height);
+        GLDevice.renderTarget = this._ssaoFBO;
+        gl.viewport(0, 0, this._ssaoTexture.width, this._ssaoTexture.height);
+        gl.scissor(0, 0, this._ssaoTexture.width, this._ssaoTexture.height);
 
         // render states
         this._renderStates.apply();
@@ -361,13 +397,13 @@ export class PostProcessor {
         // this.setTexture(this._compositeSSAOProgram.getUniformLocation("s_sceneColor"), this._sceneColorTexUnit, sourceImage);
         gl.uniform1i(this._ssaoBlurProgram.getUniformLocation("s_sceneDepth"), this._sceneDepthTexUnit);
         gl.uniform1i(this._ssaoBlurProgram.getUniformLocation("s_sceneNormal"), this._sceneNormalTexUnit);
-        this.setTexture(this._ssaoBlurProgram.getUniformLocation("s_aoTex"), this._customTexStartUnit, this._tempResultHalfTexture);
+        this.setTexture(this._ssaoBlurProgram.getUniformLocation("s_aoTex"), this._customTexStartUnit, this._ssaoTexture);
         // this._samplerUniformsSSAOComposite.setTexture("s_aoTex", this._tempResultHalfTexture);
 
         // todo: uniforms
         // uniform float u_offset;
-        texelW = 1.0 / this._tempResultHalfTexture.width;
-        texelH = 1.0 / this._tempResultHalfTexture.height;
+        texelW = 1.0 / this._ssaoTexture.width;
+        texelH = 1.0 / this._ssaoTexture.height;
         gl.uniform2f(this._ssaoBlurProgram.getUniformLocation("u_offset"), this.ssao.blurSize * texelW, this.ssao.blurSize * texelH);
 
         // uniform float u_intensity;
@@ -383,9 +419,13 @@ export class PostProcessor {
         GLTextures.setTextureAt(this._customTexStartUnit, null);
     }
 
-    applySSR() {
+    private generateSSR() {
         // todo: need prev frame image
         // throw new Error("Method not implemented.");
+    }
+
+    private composite() {
+        // todo: composite ssr, fog... to rendertarget
     }
 
     private applyToneMapping() {

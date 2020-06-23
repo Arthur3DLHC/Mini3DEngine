@@ -1,5 +1,5 @@
 /**
- * combine ssao with scene image
+ * multiply ssao with scene image
  * upsample and do a 2d bilateral blur
  */
 export default /** glsl */`
