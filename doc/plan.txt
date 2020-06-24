@@ -260,9 +260,16 @@ TODO:       主要类结构
                 SSR
                     需要保留上一帧画面和速度图？
                         在 DepthPrepass 时生成速度图？
-                        上一帧画面必须是应用了Bloom 和 Tonemapping 之前的；但是包括SSAO, SSR, Fog, 半透明
+                        上一帧画面必须是应用了Bloom 和 Tonemapping 之前的；但是包括SSAO, SSR，Fog，半透明；
+                        半透明只能在前三个特效完成之后绘制；
                     无法使用屏幕空间反射的像素，使用该像素所属 Cluster 的环境反射贴图？
                         将环境反射贴图的操作推迟到这步后期中进行？
+                    组合结果 Pass：
+                        以本帧画面，SSR 画面为输入，做雾效，组合，
+                        
+            最终输出：
+                做 Bloom 和 Tone mapping，向主屏幕输出
+
 
             半透明物体的绘制？
 
