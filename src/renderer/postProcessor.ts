@@ -155,6 +155,7 @@ export class PostProcessor {
         this._renderStates.depthState = RenderStateCache.instance.getDepthStencilState(false, false, GLDevice.gl.ALWAYS);
 
         this._ssaoBlurBlendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.DST_COLOR, GLDevice.gl.ZERO);
+        this._compositeBlendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
 
         this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
 
@@ -214,6 +215,7 @@ export class PostProcessor {
 
     private _renderStates: RenderStateSet;
     private _ssaoBlurBlendState: BlendState;
+    private _compositeBlendState: BlendState;
 
     private _rectGeom: PlaneGeometry;
 
@@ -379,7 +381,7 @@ export class PostProcessor {
         this.setTexture(this._ssaoBlurProgram.getUniformLocation("s_aoTex"), this._customTexStartUnit, this._ssaoTexture);
         // this._samplerUniformsSSAOComposite.setTexture("s_aoTex", this._tempResultHalfTexture);
 
-        // todo: uniforms
+        // uniforms
         // uniform float u_offset;
         texelW = 1.0 / this._ssaoTexture.width;
         texelH = 1.0 / this._ssaoTexture.height;
@@ -439,9 +441,27 @@ export class PostProcessor {
     }
 
     private composite() {
+        const gl = GLDevice.gl;
         // todo: composite ssr, fog... to rendertarget
         // blur ssr use a bilateral filter
         GLDevice.renderTarget = this._postProcessFBO;
+
+        // fix me: support camera viewport?
+
+        gl.viewport(0, 0, this._sceneDepthTexture.width, this._sceneDepthTexture.height);
+        gl.scissor(0, 0, this._sceneDepthTexture.width, this._sceneDepthTexture.height);
+
+        GLRenderStates.setBlendState(this._compositeBlendState);
+
+        GLPrograms.useProgram(this._compositeProgram);
+
+        // todo: textures
+
+        // todo: uniforms
+
+        this._rectGeom.draw(0, Infinity, this._compositeProgram.attributes);
+
+        // todo: clear textures;
     }
 
     private applyToneMapping() {

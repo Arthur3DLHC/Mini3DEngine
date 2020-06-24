@@ -12,7 +12,7 @@ export default /** glsl */`
 
 // samplers
 #include <samplers_postprocess>
-uniform sampler2D s_aoTex;          // for specular occlusion
+uniform sampler2D s_aoTex;          // for specular occlusion, will be blurred
 uniform sampler2D s_reflTex;        // ssr result texture, will be blurred
 
 #include <function_depth>
@@ -47,7 +47,7 @@ void main(void) {
     // kernel[3] = kernel[5] = 0.15;
     // kernel[4] = 0.16;
 
-    vec3 sumColor = vec3(0.0);
+    vec4 sumColor = vec4(0.0);
     float sumWeight = 0.0;
     float epsilon = 0.001;
 
@@ -62,19 +62,18 @@ void main(void) {
             int kj = kernelIdx[j];
             float weight = kernel[ki][kj];
             weight *= clamp(1.0 / (epsilon + abs(d - centerDepth)), 0.0, 100.0);
-            sumColor += texture(s_aoTex, uv).rgb * weight;
+            
+            float ao = texture(s_aoTex, uv).r;
+            vec4 refl = texture(s_reflTex, uv);
+            sumColor += refl * ao * weight;
             sumWeight += weight;
         }
     }
 
     sumColor /= sumWeight;
-    sumColor = vec3(1.0) - sumColor;    // invert
-    sumColor = pow(abs(sumColor), vec3(u_power));  // sharppen
-    sumColor = clamp(vec3(1.0) - sumColor * u_intensity, vec3(0.0), vec3(1.0));  // contrast and invert back
 
-    // 改为用 alpha 混合实现与场景画面相乘了
-    // vec3 sourceColor = texture(s_sceneColor, ex_texcoord).rgb;
-    o_color = vec4(sumColor, 1.0);
+    // alpha blend
+    o_color = sumColor;
 
     // debug
     // o_color = texture(s_aoTex, ex_texcoord);
