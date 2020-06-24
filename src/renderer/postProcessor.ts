@@ -399,12 +399,40 @@ export class PostProcessor {
     }
 
     private generateSSR() {
-        // todo: need prev frame image
+        const gl = GLDevice.gl;
+        
+        GLDevice.renderTarget = this._ssrFBO;
+        gl.viewport(0, 0, this._ssaoTexture.width, this._ssaoTexture.height);
+        gl.scissor(0, 0, this._ssaoTexture.width, this._ssaoTexture.height);
+
+        // render states
+        this._renderStates.apply();
+
+        GLPrograms.useProgram(this._ssrProgram);
+
+        // texture samplers
+        // prev frame image
+        GLTextures.setTextureAt(this._sceneColorTexUnit, this._prevFrame);
+        gl.uniform1i(this._ssrProgram.getUniformLocation("s_sceneColor"), this._sceneColorTexUnit);
+        gl.uniform1i(this._ssrProgram.getUniformLocation("s_sceneDepth"), this._sceneDepthTexUnit);
+        gl.uniform1i(this._ssrProgram.getUniformLocation("s_sceneNormal"), this._sceneNormalTexUnit);
+        gl.uniform1i(this._ssrProgram.getUniformLocation("s_sceneSpecRough"), this._sceneSpecRoughTexUnit);
+
+        // uniforms
+        // all uniform values are inited in glsl code
+        // nothing to pass in?
+        this._rectGeom.draw(0, Infinity, this._ssrProgram.attributes);
+
+        // clear textures
+        GLTextures.setTextureAt(this._sceneColorTexUnit, null);
+
         // throw new Error("Method not implemented.");
     }
 
     private composite() {
         // todo: composite ssr, fog... to rendertarget
+        // blur ssr use a bilateral filter
+        GLDevice.renderTarget = this._postProcessFBO;
     }
 
     private applyToneMapping() {

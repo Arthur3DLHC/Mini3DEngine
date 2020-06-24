@@ -281,6 +281,7 @@ void main(void) {
     // vec4 color = decodeHDR(texture2DLodEXT(sourceTexture, hitPixel, clamp(dist / maxRayDistance, 0.0, 1.0) * maxMipmapLevel));
 
     if (!intersect) {
+        // todo: sample cubemaps in cluster
         discard;
     }
     vec4 color = texture(s_sceneColor, hitPixel);
