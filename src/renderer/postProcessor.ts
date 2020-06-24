@@ -420,7 +420,16 @@ export class PostProcessor {
 
         // uniforms
         // all uniform values are inited in glsl code
-        // nothing to pass in?
+        gl.uniform1f(this._ssrProgram.getUniformLocation("maxRayDistance"), this.ssr.maxRayDistance);
+        gl.uniform1f(this._ssrProgram.getUniformLocation("pixelStride"), this.ssr.pixelStride);
+        gl.uniform1f(this._ssrProgram.getUniformLocation("pixelStrideZCutoff"), this.ssr.pixelStrideZCutoff);
+        gl.uniform1f(this._ssrProgram.getUniformLocation("screenEdgeFadeStart"), this.ssr.screenEdgeFadeStart);
+        gl.uniform1f(this._ssrProgram.getUniformLocation("eyeFadeStart"), this.ssr.eyeFadeStart);
+        gl.uniform1f(this._ssrProgram.getUniformLocation("eyeFadeEnd"), this.ssr.eyeFadeEnd);
+        gl.uniform1f(this._ssrProgram.getUniformLocation("minGlossiness"), this.ssr.minGlossiness);
+        gl.uniform1f(this._ssrProgram.getUniformLocation("zThicknessThreshold"), this.ssr.zThicknessThreshold);
+        gl.uniform1f(this._ssrProgram.getUniformLocation("jitterOffset"), this.ssr.jitterOffset);
+
         this._rectGeom.draw(0, Infinity, this._ssrProgram.attributes);
 
         // clear textures

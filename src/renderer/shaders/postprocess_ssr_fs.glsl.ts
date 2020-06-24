@@ -17,10 +17,10 @@ export default /** glsl */`
 // todo: uniforms
 // in es 300, we can init the default value in code and it's very convenient
 // gl will assign these values at link time
-uniform float maxRayDistance = 4;
+uniform float maxRayDistance = 4.0;
 
-uniform float pixelStride = 16;
-uniform float pixelStrideZCutoff = 10; // ray origin Z at this distance will have a pixel stride of 1.0
+uniform float pixelStride = 16.0;
+uniform float pixelStrideZCutoff = 10.0; // ray origin Z at this distance will have a pixel stride of 1.0
 
 uniform float screenEdgeFadeStart = 0.9; // distance to screen edge that ray hits will start to fade (0.0 -> 1.0)
 
@@ -29,7 +29,7 @@ uniform float eyeFadeEnd = 0.8; // ray direction's Z that ray hits will be cut (
 
 uniform float minGlossiness = 0.2; // Object larger than minGlossiness will have ssr effect
 uniform float zThicknessThreshold = 0.1;
-uniform float jitterOffset = 0;
+uniform float jitterOffset = 0.0;
 
 // uniform float nearZ;
 // uniform vec2 viewportSize: VIEWPORT_SIZE;
