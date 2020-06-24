@@ -5,6 +5,7 @@ export default /** glsl */`
 uniform sampler2D s_sceneColor;
 uniform sampler2D s_sceneDepth;
 uniform sampler2D s_sceneNormal;
+uniform sampler2D s_sceneSpecRough;     // rgb: specular color (for metals) a: roughness
 
 vec3 getSceneNormal(vec2 screenUV) {
     // normal tex format is RG_F16, no need to * 2 - 1
