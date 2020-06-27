@@ -72,6 +72,11 @@ void main(void) {
 
     sumColor /= sumWeight;
 
+    // todo: select cubemaps by pixel position
+    // todo: sample cubemap miplevels by pixel roughness and normal
+    // todo: blend cubemap with ssr color, by ssr alpha
+    // todo: output reflection color, calc alpha by fresnel and reflection color?
+
     // alpha blend
     o_color = sumColor;
 
