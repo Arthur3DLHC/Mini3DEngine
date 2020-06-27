@@ -26,6 +26,7 @@ import { GLRenderStates } from "../WebGLResources/glRenderStates.js";
 import { GLUniformBuffers } from "../WebGLResources/glUnifomBuffers.js";
 import { ClusteredForwardRenderContext } from "./clusteredForwardRenderContext.js";
 import { SSRParams } from "./postprocess/ssrParams.js";
+import vec4 from "../../lib/tsm/vec4.js";
 
 /**
  * all post processes supported
@@ -91,6 +92,8 @@ export class PostProcessor {
 
         context.bindUniformBlocks(this._ssaoProgram);
         context.bindUniformBlocks(this._ssaoBlurProgram);
+        context.bindUniformBlocks(this._ssrProgram);
+        context.bindUniformBlocks(this._compositeProgram);
         context.bindUniformBlocks(this._toneMappingProgram);
 
         // this._samplerUniformsSSAO = new SamplerUniforms(this._ssaoProgram);
@@ -407,6 +410,9 @@ export class PostProcessor {
         gl.viewport(0, 0, this._ssaoTexture.width, this._ssaoTexture.height);
         gl.scissor(0, 0, this._ssaoTexture.width, this._ssaoTexture.height);
 
+        GLDevice.clearColor = new vec4([0, 0, 0, 0]);
+        GLDevice.clear(true, false, false);
+
         // render states
         this._renderStates.apply();
 
@@ -455,13 +461,23 @@ export class PostProcessor {
 
         GLPrograms.useProgram(this._compositeProgram);
 
-        // todo: textures
+        // textures
+        const aoUnit = this._customTexStartUnit;
+        const reflUnit = this._customTexStartUnit + 1;
 
-        // todo: uniforms
+        this.setTexture(this._compositeProgram.getUniformLocation("s_aoTex"), aoUnit, this._ssaoTexture);
+        this.setTexture(this._compositeProgram.getUniformLocation("s_reflTex"), reflUnit, this._ssrTexture);
+
+        // uniforms
+        const texelW = 1.0 / this._ssrTexture.width;
+        const texelH = 1.0 / this._ssrTexture.height;
+        gl.uniform2f(this._compositeProgram.getUniformLocation("u_offset"), this.ssr.blurSize * texelW, this.ssr.blurSize * texelH);
 
         this._rectGeom.draw(0, Infinity, this._compositeProgram.attributes);
 
-        // todo: clear textures;
+        // clear textures;
+        GLTextures.setTextureAt(aoUnit, null);
+        GLTextures.setTextureAt(reflUnit, null);
     }
 
     private applyToneMapping() {

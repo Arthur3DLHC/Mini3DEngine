@@ -13,4 +13,6 @@ export class SSRParams {
     public minGlossiness: number = 0.2;
     public zThicknessThreshold: number = 0.1;
     public jitterOffset: number = 0;
+
+    public blurSize: number = 1;
 }

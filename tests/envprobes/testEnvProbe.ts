@@ -116,31 +116,31 @@ window.onload = () => {
     matPlaneRot.setIdentity();
     matPlaneTran.fromTranslation(new vec3([0, -2, 0]));
     
-    addPlane("floor", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), scene);
+    addPlane("floor", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), 0.5, 0.5, scene);
 
     // ceiling
     matPlaneRot.fromZRotation(Math.PI);
     matPlaneTran.fromTranslation(new vec3([0, 2, 0]));
 
-    addPlane("ceiling", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), scene);
+    addPlane("ceiling", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), 0.05, 0.8, scene);
 
     // back wall
     matPlaneRot.fromXRotation(Math.PI * 0.5);
     matPlaneTran.fromTranslation(new vec3([0, 0, -2]));
 
-    addPlane("backWall", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), scene);
+    addPlane("backWall", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), 0.05, 0.8, scene);
 
     // left wall
     matPlaneRot.fromZRotation(-Math.PI * 0.5);
     matPlaneTran.fromTranslation(new vec3([-2, 0, 0]));
 
-    addPlane("leftWall", matPlaneTran, matPlaneRot, new vec4([1.0, 0.0, 0.0, 1.0]), scene);
+    addPlane("leftWall", matPlaneTran, matPlaneRot, new vec4([1.0, 0.0, 0.0, 1.0]), 0.05, 0.8, scene);
 
     // right wall
     matPlaneRot.fromZRotation(Math.PI * 0.5);
     matPlaneTran.fromTranslation(new vec3([2, 0, 0]));
     
-    addPlane("rightWall", matPlaneTran, matPlaneRot, new vec4([0.0, 1.0, 0.0, 1.0]), scene);
+    addPlane("rightWall", matPlaneTran, matPlaneRot, new vec4([0.0, 1.0, 0.0, 1.0]), 0.05, 0.8, scene);
 
     // add some lights
     // todo: test point light shadow
@@ -205,7 +205,7 @@ function addEnvProbe(name: string, size: number, position: vec3, scene: Scene) {
     scene.attachChild(probe);
 }
 
-function addPlane(name: string, matPlaneTran: mat4, matPlaneRot: mat4, wallColor: vec4, scene: Scene) {
+function addPlane(name: string, matPlaneTran: mat4, matPlaneRot: mat4, wallColor: vec4, metallic: number, roughness: number, scene: Scene) {
     const planeMesh = new Mesh();
     planeMesh.name = name;
     mat4.product(matPlaneTran, matPlaneRot, planeMesh.localTransform);
@@ -214,8 +214,8 @@ function addPlane(name: string, matPlaneTran: mat4, matPlaneRot: mat4, wallColor
     planeMesh.isStatic = true;
     const planeMtl = new StandardPBRMaterial();
     planeMtl.color = wallColor.copy();
-    planeMtl.metallic = 0.05;
-    planeMtl.roughness = 0.8;
+    planeMtl.metallic = metallic;// 0.05;
+    planeMtl.roughness = roughness;// 0.8;
     planeMesh.materials.push(planeMtl);
     scene.attachChild(planeMesh);
 }

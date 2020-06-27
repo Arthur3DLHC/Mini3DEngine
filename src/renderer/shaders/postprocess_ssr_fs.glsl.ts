@@ -8,8 +8,8 @@
  */
 export default /** glsl */`
 
-#define MAX_ITERATION 20;
-#define MAX_BINARY_SEARCH_ITERATION 5;
+#define MAX_ITERATION 20
+#define MAX_BINARY_SEARCH_ITERATION 5
 
 #include <uniforms_view>
 #include <samplers_postprocess>     // s_sceneColor contains prev frame image
@@ -17,19 +17,19 @@ export default /** glsl */`
 // todo: uniforms
 // in es 300, we can init the default value in code and it's very convenient
 // gl will assign these values at link time
-uniform float maxRayDistance = 4.0;
+uniform float maxRayDistance;
 
-uniform float pixelStride = 16.0;
-uniform float pixelStrideZCutoff = 10.0; // ray origin Z at this distance will have a pixel stride of 1.0
+uniform float pixelStride;
+uniform float pixelStrideZCutoff; // ray origin Z at this distance will have a pixel stride of 1.0
 
-uniform float screenEdgeFadeStart = 0.9; // distance to screen edge that ray hits will start to fade (0.0 -> 1.0)
+uniform float screenEdgeFadeStart; // distance to screen edge that ray hits will start to fade (0.0 -> 1.0)
 
-uniform float eyeFadeStart  = 0.4; // ray direction's Z that ray hits will start to fade (0.0 -> 1.0)
-uniform float eyeFadeEnd = 0.8; // ray direction's Z that ray hits will be cut (0.0 -> 1.0)
+uniform float eyeFadeStart; // ray direction's Z that ray hits will start to fade (0.0 -> 1.0)
+uniform float eyeFadeEnd; // ray direction's Z that ray hits will be cut (0.0 -> 1.0)
 
-uniform float minGlossiness = 0.2; // Object larger than minGlossiness will have ssr effect
-uniform float zThicknessThreshold = 0.1;
-uniform float jitterOffset = 0.0;
+uniform float minGlossiness; // Object larger than minGlossiness will have ssr effect
+uniform float zThicknessThreshold;
+uniform float jitterOffset;
 
 // uniform float nearZ;
 // uniform vec2 viewportSize: VIEWPORT_SIZE;
@@ -51,7 +51,7 @@ bool rayIntersectDepth(float rayZNear, float rayZFar, vec2 hitPixel)
     {
         float t = rayZFar; rayZFar = rayZNear; rayZNear = t;
     }
-    float cameraZ = perspectiveDepthToViewZ(texture(s_sceneDepth, hitPixel).r);
+    float cameraZ = perspectiveDepthToViewZ(texture(s_sceneDepth, hitPixel).r, u_view.zRange.x, u_view.zRange.y);
     // float cameraBackZ = linearDepth(fetchDepth(backDepthTex, hitPixel));
     // Cross z
     return rayZFar <= cameraZ && rayZNear >= cameraZ - zThicknessThreshold;
@@ -285,7 +285,8 @@ void main(void) {
         discard;
     }
     vec4 color = texture(s_sceneColor, hitPixel);
-    o_color = vec4(color, alpha);
+    color.a = alpha;
+    o_color = color;
 }
 
 `;
