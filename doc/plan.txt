@@ -262,10 +262,17 @@ TODO:       主要类结构
                         在 DepthPrepass 时生成速度图？
                         上一帧画面必须是应用了Bloom 和 Tonemapping 之前的；但是包括SSAO, SSR，Fog，半透明；
                         半透明只能在前三个特效完成之后绘制；
-                    无法使用屏幕空间反射的像素，使用该像素所属 Cluster 的环境反射贴图？
-                        将环境反射贴图的操作推迟到这步后期中进行？
+                    对比两种 SSR 的 shader 的效果
+                        Unity 5 的
+                        Babylon.js 中的http://imanolfotia.com/blog/update/2017/03/11/ScreenSpaceReflections.html
+                        调整 SSR 的不透明度：视角系数和屏幕边界系数
                     组合结果 Pass：
                         以本帧画面，SSR 画面为输入，做雾效，组合，
+                    无法使用屏幕空间反射的像素，使用该像素所属 Cluster 的环境反射贴图？
+                        将环境反射贴图的操作推迟到这步后期中进行？不放到 SSR shader 中，避免 cubemap 反射结果被模糊？
+                        需要传入法线，镜面反射和粗糙度贴图
+                        根据 SSR 结果图的 alpha 通道混合 SSR 结果颜色和 cubemap 反射颜色
+                        根据视线与法线夹角、镜面反射颜色，求菲涅尔强度计算反射的整体混合系数？
                         
             最终输出：
                 做 Bloom 和 Tone mapping，向主屏幕输出
