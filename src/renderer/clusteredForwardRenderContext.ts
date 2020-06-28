@@ -128,6 +128,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         const matIdentity = mat4.identity;
         this._ubView.addMat4("matView", matIdentity);
         this._ubView.addMat4("matProj", matIdentity);
+        this._ubView.addMat4("matInvView", matIdentity);
         this._ubView.addMat4("matInvProj", matIdentity);
         this._ubView.addMat4("matViewProjPrev", matIdentity);
         this._ubView.addVec4("viewport", new vec4());
@@ -368,13 +369,16 @@ export class ClusteredForwardRenderContext extends RenderContext {
                                     irrvols: boolean = true,
                                     useClusters: boolean = false) {
 
+        let invView: mat4 = camera.viewTransform.copy();
         let invProj: mat4 = camera.projTransform.copy();
+        invView.inverse();
         invProj.inverse();
 
         // todo: fill view and proj matrix
         this._ubView.setMat4("matView", camera.viewTransform);
 
         this._ubView.setMat4("matProj", camera.projTransform);
+        this._ubView.setMat4("matInvView", invView);
         this._ubView.setMat4("matInvProj", invProj);
 
         this._ubView.setMat4("matViewProjPrev", camera.viewTransformPrev);

@@ -3,6 +3,7 @@
  */
 export default /** glsl */`
 
+#include <uniforms_scene>
 #include <uniforms_view>
 
 // uniforms
@@ -11,11 +12,16 @@ uniform vec2 u_offset;
 // uniform float u_power;
 
 // samplers
+#include <samplers_scene>
 #include <samplers_postprocess>
 uniform sampler2D s_aoTex;          // for specular occlusion, will be blurred
 uniform sampler2D s_reflTex;        // ssr result texture, will be blurred
 
+#include <function_get_items>
+#include <function_cluster>
 #include <function_depth>
+#include <function_ibl>
+
 float getLinearDepth(vec2 scrUV) {
     // now only have perspective camera
     float fragDepth = texture(s_sceneDepth, scrUV).r;
@@ -72,11 +78,75 @@ void main(void) {
 
     sumColor /= sumWeight;
 
-    // todo: select cubemaps by pixel position
-    // todo: sample cubemap miplevels by pixel roughness and normal
-    // todo: blend cubemap with ssr color, by ssr alpha
-    // todo: output reflection color, calc alpha by fresnel and reflection color?
+    if(sumColor.a < 0.95) {
+        // todo: calculate pixel world position
+        // NDC
+        vec4 projectedPos = vec4(ex_texcoord * 2.0 - 1.0, texture(s_sceneDepth, ex_texcoord).r * 2.0 - 1.0, 1.0);
+        uint cluster = clusterOfPixel(projectedPos);
+        // Position in view
+        vec4 viewPos = u_view.matInvProj * projectedPos;
+        // todo: handle orthographic
+        viewPos /= viewPos.w;
 
+        vec3 worldPos = (u_view.matInvView * viewPos).xyz;
+
+        // todo: f0 and roughness
+
+
+        // todo: select cubemaps by pixel position
+        uint envmapStart = 0u;
+        uint envmapCount = 0u;
+
+        getEnvProbeIndicesInCluster(cluster, envmapStart, envmapCount);
+
+        // todo: calculate world space reflection vector
+        vec3 v = normalize((u_view.matInvView * vec4(viewPos, 0.0)).xyz);    // world space
+        vec3 n = getSceneNormal(ex_texcoord);       // world space
+        vec3 reflV = reflect(v, n);
+        float NdotV = dot(n, v);
+
+        vec4 specRough = texture(s_sceneSpecRough, ex_texcoord);
+        vec3 f0 = specRough.rgb;
+        float roughness = specRough.a;
+        
+        // todo: only calculate specular reflection here.
+        vec3 iblSpecular = vec3(0.0);
+        float totalWeight = 0.0;
+
+        for (uint i = envmapStart; i < envmapStart + envmapCount; i++) {
+            uint probeIdx = getItemIndexAt(i);
+            EnvProbe probe = u_envProbes.probes[probeIdx];
+
+            // blend by distance to envprobe center position
+            // should also add radius weight: the smaller the probe, the stronger the weight.
+            // https://www.xmswiki.com/wiki/SMS:Inverse_Distance_Weighted_Interpolation
+            float dist = length(probe.position - worldPos) + 0.1;
+            float distxradius = dist * probe.radius;
+            float weight = 1.0 / (distxradius * distxradius);
+
+            int layer = int(i - envmapStart);
+            
+            // IBL specular part
+            vec3 ld = textureCubeArrayLod(s_envMapArray, reflV, layer, roughness * MAX_SPECULAR_MIP_LEVEL).rgb;
+            vec2 dfg = texture(s_specularDFG, vec2(NdotV, roughness)).rg;
+            iblSpecular += ld * (f0 * dfg.x + dfg.y) * weight;
+            // vec4 envmap = textureCubeArray(s_envMapArray, reflV, int(i - envmapStart));
+            // reflection += envmap.rgb * weight;
+            
+            totalWeight += weight;
+
+            // todo: sample different levels and filter by roughness
+        }
+        // debug output envmap
+        if (totalWeight > 0.0) {
+            iblSpecular /= totalWeight;
+
+            // todo: blend cubemap with ssr color, by ssr alpha
+            sumColor.rgb = mix(iblSpecular, sumColor.rgb, sumColor.a);
+        }
+    }
+
+    // todo: calc total alpha by fresnel and reflection color?
     // alpha blend
     o_color = sumColor;
 

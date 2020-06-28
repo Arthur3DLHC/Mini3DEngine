@@ -11,6 +11,7 @@ export default /** glsl */`
     {
         mat4 matView;
         mat4 matProj;
+        mat4 matInvView;
         mat4 matInvProj;
         mat4 matViewProjPrev;
         vec4 viewport;          // x, y, width, height

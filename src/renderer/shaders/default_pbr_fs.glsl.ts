@@ -192,10 +192,10 @@ void main(void)
     // float cubeUVScale = 1.0 / 6.0;
 
     vec3 iblDiffuse = vec3(0.0);
-    // reflection vector, in world space
-    vec3 reflV = reflect(-v, n);
-    vec3 iblSpecular = vec3(0.0);
+    // vec3 iblSpecular = vec3(0.0);
     float totalWeight = 0.0;
+    // reflection vector, in world space
+    // vec3 reflV = reflect(-v, n);
 
     getEnvProbeIndicesInCluster(cluster, envmapStart, envmapCount);
     for (uint i = envmapStart; i < envmapStart + envmapCount; i++) {
@@ -209,34 +209,23 @@ void main(void)
         float distxradius = dist * probe.radius;
         float weight = 1.0 / (distxradius * distxradius);
 
-        // todo: calc cubemap texcoord
-        // int faceId = 0;
-        // vec3 cubeTexCoord = vec3(getCubemapTexcoord(reflV, faceId), float(i - envmapStart));
-        
-        // cubeTexCoord.x = cubeTexCoord.x * cubeUVScale + float(faceId) * cubeUVScale;
-
-        // sample envmap, 
-        // vec4 envmap = texture(s_envMapArray, cubeTexCoord);
         // IBL diffuse part
         int layer = int(i - envmapStart);
         iblDiffuse += getIBLRadianceLambertian(s_envMapArray, layer, n, albedoColor) * weight;
         
-        // todo: IBL specular part
-        vec3 ld = textureCubeArrayLod(s_envMapArray, reflV, layer, roughness * MAX_SPECULAR_MIP_LEVEL).rgb;
-        vec2 dfg = texture(s_specularDFG, vec2(NdotV, roughness)).rg;
-        iblSpecular += ld * (f0 * dfg.x + dfg.y) * weight;
-        // vec4 envmap = textureCubeArray(s_envMapArray, reflV, int(i - envmapStart));
-        // reflection += envmap.rgb * weight;
+        // IBL specular part
+        // modified: sample specular part in ssr composition pass, not here
+        // vec3 ld = textureCubeArrayLod(s_envMapArray, reflV, layer, roughness * MAX_SPECULAR_MIP_LEVEL).rgb;
+        // vec2 dfg = texture(s_specularDFG, vec2(NdotV, roughness)).rg;
+        // iblSpecular += ld * (f0 * dfg.x + dfg.y) * weight;
         
         totalWeight += weight;
-
-        // todo: sample different levels and filter by roughness
     }
-    // debug output envmap
     if (totalWeight > 0.0) {
+        // debug output envmap
         // o.color.rgb += reflection * 0.5 / totalWeight;
         f_diffuse += iblDiffuse / totalWeight;
-        f_specular += iblSpecular / totalWeight;
+        // f_specular += iblSpecular / totalWeight;
     }
     // todo: opacity for transparent surfaces;
     // todo: tone mapping? linear space to sRGB space?

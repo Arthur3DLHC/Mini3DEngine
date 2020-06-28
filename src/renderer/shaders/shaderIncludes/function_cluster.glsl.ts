@@ -2,9 +2,8 @@
  * cluster relative functions
  */
 export default /** glsl */`
-    // todo: get cluster index from pixel H position
-    uint clusterOfPixel(vec4 hPosition) {
-        // need to divide by w?
+    // todo: get cluster index from pixel NDC position (already divide by w?)
+    uint clusterOfPixel(vec4 NDCPosition) {
         // todo: use u_view.clusterRes
         return 0u;
     }
