@@ -264,8 +264,10 @@ TODO:       主要类结构
                         半透明只能在前三个特效完成之后绘制；
                     对比两种 SSR 的 shader 的效果
                         Unity 5 的
+                            优化更好一些
                         Babylon.js 中的http://imanolfotia.com/blog/update/2017/03/11/ScreenSpaceReflections.html
-                        调整 SSR 的不透明度：视角系数和屏幕边界系数
+                            比较好理解一些，而且根据表面粗糙度对取样方向加了一个扰动；
+                        调整 SSR 的不透明度：只使用视角系数和屏幕边界系数，不考虑材质 specular
                     组合结果 Pass：
                         以本帧画面，SSR 画面为输入，做雾效，组合，
                     无法使用屏幕空间反射的像素，使用该像素所属 Cluster 的环境反射贴图？
