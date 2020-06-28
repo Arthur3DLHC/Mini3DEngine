@@ -33,7 +33,7 @@ import vec4 from "../../lib/tsm/vec4.js";
  */
 export class PostProcessor {
 
-    public constructor(context: ClusteredForwardRenderContext, sceneDepthTex: Texture2D, sceneNormalTex: Texture2D, specRoughTex: Texture2D) {
+    public constructor(context: ClusteredForwardRenderContext, sceneDepthTex: Texture2D, sceneNormalTex: Texture2D, specRoughTex: Texture2D, envmapArrayUnit: number, specDFGUnit: number) {
         // register shader codes
         if (GLPrograms.shaderCodes["fullscreen_rect_vs"] === undefined) {
             GLPrograms.shaderCodes["fullscreen_rect_vs"] = fullscreen_rect_vs;
@@ -57,6 +57,9 @@ export class PostProcessor {
         if (GLPrograms.shaderCodes["samplers_postprocess"] === undefined) {
             GLPrograms.shaderCodes["samplers_postprocess"] = samplers_postprocess;
         }
+
+        this._envMapArrayUnit = envmapArrayUnit;
+        this._specularDFGUnit = specDFGUnit;
 
         // create shaders
         this._ssaoProgram = new ShaderProgram();
@@ -158,7 +161,7 @@ export class PostProcessor {
         this._renderStates.depthState = RenderStateCache.instance.getDepthStencilState(false, false, GLDevice.gl.ALWAYS);
 
         this._ssaoBlurBlendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.DST_COLOR, GLDevice.gl.ZERO);
-        this._compositeBlendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+        this._compositeBlendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
 
         this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
 
@@ -227,6 +230,8 @@ export class PostProcessor {
     private _sceneNormalTexture: Texture2D;
     private _sceneSpecRoughTexture: Texture2D;
 
+    private _envMapArrayUnit: number = 0;
+    private _specularDFGUnit: number = 0;
     private _sceneColorTexUnit: number = 0;
     private _sceneDepthTexUnit: number = 0;
     private _sceneNormalTexUnit: number = 0;
@@ -467,6 +472,12 @@ export class PostProcessor {
 
         this.setTexture(this._compositeProgram.getUniformLocation("s_aoTex"), aoUnit, this._ssaoTexture);
         this.setTexture(this._compositeProgram.getUniformLocation("s_reflTex"), reflUnit, this._ssrTexture);
+
+        gl.uniform1i(this._compositeProgram.getUniformLocation("s_envMapArray"), this._envMapArrayUnit);
+        gl.uniform1i(this._compositeProgram.getUniformLocation("s_specularDFG"), this._specularDFGUnit);
+        gl.uniform1i(this._compositeProgram.getUniformLocation("s_sceneDepth"), this._sceneDepthTexUnit);
+        gl.uniform1i(this._compositeProgram.getUniformLocation("s_sceneNormal"), this._sceneNormalTexUnit);
+        gl.uniform1i(this._compositeProgram.getUniformLocation("s_sceneSpecRough"), this._sceneSpecRoughTexUnit);
 
         // uniforms
         const texelW = 1.0 / this._ssrTexture.width;

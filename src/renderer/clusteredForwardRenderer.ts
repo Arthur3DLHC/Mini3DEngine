@@ -285,7 +285,9 @@ export class ClusteredForwardRenderer {
 
         this._frustum = new Frustum();
 
-        this._postprocessor = new PostProcessor(this._renderContext, this._sceneDepthTexture, this._sceneNormalTexture, this._sceneSpecularRoughnessTexture);
+        this._postprocessor = new PostProcessor(this._renderContext,
+            this._sceneDepthTexture, this._sceneNormalTexture, this._sceneSpecularRoughnessTexture,
+            this._envMapArrayUnit, this._specularDFGUnit);
     }
 
     private _renderListDepthPrepass: RenderList;

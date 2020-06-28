@@ -36,7 +36,10 @@ layout(location = 0) out vec4 o_color;
 void main(void) {
     // hardcode the gaussian blur weights for left top 3x3 kernels of a 5x5 kernel matrix
     // because the weights are symmertrical
-        mat3 kernel = mat3(
+    o_color = vec4(1.0, 0.0, 0.0, 1.0);
+    return;
+
+    mat3 kernel = mat3(
         0.003765, 0.015019, 0.023792,
         0.015019, 0.059912, 0.094907,
         0.023792, 0.094907, 0.150342
@@ -145,11 +148,17 @@ void main(void) {
             // todo: blend cubemap with ssr color, by ssr alpha
             sumColor.rgb = mix(iblSpecular, sumColor.rgb, sumColor.a);
         }
-        // sumColor.rgb = n * 0.5 + vec3(0.5);
+        sumColor.rgb = n * 0.5 + vec3(0.5);
     }
-    sumColor.a = 1.0;
+
+    // todo: calc total alpha by fresnel and reflection color?
+    // alpha blend
+    // sumColor.a = 1.0;   // debug
+    sumColor = vec4(1.0, 0.0, 0.0, 1.0);
     o_color = sumColor;
-    // o_color = vec4(1.0, 0.0, 0.0, 1.0);
+
+    // debug
+    // o_color = texture(s_aoTex, ex_texcoord);
 }
 
 `;
