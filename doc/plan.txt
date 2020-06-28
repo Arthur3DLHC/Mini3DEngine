@@ -264,7 +264,7 @@ TODO:       主要类结构
                         半透明只能在前三个特效完成之后绘制；
                     对比两种 SSR 的 shader 的效果
                         Unity 5 的
-                            优化更好一些
+                            优化更好一些，但是不太科学；使用的 roughness 计算反射的强度
                         Babylon.js 中的http://imanolfotia.com/blog/update/2017/03/11/ScreenSpaceReflections.html
                             比较好理解一些，而且根据表面粗糙度对取样方向加了一个扰动；
                         调整 SSR 的不透明度：只使用视角系数和屏幕边界系数，不考虑材质 specular

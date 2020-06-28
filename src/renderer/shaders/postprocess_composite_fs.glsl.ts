@@ -78,6 +78,10 @@ void main(void) {
 
     sumColor /= sumWeight;
 
+    vec4 specRough = texture(s_sceneSpecRough, ex_texcoord);
+    vec3 f0 = specRough.rgb;
+    float roughness = specRough.a;
+
     if(sumColor.a < 0.95) {
         // todo: calculate pixel world position
         // NDC
@@ -105,10 +109,7 @@ void main(void) {
         vec3 reflV = reflect(v, n);
         float NdotV = dot(n, v);
 
-        vec4 specRough = texture(s_sceneSpecRough, ex_texcoord);
-        vec3 f0 = specRough.rgb;
-        float roughness = specRough.a;
-        
+       
         // todo: only calculate specular reflection here.
         vec3 iblSpecular = vec3(0.0);
         float totalWeight = 0.0;
@@ -147,7 +148,7 @@ void main(void) {
         }
         // sumColor.rgb = n * 0.5 + vec3(0.5);
     }
-    sumColor.a = 1.0;
+    sumColor.a = (f0.r + f0.g + f0.b) * 0.33333;
     o_color = sumColor;
     // o_color = vec4(1.0, 0.0, 0.0, 1.0);
 }

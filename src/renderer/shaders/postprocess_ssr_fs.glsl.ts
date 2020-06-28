@@ -246,7 +246,8 @@ void main(void) {
         discard;
     }
 
-    float reflectivity = (g - minGlossiness) / (1.0 - minGlossiness);
+    //float reflectivity = (g - minGlossiness) / (1.0 - minGlossiness);
+    float reflectivity = 1.0;
 
     vec3 N = normal;
 
