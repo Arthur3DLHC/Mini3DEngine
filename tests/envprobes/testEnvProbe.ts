@@ -179,6 +179,11 @@ window.onload = () => {
     addEnvProbe("envProbe07", 2, new vec3([  1,  1, -1]), scene);
     addEnvProbe("envProbe08", 2, new vec3([  1,  1,  1]), scene);
 
+    const infoPanel: HTMLDivElement = document.getElementById("infoPanel") as HTMLDivElement;
+
+    let lastUpdateFPSTime = 0;
+    let curFPS = 0;
+
     Clock.instance.start();
 
     function gameLoop(now: number) {
@@ -186,6 +191,14 @@ window.onload = () => {
         scene.updateBehavior();
         scene.updateWorldTransform(false, true);
         renderer.render(scene);
+
+        if (now - lastUpdateFPSTime > 1000) {
+            infoPanel.innerHTML = curFPS.toString();
+            lastUpdateFPSTime = now;
+            curFPS = 0;
+        }
+
+        curFPS++;
 
         requestAnimationFrame(gameLoop);
     }

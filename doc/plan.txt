@@ -268,6 +268,9 @@ TODO:       主要类结构
 
 -----------------------------------------------------
 
+                    SSR Blur 过强了问题
+                        bilateral filter 是否应该也考虑法线？
+
                     对比两种 SSR 的 shader 的效果
                         Unity 5 的
                             优化更好一些，但是不太科学；使用的 roughness 计算反射的强度
@@ -278,8 +281,6 @@ TODO:       主要类结构
                             https://sakibsaikia.github.io/graphics/2016/12/26/Screen-Space-Reflection-in-Killing-Floor-2.html#applying-reflections
 
                     SSAO blur 效果优化
-                        优化取样点和噪声？目前使用随机数取样点效果比较糙
-                        尝试改为halton sequence?
                         噪声纹理是否改为使用蓝噪声？
                         
             最终输出：
@@ -288,11 +289,16 @@ TODO:       主要类结构
                 Tone mapping shader 同时输出画面中高亮度部分和 tone mapping 结果？
                 default pbr shader 中不再做 tonemapping；
 
-            半透明物体的绘制？
+            性能：检查渲染 cubemap 用了多长时间？能否优化？
+            显式FPS的功能；SSR 是否太耗性能了？性能计时器，统计各过程用了多少毫秒？
+                TODO: 合并 SSR 的shader十分耗性能，检查原因。
 
             Subsurface scattering
                 参考 Khronos Group glTF Viewer; Blender;
                 使用神海近似的实现方式，还是 screen space subsurface scattering?
+
+            半透明物体的绘制？
+                需要由远到近排序？按照物体中心点；
 
             加载贴图
                 sampler state

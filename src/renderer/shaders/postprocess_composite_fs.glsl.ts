@@ -71,7 +71,7 @@ void main(void) {
         for(int j = 0; j < 5; j++) {
             // todo: scale the blur radius by roughness?
             vec2 offsetAO = vec2((float(i) - 4.0), float(j) - 4.0) * u_offset;
-            vec2 offsetSSR = offsetAO * (1.0 + roughness * 2.0);
+            vec2 offsetSSR = offsetAO * (1.0 + roughness);
             vec2 uvAO = clamp(ex_texcoord + offsetAO, vec2(0.0), vec2(1.0));
             vec2 uvSSR = clamp(ex_texcoord + offsetSSR, vec2(0.0), vec2(1.0));
             float dSSR = getLinearDepth(uvSSR);
