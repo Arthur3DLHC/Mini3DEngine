@@ -275,6 +275,9 @@ TODO:       主要类结构
                             优化更好一些，但是不太科学；使用的 roughness 计算反射的强度
                         Babylon.js 中的http://imanolfotia.com/blog/update/2017/03/11/ScreenSpaceReflections.html
                             比较好理解一些，而且根据表面粗糙度对取样方向加了一个扰动；
+
+                        其他参考资料：
+                            https://sakibsaikia.github.io/graphics/2016/12/26/Screen-Space-Reflection-in-Killing-Floor-2.html#applying-reflections
                         
             最终输出：
                 做 Bloom 和 Tone mapping，向主屏幕输出
