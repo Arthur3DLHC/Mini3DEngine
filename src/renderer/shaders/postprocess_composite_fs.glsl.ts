@@ -53,6 +53,11 @@ void main(void) {
     // kernel[3] = kernel[5] = 0.15;
     // kernel[4] = 0.16;
 
+    vec4 specRough = texture(s_sceneSpecRough, ex_texcoord);
+    vec3 f0 = specRough.rgb;
+    float roughness = specRough.a;
+    vec3 f90 = vec3(1.0);
+
     vec4 sumColor = vec4(0.0);
     float sumWeight = 0.0;
     float epsilon = 0.001;
@@ -61,7 +66,8 @@ void main(void) {
 
     for(int i = 0; i < 5; i++) {
         for(int j = 0; j < 5; j++) {
-            vec2 offset = vec2((float(i) - 4.0), float(j) - 4.0) * u_offset;
+            // todo: scale the blur radius by roughness?
+            vec2 offset = vec2((float(i) - 4.0), float(j) - 4.0) * u_offset * (1.0 + roughness * 2.0);
             vec2 uv = clamp(ex_texcoord + offset, vec2(0.0), vec2(1.0));
             float d = getLinearDepth(uv);
             int ki = kernelIdx[i];
@@ -78,11 +84,20 @@ void main(void) {
 
     sumColor /= sumWeight;
 
-    vec4 specRough = texture(s_sceneSpecRough, ex_texcoord);
-    vec3 f0 = specRough.rgb;
-    float roughness = specRough.a;
+    // calculate world space reflection vector
+    vec3 v = normalize((u_view.matInvView * vec4(viewPos.xyz, 0.0)).xyz);    // world space
+    vec3 n = getSceneNormal(ex_texcoord);       // world space
+    vec3 reflV = reflect(v, n);
+    float NdotV = dot(n, v);
 
-    sumColor.rgb *= f0;
+
+
+    // todo: calculate fresnel factor by f0, v and n
+    // no light vector and half vector, so use n dot v
+    vec3 F = F_Schlick(f0, f90, NdotV);
+    // vec3 F = F_Schlick(f0, f90, VdotH);
+
+    sumColor.rgb *= F;
 
     if(sumColor.a < 0.95) {
         // todo: calculate pixel world position
@@ -96,23 +111,13 @@ void main(void) {
 
         vec3 worldPos = (u_view.matInvView * viewPos).xyz;
 
-        // todo: f0 and roughness
-
-
-        // todo: select cubemaps by pixel position
+        // select cubemaps by pixel position
         uint envmapStart = 0u;
         uint envmapCount = 0u;
 
         getEnvProbeIndicesInCluster(cluster, envmapStart, envmapCount);
-
-        // todo: calculate world space reflection vector
-        vec3 v = normalize((u_view.matInvView * vec4(viewPos.xyz, 0.0)).xyz);    // world space
-        vec3 n = getSceneNormal(ex_texcoord);       // world space
-        vec3 reflV = reflect(v, n);
-        float NdotV = dot(n, v);
-
        
-        // todo: only calculate specular reflection here.
+        // only calculate envmap specular reflection here.
         vec3 iblSpecular = vec3(0.0);
         float totalWeight = 0.0;
 
@@ -143,7 +148,7 @@ void main(void) {
             iblSpecular /= totalWeight;
             iblSpecular = max(iblSpecular, vec3(0.0));
 
-            // todo: blend cubemap with ssr color, by ssr alpha
+            // blend cubemap with ssr color, by ssr alpha (view fadeout and edge fadeout)
             sumColor.rgb = mix(iblSpecular, sumColor.rgb, sumColor.a);
         }
         // sumColor.rgb = n * 0.5 + vec3(0.5);
