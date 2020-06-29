@@ -61,7 +61,8 @@ void main(void) {
 
     vec4 sumColor = vec4(0.0);
     float sumAO = 0.0;
-    float sumWeight = 0.0;
+    float sumWeightSSR = 0.0;
+    float sumWeightAO = 0.0;
     float epsilon = 0.001;
 
     float centerDepth = getLinearDepth(ex_texcoord);
@@ -73,22 +74,25 @@ void main(void) {
             vec2 offsetSSR = offsetAO * (1.0 + roughness * 2.0);
             vec2 uvAO = clamp(ex_texcoord + offsetAO, vec2(0.0), vec2(1.0));
             vec2 uvSSR = clamp(ex_texcoord + offsetSSR, vec2(0.0), vec2(1.0));
-            float d = getLinearDepth(uvSSR);
+            float dSSR = getLinearDepth(uvSSR);
+            float dAO = getLinearDepth(uvAO);
             int ki = kernelIdx[i];
             int kj = kernelIdx[j];
             float weight = kernel[ki][kj];
-            weight *= clamp(1.0 / (epsilon + abs(d - centerDepth)), 0.0, 100.0);
+            float weightSSR = weight * clamp(1.0 / (epsilon + abs(dSSR - centerDepth)), 0.0, 100.0);
+            float weightAO = weight * clamp(1.0 / (epsilon + abs(dAO - centerDepth)), 0.0, 100.0);
             
             float ao = texture(s_aoTex, uvAO).r;
             vec4 refl = texture(s_reflTex, uvSSR);
-            sumColor += refl * ao * weight;
-            sumAO += ao * weight;
-            sumWeight += weight;
+            sumColor += refl * weightSSR;
+            sumAO += ao * weightAO;
+            sumWeightSSR += weightSSR;
+            sumWeightAO += weightAO;
         }
     }
 
-    sumColor /= sumWeight;
-    sumAO /= sumWeight;
+    sumColor /= sumWeightSSR;
+    sumAO /= sumWeightAO;
 
     vec4 projectedPos = vec4(ex_texcoord * 2.0 - 1.0, texture(s_sceneDepth, ex_texcoord).r * 2.0 - 1.0, 1.0);
     uint cluster = clusterOfPixel(projectedPos);
@@ -152,7 +156,7 @@ void main(void) {
         // debug output envmap
         if (totalWeight > 0.0) {
             iblSpecular /= totalWeight;
-            iblSpecular = max(iblSpecular * sumAO, vec3(0.0));
+            iblSpecular = max(iblSpecular, vec3(0.0));
 
             // blend cubemap with ssr color, by ssr alpha (view fadeout and edge fadeout)
             sumColor.rgb = mix(iblSpecular, sumColor.rgb, sumColor.a);
@@ -161,7 +165,7 @@ void main(void) {
     }
     // fix me: test add blend?
     // sumColor.a = (f0.r + f0.g + f0.b) * 0.33333;
-    o_color = vec4(sumColor.rgb, 0.0);
+    o_color = vec4(sumColor.rgb * sumAO, 0.0);
     // o_color = vec4(1.0, 0.0, 0.0, 1.0);
 }
 
