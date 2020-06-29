@@ -233,13 +233,6 @@ TODO:       主要类结构
                         渲染cubemap时，不做 tonemapping；
                         渲染cubemap时，不使用 MRT
 
-            Tone mapping and Bloom
-                作为一个后期特效。这样保证在之前的整个渲染流程都是 HDR 线性空间的。
-                Tone mapping shader 同时输出画面中高亮度部分和 tone mapping 结果？
-                default pbr shader 中不再做 tonemapping；
-
------------------------------------------------------
-
                 // 生成 irradiance volume？或者尝试用low mipmap envmap cube 做间接光照？
                 //    为每个 envmap probe 生成一个 shadowmap，用以剔除影响范围外的物体
                 //        该 shadowmap 中只绘制开启了 occlusion query 的静态物体；这样房间内的细节物体的背向 probe 中心点的面不会被剔除，也可以有环境光照。
@@ -262,11 +255,7 @@ TODO:       主要类结构
                         在 DepthPrepass 时生成速度图？
                         上一帧画面必须是应用了Bloom 和 Tonemapping 之前的；但是包括SSAO, SSR，Fog，半透明；
                         半透明只能在前三个特效完成之后绘制；
-                    对比两种 SSR 的 shader 的效果
-                        Unity 5 的
-                            优化更好一些，但是不太科学；使用的 roughness 计算反射的强度
-                        Babylon.js 中的http://imanolfotia.com/blog/update/2017/03/11/ScreenSpaceReflections.html
-                            比较好理解一些，而且根据表面粗糙度对取样方向加了一个扰动；
+
                         调整 SSR 的不透明度：只使用视角系数和屏幕边界系数，不考虑材质 specular
                     组合结果 Pass：
                         以本帧画面，SSR 画面为输入，做雾效，组合，
@@ -276,10 +265,22 @@ TODO:       主要类结构
                         根据 SSR 结果图的 alpha 通道混合 SSR 结果颜色和 cubemap 反射颜色；需要乘以表面本身的镜面反射颜色？
                         根据视线与法线夹角、镜面反射颜色，求菲涅尔强度计算反射的整体混合系数？
                         改为通过颜色相加的方式混合？因为应该是 Diffuse + specular
+
+-----------------------------------------------------
+
+                        SSAO 作为 specular occlusion
+
+                    对比两种 SSR 的 shader 的效果
+                        Unity 5 的
+                            优化更好一些，但是不太科学；使用的 roughness 计算反射的强度
+                        Babylon.js 中的http://imanolfotia.com/blog/update/2017/03/11/ScreenSpaceReflections.html
+                            比较好理解一些，而且根据表面粗糙度对取样方向加了一个扰动；
                         
             最终输出：
                 做 Bloom 和 Tone mapping，向主屏幕输出
-
+                作为一个后期特效。这样保证在之前的整个渲染流程都是 HDR 线性空间的。
+                Tone mapping shader 同时输出画面中高亮度部分和 tone mapping 结果？
+                default pbr shader 中不再做 tonemapping；
 
             半透明物体的绘制？
 

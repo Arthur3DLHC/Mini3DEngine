@@ -60,6 +60,7 @@ void main(void) {
     vec3 f90 = vec3(1.0);
 
     vec4 sumColor = vec4(0.0);
+    float sumAO = 0.0;
     float sumWeight = 0.0;
     float epsilon = 0.001;
 
@@ -68,22 +69,26 @@ void main(void) {
     for(int i = 0; i < 5; i++) {
         for(int j = 0; j < 5; j++) {
             // todo: scale the blur radius by roughness?
-            vec2 offset = vec2((float(i) - 4.0), float(j) - 4.0) * u_offset * (1.0 + roughness * 2.0);
-            vec2 uv = clamp(ex_texcoord + offset, vec2(0.0), vec2(1.0));
-            float d = getLinearDepth(uv);
+            vec2 offsetAO = vec2((float(i) - 4.0), float(j) - 4.0) * u_offset;
+            vec2 offsetSSR = offsetAO * (1.0 + roughness * 2.0);
+            vec2 uvAO = clamp(ex_texcoord + offsetAO, vec2(0.0), vec2(1.0));
+            vec2 uvSSR = clamp(ex_texcoord + offsetSSR, vec2(0.0), vec2(1.0));
+            float d = getLinearDepth(uvSSR);
             int ki = kernelIdx[i];
             int kj = kernelIdx[j];
             float weight = kernel[ki][kj];
             weight *= clamp(1.0 / (epsilon + abs(d - centerDepth)), 0.0, 100.0);
             
-            float ao = texture(s_aoTex, uv).r;
-            vec4 refl = texture(s_reflTex, uv);
+            float ao = texture(s_aoTex, uvAO).r;
+            vec4 refl = texture(s_reflTex, uvSSR);
             sumColor += refl * ao * weight;
+            sumAO += ao * weight;
             sumWeight += weight;
         }
     }
 
     sumColor /= sumWeight;
+    sumAO /= sumWeight;
 
     vec4 projectedPos = vec4(ex_texcoord * 2.0 - 1.0, texture(s_sceneDepth, ex_texcoord).r * 2.0 - 1.0, 1.0);
     uint cluster = clusterOfPixel(projectedPos);
@@ -99,8 +104,6 @@ void main(void) {
     vec3 n = getSceneNormal(ex_texcoord);       // world space
     vec3 reflV = reflect(v, n);
     float NdotV = dot(n, v);
-
-
 
     // todo: calculate fresnel factor by f0, v and n
     // no light vector and half vector, so use n dot v
@@ -149,7 +152,7 @@ void main(void) {
         // debug output envmap
         if (totalWeight > 0.0) {
             iblSpecular /= totalWeight;
-            iblSpecular = max(iblSpecular, vec3(0.0));
+            iblSpecular = max(iblSpecular * sumAO, vec3(0.0));
 
             // blend cubemap with ssr color, by ssr alpha (view fadeout and edge fadeout)
             sumColor.rgb = mix(iblSpecular, sumColor.rgb, sumColor.a);
