@@ -280,7 +280,7 @@ TODO:       主要类结构
                     SSAO blur 效果优化
                         优化取样点和噪声？目前使用随机数取样点效果比较糙
                         尝试改为halton sequence?
-                        是否改为使用蓝噪声？
+                        噪声纹理是否改为使用蓝噪声？
                         
             最终输出：
                 做 Bloom 和 Tone mapping，向主屏幕输出
