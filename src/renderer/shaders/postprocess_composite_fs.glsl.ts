@@ -19,6 +19,7 @@ uniform sampler2D s_reflTex;        // ssr result texture, will be blurred
 
 #include <function_cluster>
 #include <function_get_items>
+#include <function_brdf_pbr>
 #include <function_depth>
 #include <function_cubemap>
 #include <function_ibl>
@@ -84,6 +85,15 @@ void main(void) {
 
     sumColor /= sumWeight;
 
+    vec4 projectedPos = vec4(ex_texcoord * 2.0 - 1.0, texture(s_sceneDepth, ex_texcoord).r * 2.0 - 1.0, 1.0);
+    uint cluster = clusterOfPixel(projectedPos);
+    // Position in view
+    vec4 viewPos = u_view.matInvProj * projectedPos;
+    // todo: handle orthographic
+    viewPos /= viewPos.w;
+
+    vec3 worldPos = (u_view.matInvView * viewPos).xyz;
+
     // calculate world space reflection vector
     vec3 v = normalize((u_view.matInvView * vec4(viewPos.xyz, 0.0)).xyz);    // world space
     vec3 n = getSceneNormal(ex_texcoord);       // world space
@@ -102,14 +112,7 @@ void main(void) {
     if(sumColor.a < 0.95) {
         // todo: calculate pixel world position
         // NDC
-        vec4 projectedPos = vec4(ex_texcoord * 2.0 - 1.0, texture(s_sceneDepth, ex_texcoord).r * 2.0 - 1.0, 1.0);
-        uint cluster = clusterOfPixel(projectedPos);
-        // Position in view
-        vec4 viewPos = u_view.matInvProj * projectedPos;
-        // todo: handle orthographic
-        viewPos /= viewPos.w;
 
-        vec3 worldPos = (u_view.matInvView * viewPos).xyz;
 
         // select cubemaps by pixel position
         uint envmapStart = 0u;
