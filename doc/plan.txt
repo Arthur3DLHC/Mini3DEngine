@@ -265,10 +265,10 @@ TODO:       主要类结构
                         根据 SSR 结果图的 alpha 通道混合 SSR 结果颜色和 cubemap 反射颜色；需要乘以表面本身的镜面反射颜色？
                         根据视线与法线夹角、镜面反射颜色，求菲涅尔强度计算反射的整体混合系数？
                         改为通过颜色相加的方式混合？因为应该是 Diffuse + specular
+                    
+                    SSAO 作为 specular occlusion
 
 -----------------------------------------------------
-
-                        SSAO 作为 specular occlusion
 
                     对比两种 SSR 的 shader 的效果
                         Unity 5 的
