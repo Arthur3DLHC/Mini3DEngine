@@ -245,9 +245,7 @@ TODO:       主要类结构
                 需要将主画面输出改为到一个 MRT 上？
                     注意将各 shader 输出也改为 MRT 的
                 SSAO shader;
-                    优化取样点和噪声？目前使用随机数取样点效果比较糙
-                        尝试改为halton sequence?
-                        是否改为使用蓝噪声？
+
                     改为不是立刻混合到原画面，而是在最后和 SSR、Fog 等一起混合？
 
                 SSR
@@ -278,6 +276,11 @@ TODO:       主要类结构
 
                         其他参考资料：
                             https://sakibsaikia.github.io/graphics/2016/12/26/Screen-Space-Reflection-in-Killing-Floor-2.html#applying-reflections
+
+                    SSAO blur 效果优化
+                        优化取样点和噪声？目前使用随机数取样点效果比较糙
+                        尝试改为halton sequence?
+                        是否改为使用蓝噪声？
                         
             最终输出：
                 做 Bloom 和 Tone mapping，向主屏幕输出
