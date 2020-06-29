@@ -82,6 +82,8 @@ void main(void) {
     vec3 f0 = specRough.rgb;
     float roughness = specRough.a;
 
+    sumColor.rgb *= f0;
+
     if(sumColor.a < 0.95) {
         // todo: calculate pixel world position
         // NDC
@@ -135,8 +137,6 @@ void main(void) {
             // reflection += envmap.rgb * weight;
             
             totalWeight += weight;
-
-            // todo: sample different levels and filter by roughness
         }
         // debug output envmap
         if (totalWeight > 0.0) {
@@ -148,8 +148,9 @@ void main(void) {
         }
         // sumColor.rgb = n * 0.5 + vec3(0.5);
     }
-    sumColor.a = (f0.r + f0.g + f0.b) * 0.33333;
-    o_color = sumColor;
+    // fix me: test add blend?
+    // sumColor.a = (f0.r + f0.g + f0.b) * 0.33333;
+    o_color = vec4(sumColor.rgb, 0.0);
     // o_color = vec4(1.0, 0.0, 0.0, 1.0);
 }
 
