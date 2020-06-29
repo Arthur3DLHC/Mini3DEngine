@@ -162,6 +162,10 @@ export class PostProcessor {
 
         this._ssaoBlurBlendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.DST_COLOR, GLDevice.gl.ZERO);
         // this._compositeBlendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+        
+        // use color ADD blend mode
+        // diffuse + specular
+        // if some surface's reflection is strong, it's diffuse must be dark. this is ensured by 'metallic' of it's PBR material.
         this._compositeBlendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.ONE, GLDevice.gl.ONE);
 
         this._rectGeom = new PlaneGeometry(2, 2, 1, 1);

@@ -2,6 +2,7 @@ import { Texture2D } from "../../WebGLResources/textures/texture2D.js";
 import { GLDevice } from "../../WebGLResources/glDevice.js";
 import { SamplerState } from "../../WebGLResources/renderStates/samplerState.js";
 import vec3 from "../../../lib/tsm/vec3.js";
+import { Halton } from "../../math/halton.js";
 
 export class SSAOParams {
     public constructor() {
@@ -51,16 +52,21 @@ export class SSAOParams {
         let sample = new vec3();
 
         for(let i = 0; i < SSAOParams.numKernels; i++) {
-            // let phi = Halton.get(i + offset, 2) * Math.PI;      // hemisphere
-            // let theta = Halton.get(i + offset, 3) * 
+            // test: use halton sequence
+            let phi = Halton.get(i + offset, 2) * Math.PI;          // hemisphere, pitch
+            let theta = Halton.get(i + offset, 3) * Math.PI * 2;    // yaw
+
+            sample.z = Math.cos(phi);
+            sample.x = Math.sin(phi) * Math.cos(theta);
+            sample.y = Math.sin(phi) * Math.sin(theta);
 
             // test: use plain random values, same as three.js
             // hemisphere
-            sample.x = Math.random() * 2.0 - 1.0;
-            sample.y = Math.random() * 2.0 - 1.0;
-            sample.z = Math.random();
+            // sample.x = Math.random() * 2.0 - 1.0;
+            // sample.y = Math.random() * 2.0 - 1.0;
+            // sample.z = Math.random();
 
-            sample.normalize();
+            // sample.normalize();
 
             // vary length
             let scale = i / SSAOParams.numKernels;
