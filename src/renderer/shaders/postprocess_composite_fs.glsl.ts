@@ -103,24 +103,32 @@ void main(void) {
 
     vec3 worldPos = (u_view.matInvView * viewPos).xyz;
 
-    // calculate world space reflection vector
-    vec3 v = normalize((u_view.matInvView * vec4(viewPos.xyz, 0.0)).xyz);    // world space
-    vec3 n = getSceneNormal(ex_texcoord);       // world space
-    vec3 reflV = reflect(v, n);
-    float NdotV = dot(n, v);
 
-    // todo: calculate fresnel factor by f0, v and n
+
+    // calculate world space reflection vector
+    // vec3 v = normalize((u_view.matInvView * vec4(viewPos.xyz, 0.0)).xyz);    // world space
+    vec3 v = normalize(u_view.position - worldPos); // world space view vector
+    vec3 n = getSceneNormal(ex_texcoord);       // world space
+    vec3 reflV = reflect(-v, n);
+    float NdotV = dot(n, v);
+    // calculate fresnel factor by f0, v and n
     // no light vector and half vector, so use n dot v
     vec3 F = F_Schlick(f0, f90, NdotV);
     // vec3 F = F_Schlick(f0, f90, VdotH);
+    
+    // debug output
+    // o_color = vec4(abs(fract(worldPos)), 1.0);
+    // o_color = vec4(n * 0.5 + vec3(0.5), 1.0);
+    // o_color = vec4(v * 0.5 + vec3(0.5), 1.0);
+    // o_color.rgb = vec3(NdotV * 0.5 + 0.5);
+    // o_color.a = 1.0;
+    // o_color = vec4(reflV * 0.5 + vec3(0.5), 1.0);
+    // o_color = vec4(F, 1.0);
+    // return;
 
     sumColor.rgb *= F;
 
     if(sumColor.a < 0.95) {
-        // todo: calculate pixel world position
-        // NDC
-
-
         // select cubemaps by pixel position
         uint envmapStart = 0u;
         uint envmapCount = 0u;
@@ -138,8 +146,8 @@ void main(void) {
             // blend by distance to envprobe center position
             // should also add radius weight: the smaller the probe, the stronger the weight.
             // https://www.xmswiki.com/wiki/SMS:Inverse_Distance_Weighted_Interpolation
-            float dist = length(probe.position - worldPos) + 0.1;
-            float distxradius = dist * probe.radius;
+            float dist = length(probe.position - worldPos);
+            float distxradius = dist * probe.radius + 0.01;
             float weight = 1.0 / (distxradius * distxradius);
 
             int layer = int(i - envmapStart);

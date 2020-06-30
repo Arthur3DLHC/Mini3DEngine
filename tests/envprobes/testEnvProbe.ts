@@ -69,19 +69,39 @@ window.onload = () => {
 
     scene.attachChild(boxMesh);
 
-    const sphereMesh = new Mesh();
-    sphereMesh.name = "sphere01";
-    sphereMesh.localTransform.fromTranslation(new vec3([0, 0, 0.75]));
-    sphereMesh.geometry = new SphereGeometry(0.2, 16, 8);
-    sphereMesh.castShadow = true;
-    sphereMesh.isStatic = false;
-    const sphereMtl = new StandardPBRMaterial();
-    sphereMtl.color = new vec4([1.0, 1.0, 1.0, 1.0]);
-    sphereMtl.metallic = 0.2;
-    sphereMtl.roughness = 0.1;
-    sphereMesh.materials.push(sphereMtl);
+    // moving sphere
+    {
+        const sphereMesh = new Mesh();
+        sphereMesh.name = "sphere.Dynamic";
+        sphereMesh.localTransform.fromTranslation(new vec3([0, 0, 0.75]));
+        sphereMesh.geometry = new SphereGeometry(0.2, 16, 8);
+        sphereMesh.castShadow = true;
+        sphereMesh.isStatic = false;
+        const sphereMtl = new StandardPBRMaterial();
+        sphereMtl.color = new vec4([1.0, 1.0, 1.0, 1.0]);
+        sphereMtl.metallic = 0.2;
+        sphereMtl.roughness = 0.1;
+        sphereMesh.materials.push(sphereMtl);
+    
+        boxMesh.attachChild(sphereMesh);
+    }
 
-    boxMesh.attachChild(sphereMesh);
+    // static sphere
+    {
+        const sphereMesh = new Mesh();
+        sphereMesh.name = "sphere.Static";
+        sphereMesh.localTransform.fromTranslation(new vec3([-0.75, -1.2, 0]));
+        sphereMesh.geometry = new SphereGeometry(0.4, 16, 8);
+        sphereMesh.castShadow = true;
+        sphereMesh.isStatic = true;
+        const sphereMtl = new StandardPBRMaterial();
+        sphereMtl.color = new vec4([1.0, 1.0, 1.0, 1.0]);
+        sphereMtl.metallic = 0.9;
+        sphereMtl.roughness = 0.1;
+        sphereMesh.materials.push(sphereMtl);
+    
+        scene.attachChild(sphereMesh);
+    }
 
     /*
     const sphereAutoRot = new AutoRotateBehavior(sphereMesh);

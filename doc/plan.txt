@@ -291,7 +291,7 @@ TODO:       主要类结构
 
             性能：检查渲染 cubemap 用了多长时间？能否优化？
             显式FPS的功能；SSR 是否太耗性能了？性能计时器，统计各过程用了多少毫秒？
-                TODO: 合并 SSR 的shader十分耗性能，检查原因。
+                TODO: 合并 SSR 的 shader 在低端显卡上十分耗性能，检查原因。
 
             Subsurface scattering
                 参考 Khronos Group glTF Viewer; Blender;
