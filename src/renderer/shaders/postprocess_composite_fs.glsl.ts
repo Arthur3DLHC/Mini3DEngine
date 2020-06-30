@@ -61,38 +61,57 @@ void main(void) {
 
     vec4 sumColor = vec4(0.0);
     float sumAO = 0.0;
-    float sumWeightSSR = 0.0;
-    float sumWeightAO = 0.0;
-    float epsilon = 0.001;
+    // float sumWeightSSR = 0.0;
+    // float sumWeightAO = 0.0;
+    // float epsilon = 0.001;
+    vec2 sumWeight = vec2(0.0);
+    vec2 epsilon = vec2(0.001);
 
     float centerDepth = getLinearDepth(ex_texcoord);
+    vec4 centerUV = vec4(ex_texcoord, ex_texcoord);
 
     for(int i = 0; i < 5; i++) {
         for(int j = 0; j < 5; j++) {
             // todo: scale the blur radius by roughness?
+            // todo: optimize: use vec4 to pack uv and offset
             vec2 offsetAO = vec2((float(i) - 4.0), float(j) - 4.0) * u_offset;
             vec2 offsetSSR = offsetAO * (1.0 + roughness);
-            vec2 uvAO = clamp(ex_texcoord + offsetAO, vec2(0.0), vec2(1.0));
-            vec2 uvSSR = clamp(ex_texcoord + offsetSSR, vec2(0.0), vec2(1.0));
-            float dSSR = getLinearDepth(uvSSR);
-            float dAO = getLinearDepth(uvAO);
+
+            vec4 offset = vec4(offsetAO, offsetSSR);
+            vec4 uv = clamp(centerUV + offset, vec4(0.0), vec4(1.0));
+
+            // vec2 uvAO = clamp(ex_texcoord + offsetAO, vec2(0.0), vec2(1.0));
+            // vec2 uvSSR = clamp(ex_texcoord + offsetSSR, vec2(0.0), vec2(1.0));
+            // float dAO = getLinearDepth(uv.xy);
+            // float dSSR = getLinearDepth(uv.zw);
+            vec2 d = vec2(getLinearDepth(uv.xy), getLinearDepth(uv.zw));
             int ki = kernelIdx[i];
             int kj = kernelIdx[j];
-            float weight = kernel[ki][kj];
-            float weightSSR = weight * clamp(1.0 / (epsilon + abs(dSSR - centerDepth)), 0.0, 100.0);
-            float weightAO = weight * clamp(1.0 / (epsilon + abs(dAO - centerDepth)), 0.0, 100.0);
+            float k = kernel[ki][kj];
+            vec2 weight = k * clamp(vec2(1.0) / (epsilon + abs(d - vec2(centerDepth))), vec2(0.0), vec2(100.0));
+            // float weightSSR = weight * clamp(1.0 / (epsilon + abs(dSSR - centerDepth)), 0.0, 100.0);
+            // float weightAO = weight * clamp(1.0 / (epsilon + abs(dAO - centerDepth)), 0.0, 100.0);
             
-            float ao = texture(s_aoTex, uvAO).r;
-            vec4 refl = texture(s_reflTex, uvSSR);
-            sumColor += refl * weightSSR;
-            sumAO += ao * weightAO;
-            sumWeightSSR += weightSSR;
-            sumWeightAO += weightAO;
+            // float ao = texture(s_aoTex, uvAO).r;
+            // vec4 refl = texture(s_reflTex, uvSSR);
+            float ao = texture(s_aoTex, uv.xy).r;
+            vec4 refl = texture(s_reflTex, uv.zw);
+
+            // sumColor += refl * weightSSR;
+            // sumAO += ao * weightAO;
+            // sumWeightSSR += weightSSR;
+            // sumWeightAO += weightAO;
+
+            sumAO += ao * weight.x;
+            sumColor += refl * weight.y;
+            sumWeight += weight;
         }
     }
 
-    sumColor /= sumWeightSSR;
-    sumAO /= sumWeightAO;
+    // sumColor /= sumWeightSSR;
+    // sumAO /= sumWeightAO;
+    sumAO /= sumWeight.x;
+    sumColor /= sumWeight.y;
 
     vec4 projectedPos = vec4(ex_texcoord * 2.0 - 1.0, texture(s_sceneDepth, ex_texcoord).r * 2.0 - 1.0, 1.0);
     uint cluster = clusterOfPixel(projectedPos);
@@ -108,7 +127,8 @@ void main(void) {
     // calculate world space reflection vector
     // vec3 v = normalize((u_view.matInvView * vec4(viewPos.xyz, 0.0)).xyz);    // world space
     vec3 v = normalize(u_view.position - worldPos); // world space view vector
-    vec3 n = getSceneNormal(ex_texcoord);       // world space
+    vec3 n = getSceneNormal(ex_texcoord);       // view space, need to transform to world space
+    n = (u_view.matInvView * vec4(n, 0.0)).xyz;
     vec3 reflV = reflect(-v, n);
     float NdotV = dot(n, v);
     // calculate fresnel factor by f0, v and n
@@ -127,8 +147,9 @@ void main(void) {
     // return;
 
     sumColor.rgb *= F;
+    // sumColor.a *= length(sumColor.rgb);
 
-    if(sumColor.a < 0.95) {
+    if(sumColor.a < 0.99) {
         // select cubemaps by pixel position
         uint envmapStart = 0u;
         uint envmapCount = 0u;
