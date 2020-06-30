@@ -296,6 +296,21 @@ TODO:       主要类结构
             Subsurface scattering
                 参考 Khronos Group glTF Viewer; Blender;
                 使用神海近似的实现方式，还是 screen space subsurface scattering?
+                预先生成 subsurface scattering BRDF 纹理
+                    纵轴是曲度，横轴是NdotL
+                    Fix me: 如何将 subsurface 颜色 例如 肤色 或 雪色 放进去？还是将该颜色提取出来，作为材质参数？
+                        是否可以简化一下生成的过程；
+                        将 BRDF 纹理拆成两部分：
+                            brightness: 明暗部分，黑白，模糊后的 ndotl
+                            colorAmount: 透光颜色部分，黑白，代表透光颜色的强度，在明暗交界的地方最强
+                        分别放到纹理的两个通道中；
+                    此 BRDF 纹理是作为一个 per scene 的纹理，还是 per material 的？只有 subsurface material 才用？
+                    是在标准材质和 shader 中添加 subsurface 参数，还是单做一种 subsurface 材质？
+                需要取得表面的弯曲度；曲度越大，SS 越明显
+                绘制时：
+                    用 ndotl 和 curvature 为 UV 取 BRDF 纹理；
+                    结果 = clamp(brightness + colorAmount * subsurfColor, 0.0, 1.0) ？
+                    尝试用 max, blend 等方式混合 brightness 和 colorAmount * subsurfColor，看哪种效果好
 
             半透明物体的绘制？
                 需要由远到近排序？按照物体中心点；
@@ -327,7 +342,10 @@ TODO:       主要类结构
 
             资源加载器
                 资源列表和资源计数？
-                所有资源加载完后再开始逻辑循环？
+                参考类似 PIXI.js 的机制？
+                    输入一个要加载的资源 url 列表？
+                    所有资源加载完后再开始逻辑循环？
+                    切换场景时清空资源缓存，更新要加载的资源列表，调用 load 方法?
                 
         大场景相关
 

@@ -65,6 +65,9 @@ void main(void) {
     vec2 noiseScale = u_noiseTexelSize / u_texelSize;   // == texture res / noisetexture res
     vec3 random = texture(s_noiseTex, ex_texcoord * noiseScale).rgb;
 
+    // o_color = vec4(random * 0.5 + vec3(0.5), 1.0);
+    // return;
+
 	// compute matrix used to reorient a kernel vector
     vec3 tangent = normalize(random - viewNormal * dot(random, viewNormal));
     vec3 bitangent = cross(viewNormal, tangent);
