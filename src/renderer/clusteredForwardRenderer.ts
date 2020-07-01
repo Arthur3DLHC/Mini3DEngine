@@ -11,6 +11,7 @@ import function_get_items from "./shaders/shaderIncludes/function_get_items.glsl
 import function_ibl from "./shaders/shaderIncludes/function_ibl.glsl.js";
 import function_punctual_lights from "./shaders/shaderIncludes/function_punctual_lights.glsl.js";
 import function_shadow from "./shaders/shaderIncludes/function_shadow.glsl.js";
+import function_subsurface from "./shaders/shaderIncludes/function_subsurface.glsl.js";
 import function_tonemap from "./shaders/shaderIncludes/function_tonemap.glsl.js";
 import function_brdf_pbr from "./shaders/shaderIncludes/function_brdf_pbr.glsl.js";
 import function_transforms from "./shaders/shaderIncludes/function_transforms.glsl.js";
@@ -457,6 +458,7 @@ export class ClusteredForwardRenderer {
         GLPrograms.shaderCodes["function_ibl"] = function_ibl;
         GLPrograms.shaderCodes["function_punctual_lights"] = function_punctual_lights;
         GLPrograms.shaderCodes["function_shadow"] = function_shadow;
+        GLPrograms.shaderCodes["function_subsurface"] = function_subsurface;
         GLPrograms.shaderCodes["function_tonemap"] = function_tonemap;
         GLPrograms.shaderCodes["function_brdf_pbr"] = function_brdf_pbr;
         GLPrograms.shaderCodes["function_transforms"] = function_transforms;

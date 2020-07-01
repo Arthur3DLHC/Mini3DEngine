@@ -14,6 +14,7 @@ export default /** glsl */`
 #include <function_get_items>
 #include <function_punctual_lights>
 #include <function_shadow>
+#include <function_subsurface>
 #include <function_brdf_pbr>
 #include <function_ibl>
 #include <function_tonemap>
@@ -65,6 +66,13 @@ void main(void)
     float metallic = metallicRoughness.x;
     float roughness = metallicRoughness.y;
 
+    // fix me: subsurface amount and texture use textures?
+    float curvature = 0.0;
+    // if(u_material.subsurface > 0.0) {
+        // hpos.w == viewpos.z
+        curvature = calcCurvature(n, ex_worldPosition);
+    //}
+
     // simple default f0
     vec3 f0 = vec3(0.04);
     // use metallic factor to lerp between default 0.04 and baseColor
@@ -78,8 +86,8 @@ void main(void)
     vec3 f_emissive = vec3(0.0);
 
     // todo: decals
-
-    uint cluster = clusterOfPixel(ex_hPosition);
+    vec4 ndc = ex_hPosition / ex_hPosition.w;
+    uint cluster = clusterOfPixel(ndc);
 
     uint lightCount = getLightCountInCluster(cluster);
     for(uint i = 0u; i < lightCount; i++) {
@@ -151,6 +159,12 @@ void main(void)
         // o.color = vec4(rangeAttenuation, rangeAttenuation, rangeAttenuation, 1.0);
         vec3 l = normalize(pointToLight);   // Direction from surface point to light
         float NdotL = clampedDot(n, l);
+
+        // todo: if subsurface > 0, sample subsurface strength from subsurface scattering BRDF texture
+        if(u_material.subsurface > 0.0) {
+            // TODO: 根据 ndotl 和 curvature 取样 subsurface BRDF texture
+        }
+
         // float NdotV = clampedDot(n, v);  // 前面已经算过了，与光源无关
         if (NdotL > 0.0 || NdotV > 0.0)
         {
@@ -232,7 +246,9 @@ void main(void)
     vec3 color = f_diffuse + f_specular + f_emissive;
     // put tone mapping in post process
     // color = ACESToneMapping(color, 1.0);
-    o.color = vec4(color, getOpacity());
+
+    // o.color = vec4(color, getOpacity());
+    o.color = vec4(curvature, curvature, curvature, getOpacity());
     o.normal = (u_view.matView * vec4(n, 0)).xyz;  // output world normal or view normal?
     o.roughness = roughness;
     o.specular = f0;

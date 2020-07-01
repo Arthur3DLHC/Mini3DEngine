@@ -28,4 +28,6 @@ export default /** glsl */`
     uniform sampler2D s_normalMap;
     uniform sampler2D s_occlusionMap;
     uniform sampler2D s_emissiveMap;
+
+    // fix me: subsurface scattering use textures or not?
 `;
