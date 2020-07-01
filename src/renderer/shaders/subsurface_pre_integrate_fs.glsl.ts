@@ -19,7 +19,8 @@ void main(void) {
 
     // todo: test use multiple Gaussian curves with different deltas ?
     float x = ex_texcoord.s * 2.0 - 1.0;
-    float delta = 0.5 * curvature;
+    float delta = curvature;
+    // float delta = 0.5 * curvature;
     float gaussian = exp(-((x * x) / (2.0 * delta * delta)));
     float gaussian1 = pow(gaussian, 15.0);
     float subsurfStrength = (gaussian * 0.5 + gaussian1 * 0.5) * curvature;
