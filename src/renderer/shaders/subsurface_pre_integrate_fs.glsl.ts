@@ -26,7 +26,7 @@ void main(void) {
     float subsurfStrength = (gaussian * 0.5 + gaussian1 * 0.5) * curvature;
     // float subsurfStrength = (1.0 - smoothstep(0.0, subsurfWidth, subsurf)) * curvature * curvature;
 
-    // test combine color
+    // debug test combine color
     vec3 subsufColor = vec3(0.4, 0.06, 0.0) * subsurfStrength;
     vec3 color = vec3(ndotl) + subsufColor;
     //o_color = vec4(subsufColor, 1.0);
