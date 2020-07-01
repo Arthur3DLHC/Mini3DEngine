@@ -731,18 +731,6 @@ export class ClusteredForwardRenderer {
             // Test code: apply render target texture to a screen space rectangle
             // test drawing a screen space rectangle
             // GLDevice.renderTarget = null;
-            if (this._drawDebugTexture) {
-                // shadowmap:
-                // this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._debugDepthTexture, 1, 0, false);
-                
-                // envmap:
-                // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, false);
-                // debug outpu diffuse Riemann sum result
-                // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, CubemapProcessor.diffuseMipLevel, false);
-                // todo: debug outpu specular LD parts and DFG parts
-                // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, 4, false);
-                this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._subsurfProcessor.preIntegratedBRDFTexture, 1, 0, 0, false);
-            }
         }
 
         // todo: copy scene image to main backbuffer
@@ -755,6 +743,19 @@ export class ClusteredForwardRenderer {
         // this.renderScreenRect(0, 0, 1, 1, new vec4([1,1,1,1]), this._sceneColorTexture, 1, 0, 0, false);
 
         this._postprocessor.processFinal(this.numReservedTextures);
+
+        if (this._drawDebugTexture) {
+            // shadowmap:
+            // this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._debugDepthTexture, 1, 0, false);
+            
+            // envmap:
+            // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, false);
+            // debug outpu diffuse Riemann sum result
+            // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, CubemapProcessor.diffuseMipLevel, false);
+            // todo: debug outpu specular LD parts and DFG parts
+            // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, 4, false);
+            this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._subsurfProcessor.preIntegratedBRDFTexture, 1, 0, 0, false);
+        }
 
         // swap between curr and prev frame
         if (this._currFrameFBOIdx === 0) {

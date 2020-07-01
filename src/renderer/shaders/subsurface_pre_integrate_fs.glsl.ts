@@ -16,11 +16,16 @@ void main(void) {
 
     // todo: test use multiple Gaussian curves with different deltas ?
     float x = ex_texcoord.s * 2.0 - 1.0;
-    float delta = 0.4 * curvature;
+    float delta = 0.5 * curvature;
     float gaussian = exp(-((x * x) / (2.0 * delta * delta)));
-    float subsurfStrength = gaussian * curvature * curvature;
+    // gaussian *= gaussian;
+    float subsurfStrength = gaussian * curvature;
     // float subsurfStrength = (1.0 - smoothstep(0.0, subsurfWidth, subsurf)) * curvature * curvature;
 
-    o_color = vec4(subsurfStrength, subsurfStrength, subsurfStrength, 1.0);
+    // test combine color
+    vec3 subsufColor = vec3(0.2, 0.05, 0.0) * subsurfStrength;
+    vec3 color = vec3(ndotl) + subsufColor;
+    o_color = vec4(color, 1.0);
+    //o_color = vec4(subsurfStrength, subsurfStrength, subsurfStrength, 1.0);
 }
 `;
