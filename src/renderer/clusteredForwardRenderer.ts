@@ -70,11 +70,12 @@ import { TextureCube } from "../WebGLResources/textures/textureCube.js";
 import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 import { CubemapProcessor } from "./cubemapProcessor.js";
 import { PostProcessor } from "./postProcessor.js";
+import { SubsurfaceProcessor } from "./subsurfaceProcessor.js";
 
 export class ClusteredForwardRenderer {
 
     public constructor() {
-        this._drawDebugTexture = false;
+        this._drawDebugTexture = true;
         const gl = GLDevice.gl;
         gl.enable(gl.SCISSOR_TEST);
 
@@ -288,6 +289,8 @@ export class ClusteredForwardRenderer {
         this._postprocessor = new PostProcessor(this._renderContext,
             this._sceneDepthTexture, this._sceneNormalTexture, this._sceneSpecularRoughnessTexture,
             this._envMapArrayUnit, this._specularDFGUnit);
+
+        this._subsurfProcessor = new SubsurfaceProcessor();
     }
 
     private _renderListDepthPrepass: RenderList;
@@ -387,6 +390,7 @@ export class ClusteredForwardRenderer {
     private _frustum: Frustum;
 
     private _postprocessor: PostProcessor;
+    private _subsurfProcessor: SubsurfaceProcessor;
 
     private createRenderStates() {
         const gl = GLDevice.gl;
@@ -736,7 +740,8 @@ export class ClusteredForwardRenderer {
                 // debug outpu diffuse Riemann sum result
                 // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, CubemapProcessor.diffuseMipLevel, false);
                 // todo: debug outpu specular LD parts and DFG parts
-                this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, 4, false);
+                // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, 4, false);
+                this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._subsurfProcessor.preIntegratedBRDFTexture, 1, 0, 0, false);
             }
         }
 
