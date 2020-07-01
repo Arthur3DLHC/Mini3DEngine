@@ -3,6 +3,7 @@ import { CullState } from "./renderStates/cullState.js";
 import { DepthStencilState } from "./renderStates/depthStencilState.js";
 import { SamplerState } from "./renderStates/samplerState.js";
 import { ColorWriteState } from "./renderStates/colorWriteState.js";
+import { GLDevice } from "./glDevice.js";
 
 export class RenderStateCache {
     private static _instance: RenderStateCache|null = null;
@@ -28,7 +29,7 @@ export class RenderStateCache {
         return this._instance;
     }
 
-    public getBlendState(enable: boolean, equation: GLenum, srcFactor: GLenum, destFactor: GLenum): BlendState {
+    public getBlendState(enable: boolean = false, equation: GLenum = GLDevice.gl.FUNC_ADD, srcFactor: GLenum = GLDevice.gl.SRC_ALPHA, destFactor: GLenum = GLDevice.gl.ONE_MINUS_SRC_ALPHA): BlendState {
         for (const bs of this.blendStates) {
             if (bs.equals(enable, equation, srcFactor, destFactor)) {
                 return bs;
@@ -39,7 +40,7 @@ export class RenderStateCache {
         return newState;
     }
 
-    public getCullState(enable: boolean, mode: GLenum): CullState {
+    public getCullState(enable: boolean = true, mode: GLenum = GLDevice.gl.BACK): CullState {
         for (const cs of this.cullStates) {
             if (cs.equals(enable, mode)) {
                 return cs;
@@ -50,7 +51,7 @@ export class RenderStateCache {
         return newState;
     }
 
-    public getDepthStencilState(enable: boolean, write: boolean, func: GLenum): DepthStencilState {
+    public getDepthStencilState(enable: boolean = true, write: boolean = true, func: GLenum = GLDevice.gl.LEQUAL): DepthStencilState {
         for (const ds of this.depthStates) {
             if (ds.equals(enable, write, func)) {
                 return ds;
@@ -61,7 +62,7 @@ export class RenderStateCache {
         return newState;
     }
 
-    public getColorWriteState(red: boolean, green: boolean, blue: boolean, alpha: boolean) {
+    public getColorWriteState(red: boolean = true, green: boolean = true, blue: boolean = true, alpha: boolean = true) {
         for (const cs of this.colorWriteStates) {
             if (cs.equals(red, green, blue, alpha)) {
                 return cs;

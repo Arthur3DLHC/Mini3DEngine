@@ -6,6 +6,9 @@ import { GLDevice } from "../WebGLResources/glDevice.js";
 import { FrameBuffer } from "../WebGLResources/frameBuffer.js";
 import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
 import { GLPrograms } from "../WebGLResources/glPrograms.js";
+import { PlaneGeometry } from "../geometry/common/planeGeometry.js";
+import { RenderStateSet } from "./renderStateSet.js";
+import { RenderStateCache } from "../WebGLResources/renderStateCache.js";
 
 /**
  * processor for subsurface scattering
@@ -28,35 +31,46 @@ export class SubsurfaceProcessor {
         // do not need to bind uniform blocks?
 
         // todo: plane geometry
+        const planeGeom = new PlaneGeometry(2, 2, 1, 1);
 
         // todo: bake pre-integrated BRDF texture
         // two channels: 
         // R: blurred NdotL
         // G: subsurface color intensity
-        this.brdfTexture = new Texture2D(256, 256, 1, 1, GLDevice.gl.RG, GLDevice.gl.HALF_FLOAT, false);
-        this.brdfTexture.create();
+        this.preIntegratedBRDFTexture = new Texture2D(256, 256, 1, 1, GLDevice.gl.RG, GLDevice.gl.HALF_FLOAT, false);
+        this.preIntegratedBRDFTexture.create();
 
         // create a temp FBO, bind brdf texture
         const tmpFBO = new FrameBuffer();
-        tmpFBO.setTexture(0, this.brdfTexture);
+        tmpFBO.setTexture(0, this.preIntegratedBRDFTexture);
         tmpFBO.prepare();
 
         // set as rendertarget; set viewport and scissor
         GLDevice.renderTarget = tmpFBO;
-        gl.viewport(0, 0, this.brdfTexture.width, this.brdfTexture.height);
-        gl.scissor(0, 0, this.brdfTexture.width, this.brdfTexture.height);
+        gl.viewport(0, 0, this.preIntegratedBRDFTexture.width, this.preIntegratedBRDFTexture.height);
+        gl.scissor(0, 0, this.preIntegratedBRDFTexture.width, this.preIntegratedBRDFTexture.height);
 
         // todo: render state
+        const renderStates = new RenderStateSet();
+        renderStates.blendState = RenderStateCache.instance.getBlendState(false);
+        renderStates.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
+        renderStates.cullState = RenderStateCache.instance.getCullState(false);
+        renderStates.depthState = RenderStateCache.instance.getDepthStencilState(false, false);
+
+        renderStates.apply();
 
         // use shader
         GLPrograms.useProgram(integrateProgram);
 
         // render a fullscreen quad
+        planeGeom.draw(0, Infinity, integrateProgram.attributes);
         
-        // release FBO, geometry and shader
+        // cleanup: release FBO, geometry and shader
+        tmpFBO.release();
         integrateProgram.release();
+        planeGeom.destroy();
     }
 
     // pre-integrated BRDF texture
-    public brdfTexture: Texture2D;
+    public preIntegratedBRDFTexture: Texture2D;
 }

@@ -1,7 +1,7 @@
 import { GLDevice } from "../glDevice.js";
 
 export class ColorWriteState {
-    public constructor(red: boolean, green: boolean, blue: boolean, alpha: boolean) {
+    public constructor(red: boolean = true, green: boolean = true, blue: boolean = true, alpha: boolean = true) {
         this._red = red;
         this._green = green;
         this._blue = blue;
