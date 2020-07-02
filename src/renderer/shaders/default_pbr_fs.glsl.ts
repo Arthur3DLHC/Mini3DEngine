@@ -149,7 +149,7 @@ void main(void)
                                          + vec3(rect.z * 0.5 + rect.x, rect.w * 0.5 + rect.y, 0.5);
             }
             shadow = texture(s_shadowAtlas, shadowCoord);
-            if(shadow < 0.001) {
+            if(shadow < 0.001 && u_material.subsurface < 0.01) {
                 continue;
             }
         }

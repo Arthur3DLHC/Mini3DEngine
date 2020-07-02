@@ -9,6 +9,7 @@ import { GLPrograms } from "../WebGLResources/glPrograms.js";
 import { PlaneGeometry } from "../geometry/common/planeGeometry.js";
 import { RenderStateSet } from "./renderStateSet.js";
 import { RenderStateCache } from "../WebGLResources/renderStateCache.js";
+import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 
 /**
  * processor for subsurface scattering
@@ -41,6 +42,7 @@ export class SubsurfaceProcessor {
         // test color result
         this.preIntegratedBRDFTexture = new Texture2D(256, 256, 1, 1, GLDevice.gl.RED, GLDevice.gl.HALF_FLOAT, false);
         // this.preIntegratedBRDFTexture = new Texture2D(256, 256, 1, 1, GLDevice.gl.RG, GLDevice.gl.HALF_FLOAT, false);
+        this.preIntegratedBRDFTexture.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.LINEAR, gl.LINEAR);
         this.preIntegratedBRDFTexture.create();
 
         // create a temp FBO, bind brdf texture

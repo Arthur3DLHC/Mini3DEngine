@@ -40,7 +40,7 @@ float getRangeAttenuation(float range, float distanceSq) {
     float distByRangeSq = distanceSq / (range * range);
     float invDistByRangeSq4 = 1.0 - distByRangeSq * distByRangeSq;
     float smoothFactor = clamp(invDistByRangeSq4 * invDistByRangeSq4, 0.0, 1.0);
-    return smoothFactor / (distanceSq + 1.0);
+    return clamp(smoothFactor / (distanceSq + 1.0), 0.0, 1.0);
 
     // modified formular used by Khronos group glTF Viewer:
     // https://github.com/KhronosGroup/glTF/blob/master/extensions/2.0/Khronos/KHR_lights_punctual/README.md#range-property

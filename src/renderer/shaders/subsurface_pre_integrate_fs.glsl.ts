@@ -24,6 +24,7 @@ void main(void) {
     float gaussian = exp(-((x * x) / (2.0 * delta * delta)));
     float gaussian1 = pow(gaussian, 15.0);
     float subsurfStrength = (gaussian * 0.5 + gaussian1 * 0.5) * curvature;
+    subsurfStrength = clamp(subsurfStrength, 0.0, 1.0);
     // float subsurfStrength = (1.0 - smoothstep(0.0, subsurfWidth, subsurf)) * curvature * curvature;
 
     // debug test combine color
