@@ -68,10 +68,9 @@ void main(void)
 
     // fix me: subsurface amount and texture use textures?
     float curvature = 0.0;
-    // if(u_material.subsurface > 0.0) {
-        // hpos.w == viewpos.z
+    if(u_material.subsurface > 0.0) {
         curvature = calcCurvature(n, ex_worldPosition);
-    //}
+    }
 
     // simple default f0
     vec3 f0 = vec3(0.04);
@@ -158,17 +157,28 @@ void main(void)
         // test range attenuation
         // o.color = vec4(rangeAttenuation, rangeAttenuation, rangeAttenuation, 1.0);
         vec3 l = normalize(pointToLight);   // Direction from surface point to light
-        float NdotL = clampedDot(n, l);
+
+        // do not clamp, because we need to calculate subsurface scattering.
+        // float NdotL = clampedDot(n, l);
+        float NdotL = dot(n, l);
+
+        // don't apply shadow while subsurface scattering
+        vec3 intensity = rangeAttenuation * spotAttenuation * light.color.rgb;// * shadow;
 
         // todo: if subsurface > 0, sample subsurface strength from subsurface scattering BRDF texture
         if(u_material.subsurface > 0.0) {
             // TODO: 根据 ndotl 和 curvature 取样 subsurface BRDF texture
+            vec3 subsuf = subsurfaceScattering(NdotL, curvature, u_material.subsurfaceColor, u_material.subsurface);
+            f_diffuse += subsuf * intensity;
         }
 
         // float NdotV = clampedDot(n, v);  // 前面已经算过了，与光源无关
         if (NdotL > 0.0 || NdotV > 0.0)
         {
-            vec3 intensity = rangeAttenuation * spotAttenuation * light.color.rgb * shadow;
+            NdotL = clamp(NdotL, 0.0, 1.0);
+            // apply shadow while diffuse?
+            intensity *= shadow;
+
             // these values may be used by sheen, clearcoat, subsurface or other effets
             // if so, they may be need to move outside
             vec3 h = normalize(l + v);          // Direction of the vector between l and v, called halfway vector
@@ -247,8 +257,9 @@ void main(void)
     // put tone mapping in post process
     // color = ACESToneMapping(color, 1.0);
 
-    // o.color = vec4(color, getOpacity());
-    o.color = vec4(curvature, curvature, curvature, getOpacity());
+    o.color = vec4(color, getOpacity());
+    // o.color = vec4(curvature, curvature, curvature, getOpacity());
+    // o.color = vec4(curvature, curvature, curvature, getOpacity());
     o.normal = (u_view.matView * vec4(n, 0)).xyz;  // output world normal or view normal?
     o.roughness = roughness;
     o.specular = f0;

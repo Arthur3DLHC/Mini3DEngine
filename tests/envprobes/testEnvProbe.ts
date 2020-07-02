@@ -79,8 +79,10 @@ window.onload = () => {
         sphereMesh.isStatic = false;
         const sphereMtl = new StandardPBRMaterial();
         sphereMtl.color = new vec4([1.0, 1.0, 1.0, 1.0]);
-        sphereMtl.metallic = 0.2;
-        sphereMtl.roughness = 0.1;
+        sphereMtl.metallic = 0.1;
+        sphereMtl.roughness = 0.5;
+        sphereMtl.subsurface = 1.0;
+        sphereMtl.subsurfaceColor = new vec3([0.4, 0.06, 0.0]);
         sphereMesh.materials.push(sphereMtl);
     
         boxMesh.attachChild(sphereMesh);

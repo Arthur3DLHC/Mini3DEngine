@@ -39,7 +39,7 @@ export class SubsurfaceProcessor {
         // G: subsurface color intensity
 
         // test color result
-        this.preIntegratedBRDFTexture = new Texture2D(256, 256, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.UNSIGNED_BYTE, false);
+        this.preIntegratedBRDFTexture = new Texture2D(256, 256, 1, 1, GLDevice.gl.RED, GLDevice.gl.HALF_FLOAT, false);
         // this.preIntegratedBRDFTexture = new Texture2D(256, 256, 1, 1, GLDevice.gl.RG, GLDevice.gl.HALF_FLOAT, false);
         this.preIntegratedBRDFTexture.create();
 

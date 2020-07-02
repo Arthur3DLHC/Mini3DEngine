@@ -610,6 +610,9 @@ export class ClusteredForwardRenderer {
                 this._samplerUniformsStdPBR.setTexture("s_emissiveMap", pbrMtl.emissiveMap);
                 this._samplerUniformsStdPBR.setTexture("s_normalMap", pbrMtl.normalMap);
                 this._samplerUniformsStdPBR.setTexture("s_occlusionMap", pbrMtl.occlusionMap);
+                if (pbrMtl.subsurface > 0) {
+                    this._samplerUniformsStdPBR.setTexture("s_subsurfBRDF", this._subsurfProcessor.preIntegratedBRDFTexture);
+                }
             }        
         } else {
             throw new Error("Method not implemented.");

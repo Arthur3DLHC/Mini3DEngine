@@ -27,10 +27,12 @@ void main(void) {
     // float subsurfStrength = (1.0 - smoothstep(0.0, subsurfWidth, subsurf)) * curvature * curvature;
 
     // debug test combine color
-    vec3 subsufColor = vec3(0.4, 0.06, 0.0) * subsurfStrength;
-    vec3 color = vec3(ndotl) + subsufColor;
-    //o_color = vec4(subsufColor, 1.0);
-    o_color = vec4(color, 1.0);
+    // vec3 subsufColor = vec3(0.4, 0.06, 0.0) * subsurfStrength;
+    // vec3 color = vec3(ndotl) + subsufColor;
+    // o_color = vec4(subsufColor, 1.0);
+    // o_color = vec4(color, 1.0);
     //o_color = vec4(subsurfStrength, subsurfStrength, subsurfStrength, 1.0);
+
+    o_color = vec4(subsurfStrength, subsurfStrength, subsurfStrength, 1.0);
 }
 `;
