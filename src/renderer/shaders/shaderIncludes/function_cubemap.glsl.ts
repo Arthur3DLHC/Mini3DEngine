@@ -94,6 +94,14 @@ export default /** glsl */`
         int sampleFaceIdx = 0;
         vec2 cubeUV = getCubemapTexcoord(v, sampleFaceIdx);
         // fix me: how to implement seamless filter?
+        // if cubeuv is near borders, calculate a new vector pointing the opposite texel on the other side of the border,
+        // do a sample and linear filter
+        // fix me: need to know the cubemap size?
+
+        // or make a pre-filter shader, and make the adjacent border texels has exactly same color (average color?)
+        // "EDGE FIXUP"
+        // http://www.pixelmaven.com/jason/articles/ATI/Isidoro_CubeMapFiltering_2005_Slides.pdf
+
         return sampleCubeMapArrayLod(s, cubeUV, sampleFaceIdx, layer, lod);
     }
 
