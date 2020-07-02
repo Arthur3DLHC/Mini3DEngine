@@ -162,7 +162,8 @@ void main(void)
         // float NdotL = clampedDot(n, l);
         float NdotL = dot(n, l);
 
-        // don't apply shadow while subsurface scattering
+        // don't apply shadow while subsurface scattering?
+        // fix me: 在阴影中的物体的明暗交界线上会出现一条光环
         vec3 intensity = rangeAttenuation * spotAttenuation * light.color.rgb;// * shadow;
 
         // todo: if subsurface > 0, sample subsurface strength from subsurface scattering BRDF texture

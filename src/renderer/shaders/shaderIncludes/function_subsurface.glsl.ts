@@ -7,7 +7,8 @@ uniform sampler2D s_subsurfBRDF;
 // calc curvature
 float calcCurvature(vec3 n, vec3 pos) {
     // https://zhuanlan.zhihu.com/p/43244741
-    return clamp(length(fwidth(n)) / length(fwidth(pos)) * 0.1, 0.0, 1.0);
+    // 0.01 is an adjust factor
+    return clamp(0.05 * length(fwidth(n)) / length(fwidth(pos)), 0.0, 1.0);
 
     // http://madebyevan.com/shaders/curvature/, not very good
     // vec3 dx = dFdx(n);

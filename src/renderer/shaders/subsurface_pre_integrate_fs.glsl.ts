@@ -23,7 +23,8 @@ void main(void) {
     // float delta = 0.5 * curvature;
     float gaussian = exp(-((x * x) / (2.0 * delta * delta)));
     float gaussian1 = pow(gaussian, 15.0);
-    float subsurfStrength = (gaussian * 0.5 + gaussian1 * 0.5) * curvature;
+    float curvatureFactor = curvature * curvature;
+    float subsurfStrength = (gaussian * 0.5 + gaussian1 * 0.5 + ndotl) * curvatureFactor;
     subsurfStrength = clamp(subsurfStrength, 0.0, 1.0);
     // float subsurfStrength = (1.0 - smoothstep(0.0, subsurfWidth, subsurf)) * curvature * curvature;
 
