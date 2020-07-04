@@ -225,7 +225,8 @@ export class CubemapProcessor {
         fixEdgeProgram.build();
 
         // render to temp texture and fbo for edge fixing
-        const tmpTexture = new Texture2D(dest.width, dest.height, 1, 1024, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT, false);
+        const size = dest.getLevelSize(CubemapProcessor.diffuseMipLevel);
+        const tmpTexture = new Texture2D(size.x, size.y, 1, 1024, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT, false);
         tmpTexture.create();
         const tmpFBO = new FrameBuffer();
         const destFBO = new FrameBuffer();
@@ -238,8 +239,8 @@ export class CubemapProcessor {
             // level 5, 2x2？
             // 64, 32, 16, 8, 4, 2
             // tmp texture only has 1 layer
-            // tmpFBO.attachTexture(0, tmpTexture, CubemapProcessor.diffuseMipLevel);
-            tmpFBO.attachTexture(0, dest, CubemapProcessor.diffuseMipLevel, ilayer);
+            tmpFBO.attachTexture(0, tmpTexture);
+            // tmpFBO.attachTexture(0, dest, CubemapProcessor.diffuseMipLevel, ilayer);
             tmpFBO.prepare();
 
             GLDevice.renderTarget = tmpFBO;
@@ -270,40 +271,40 @@ export class CubemapProcessor {
             GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D);
             GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D_ARRAY);
 
-            /*
-        
             // --------------- fix edge --------------------
 
-            GLPrograms.useProgram(fixEdgeProgram);
 
             destFBO.attachTexture(0, dest, CubemapProcessor.diffuseMipLevel, ilayer);
             destFBO.prepare();
 
             GLDevice.renderTarget = destFBO;
 
+            GLPrograms.useProgram(fixEdgeProgram);
+
             this._renderStates.apply();
 
             GLDevice.gl.viewport(0, 0, size.x, size.y);
             GLDevice.gl.scissor(0, 0, size.x, size.y);
 
-            GLTextures.setTextureAt(textureUnit, tmpTexture, GLDevice.gl.TEXTURE_2D);
+            const tmpTexUnit = textureUnit + 1;
+
+            GLTextures.setTextureAt(tmpTexUnit, tmpTexture, GLDevice.gl.TEXTURE_2D);
         
             sourceTexLocation = fixEdgeProgram.getUniformLocation("s_source");
-            GLDevice.gl.uniform1i(sourceTexLocation, textureUnit);
+            GLDevice.gl.uniform1i(sourceTexLocation, tmpTexUnit);
 
             // texture size at mipmap level
             const texSizeLocation = fixEdgeProgram.getUniformLocation("u_texSize");
             GLDevice.gl.uniform1f(texSizeLocation, size.y);
 
+            // diffuse temp texture only has one level
             const levelLocation = fixEdgeProgram.getUniformLocation("u_level");
-            GLDevice.gl.uniform1f(levelLocation, CubemapProcessor.diffuseMipLevel);
+            GLDevice.gl.uniform1f(levelLocation, 0);
 
             this._rectGeom.draw(0, Infinity, fixEdgeProgram.attributes);
 
-            GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D);
-            GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D_ARRAY);
-
-            */
+            GLTextures.setTextureAt(tmpTexUnit, null, GLDevice.gl.TEXTURE_2D);
+            GLTextures.setTextureAt(tmpTexUnit, null, GLDevice.gl.TEXTURE_2D_ARRAY);
         }
         
         // delete temp FBO
