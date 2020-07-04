@@ -215,7 +215,7 @@ export class CubemapProcessor {
         const diffuseProgram = new ShaderProgram();
         diffuseProgram.name = "cubemap_filter_diffuse";
         diffuseProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_vs"]);
-        diffuseProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_specular_LD_fs"]);
+        diffuseProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_diffuse_fs"]);
         diffuseProgram.build();
 
         const fixEdgeProgram = new ShaderProgram();
@@ -235,10 +235,11 @@ export class CubemapProcessor {
         // iterate all cubemaps
         for (let ilayer = 0; ilayer < cubemapCount; ilayer++) {
             // use a specific mipmap level as diffuse
-            // level 5, 4x4？
-
+            // level 5, 2x2？
+            // 64, 32, 16, 8, 4, 2
             // tmp texture only has 1 layer
-            tmpFBO.attachTexture(0, tmpTexture, CubemapProcessor.diffuseMipLevel);
+            // tmpFBO.attachTexture(0, tmpTexture, CubemapProcessor.diffuseMipLevel);
+            tmpFBO.attachTexture(0, dest, CubemapProcessor.diffuseMipLevel, ilayer);
             tmpFBO.prepare();
 
             GLDevice.renderTarget = tmpFBO;
@@ -268,7 +269,11 @@ export class CubemapProcessor {
 
             GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D);
             GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D_ARRAY);
+
+            /*
         
+            // --------------- fix edge --------------------
+
             GLPrograms.useProgram(fixEdgeProgram);
 
             destFBO.attachTexture(0, dest, CubemapProcessor.diffuseMipLevel, ilayer);
@@ -297,6 +302,8 @@ export class CubemapProcessor {
 
             GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D);
             GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D_ARRAY);
+
+            */
         }
         
         // delete temp FBO

@@ -31,7 +31,7 @@ vec3 convolurionCubeMap(int faceIndex, vec2 uv) {
 
     // Convolution
     float samplingStep = 0.025;
-    int samples = 0;
+    float samples = 0.0;
     vec3 lum = vec3(0.0, 0.0, 0.0);
     for (float phi = 0.0; phi < 2.0 * PI; phi = phi + samplingStep) {
         for (float theta = 0.0; theta < 0.5 * PI; theta = theta + samplingStep) {
@@ -42,7 +42,7 @@ vec3 convolurionCubeMap(int faceIndex, vec2 uv) {
             // vec3 texColor = sampleCubeMapArray(s_source, cubeUV, sampleFaceIdx, u_layer).rgb;
             vec3 texColor = textureCubeArray(s_source, d, u_layer).rgb;
             lum = lum + texColor * cos(theta) * sin(theta);  // L * (ndotl) * sin(theta) d(theta)d(phi)
-            samples = samples + lum;
+            samples = samples + 1.0;
         }
     }
     lum = PI * lum * (1.0 / samples);

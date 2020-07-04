@@ -5,7 +5,7 @@
 export default /** glsl */`
 #include <function_cubemap>
 
-uniform sampler2D  s_source;
+uniform sampler2D       s_source;
 uniform float           u_level;
 uniform float           u_texSize;
 
@@ -14,6 +14,11 @@ layout(location = 0) out vec4 o_color;
 
 void main(void)
 {
+    //o_color = textureLod(s_source, ex_texcoord, u_level);
+    o_color = texture(s_source, ex_texcoord);
+    //o_color = vec4(1.0, 0.0, 0.0, 1.0);
+    return;
+
     // get face index from UV
     vec2 uv = ex_texcoord * vec2(6.0, 1.0);
     float u = floor(uv.x);
