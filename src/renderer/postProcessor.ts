@@ -119,7 +119,7 @@ export class PostProcessor {
         this._ssaoTexture.create();
 
         this._ssaoFBO = new FrameBuffer();
-        this._ssaoFBO.setTexture(0, this._ssaoTexture);
+        this._ssaoFBO.attachTexture(0, this._ssaoTexture);
         this._ssaoFBO.prepare();
 
         this._ssrTexture = new Texture2D(sceneDepthTex.width / 2, sceneDepthTex.height / 2, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
@@ -127,7 +127,7 @@ export class PostProcessor {
         this._ssrTexture.create();
 
         this._ssrFBO = new FrameBuffer();
-        this._ssrFBO.setTexture(0, this._ssrTexture);
+        this._ssrFBO.attachTexture(0, this._ssrTexture);
         this._ssrFBO.prepare();
 
         // this._tempFullSwapFBO = [];

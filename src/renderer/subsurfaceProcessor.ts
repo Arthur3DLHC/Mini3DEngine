@@ -47,7 +47,7 @@ export class SubsurfaceProcessor {
 
         // create a temp FBO, bind brdf texture
         const tmpFBO = new FrameBuffer();
-        tmpFBO.setTexture(0, this.preIntegratedBRDFTexture);
+        tmpFBO.attachTexture(0, this.preIntegratedBRDFTexture);
         tmpFBO.prepare();
 
         // set as rendertarget; set viewport and scissor

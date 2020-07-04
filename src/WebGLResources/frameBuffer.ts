@@ -20,7 +20,7 @@ export class FrameBuffer {
      * @param texture 
      * @param layer if texture is array texture, this is the layer to bind. or should use -1
      */
-    public setTexture(index: number, texture: Texture | null, level: number = 0, layer: number = -1) {
+    public attachTexture(index: number, texture: Texture | null, level: number = 0, layer: number = -1) {
         if (this._textures[index] !== texture || this._textureLevels[index] !== level || this._textureLayers[index] !== layer) {
             this._textures[index] = texture;
             this._textureLevels[index] = level;

@@ -135,14 +135,14 @@ export class ClusteredForwardRenderer {
             this._sceneColorTexture[i].create();
 
             this._mainFBO[i] = new FrameBuffer();
-            this._mainFBO[i].setTexture(0, this._sceneColorTexture[i]);
-            this._mainFBO[i].setTexture(1, this._sceneNormalTexture);
-            this._mainFBO[i].setTexture(2, this._sceneSpecularRoughnessTexture);
+            this._mainFBO[i].attachTexture(0, this._sceneColorTexture[i]);
+            this._mainFBO[i].attachTexture(1, this._sceneNormalTexture);
+            this._mainFBO[i].attachTexture(2, this._sceneSpecularRoughnessTexture);
             this._mainFBO[i].depthStencilTexture = this._sceneDepthTexture;
             this._mainFBO[i].prepare();
 
             this._postprocessFBO[i] = new FrameBuffer();
-            this._postprocessFBO[i].setTexture(0, this._sceneColorTexture[i]);
+            this._postprocessFBO[i].attachTexture(0, this._sceneColorTexture[i]);
             this._postprocessFBO[i].prepare();
         }
         this._currFrameFBOIdx = 0;
@@ -213,7 +213,7 @@ export class ClusteredForwardRenderer {
         this._shadowmapCacheFBO = new FrameBuffer();
         this._shadowmapCacheFBO.depthStencilTexture = this._shadowmapAtlasCache.texture;
         if (this._debugDepthTexture) {
-            this._shadowmapCacheFBO.setTexture(0, this._debugDepthTexture);
+            this._shadowmapCacheFBO.attachTexture(0, this._debugDepthTexture);
         }
         this._shadowmapCacheFBO.prepare();
 
@@ -755,11 +755,11 @@ export class ClusteredForwardRenderer {
             
             // envmap:
             // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, false);
-            // debug outpu diffuse Riemann sum result
-            // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, CubemapProcessor.diffuseMipLevel, false);
+            // debug output diffuse Riemann sum result
+            this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, CubemapProcessor.diffuseMipLevel, false);
             // todo: debug outpu specular LD parts and DFG parts
             // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, 4, false);
-            this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._subsurfProcessor.preIntegratedBRDFTexture, 1, 0, 0, false);
+            // this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._subsurfProcessor.preIntegratedBRDFTexture, 1, 0, 0, false);
         }
 
         // swap between curr and prev frame
@@ -1277,7 +1277,7 @@ export class ClusteredForwardRenderer {
             matWorldToProbe.inverse();
 
             // todo: set the cubemap texture array layer as render target
-            envMapFBO.setTexture(0, envMapArray, 0, ienvprobe);
+            envMapFBO.attachTexture(0, envMapArray, 0, ienvprobe);
             envMapFBO.prepare();
             // need to force set, or the target will be set to null in prepare() function
             GLDevice.renderTarget = envMapFBO;

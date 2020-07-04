@@ -3,11 +3,10 @@
  * http://www.pixelmaven.com/jason/articles/ATI/Isidoro_CubeMapFiltering_2005_Slides.pdf
  */
 export default /** glsl */`
-precision lowp sampler2DArray;
 #include <function_cubemap>
 
-uniform sampler2DArray  s_source;
-uniform int             u_layer;
+uniform sampler2D  s_source;
+uniform float           u_level;
 uniform float           u_texSize;
 
 in vec2 ex_texcoord;
@@ -26,7 +25,7 @@ void main(void)
 
     // not border texel, copy and early quit.
     if (uv.x >= edgeWidth && uv.x <= 1.0 - edgeWidth && uv.y >= edgeWidth && uv.y <= 1.0 - edgeWidth) {
-        o_color = texture(s_source, vec3(ex_texcoord, float(u_layer)));
+        o_color = textureLod(s_source, ex_texcoord, u_level);
         return;
     }
 
@@ -155,8 +154,8 @@ void main(void)
         }
     }
 
-    vec4 sourceColor = texture(s_source, vec3(ex_texcoord, float(u_layer)));
-    vec4 adjColor = texture(s_source, vec3(float(adjFaceIdx) / 6.0 + adjuv.x, adjuv.y, float(u_layer)));
+    vec4 sourceColor = textureLod(s_source, ex_texcoord, u_level);
+    vec4 adjColor = textureLod(s_source, vec2(float(adjFaceIdx) / 6.0 + adjuv.x, adjuv.y), u_level);
 
     o_color = (sourceColor + adjColor) * 0.5;
 }
