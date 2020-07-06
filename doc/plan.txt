@@ -319,6 +319,10 @@ TODO:       主要类结构
                     例如，将水平四个面按相邻顺序排列？
                     渲染时和取纹理时都得对应修改；
                     为了避免把现在的功能搞乱，还是先不调整了，直接每个面都统一处理边缘吧。
+                    Fix me: 即使 fix edge 了，在绘制时做双线过滤仍然会取样到非邻接面的像素，导致有接缝
+                    或者考虑不用 cubemap，使用全景图形式？
+                    * 或者不再把六张图排到一张贴图里，而是分开，占用 texturearray 的六个 layer？
+                    webgl 什么时候才能支持 cubmap array =.=
             
             半透明物体的绘制？
                 需要由远到近排序？按照物体中心点；
@@ -327,6 +331,7 @@ TODO:       主要类结构
                 sampler state
                 贴图的属性
                 贴图的加载和绑定
+                加载完成事件？
                 
             Dithered soft shadow?
                 使用一个 blue noise dither texture；在做 shadowmap 取样时根据像素屏幕坐标取 dither 偏移量，应用到 shadowmap uv 上？
