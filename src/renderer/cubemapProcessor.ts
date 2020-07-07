@@ -87,7 +87,7 @@ export class CubemapProcessor {
         fixEdgeProgram.build();
 
         // render to temp texture and fbo for edge fixing
-        const tmpTexture = new Texture2D(dest.width, dest.height, 1, 1024, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT, false);
+        const tmpTexture = new Texture2DArray(dest.width, dest.height, 6, 1024, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT, false);
         tmpTexture.create();
         const tmpFBO = new FrameBuffer();
         const destFBO = new FrameBuffer();
@@ -95,83 +95,95 @@ export class CubemapProcessor {
         // use shader program
 
         // iterate all cubemaps
-        for (let ilayer = 0; ilayer < cubemapCount; ilayer++) {
+        for (let ienvmap = 0; ienvmap < cubemapCount; ienvmap++) {
 
             GLPrograms.useProgram(specLDProgram);
+            for (let iface = 0; iface < 6; iface++) {
 
-            // use 0 ~ 4 level as specular (64x64 to 8x8)
-            // with different roughness
-            for (let ilevel = 0; ilevel <= CubemapProcessor.maxSpecularMipLevel; ilevel++) {
-                // bind texture layer to fbo
-                // temp texture only have one layer
-                tmpFBO.attachTexture(0, tmpTexture, ilevel);
-                tmpFBO.prepare();
+                // use 0 ~ 4 level as specular (64x64 to 8x8)
+                // with different roughness
+                for (let ilevel = 0; ilevel <= CubemapProcessor.maxSpecularMipLevel; ilevel++) {
+                    // bind texture layer to fbo
+                    // temp texture only have one cubemap (6 faces)
+                    tmpFBO.attachTexture(0, tmpTexture, ilevel, iface);
+                    tmpFBO.prepare();
+    
+                    // render target
+                    GLDevice.renderTarget = tmpFBO;
+    
+                    // render state
+                    this._renderStates.apply();
+    
+                    // viewport
+                    const size = dest.getLevelSize(ilevel);
+                    GLDevice.gl.viewport(0, 0, size.x, size.y);
+                    GLDevice.gl.scissor(0, 0, size.x, size.y);
+    
+                    // set textures. because framebuffer.prepare will bind texture,
+                    // need set textures here.
+                    GLTextures.setTextureAt(textureUnit, source, GLDevice.gl.TEXTURE_2D_ARRAY);
+    
+                    // set uniform params and samplers
+                    const sourceTexLocation = specLDProgram.getUniformLocation("s_source");
+                    GLDevice.gl.uniform1i(sourceTexLocation, textureUnit);
+    
+                    const roughness = ilevel / CubemapProcessor.maxSpecularMipLevel;
+                    const roughnessLocation = specLDProgram.getUniformLocation("u_roughness");
+                    GLDevice.gl.uniform1f(roughnessLocation, roughness);
+    
+                    // source texture layer index
+                    const layerLocation = specLDProgram.getUniformLocation("u_envmapIdx");
+                    GLDevice.gl.uniform1i(layerLocation, ienvmap);
+                    // GLDevice.gl.uniform1i(layerLocation, ilayer);
 
-                // render target
-                GLDevice.renderTarget = tmpFBO;
-
-                // render state
-                this._renderStates.apply();
-
-                // viewport
-                const size = dest.getLevelSize(ilevel);
-                GLDevice.gl.viewport(0, 0, size.x, size.y);
-                GLDevice.gl.scissor(0, 0, size.x, size.y);
-
-                // set textures. because framebuffer.prepare will bind texture,
-                // need set textures here.
-                GLTextures.setTextureAt(textureUnit, source, GLDevice.gl.TEXTURE_2D_ARRAY);
-
-                // set uniform params and samplers
-                const sourceTexLocation = specLDProgram.getUniformLocation("s_source");
-                GLDevice.gl.uniform1i(sourceTexLocation, textureUnit);
-
-                const roughness = ilevel / CubemapProcessor.maxSpecularMipLevel;
-                const roughnessLocation = specLDProgram.getUniformLocation("u_roughness");
-                GLDevice.gl.uniform1f(roughnessLocation, roughness);
-
-                // source texture layer index
-                const layerLocation = specLDProgram.getUniformLocation("u_layer");
-                GLDevice.gl.uniform1i(layerLocation, ilayer);
-
-                // draw a full screen quad
-                this._rectGeom.draw(0, Infinity, specLDProgram.attributes);
+                    const faceLocation = specLDProgram.getUniformLocation("u_faceIdx");
+                    GLDevice.gl.uniform1i(faceLocation, iface);
+    
+                    // draw a full screen quad
+                    this._rectGeom.draw(0, Infinity, specLDProgram.attributes);
+                }
             }
-
+                
             GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D);
             GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D_ARRAY);
-
+    
             GLPrograms.useProgram(fixEdgeProgram);
+            for (let iface = 0; iface < 6; iface++) {
+    
+                for (let ilevel = 0; ilevel <= CubemapProcessor.maxSpecularMipLevel; ilevel++) {
+                    destFBO.attachTexture(0, dest, ilevel, ienvmap * 6 + iface);
+                    destFBO.prepare();
+    
+                    GLDevice.renderTarget = destFBO;
+    
+                    this._renderStates.apply();
+    
+                    const size = dest.getLevelSize(ilevel);
+                    GLDevice.gl.viewport(0, 0, size.x, size.y);
+                    GLDevice.gl.scissor(0, 0, size.x, size.y);
+    
+                    // only one cubemap (6 faces) in tmpTexture
+                    GLTextures.setTextureAt(textureUnit, tmpTexture, GLDevice.gl.TEXTURE_2D_ARRAY);
+                
+                    const sourceTexLocation = fixEdgeProgram.getUniformLocation("s_source");
+                    GLDevice.gl.uniform1i(sourceTexLocation, textureUnit);
+    
+                    // texture size at mipmap level
+                    const texSizeLocation = fixEdgeProgram.getUniformLocation("u_texSize");
+                    GLDevice.gl.uniform1f(texSizeLocation, size.y);
 
-            for (let ilevel = 0; ilevel <= CubemapProcessor.maxSpecularMipLevel; ilevel++) {
-                destFBO.attachTexture(0, dest, ilevel, ilayer);
-                destFBO.prepare();
-
-                GLDevice.renderTarget = destFBO;
-
-                this._renderStates.apply();
-
-                const size = dest.getLevelSize(ilevel);
-                GLDevice.gl.viewport(0, 0, size.x, size.y);
-                GLDevice.gl.scissor(0, 0, size.x, size.y);
-
-                GLTextures.setTextureAt(textureUnit, tmpTexture, GLDevice.gl.TEXTURE_2D);
-            
-                const sourceTexLocation = fixEdgeProgram.getUniformLocation("s_source");
-                GLDevice.gl.uniform1i(sourceTexLocation, textureUnit);
-
-                // texture size at mipmap level
-                const texSizeLocation = fixEdgeProgram.getUniformLocation("u_texSize");
-                GLDevice.gl.uniform1f(texSizeLocation, size.y);
-
-                const levelLocation = fixEdgeProgram.getUniformLocation("u_level");
-                GLDevice.gl.uniform1f(levelLocation, ilevel);
-
-                this._rectGeom.draw(0, Infinity, fixEdgeProgram.attributes);
+                    const faceLocation = fixEdgeProgram.getUniformLocation("u_faceIdx"); // cube face
+                    GLDevice.gl.uniform1i(faceLocation, iface);
+    
+                    const levelLocation = fixEdgeProgram.getUniformLocation("u_level");
+                    GLDevice.gl.uniform1f(levelLocation, ilevel);
+    
+                    this._rectGeom.draw(0, Infinity, fixEdgeProgram.attributes);
+                }
+                
+                GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D);
+                GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D_ARRAY);                
             }
-            
-            GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D);
-            GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D_ARRAY);
         }
 
         // delete temp FBOs and textures
@@ -226,7 +238,7 @@ export class CubemapProcessor {
 
         // render to temp texture and fbo for edge fixing
         const size = dest.getLevelSize(CubemapProcessor.diffuseMipLevel);
-        const tmpTexture = new Texture2D(size.x, size.y, 1, 1024, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT, false);
+        const tmpTexture = new Texture2DArray(size.x, size.y, 6, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT, false);
         tmpTexture.create();
         const tmpFBO = new FrameBuffer();
         const destFBO = new FrameBuffer();
@@ -234,74 +246,82 @@ export class CubemapProcessor {
         // use shader program
 
         // iterate all cubemaps
-        for (let ilayer = 0; ilayer < cubemapCount; ilayer++) {
+        for (let ienvmap = 0; ienvmap < cubemapCount; ienvmap++) {
             // use a specific mipmap level as diffuse
             // level 5, 2x2？
             // 64, 32, 16, 8, 4, 2
-            // tmp texture only has 1 layer
-            tmpFBO.attachTexture(0, tmpTexture);
-            // tmpFBO.attachTexture(0, dest, CubemapProcessor.diffuseMipLevel, ilayer);
-            tmpFBO.prepare();
-
-            GLDevice.renderTarget = tmpFBO;
-            // set viewport
-            const size = dest.getLevelSize(CubemapProcessor.diffuseMipLevel);
-            GLDevice.gl.viewport(0, 0, size.x, size.y);
-            GLDevice.gl.scissor(0, 0, size.x, size.y);
-
-            // set render state
-            this._renderStates.apply();
-
             GLPrograms.useProgram(diffuseProgram);
 
-            // set textures
-            GLTextures.setTextureAt(textureUnit, source, GLDevice.gl.TEXTURE_2D_ARRAY);
+            for (let iface = 0; iface < 6; iface++) {
+                // tmp texture only has 1 mip level; 6 faces
+                tmpFBO.attachTexture(0, tmpTexture, 0, iface);
+                // tmpFBO.attachTexture(0, dest, CubemapProcessor.diffuseMipLevel, ilayer);
+                tmpFBO.prepare();
 
-            // set uniform params and samplers
-            let sourceTexLocation = diffuseProgram.getUniformLocation("s_source");
-            GLDevice.gl.uniform1i(sourceTexLocation, textureUnit);
+                GLDevice.renderTarget = tmpFBO;
+                // set viewport
+                const size = dest.getLevelSize(CubemapProcessor.diffuseMipLevel);
+                GLDevice.gl.viewport(0, 0, size.x, size.y);
+                GLDevice.gl.scissor(0, 0, size.x, size.y);
 
-            // source texture layer index
-            const layerLocation = diffuseProgram.getUniformLocation("u_layer");
-            GLDevice.gl.uniform1i(layerLocation, ilayer);
+                // set render state
+                this._renderStates.apply();
 
-            // draw a full screen quad
-            this._rectGeom.draw(0, Infinity, diffuseProgram.attributes);
+
+                // set textures
+                GLTextures.setTextureAt(textureUnit, source, GLDevice.gl.TEXTURE_2D_ARRAY);
+
+                // set uniform params and samplers
+                let sourceTexLocation = diffuseProgram.getUniformLocation("s_source");
+                GLDevice.gl.uniform1i(sourceTexLocation, textureUnit);
+
+                // source texture cubemap index
+                const ienvLocation = diffuseProgram.getUniformLocation("u_envmapIdx");
+                GLDevice.gl.uniform1i(ienvLocation, ienvmap);
+
+                const ifaceLocation = diffuseProgram.getUniformLocation("u_faceIdx");
+                GLDevice.gl.uniform1i(ifaceLocation, iface);
+
+                // draw a full screen quad
+                this._rectGeom.draw(0, Infinity, diffuseProgram.attributes);
+            }
 
             GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D);
             GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D_ARRAY);
 
             // --------------- fix edge --------------------
-
-
-            destFBO.attachTexture(0, dest, CubemapProcessor.diffuseMipLevel, ilayer);
-            destFBO.prepare();
-
-            GLDevice.renderTarget = destFBO;
-
             GLPrograms.useProgram(fixEdgeProgram);
-
-            this._renderStates.apply();
-
-            GLDevice.gl.viewport(0, 0, size.x, size.y);
-            GLDevice.gl.scissor(0, 0, size.x, size.y);
-
             const tmpTexUnit = textureUnit + 1;
+            for (let iface = 0; iface < 6; iface++) {
 
-            GLTextures.setTextureAt(tmpTexUnit, tmpTexture, GLDevice.gl.TEXTURE_2D);
-        
-            sourceTexLocation = fixEdgeProgram.getUniformLocation("s_source");
-            GLDevice.gl.uniform1i(sourceTexLocation, tmpTexUnit);
+                destFBO.attachTexture(0, dest, CubemapProcessor.diffuseMipLevel, ienvmap * 6 + iface);
+                destFBO.prepare();
 
-            // texture size at mipmap level
-            const texSizeLocation = fixEdgeProgram.getUniformLocation("u_texSize");
-            GLDevice.gl.uniform1f(texSizeLocation, size.y);
+                GLDevice.renderTarget = destFBO;
 
-            // diffuse temp texture only has one level
-            const levelLocation = fixEdgeProgram.getUniformLocation("u_level");
-            GLDevice.gl.uniform1f(levelLocation, 0);
+                this._renderStates.apply();
 
-            this._rectGeom.draw(0, Infinity, fixEdgeProgram.attributes);
+                GLDevice.gl.viewport(0, 0, size.x, size.y);
+                GLDevice.gl.scissor(0, 0, size.x, size.y);
+
+                GLTextures.setTextureAt(tmpTexUnit, tmpTexture, GLDevice.gl.TEXTURE_2D_ARRAY);
+
+                const sourceTexLocation = fixEdgeProgram.getUniformLocation("s_source");
+                GLDevice.gl.uniform1i(sourceTexLocation, tmpTexUnit);
+
+                // texture size at mipmap level
+                const texSizeLocation = fixEdgeProgram.getUniformLocation("u_texSize");
+                GLDevice.gl.uniform1f(texSizeLocation, size.y);
+
+                // diffuse temp texture only has one mip level, 6 faces
+                const faceLocation = fixEdgeProgram.getUniformLocation("u_faceIdx");
+                GLDevice.gl.uniform1i(faceLocation, iface);
+
+                const levelLocation = fixEdgeProgram.getUniformLocation("u_level");
+                GLDevice.gl.uniform1f(levelLocation, 0);
+
+                this._rectGeom.draw(0, Infinity, fixEdgeProgram.attributes);
+            }
 
             GLTextures.setTextureAt(tmpTexUnit, null, GLDevice.gl.TEXTURE_2D);
             GLTextures.setTextureAt(tmpTexUnit, null, GLDevice.gl.TEXTURE_2D_ARRAY);

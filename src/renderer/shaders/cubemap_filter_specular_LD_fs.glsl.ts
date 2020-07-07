@@ -10,7 +10,8 @@ precision lowp sampler2DArray;
 #include <function_ibl>
 
 uniform sampler2DArray      s_source;
-uniform int                 u_layer;
+uniform int                 u_envmapIdx;
+uniform int                 u_faceIdx;
 uniform float               u_roughness;
 
 in vec2 ex_texcoord;
@@ -36,7 +37,7 @@ vec3 convolutionCubeMap(sampler2DArray s, int faceIndex, vec2 uv) {
 
         float ndotl = max(0.0, dot(n, l));
         if (ndotl > 0.0) {
-            color = color + textureCubeArray(s, l, u_layer).xyz * ndotl;
+            color = color + textureCubeArray(s, l, u_envmapIdx).xyz * ndotl;
             weight = weight + ndotl;
         }
     }
@@ -49,10 +50,12 @@ void main(void)
     // test simple copy
     // o_color = texture(s_source, vec3(ex_texcoord, float(u_layer)));
 
-    vec2 uv = ex_texcoord * vec2(6.0, 1.0);
-    float u = floor(uv.x);
-    int faceIdx = int(u);
-    uv.x -= u;
+    // vec2 uv = ex_texcoord * vec2(6.0, 1.0);
+    // float u = floor(uv.x);
+    // int faceIdx = int(u);
+    // uv.x -= u;
+    vec2 uv = ex_texcoord;
+    int faceIdx = u_faceIdx;
 
     vec3 color = convolutionCubeMap(s_source, faceIdx, uv);
     o_color = vec4(color, 1.0);

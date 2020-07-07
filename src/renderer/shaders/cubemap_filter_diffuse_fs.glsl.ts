@@ -10,7 +10,8 @@ precision lowp sampler2DArray;
 const float PI = 3.1415926536898;
 
 uniform sampler2DArray      s_source;
-uniform int                 u_layer;
+uniform int                 u_envmapIdx;
+uniform int                 u_faceIdx;
 
 in vec2 ex_texcoord;
 layout(location = 0) out vec4 o_color;
@@ -40,7 +41,7 @@ vec3 convolurionCubeMap(int faceIndex, vec2 uv) {
             // int sampleFaceIdx = 0;
             // vec2 cubeUV = getCubemapTexcoord(d, sampleFaceIdx);
             // vec3 texColor = sampleCubeMapArray(s_source, cubeUV, sampleFaceIdx, u_layer).rgb;
-            vec3 texColor = textureCubeArray(s_source, d, u_layer).rgb;
+            vec3 texColor = textureCubeArray(s_source, d, u_envmapIdx).rgb;
             lum = lum + texColor * cos(theta) * sin(theta);  // L * (ndotl) * sin(theta) d(theta)d(phi)
             samples = samples + 1.0;
         }
@@ -55,10 +56,13 @@ void main(void)
     // sample source and do a Riemann Sum
 
     // get face index from UV
-    vec2 uv = ex_texcoord * vec2(6.0, 1.0);
-    float u = floor(uv.x);
-    int faceIdx = int(u);
-    uv.x -= u;
+    // vec2 uv = ex_texcoord * vec2(6.0, 1.0);
+    // float u = floor(uv.x);
+    // int faceIdx = int(u);
+    // uv.x -= u;
+
+    vec2 uv = ex_texcoord;
+    int faceIdx = u_faceIdx;
 
     vec3 color = convolurionCubeMap(faceIdx, uv);
     o_color = vec4(color, 1.0);

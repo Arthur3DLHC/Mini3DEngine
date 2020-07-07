@@ -9,9 +9,9 @@ const float DIFFUSE_MIP_LEVEL = 5.0;
 const float PI = 3.1415926536898;
 
 // diffuseColor is (1 - F) * (1 - metalic)
-vec3 getIBLRadianceLambertian(sampler2DArray s, int layer, vec3 n, vec3 diffuseColor)
+vec3 getIBLRadianceLambertian(sampler2DArray s, int envmapIdx, vec3 n, vec3 diffuseColor)
 {
-    vec3 diffuseLight = textureCubeArrayLod(s, n, layer, DIFFUSE_MIP_LEVEL).rgb;
+    vec3 diffuseLight = textureCubeArrayLod(s, n, envmapIdx, DIFFUSE_MIP_LEVEL).rgb;
 
     //#ifndef USE_HDR
     //    diffuseLight = sRGBToLinear(diffuseLight);

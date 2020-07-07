@@ -185,11 +185,12 @@ export class ClusteredForwardRenderer {
         // fix me: firefox do not support RGB 16F rendertarget, only RGBA 16F
         // this._envMapArray = new Texture2DArray(this._renderContext.envmapSize * 6, this._renderContext.envmapSize,
         //     ClusteredForwardRenderContext.MAX_ENVPROBES, 1024, gl.RGB, gl.UNSIGNED_BYTE, false);
-        this._envMapArray = new Texture2DArray(this._renderContext.envmapSize * 6, this._renderContext.envmapSize,
-            ClusteredForwardRenderContext.MAX_ENVPROBES, 1024, gl.RGBA, gl.HALF_FLOAT, false);
+        this._envMapArray = new Texture2DArray(this._renderContext.envmapSize,// * 6,
+            this._renderContext.envmapSize,
+            ClusteredForwardRenderContext.MAX_ENVPROBES * 6, 1024, gl.RGBA, gl.HALF_FLOAT, false);
     
         this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.LINEAR_MIPMAP_LINEAR, gl.LINEAR_MIPMAP_LINEAR);
-        this._envMapArray.create();
+
 
         // this._envMapDepthTexture = new Texture2D();
         // this._envMapDepthTexture.width = this._renderContext.envmapSize * 6;
@@ -756,7 +757,8 @@ export class ClusteredForwardRenderer {
             // envmap:
             // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, false);
             // debug output diffuse Riemann sum result
-            this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, CubemapProcessor.diffuseMipLevel, false);
+            this.renderScreenRect(0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, CubemapProcessor.diffuseMipLevel, false);
+            this.renderScreenRect(128.0 / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 2, CubemapProcessor.diffuseMipLevel, false);
             // todo: debug outpu specular LD parts and DFG parts
             // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, 4, false);
             // this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._subsurfProcessor.preIntegratedBRDFTexture, 1, 0, 0, false);
@@ -1226,6 +1228,10 @@ export class ClusteredForwardRenderer {
     private updateCubemaps() {
         console.log("updating cubemaps...");
 
+        if (this._envMapArray.glTexture) {
+            this._envMapArray.release();
+        }
+
         const gl = GLDevice.gl;
 
         GLTextures.setTextureAt(this._shadowmapAtlasUnit, this._shadowmapAtlas.texture);
@@ -1241,21 +1247,32 @@ export class ClusteredForwardRenderer {
         const matWorldToProbe = new mat4();
         const matViewProj = new mat4();
 
-        // use a temp texturearray and fbo to render cubemaps?
-        const envMapArray = new Texture2DArray();
+        // resize envmap array
+        this._envMapArray.width = this._renderContext.envmapSize;
+        this._envMapArray.height = this._renderContext.envmapSize;
+        this._envMapArray.depth = this._renderContext.envprobeCount * 6;
+        this._envMapArray.mipLevels = 1024;
+        this._envMapArray.format = gl.RGBA;
+        this._envMapArray.componentType = gl.HALF_FLOAT;
+        this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.LINEAR_MIPMAP_LINEAR, gl.LINEAR_MIPMAP_LINEAR);
 
-        envMapArray.width = this._renderContext.envmapSize * 6;
-        envMapArray.height = this._renderContext.envmapSize;
-        envMapArray.depth = this._renderContext.envprobeCount;
-        envMapArray.mipLevels = 1;
-        envMapArray.format = gl.RGB;
-        envMapArray.componentType = gl.UNSIGNED_BYTE;
-        envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
-        envMapArray.create();
+        this._envMapArray.create();
+
+        // use a temp texturearray and fbo to render cubemaps?
+        const tmpEnvMapArray = new Texture2DArray();
+
+        tmpEnvMapArray.width = this._renderContext.envmapSize;// * 6;
+        tmpEnvMapArray.height = this._renderContext.envmapSize;
+        tmpEnvMapArray.depth = this._renderContext.envprobeCount * 6;
+        tmpEnvMapArray.mipLevels = 1;
+        tmpEnvMapArray.format = gl.RGBA;
+        tmpEnvMapArray.componentType = gl.HALF_FLOAT;
+        tmpEnvMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
+        tmpEnvMapArray.create();
 
         const envMapDepthTexture = new Texture2D();
         
-        envMapDepthTexture.width = this._renderContext.envmapSize * 6;
+        envMapDepthTexture.width = this._renderContext.envmapSize;// * 6;
         envMapDepthTexture.height = this._renderContext.envmapSize;
         envMapDepthTexture.depth = 1;
         envMapDepthTexture.isShadowMap = true;
@@ -1276,16 +1293,15 @@ export class ClusteredForwardRenderer {
             envprobe.worldTransform.copy(matWorldToProbe);
             matWorldToProbe.inverse();
 
-            // todo: set the cubemap texture array layer as render target
-            envMapFBO.attachTexture(0, envMapArray, 0, ienvprobe);
-            envMapFBO.prepare();
-            // need to force set, or the target will be set to null in prepare() function
-            GLDevice.renderTarget = envMapFBO;
-            // GLDevice.forceSetRenderTarget(this._envmapFBO);
-
-            // todo: set viewport and scissor, render 6 faces of cubemap
             for(let iface = 0; iface < 6; iface++) {
-                const x = iface * this._renderContext.envmapSize;
+                // todo: set the cubemap texture array layer as render target
+                envMapFBO.attachTexture(0, tmpEnvMapArray, 0, ienvprobe * 6 + iface);
+                envMapFBO.prepare();
+                // need to force set, or the target will be set to null in prepare() function
+                GLDevice.renderTarget = envMapFBO;
+                // GLDevice.forceSetRenderTarget(this._envmapFBO);
+
+                const x = 0; //iface * this._renderContext.envmapSize;
                 const y = 0;
                 const width = this._renderContext.envmapSize;
                 const height = this._renderContext.envmapSize;
@@ -1328,8 +1344,8 @@ export class ClusteredForwardRenderer {
 
         const cubeProc = new CubemapProcessor();
 
-        cubeProc.processSpecularLD(envMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
-        cubeProc.processDiffuse(envMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
+        cubeProc.processSpecularLD(tmpEnvMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
+        cubeProc.processDiffuse(tmpEnvMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
         // todo: Spherical Harmonic?
 
         cubeProc.processSpecularDFG(this._specularDFG);
@@ -1337,7 +1353,7 @@ export class ClusteredForwardRenderer {
         cubeProc.release();
 
         envMapFBO.release();
-        envMapArray.release();
+        tmpEnvMapArray.release();
         envMapDepthTexture.release();
 
         console.log("done.");

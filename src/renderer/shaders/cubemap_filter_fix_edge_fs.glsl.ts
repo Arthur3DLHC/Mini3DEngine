@@ -3,10 +3,13 @@
  * http://www.pixelmaven.com/jason/articles/ATI/Isidoro_CubeMapFiltering_2005_Slides.pdf
  */
 export default /** glsl */`
+precision lowp sampler2DArray;
+
 #include <function_cubemap>
 
-uniform sampler2D       s_source;
-uniform float           u_level;     // diffuse only have one level
+uniform sampler2DArray  s_source;       // one cubemap, 6 faces
+uniform int             u_faceIdx;        // cube face idx
+uniform float           u_level;        // diffuse only have one level
 uniform float           u_texSize;
 
 in vec2 ex_texcoord;
@@ -20,17 +23,19 @@ void main(void)
     //return;
 
     // get face index from UV
-    vec2 uv = ex_texcoord * vec2(6.0, 1.0);
-    float u = floor(uv.x);
-    int faceIdx = int(u);
-    uv.x -= u;
+    // vec2 uv = ex_texcoord * vec2(6.0, 1.0);
+    // float u = floor(uv.x);
+    // int faceIdx = int(u);
+    // uv.x -= u;
+    vec2 uv = ex_texcoord;
+    int faceIdx = u_faceIdx;
 
     // todo: if uv is on edge, average the pixel color
     float edgeWidth = 1.0 / u_texSize;
 
     // not border texel, copy and early quit.
     if (uv.x >= edgeWidth && uv.x <= 1.0 - edgeWidth && uv.y >= edgeWidth && uv.y <= 1.0 - edgeWidth) {
-        o_color = textureLod(s_source, ex_texcoord, u_level);
+        o_color = textureLod(s_source, vec3(ex_texcoord, float(faceIdx)), u_level);
         //o_color = vec4(1.0, 0.0, 0.0, 1.0);
         return;
     }
@@ -160,8 +165,9 @@ void main(void)
         }
     }
 
-    vec4 sourceColor = textureLod(s_source, ex_texcoord, u_level);
-    vec4 adjColor = textureLod(s_source, vec2(float(adjFaceIdx) / 6.0 + adjuv.x / 6.0, adjuv.y), u_level);
+    vec4 sourceColor = textureLod(s_source, vec3(ex_texcoord, float(faceIdx)), u_level);
+    // vec4 adjColor = textureLod(s_source, vec2(float(adjFaceIdx) / 6.0 + adjuv.x / 6.0, adjuv.y), u_level);
+    vec4 adjColor = textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
 
     o_color = (sourceColor + adjColor) * 0.5;
 }

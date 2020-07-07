@@ -235,8 +235,8 @@ void main(void)
         float weight = 1.0 / (distxradius * distxradius);
 
         // IBL diffuse part
-        int layer = int(i - envmapStart);
-        iblDiffuse += getIBLRadianceLambertian(s_envMapArray, layer, n, albedoColor) * weight;
+        int envIdx = int(i - envmapStart);
+        iblDiffuse += getIBLRadianceLambertian(s_envMapArray, envIdx, n, albedoColor) * weight;
         
         // IBL specular part
         // modified: sample specular part in ssr composition pass, not here
