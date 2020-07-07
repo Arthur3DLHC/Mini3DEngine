@@ -323,20 +323,26 @@ TODO:       主要类结构
                     或者考虑不用 cubemap，使用全景图形式？
                     * 或者不再把六张图排到一张贴图里，而是分开，占用 texturearray 的六个 layer？
                     webgl 什么时候才能支持 cubmap array =.=
-            
+
+                
+            Dithered soft shadow?
+                使用一个 blue noise dither texture；在做 shadowmap 取样时根据像素屏幕坐标取 dither 偏移量，应用到 shadowmap uv 上？
+                或者使用程序生成的 noise texture?
+
             半透明物体的绘制？
                 需要由远到近排序？按照物体中心点；
+
+            文件加载机制
+                使用Promise, async, await
+                参考 https://github.com/bwasty/gltf-loader-ts
+                FileLoader
 
             加载贴图
                 sampler state
                 贴图的属性
                 贴图的加载和绑定
                 加载完成事件？
-                
-            Dithered soft shadow?
-                使用一个 blue noise dither texture；在做 shadowmap 取样时根据像素屏幕坐标取 dither 偏移量，应用到 shadowmap uv 上？
 
-            FileLoader
             GLTFLoader
                 从 Blender 导出测试用的模型
                 先直接引用 minimal gltf loader? 或者参考Khronos Group glTF Viewer
