@@ -17,7 +17,7 @@ export class TextureLoader extends BaseLoader {
     onProgress?: ( event: ProgressEvent ) => void,
     onError?: ( event: ErrorEvent ) => void): Texture2D {
         // todo: check cache?
-
+        // todo: need to use different key from images in cache.
         const texture = new Texture2D();
         const loader = new ImageLoader(this.manager);
 
