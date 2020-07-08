@@ -1,3 +1,5 @@
+// Adapted from https://github.com/mrdoob/three.js/blob/dev/src/loaders/ImageLoader.js
+
 import { LoadingManager } from "./loadingmanager.js";
 import { Cache } from "./cache.js";
 
