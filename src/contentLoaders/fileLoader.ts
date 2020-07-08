@@ -3,13 +3,13 @@
 // https://github.com/mrdoob/three.js/blob/master/src/loaders/FileLoader.js
 
 import { LoadingManager } from './loadingmanager.js';
+import { BaseLoader } from './baseLoader.js';
 
 export type ProgressCallback = (xhr: XMLHttpRequest) => void;
 export type XMLHttpRequestResponse = any;
 
-export class FileLoader {
-    manager: LoadingManager;
-    path: string | undefined;
+export class FileLoader extends BaseLoader {
+
     responseType: XMLHttpRequestResponseType | undefined;
     withCredentials: boolean = false;;
     mimeType: string | undefined;
@@ -18,7 +18,7 @@ export class FileLoader {
     private runningRequests: { [url: string]: Promise<XMLHttpRequestResponse>} = {};
 
     constructor(manager: LoadingManager) {
-        this.manager = manager;
+        super(manager);
     }
     load(url: string, onProgress?: ProgressCallback): Promise<XMLHttpRequestResponse> {
         if (this.path !== undefined) { url = this.path + url; }

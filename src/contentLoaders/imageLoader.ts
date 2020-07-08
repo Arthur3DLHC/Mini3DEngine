@@ -2,18 +2,15 @@
 
 import { LoadingManager } from "./loadingmanager.js";
 import { Cache } from "./cache.js";
+import { BaseLoader } from "./baseLoader.js";
 
 /**
  * Image loader
  */
-export class ImageLoader {
+export class ImageLoader extends BaseLoader {
     public constructor(manager: LoadingManager) {
-        this.manager = manager;
+        super(manager);
     }
-
-    public path: string | undefined;
-    public crossOrigin: string | undefined;
-    public manager: LoadingManager;
 
     public load(url: string, 
         onImgLoad?:(image: HTMLImageElement)=>void,
