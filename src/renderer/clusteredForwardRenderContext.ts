@@ -267,7 +267,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         const randY: mat4 = new mat4();
 
         // test raw random
-        // should use blue noise ?
+        // should use blue noise ? or halton sequence?
         for(let i = 0; i < 4; i++) {
             for(let j = 0; j < 4; j++) {
                 randX.values[i * 4 + j] = Math.random();
