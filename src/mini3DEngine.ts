@@ -1,4 +1,9 @@
 // TODO: export all public classes of engine
+export * from "./contentLoaders/baseLoader.js";
+export * from "./contentLoaders/cache.js";
+export * from "./contentLoaders/imageLoader.js";
+export * from "./contentLoaders/loadingManager.js";
+export * from "./contentLoaders/textureLoader.js";
 export * from "./geometry/bufferGeometry.js";
 export * from "./geometry/common/boxGeometry.js";
 export * from "./geometry/common/cylinderGeometry.js";

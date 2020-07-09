@@ -325,7 +325,7 @@ TODO:       主要类结构
                     webgl 什么时候才能支持 cubmap array =.=
 
                 
-            Dithered soft shadow?
+            ** Dithered soft shadow?
                 使用一个 blue noise dither texture；在做 shadowmap 取样时根据像素屏幕坐标取 dither 偏移量，应用到 shadowmap uv 上？
                 或者使用程序生成的 noise texture?
 
