@@ -344,6 +344,9 @@ TODO:       主要类结构
                 加载完成事件？
                 加载后拷贝内容到显存的操作；
                 测试加载贴图；
+                Texture Cache;
+                加载完贴图再生成 environment probe；模型也是
+                    等场景中的所有模型贴图都加载完了，再将 Scene 赋给 Renderer？
 
             GLTFLoader
                 从 Blender 导出测试用的模型

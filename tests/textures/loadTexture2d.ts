@@ -153,7 +153,7 @@ window.onload = () => {
     matPlaneRot.fromXRotation(Math.PI * 0.5);
     matPlaneTran.fromTranslation(new vec3([0, 0, -2]));
 
-    addPlane("backWall", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), 0.05, 0.8, scene);
+    addPlane("backWall", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), 0.05, 0.8, scene, "./textures/checker-map_tho.png");
 
     // left wall
     matPlaneRot.fromZRotation(-Math.PI * 0.5);
@@ -256,7 +256,7 @@ window.onload = () => {
     
         // test load texture
         if(textureUrl !== undefined) {
-            planeMtl.colorMap = textureLoader.load("./textures/testmap.png", (texture: Texture2D)=>{
+            planeMtl.colorMap = textureLoader.load(textureUrl, (texture: Texture2D)=>{
                 planeMtl.colorMapAmount = 1.0;
             });
         }

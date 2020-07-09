@@ -110,7 +110,9 @@ export class Texture2D extends Texture {
         }
 
         // todo: upload mipmaps
-
+        if (this.mipLevels > 1) {
+            gl.generateMipmap(gl.TEXTURE_2D);
+        }
         GLDevice.gl.bindTexture(GLDevice.gl.TEXTURE_2D, null);
     }
 }

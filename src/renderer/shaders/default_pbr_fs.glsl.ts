@@ -34,7 +34,8 @@ vec3 getNormal() {
 
 vec3 getBaseColor() {
     // todo: base color map
-    return (u_material.baseColor * ex_color).rgb;
+    vec4 texColor = texture(s_baseColorMap, ex_texcoord);
+    return (mix(u_material.baseColor, texColor, u_material.colorMapAmount) * ex_color).rgb;
 }
 
 vec3 getEmissive() {
@@ -49,7 +50,8 @@ vec2 getMetallicRoughness() {
 }
 
 float getOpacity() {
-    return u_material.baseColor.a;
+    float texOp = texture(s_baseColorMap, ex_texcoord).a;
+    return mix(u_material.baseColor.a, texOp, u_material.colorMapAmount);
 }
 
 void main(void)
