@@ -23,7 +23,7 @@ export default /** glsl */`
     } u_material;
 
     // samplers
-    uniform sampler2D s_baseColorMap;
+    uniform sampler2D s_baseColorMap;               // opacity is in alpha channel
     uniform sampler2D s_metallicRoughnessMap;
     uniform sampler2D s_normalMap;
     uniform sampler2D s_occlusionMap;

@@ -53,5 +53,9 @@ export default /** glsl */`
         IrradianceVolume volumes[MAX_IRRADIANCE_VOLUMES_PERSCENE];
     } u_irrVolumes;
 
-
+    // dithering pattern?
+    uniform DitherPattern {
+        mat4 randX;             // 4 x 4 随机值，0.0 ~ 1.0
+        mat4 randY;             // 4 x 4 随机值，0.0 ~ 1.0
+    } u_ditherPattern;
 `;

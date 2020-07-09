@@ -40,6 +40,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubDecals = new UniformBuffer("decals");
         this._ubEnvProbes = new UniformBuffer("envprobes");
         this._ubIrrVolumes = new UniformBuffer("irrVolumes");
+        this._ubDitherPattern = new UniformBuffer("ditherPattern");
         //this._ubFrame = new UniformBuffer();
         this._ubView = new UniformBuffer("view");
         this._ubItemIndices = new UniformBuffer("itemIndices");
@@ -53,6 +54,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubDecals.build();
         this._ubEnvProbes.build();
         this._ubIrrVolumes.build();
+        this._ubDitherPattern.build();
         //this._ubFrame.build();
         this._ubView.build();
         this._ubItemIndices.build();
@@ -77,6 +79,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
     private _ubDecals: UniformBuffer;
     private _ubEnvProbes: UniformBuffer;
     private _ubIrrVolumes: UniformBuffer;
+    private _ubDitherPattern: UniformBuffer;
     // private _ubFrame: UniformBuffer;
     private _ubView: UniformBuffer;
     private _ubItemIndices: UniformBuffer;
@@ -114,10 +117,13 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
         // TODO: 带结构和数组的 uniform buffer 怎么初始化和更新值？
         // 数组长度 * 对齐后的结构浮点数个数
+        const matIdentity = mat4.identity;
         this._ubLights.addUniform("lights", ClusteredForwardRenderContext.MAX_LIGHTS * ClusteredForwardRenderContext.LIGHT_SIZE_FLOAT);
         this._ubDecals.addUniform("decals", ClusteredForwardRenderContext.MAX_DECALS * ClusteredForwardRenderContext.DECAL_SIZE_FLOAT);
         this._ubEnvProbes.addUniform("probes", ClusteredForwardRenderContext.MAX_ENVPROBES * ClusteredForwardRenderContext.ENVPROBE_SIZE_FLOAT);
         this._ubIrrVolumes.addUniform("volumes", ClusteredForwardRenderContext.MAX_IRRVOLUMES * ClusteredForwardRenderContext.IRRVOL_SIZE_FLOAT);
+        this._ubDitherPattern.addMat4("randX", matIdentity);
+        this._ubDitherPattern.addMat4("randY", matIdentity);
 
         // per frame,
         // it's too small and webgl does not allow small uniform buffers,
@@ -125,7 +131,6 @@ export class ClusteredForwardRenderContext extends RenderContext {
         //this._ubFrame.addFloat("time", 0);
 
         // per view,
-        const matIdentity = mat4.identity;
         this._ubView.addMat4("matView", matIdentity);
         this._ubView.addMat4("matProj", matIdentity);
         this._ubView.addMat4("matInvView", matIdentity);
@@ -173,11 +178,12 @@ export class ClusteredForwardRenderContext extends RenderContext {
         GLUniformBuffers.uniformBlockNames["EnvProbes"] = 2;
         GLUniformBuffers.uniformBlockNames["IrrVolumes"] = 3;
         GLUniformBuffers.uniformBlockNames["View"] = 4;
-        GLUniformBuffers.uniformBlockNames["ItemIndices"] = 5;
-        GLUniformBuffers.uniformBlockNames["Clusters"] = 6;
-        GLUniformBuffers.uniformBlockNames["Object"] = 7;
-        GLUniformBuffers.uniformBlockNames["Material"] = 8;
-        //GLUniformBuffers.uniformBlockNames["Frame"] = 9;
+        GLUniformBuffers.uniformBlockNames["DitherPattern"] = 5;
+        GLUniformBuffers.uniformBlockNames["ItemIndices"] = 6;
+        GLUniformBuffers.uniformBlockNames["Clusters"] = 7;
+        GLUniformBuffers.uniformBlockNames["Object"] = 8;
+        GLUniformBuffers.uniformBlockNames["Material"] = 9;
+        //GLUniformBuffers.uniformBlockNames["Frame"] = 10;
     }
 
     private bindUniformBuffers() {
@@ -185,6 +191,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         GLUniformBuffers.bindUniformBuffer(this._ubDecals, "Decals");
         GLUniformBuffers.bindUniformBuffer(this._ubEnvProbes, "EnvProbes");
         GLUniformBuffers.bindUniformBuffer(this._ubIrrVolumes, "IrrVolumes");
+        GLUniformBuffers.bindUniformBuffer(this._ubDitherPattern, "DitherPattern");
         //GLUniformBuffers.bindUniformBuffer(this._ubFrame, "Frame");
         GLUniformBuffers.bindUniformBuffer(this._ubView, "View");
         GLUniformBuffers.bindUniformBuffer(this._ubItemIndices, "ItemIndices");
@@ -198,6 +205,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         GLUniformBuffers.bindUniformBlock(program, "Decals");
         GLUniformBuffers.bindUniformBlock(program, "EnvProbes");
         GLUniformBuffers.bindUniformBlock(program, "IrrVolumes");
+        GLUniformBuffers.bindUniformBlock(program, "DitherPattern");
         //GLUniformBuffers.bindUniformBlock(program, "Frame");
         GLUniformBuffers.bindUniformBlock(program, "View");
         GLUniformBuffers.bindUniformBlock(program, "ItemIndices");
@@ -253,6 +261,23 @@ export class ClusteredForwardRenderContext extends RenderContext {
         }
         this._ubIrrVolumes.setUniform("volumes", this._tmpData, this._buffer.length);
         this._ubIrrVolumes.update();
+
+        // dither pattern
+        const randX: mat4 = new mat4();
+        const randY: mat4 = new mat4();
+
+        // test raw random
+        // should use blue noise ?
+        for(let i = 0; i < 4; i++) {
+            for(let j = 0; j < 4; j++) {
+                randX.values[i * 4 + j] = Math.random();
+                randY.values[i * 4 + j] = Math.random();
+            }
+        }
+        this._ubDitherPattern.setMat4("randX", randX);
+        this._ubDitherPattern.setMat4("randY", randY);
+
+        this._ubDitherPattern.update();
     }
 
     private addDecalToBuffer(buffer: BufferHelper, decal: Decal) {

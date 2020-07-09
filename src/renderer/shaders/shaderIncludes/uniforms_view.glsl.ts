@@ -24,7 +24,6 @@ export default /** glsl */`
         // fix me: 是否加一个亮度系数？
     } u_view;
 
-
     uniform ItemIndices
     {
         // fix me: 由于对齐，每个 int 元素会占一个ivec4
