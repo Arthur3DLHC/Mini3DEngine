@@ -21,6 +21,7 @@ import vec2 from "../../lib/tsm/vec2.js";
 import { Clock } from "../scene/clock.js";
 import { TextureCube } from "../WebGLResources/textures/textureCube.js";
 import { Halton } from "../math/halton.js";
+import { Hammersley } from "../math/Hammersley.js";
 
 export class ClusteredForwardRenderContext extends RenderContext {
     public constructor() {
@@ -275,8 +276,13 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 // randX.values[i * 4 + j] = Math.random();
                 // randY.values[i * 4 + j] = Math.random();
             
-                randX.values[i * 4 + j] = Halton.get(i * 4 + j, 2);
-                randY.values[i * 4 + j] = Halton.get(i * 4 + j, 3);
+                // halton
+                // randX.values[i * 4 + j] = Halton.get(i * 4 + j, 2);
+                // randY.values[i * 4 + j] = Halton.get(i * 4 + j, 3);
+
+                // hammersley
+                randX.values[i * 4 + j] = Hammersley.get(0, i * 4 + j, 2, 16);
+                randY.values[i * 4 + j] = Hammersley.get(1, i * 4 + j, 3, 16);
             }
         }
         this._ubDitherPattern.setMat4("randX", randX);
