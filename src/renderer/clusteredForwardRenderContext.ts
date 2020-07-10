@@ -20,6 +20,7 @@ import vec3 from "../../lib/tsm/vec3.js";
 import vec2 from "../../lib/tsm/vec2.js";
 import { Clock } from "../scene/clock.js";
 import { TextureCube } from "../WebGLResources/textures/textureCube.js";
+import { Halton } from "../math/halton.js";
 
 export class ClusteredForwardRenderContext extends RenderContext {
     public constructor() {
@@ -270,8 +271,12 @@ export class ClusteredForwardRenderContext extends RenderContext {
         // should use blue noise ? or halton sequence?
         for(let i = 0; i < 4; i++) {
             for(let j = 0; j < 4; j++) {
-                randX.values[i * 4 + j] = Math.random();
-                randY.values[i * 4 + j] = Math.random();
+                // plain randeom
+                // randX.values[i * 4 + j] = Math.random();
+                // randY.values[i * 4 + j] = Math.random();
+            
+                randX.values[i * 4 + j] = Halton.get(i * 4 + j, 2);
+                randY.values[i * 4 + j] = Halton.get(i * 4 + j, 3);
             }
         }
         this._ubDitherPattern.setMat4("randX", randX);
