@@ -329,6 +329,7 @@ TODO:       主要类结构
                 使用一个 blue noise dither texture；在做 shadowmap 取样时根据像素屏幕坐标取 dither 偏移量，应用到 shadowmap uv 上？
                 或者使用程序生成的 noise texture?
                 使用 blue noise 或 halton sequence？
+                改为使用纹理，扩大取样点数量？
 
             半透明物体的绘制？
                 需要由远到近排序？按照物体中心点；

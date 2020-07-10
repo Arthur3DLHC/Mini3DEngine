@@ -265,6 +265,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubIrrVolumes.update();
 
         // dither pattern
+        // todo: should use a texture ?
         const randX: mat4 = new mat4();
         const randY: mat4 = new mat4();
 
