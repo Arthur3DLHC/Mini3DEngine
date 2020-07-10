@@ -1,6 +1,13 @@
 // https://zhuanlan.zhihu.com/p/20374706
 
 export class Hammersley {
+    /**
+     * 获得一个取样点
+     * @param dimension 维度
+     * @param index 取样点索引
+     * @param base 基数，必须用质数
+     * @param numSamples 取样点总数
+     */
     public static get(dimension: number, index: number, base: number, numSamples: number): number {
         if (dimension === 0) {
             return index / numSamples;

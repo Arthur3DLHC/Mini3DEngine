@@ -3,6 +3,7 @@ import { GLDevice } from "../../WebGLResources/glDevice.js";
 import { SamplerState } from "../../WebGLResources/renderStates/samplerState.js";
 import vec3 from "../../../lib/tsm/vec3.js";
 import { Halton } from "../../math/halton.js";
+import { Hammersley } from "../../math/Hammersley.js";
 
 export class SSAOParams {
     public constructor() {
@@ -14,9 +15,17 @@ export class SSAOParams {
         const data = new Float32Array(numPixels * 3);
         // todo: try and compare different methods to generate noise texture:
         // plain random number
-        for(let i = 0; i < numPixels * 3; i++) {
-            data[i] = Math.random() * 2.0 - 1.0;
+        //for(let i = 0; i < numPixels * 3; i++) {
+        //    data[i] = Math.random() * 2.0 - 1.0;
+        //}
+        // hammersley
+        for(let i = 0; i < numPixels; i++) {
+            // base 必须使用质数
+            data[i * 3 + 0] = Hammersley.get(0, i, 2, numPixels) * 2.0 - 1.0;
+            data[i * 3 + 1] = Hammersley.get(1, i, 3, numPixels) * 2.0 - 1.0;
+            data[i * 3 + 2] = Hammersley.get(2, i, 5, numPixels) * 2.0 - 1.0;
         }
+        
         // simplex noise
         // blue noise?
         // rotation disk (sin and cos values)
