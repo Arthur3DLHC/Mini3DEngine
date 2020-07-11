@@ -1,7 +1,8 @@
 // Adapted from https://github.com/mrdoob/three.js/blob/dev/src/loaders/Cache.js
 
 /**
- * 
+ * Only cache the objects in system memory.
+ * for video memory objects, use TextureCache / GeometryCache
  */
 export class Cache {
     // put everything in one map? or put objects of different types in different maps?

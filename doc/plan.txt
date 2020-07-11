@@ -343,6 +343,11 @@ TODO:       主要类结构
                     在该函数中再创建 scene 并赋值给 renderer
                     加载关卡资源 -> onLoad 创建 scene 中的对象 -> 传给 renderer
 
+                    能否利用 Promise.all？
+
+            Cache?
+                将各种类型的硬件资源cache分开？便于提升cache查找速度？且可以针对不同类型的资源分别实现清除逻辑
+
             加载贴图
                 sampler state
                 贴图的属性
@@ -386,6 +391,7 @@ TODO:       主要类结构
                     切换场景时清空资源缓存，更新要加载的资源列表，调用 load 方法?
                 
         大场景相关
+            Decals
 
             Clustered 光源、envmap、irradiance volume
                 fillItemsPerView

@@ -63,7 +63,7 @@ export * from "./WebGLResources/renderStates/colorWriteState.js";
 export * from "./WebGLResources/renderStates/cullState.js";
 export * from "./WebGLResources/renderStates/depthStencilState.js";
 export * from "./WebGLResources/renderStates/samplerState.js";
-export * from "./WebGLResources/resourceCache.js";
+export * from "./WebGLResources/textureCache.js";
 export * from "./WebGLResources/samplerUniforms.js";
 export * from "./WebGLResources/shaderProgram.js";
 export * from "./WebGLResources/textures/texture.js";

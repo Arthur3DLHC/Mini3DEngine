@@ -7,6 +7,7 @@ import { ImageLoader } from "./imageLoader.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 import { Cache } from "./cache.js";
+import { TextureCache } from "../WebGLResources/textureCache.js";
 
 export class TextureLoader extends BaseLoader {
     public constructor(manager: LoadingManager) {
@@ -17,10 +18,8 @@ export class TextureLoader extends BaseLoader {
     public load(url: string, onTexLoad?: ( texture: Texture2D ) => void,
     onProgress?: ( event: ProgressEvent ) => void,
     onError?: ( event: ErrorEvent ) => void): Texture2D {
-        // todo: check cache?
-        // todo: need to use different key from images in cache.
         const texKey = "tex:" + url;
-        let cached = Cache.get(texKey);
+        let cached = TextureCache.instance.get(texKey);
         if (cached !== undefined) {
             this.manager.itemStart(texKey);
             setTimeout(()=>{
@@ -57,7 +56,7 @@ export class TextureLoader extends BaseLoader {
             texture.cached = true;
             // upload to vidmem now? or add a 'needUpdate' flag and upload in render loop?
             texture.upload();
-            Cache.add(texKey, texture);
+            TextureCache.instance.add(texKey, texture);
 
             if (onTexLoad !== undefined) {
                 onTexLoad(texture);
