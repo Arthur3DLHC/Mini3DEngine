@@ -14,9 +14,6 @@ export default /** glsl */`
 #include <uniforms_view>
 #include <samplers_postprocess>     // s_sceneColor contains prev frame image
 
-// todo: uniforms
-// in es 300, we can init the default value in code and it's very convenient
-// gl will assign these values at link time
 uniform float maxRayDistance;
 
 uniform float pixelStride;
