@@ -2,10 +2,11 @@
 // Originally derived from THREE.GLTFLoader
 // https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/GLTFLoader.js
 
-import { LoadingManager } from "./loadingmanager";
-import { GltfAsset } from "./gltfAsset";
-import { LoaderUtils } from "./loaderUtils";
-import { FileLoader } from "./fileLoader";
+import { LoadingManager } from "./loadingmanager.js";
+import { GltfAsset } from "./gltfAsset.js";
+import { LoaderUtils } from "./loaderUtils.js";
+import { FileLoader } from "./fileLoader.js";
+import { GLTFBinaryData, BINARY_HEADER_MAGIC } from "./gltfBinaryData.js";
 
 /**
  * GLTF model file loaer
@@ -38,8 +39,7 @@ export class GLTFLoader {
     }
 
     private async parse(data: ArrayBuffer, path: string): Promise<GltfAsset> {
-        /*
-        let content: string;
+        let content: string | null = null;
         // tslint:disable-next-line:no-unnecessary-initializer
         let glbData: GLTFBinaryData | undefined = undefined;
         if (typeof data === 'string') {
@@ -54,14 +54,17 @@ export class GLTFLoader {
             }
         }
 
-        const json = JSON.parse(content);
+        if (content !== null) {
 
-        if (json.asset === undefined || json.asset.version[ 0 ] < 2) {
-            throw new Error('Unsupported asset. glTF versions >=2.0 are supported.');
+            const json = JSON.parse(content);
+
+            if (json.asset === undefined || json.asset.version[0] < 2) {
+                throw new Error('Unsupported asset. glTF versions >=2.0 are supported.');
+            }
+            return new GltfAsset(json, path, glbData, this._manager);
+        } else {
+            // todo: return what?
+            throw new Error("Not implemented.");
         }
-
-        return new GltfAsset(json, path, glbData, this.manager);
-        */
-       throw new Error("Not implemented.");
     }
 }
