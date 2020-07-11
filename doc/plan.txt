@@ -338,6 +338,10 @@ TODO:       主要类结构
                 使用Promise, async, await
                 参考 https://github.com/bwasty/gltf-loader-ts
                 FileLoader
+                文件加载管理器
+                    类似于 Pixi.js 的做法，一次提交批量要加载的文件；等所有文件加载成功后，调用一个 onLoad 函数
+                    在该函数中再创建 scene 并赋值给 renderer
+                    加载关卡资源 -> onLoad 创建 scene 中的对象 -> 传给 renderer
 
             加载贴图
                 sampler state
