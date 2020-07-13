@@ -242,7 +242,10 @@ export class ImageData {
             throw new Error('Invalid glTF: image must either have a `uri` or a `bufferView`');
         }
 
-        // todo: 改为使用 imageloader?
+        // todo: 这里有必要改为使用 imageloader 么？
+        // gltf 中的图片在自己内部做缓存是否就可以了？
+        // 在外部加载场景时，针对用到的 gltf 文件统一做一个缓存；
+        // 通过 gltf 数据生成 geometry 和 材质时，再针对 geometry 和 texture 做缓存？
 
         const img = new Image();
         img.crossOrigin = this.crossOrigin;
