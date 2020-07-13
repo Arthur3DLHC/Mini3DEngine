@@ -64,7 +64,7 @@ export class GLTFLoader {
             return new GltfAsset(json, path, glbData, this._manager);
         } else {
             // todo: return what?
-            throw new Error("Not implemented.");
+            throw new Error("Faild parsing gltf data.");
         }
     }
 }
