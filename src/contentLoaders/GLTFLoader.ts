@@ -59,11 +59,12 @@ export class GLTFLoader {
             const json = JSON.parse(content);
 
             if (json.asset === undefined || json.asset.version[0] < 2) {
+                // this will returen a rejected promise
                 throw new Error('Unsupported asset. glTF versions >=2.0 are supported.');
             }
             return new GltfAsset(json, path, glbData, this._manager);
         } else {
-            // todo: return what?
+            // this will returen a rejected promise
             throw new Error("Faild parsing gltf data.");
         }
     }
