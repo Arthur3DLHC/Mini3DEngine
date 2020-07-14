@@ -5,6 +5,7 @@ import { Object3D } from "../scene/object3D.js";
 import { Mesh } from "../scene/mesh.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import quat from "../../lib/tsm/quat.js";
+import mat4 from "../../lib/tsm/mat4.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -87,6 +88,9 @@ export class GLTFSceneBuilder {
         if (nodeDef.matrix !== undefined) {
             node.localTransform.init(nodeDef.matrix);
             // todo: decompose matrix ?
+            node.localTransform.getScaling(node.scale);
+            node.localTransform.getRotation(node.rotation);
+            node.localTransform.getTranslation(node.translation);
         } else {
             if (nodeDef.translation !== undefined) {
                 node.translation = new vec3([nodeDef.translation[0], nodeDef.translation[1], nodeDef.translation[2]]);
@@ -100,7 +104,7 @@ export class GLTFSceneBuilder {
                 node.scale = new vec3([nodeDef.scale[0], nodeDef.scale[1], nodeDef.scale[2]]);
             }
 
-            // todo: update matrix ?
+            // todo: update local matrix or update it later ?
         }
 
         if (nodeDef.children !== undefined) {
