@@ -372,6 +372,9 @@ TODO:       主要类结构
 
                 读取mesh, material, texture
                 File Cache
+
+            从读取出的 gtlf 数据生成图元、mesh 的逻辑
+
                 Geometry Cache
                     所有从 gltf 文件加载的 geometry，统一用文件名 + 网格名生成一个key，放在 cache 中；多个 mesh 共享之；
                         注意这种 geometry 要标一下 incache，在对象 release 时避免释放它；由cache统一释放；
@@ -386,7 +389,8 @@ TODO:       主要类结构
             资源加载器
                 资源列表和资源计数？
                 参考类似 PIXI.js 的机制？
-                    输入一个要加载的资源 url 列表？
+                    输入一个要加载的资源 url 列表？在 onload 函数中回调一个加载完的资源数据 map？
+                    能否通过 promise 的方式返回？
                     所有资源加载完后再开始逻辑循环？
                     切换场景时清空资源缓存，更新要加载的资源列表，调用 load 方法?
                 
