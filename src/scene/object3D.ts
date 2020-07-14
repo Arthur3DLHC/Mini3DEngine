@@ -3,6 +3,8 @@ import { GLDevice } from "../WebGLResources/glDevice.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import mat4 from "../../lib/tsm/mat4.js";
 import { Behavior } from "./behavior.js";
+import vec3 from "../../lib/tsm/vec3.js";
+import quat from "../../lib/tsm/quat.js";
 
 export class Object3D {
     // base class of all render objects
@@ -18,6 +20,9 @@ export class Object3D {
         this.localTransform = mat4.identity.copy();
         this.worldTransform = mat4.identity.copy();
         this.worldTransformPrev = mat4.identity.copy();
+        this.translation = new vec3([0,0,0]);
+        this.rotation = quat.identity;
+        this.scale = new vec3([0,0,0]);
         this._moved = false;
         this.castShadow = false;
         this.receiveShadow = false;
@@ -52,6 +57,10 @@ export class Object3D {
     public worldTransform : mat4;
     // todo: prev frame world transform? for temporal effects?
     public worldTransformPrev: mat4;
+
+    public translation: vec3;
+    public rotation: quat;
+    public scale: vec3;
 
     private _moved: boolean;
     public get moved(): boolean {
