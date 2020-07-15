@@ -9,6 +9,7 @@ import mat4 from "../../lib/tsm/mat4.js";
 import { BufferGeometry } from "../geometry/bufferGeometry.js";
 import { StandardPBRMaterial } from "../scene/materials/standardPBRMaterial.js";
 import { Primitive } from "../geometry/primitive.js";
+import vec4 from "../../lib/tsm/vec4.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -121,7 +122,13 @@ export class GLTFSceneBuilder {
 
     }
 
-    private processMesh(meshId: GlTfId, gltf: GltfAsset): Mesh {
+    /**
+     * 
+     * @param meshId 
+     * @param gltf 
+     * @returns if mesh only has 1 primitive, return a mesh object; or return an object3d node with multiple mesh children.
+     */
+    private processMesh(meshId: GlTfId, gltf: GltfAsset): Mesh | Object3D {
         if (gltf.gltf.meshes === undefined) {
             throw new Error("No meshes in gltf.");
         }
@@ -132,29 +139,43 @@ export class GLTFSceneBuilder {
             throw new Error("Mesh not found in meshes array");
         }
         
-        const mesh = new Mesh();
-        mesh.geometry = new BufferGeometry();
-
-        // todo: attributes, vertexbuffer, indexbuffer
+        // the sub primitives in gltf is separated.
+        // need to use multiple meshes
+        const meshes: Mesh[] = [];
 
         for (const primDef of meshDef.primitives) {
             // geometry
+            const mesh = new Mesh();
+            mesh.geometry = new BufferGeometry();
+    
+            // todo: attributes, vertexbuffer, indexbuffer
 
+            // in gltf, one primitive only has one material
+            const prim = new Primitive(0, Infinity, 0);
+            mesh.geometry.primitives.push(prim);
 
             // material
             if(primDef.material !== undefined) {
-                // todo: set material index of primitive group
-                const prim = new Primitive(0, 0, primDef.material);
-                mesh.geometry.primitives.push(prim);
                 mesh.materials.push(this.processMaterial(primDef.material, gltf));
             } else {
                 // add a default material?
+                const defaultMtl = new StandardPBRMaterial();
+                mesh.materials.push(defaultMtl);
             }
+
+            meshes.push(mesh);
         }
 
         // todo: if mesh has skin info
+        if (meshes.length === 1) {
+            return meshes[0];
+        }
 
-        return mesh;
+        const meshlist = new Object3D();
+        for (const mesh of meshes) {
+            meshlist.attachChild(mesh);
+        }
+        return meshlist;
     }
 
     private processMaterial(mtlId: GlTfId, gltf: GltfAsset): StandardPBRMaterial {
@@ -162,10 +183,53 @@ export class GLTFSceneBuilder {
         if (gltf.gltf.materials !== undefined) {
             const mtlDef = gltf.gltf.materials[mtlId];
 
-            // todo: fill mtl info
+            // todo: alpha blend mode, alpha clip, double sided?
 
+            // todo: fill mtl info
+            // todo: get texture images; they must have been loaded by calling gltfAsset.prefetchAll()
+            const pbrDef = mtlDef.pbrMetallicRoughness;
+            if (pbrDef !== undefined) {
+                if (pbrDef.baseColorFactor !== undefined) {
+                    // mtl.color = new vec4([pbrDef.baseColorFactor[0], pbrDef.baseColorFactor[1], pbrDef.baseColorFactor[2], pbrDef.baseColorFactor[3]]);
+                    this.numberArraytoVec(pbrDef.baseColorFactor, mtl.color);
+                }
+                if (pbrDef.metallicFactor !== undefined) mtl.metallic = pbrDef.metallicFactor;
+                if (pbrDef.roughnessFactor !== undefined) mtl.roughness = pbrDef.roughnessFactor;
+
+                // basecolor texture and metallicRoughness texture
+                // according to the glTF specification, the baseColorFactor should multiply by baseColorTexture,
+                // so amount should either be 0 or 1
+                if (pbrDef.baseColorTexture !== undefined) {
+                    mtl.colorMapAmount = 1;
+                    // todo: create texture from image
+                }
+
+                if (pbrDef.metallicRoughnessTexture !== undefined) {
+                    mtl.metallicMapAmount = 1;
+                    mtl.roughnessMapAmount = 1;
+                    // todo: create texture from image
+                }
+
+            }
+
+            // todo: emissive factor
+            if (mtlDef.emissiveFactor !== undefined) {
+                this.numberArraytoVec(mtlDef.emissiveFactor, mtl.emissive);
+            }
+
+            // normal texture and amount
+
+            // todo: subsurface?
         }
         return mtl;
+    }
+
+    private numberArraytoVec(numbers: number[], result?: vec3 | vec4): vec3 | vec4 {
+        let ret: vec3 | vec4 = result? result: new vec4();
+        for(let i = 0; i < numbers.length && i < ret.values.length; i++) {
+            ret.values[i] = numbers[i];
+        }
+        return ret;
     }
 
     // todo: handle instancing?

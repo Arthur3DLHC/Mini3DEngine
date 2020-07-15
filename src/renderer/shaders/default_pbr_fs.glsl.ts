@@ -33,7 +33,8 @@ vec3 getNormal() {
 }
 
 vec3 getBaseColor() {
-    // todo: base color map
+    // fix me: according to Khronos group gltf file specification,
+    // should multiply the texColor by baseColor, not mix
     vec4 texColor = texture(s_baseColorMap, ex_texcoord);
     return (mix(u_material.baseColor, texColor, u_material.colorMapAmount) * ex_color).rgb;
 }

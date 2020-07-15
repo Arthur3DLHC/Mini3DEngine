@@ -381,6 +381,9 @@ TODO:       主要类结构
                 Texture cache
                     用纹理文件 url 作为 key
 
+                材质
+                    shader中应该改为将 baseColor 和 baseColorMap 相乘？
+
                 Object3D 更新变换时使用分开的 SRT？
 
                 读取light, decal, envprobe, irradiance volume;

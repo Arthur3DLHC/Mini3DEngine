@@ -21,6 +21,8 @@ export class StandardPBRMaterial extends Material {
         this.occlusionMap = null;
         this.emissiveMap = null;
 
+        // fix me: according to the specification of gltf file, the color value should multiply by colorMap in shader
+        // this is different from 3ds max standard material
         this.colorMapAmount = 0;
         this.metallicMapAmount = 0;
         this.roughnessMapAmount = 0;
