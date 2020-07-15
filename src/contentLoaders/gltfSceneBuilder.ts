@@ -10,6 +10,8 @@ import { BufferGeometry } from "../geometry/bufferGeometry.js";
 import { StandardPBRMaterial } from "../scene/materials/standardPBRMaterial.js";
 import { Primitive } from "../geometry/primitive.js";
 import vec4 from "../../lib/tsm/vec4.js";
+import { RenderStateCache } from "../WebGLResources/renderStateCache.js";
+import { GLDevice } from "../WebGLResources/glDevice.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -184,6 +186,27 @@ export class GLTFSceneBuilder {
             const mtlDef = gltf.gltf.materials[mtlId];
 
             // todo: alpha blend mode, alpha clip, double sided?
+            if (mtlDef.alphaMode !== undefined) {
+                switch(mtlDef.alphaMode) {
+                    case "OPAQUE":
+                        mtl.blendState = RenderStateCache.instance.getBlendState(false);
+                        mtl.depthStencilState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.LEQUAL);
+                        break;
+                    case "MASK":
+                        mtl.blendState = RenderStateCache.instance.getBlendState(false);
+                        // todo: how to alpha test?
+                        mtl.depthStencilState = RenderStateCache.instance.getDepthStencilState(true, true, GLDevice.gl.LEQUAL);
+                        break;
+                    case "BLEND":
+                        mtl.blendState = RenderStateCache.instance.getBlendState(true);
+                        mtl.depthStencilState = RenderStateCache.instance.getDepthStencilState(true, false, GLDevice.gl.LEQUAL);
+                        break;
+                }
+            }
+
+            if (mtlDef.doubleSided) {
+                mtl.cullState = RenderStateCache.instance.getCullState(false);
+            }
 
             // todo: fill mtl info
             // todo: get texture images; they must have been loaded by calling gltfAsset.prefetchAll()
