@@ -9,7 +9,7 @@ export * from "./geometry/common/boxGeometry.js";
 export * from "./geometry/common/cylinderGeometry.js";
 export * from "./geometry/common/planeGeometry.js"
 export * from "./geometry/common/sphereGeometry.js";
-export * from "./geometry/primitiveGroup.js";
+export * from "./geometry/primitive.js";
 export * from "./input/KeyCodes.js";
 export * from "./math/boundingBox.js";
 export * from "./math/boundingSphere.js";

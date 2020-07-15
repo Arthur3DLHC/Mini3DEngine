@@ -1,7 +1,7 @@
 /**
- * A group of indexed WebGL primitves
+ * WebGL primitve
  */
-export class PrimitiveGroup {
+export class Primitive {
     public constructor(start: number = 0, count: number = Infinity, materialId: number = 0) {
         this.start = start;
         this.count = count;

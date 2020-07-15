@@ -6,6 +6,9 @@ import { Mesh } from "../scene/mesh.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import quat from "../../lib/tsm/quat.js";
 import mat4 from "../../lib/tsm/mat4.js";
+import { BufferGeometry } from "../geometry/bufferGeometry.js";
+import { StandardPBRMaterial } from "../scene/materials/standardPBRMaterial.js";
+import { Primitive } from "../geometry/primitive.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -104,7 +107,7 @@ export class GLTFSceneBuilder {
                 node.scale = new vec3([nodeDef.scale[0], nodeDef.scale[1], nodeDef.scale[2]]);
             }
 
-            // todo: update local matrix or update it later ?
+            // todo: update local matrix or update it later when scene update every frame?
         }
 
         if (nodeDef.children !== undefined) {
@@ -119,13 +122,50 @@ export class GLTFSceneBuilder {
     }
 
     private processMesh(meshId: GlTfId, gltf: GltfAsset): Mesh {
-        // geometries, materials
+        if (gltf.gltf.meshes === undefined) {
+            throw new Error("No meshes in gltf.");
+        }
+        // what if no materials in gltf?
+        // use a default mtl? or ignore mtls?
+        const meshDef = gltf.gltf.meshes[meshId];
+        if (meshDef === undefined) {
+            throw new Error("Mesh not found in meshes array");
+        }
+        
+        const mesh = new Mesh();
+        mesh.geometry = new BufferGeometry();
+
+        // todo: attributes, vertexbuffer, indexbuffer
+
+        for (const primDef of meshDef.primitives) {
+            // geometry
+
+
+            // material
+            if(primDef.material !== undefined) {
+                // todo: set material index of primitive group
+                const prim = new Primitive(0, 0, primDef.material);
+                mesh.geometry.primitives.push(prim);
+                mesh.materials.push(this.processMaterial(primDef.material, gltf));
+            } else {
+                // add a default material?
+            }
+        }
+
         // todo: if mesh has skin info
-        throw new Error("Not implemented");
+
+        return mesh;
     }
 
-    private processMaterial() {
+    private processMaterial(mtlId: GlTfId, gltf: GltfAsset): StandardPBRMaterial {
+        const mtl = new StandardPBRMaterial();
+        if (gltf.gltf.materials !== undefined) {
+            const mtlDef = gltf.gltf.materials[mtlId];
 
+            // todo: fill mtl info
+
+        }
+        return mtl;
     }
 
     // todo: handle instancing?

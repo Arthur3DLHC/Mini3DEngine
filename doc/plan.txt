@@ -380,6 +380,9 @@ TODO:       主要类结构
                         注意这种 geometry 要标一下 incache，在对象 release 时避免释放它；由cache统一释放；
                 Texture cache
                     用纹理文件 url 作为 key
+
+                Object3D 更新变换时使用分开的 SRT？
+
                 读取light, decal, envprobe, irradiance volume;
             
             骨骼皮肤动画

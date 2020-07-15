@@ -17,8 +17,8 @@ export class Mesh extends Object3D {
 
     public provideRenderItem(renderList: RenderList) {
         if (this.geometry) {
-            if (this.geometry.groups) {
-                for (const grp of this.geometry.groups) {
+            if (this.geometry.primitives) {
+                for (const grp of this.geometry.primitives) {
                 renderList.addRenderItem(this, this.geometry, grp.start, grp.count, this.getMaterial(grp.materialId));
                 }
             } else {

@@ -2,7 +2,7 @@ import { BufferGeometry } from "../bufferGeometry.js";
 import { VertexBuffer } from "../../WebGLResources/vertexBuffer.js";
 import { GLDevice } from "../../WebGLResources/glDevice.js";
 import { IndexBuffer } from "../../WebGLResources/indexBuffer.js";
-import { PrimitiveGroup } from "../primitiveGroup.js";
+import { Primitive } from "../primitive.js";
 import { VertexBufferAttribute } from "../../WebGLResources/vertexBufferAttribute.js";
 
 export class BoxGeometry extends BufferGeometry {
@@ -77,8 +77,8 @@ export class BoxGeometry extends BufferGeometry {
         curOffset = this.addAttribute(VertexBufferAttribute.defaultNameNormal, this.vertexBuffer, 3, curOffset);
         curOffset = this.addAttribute(VertexBufferAttribute.defaultNameTexcoord0, this.vertexBuffer, 2, curOffset);
 
-        const grp = new PrimitiveGroup();
-        this.groups.push(grp);
+        const grp = new Primitive();
+        this.primitives.push(grp);
 
         this.computeBoundingSphere();
     }

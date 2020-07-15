@@ -1,4 +1,4 @@
-import { PrimitiveGroup } from "./primitiveGroup.js";
+import { Primitive } from "./primitive.js";
 import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { IndexBuffer } from "../WebGLResources/indexBuffer.js";
@@ -13,7 +13,7 @@ export class BufferGeometry {
         this.attributes = [];
         this.vertexBuffer = null;
         this.indexBuffer = null;
-        this.groups = [];
+        this.primitives = [];
         this.drawMode = GLDevice.gl.TRIANGLES;
         this.boundingSphere = new BoundingSphere();
     }
@@ -27,8 +27,8 @@ export class BufferGeometry {
     // ibo
     public indexBuffer: IndexBuffer | null;
 
-    // groups
-    public groups: PrimitiveGroup[];
+    // primitives
+    public primitives: Primitive[];
 
     // todo: geometry type?
     public drawMode: GLenum;
