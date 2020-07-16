@@ -26,6 +26,17 @@ export const GLTF_ELEMENTS_PER_TYPE: { [index: string]: number } = {
     MAT4:  16,
 };
 
+export const GLTF_ATTRIBUTES = {
+    POSITION: "POSITION",
+    NORMAL: "NORMAL",
+    TANGENT: "TANGENT",
+    TEXCOORD_0: "TEXCOORD_0",
+    TEXCOORD_1: "TEXCOORD_1",
+    COLOR_0: "COLOR_0",
+    JOINTS_0: "JOINTS_0",
+    WEIGHTS_0: "WEIGHTS_0",
+};
+
 export const GLTF_EXTENSIONS = {
     KHR_BINARY_GLTF: 'KHR_binary_glTF',
     KHR_DRACO_MESH_COMPRESSION: 'KHR_draco_mesh_compression',

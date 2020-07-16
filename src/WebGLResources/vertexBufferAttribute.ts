@@ -14,6 +14,7 @@ export class VertexBufferAttribute {
     public static readonly defaultNamePosition = "a_position";
     public static readonly defaultNameNormal = "a_normal";
     public static readonly defaultNameTexcoord0 = "a_texcoord0";
+    public static readonly defaultNameTexcoord1 = "a_texcoord1";
     public static readonly defaultNameTangent = "a_tangent";
     public static readonly defaultNameColor0 = "a_color0";
     public static readonly defaultNameJoints0 = "a_joints0";

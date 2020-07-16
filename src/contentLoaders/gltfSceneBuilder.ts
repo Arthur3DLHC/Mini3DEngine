@@ -1,4 +1,4 @@
-import { GltfAsset, GLTF_EXTENSIONS } from "./gltfAsset.js";
+import { GltfAsset, GLTF_EXTENSIONS, GLTF_ATTRIBUTES } from "./gltfAsset.js";
 import { Scene } from "../scene/scene.js";
 import { GlTfId, GlTf, TextureInfo } from "./gltf.js";
 import { Object3D } from "../scene/object3D.js";
@@ -14,6 +14,7 @@ import { RenderStateCache } from "../WebGLResources/renderStateCache.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
+import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -159,10 +160,14 @@ export class GLTFSceneBuilder {
                 const attributes = primDef.attributes;
                 for (const attr in attributes) {
                     // todo: from glTF attribute name to our attribute name
-                    const accessor = attributes[attr];
-                    // todo: get data accessor
+                    // attr is key string
+                    const attrname = this.attributeNameFromGLTF(attr);
 
-                    // todo: convert to interleaved vertex buffer
+                    const accessorId = attributes[attr];
+
+                    // todo: get data accessor; get component type, byte size infos
+
+                    // todo: convert to interleaved vertex buffer data
                 }
             }
     
@@ -205,6 +210,39 @@ export class GLTFSceneBuilder {
             meshlist.attachChild(mesh);
         }
         return meshlist;
+    }
+
+    attributeNameFromGLTF(gltfAttr: string): string {
+        switch (gltfAttr) {
+            case GLTF_ATTRIBUTES.POSITION:
+                return VertexBufferAttribute.defaultNamePosition;
+                break;
+            case GLTF_ATTRIBUTES.NORMAL:
+                return VertexBufferAttribute.defaultNameNormal;
+                break;
+            case GLTF_ATTRIBUTES.TANGENT:
+                return VertexBufferAttribute.defaultNameTangent;
+                break;
+            case GLTF_ATTRIBUTES.TEXCOORD_0:
+                return VertexBufferAttribute.defaultNameTexcoord0;
+                break;
+            case GLTF_ATTRIBUTES.TEXCOORD_1:
+                return VertexBufferAttribute.defaultNameTexcoord1;
+                break;
+            case GLTF_ATTRIBUTES.COLOR_0:
+                return VertexBufferAttribute.defaultNameColor0;
+                break;
+            case GLTF_ATTRIBUTES.JOINTS_0:
+                return VertexBufferAttribute.defaultNameJoints0;
+                break;
+            case GLTF_ATTRIBUTES.WEIGHTS_0:
+                return VertexBufferAttribute.defaultNameWeights0;
+                break;
+
+            default:
+                throw new Error("Unknown attribute:" + gltfAttr);
+                break;
+        }
     }
 
     private processMaterial(mtlId: GlTfId, gltf: GltfAsset): StandardPBRMaterial {
