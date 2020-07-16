@@ -1,6 +1,6 @@
 import { GltfAsset } from "./gltfAsset.js";
 import { Scene } from "../scene/scene.js";
-import { GlTfId, GlTf } from "./gltf.js";
+import { GlTfId, GlTf, TextureInfo } from "./gltf.js";
 import { Object3D } from "../scene/object3D.js";
 import { Mesh } from "../scene/mesh.js";
 import vec3 from "../../lib/tsm/vec3.js";
@@ -12,6 +12,8 @@ import { Primitive } from "../geometry/primitive.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { RenderStateCache } from "../WebGLResources/renderStateCache.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
+import { Texture2D } from "../WebGLResources/textures/texture2D.js";
+import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -224,25 +226,34 @@ export class GLTFSceneBuilder {
                 // so amount should either be 0 or 1
                 if (pbrDef.baseColorTexture !== undefined) {
                     mtl.colorMapAmount = 1;
-                    // todo: create texture from image
+                    mtl.colorMap = this.processTexture(pbrDef.baseColorTexture, gltf);
                 }
 
                 if (pbrDef.metallicRoughnessTexture !== undefined) {
                     mtl.metallicMapAmount = 1;
                     mtl.roughnessMapAmount = 1;
-                    // todo: create texture from image
+                    mtl.metallicRoughnessMap = this.processTexture(pbrDef.metallicRoughnessTexture, gltf);
                 }
 
             }
 
-            // todo: emissive factor
+            // emissive factor
             if (mtlDef.emissiveFactor !== undefined) {
                 this.numberArraytoVec(mtlDef.emissiveFactor, mtl.emissive);
             }
 
-            // normal texture and amount
+            if (mtlDef.emissiveTexture !== undefined) {
+                mtl.emissiveMapAmount = 1;
+                mtl.emissiveMap = this.processTexture(mtlDef.emissiveTexture, gltf);
+            }
 
-            // todo: subsurface?
+            // normal texture and amount
+            if (mtlDef.normalTexture !== undefined) {
+                mtl.normalMapAmount = 1;
+                mtl.normalMap = this.processTexture(mtlDef.normalTexture.index, gltf);
+            }
+
+            // todo: subsurface? save in gltf extra?
         }
         return mtl;
     }
@@ -253,6 +264,70 @@ export class GLTFSceneBuilder {
             ret.values[i] = numbers[i];
         }
         return ret;
+    }
+
+    private processTexture(textureInfo: TextureInfo, gltf: GltfAsset): Texture2D {
+        if (gltf.gltf.textures === undefined) {
+            throw new Error("No textures in gltf.");
+        }
+
+        if (gltf.gltf.images === undefined) {
+            throw new Error("No images in gltf.");
+        }
+
+        const texDef = gltf.gltf.textures[textureInfo.index];
+        if (texDef === undefined) {
+            throw new Error("Texture with index not found in gltf.");
+        }
+
+        const texture = new Texture2D();
+
+        if (texDef.sampler !== undefined && gltf.gltf.samplers !== undefined) {
+            const sampDef = gltf.gltf.samplers[texDef.sampler];
+            if (sampDef === undefined) {
+                throw new Error("Sampler with index not found in gltf.");
+            }
+            // todo: create sampler state ?
+            texture.samplerState = new SamplerState(sampDef.wrapS, sampDef.wrapT, sampDef.minFilter, sampDef.magFilter);
+        }
+
+        if (texDef.source !== undefined) {
+            const image = gltf.gltf.images[texDef.source];
+            if (image === undefined) {
+                throw new Error("Image with index not found in gltf.");
+            }
+            // should be already loaded by calling prefetchAll
+            const imageData = gltf.imageData.get(texDef.source);
+            imageData.then((img) => {
+                texture.width = img.width;
+                texture.height = img.height;
+                texture.depth = 1;
+                // decide generate mipmaps by sample state
+                if (texture.samplerState?.magFilter === GLDevice.gl.LINEAR_MIPMAP_LINEAR
+                    || texture.samplerState?.magFilter === GLDevice.gl.LINEAR_MIPMAP_NEAREST
+                    || texture.samplerState?.magFilter === GLDevice.gl.NEAREST_MIPMAP_LINEAR
+                    || texture.samplerState?.magFilter === GLDevice.gl.NEAREST_MIPMAP_NEAREST) {
+                    texture.mipLevels = 1024;
+                } else {
+                    texture.mipLevels = 1;
+                }
+                // fix me: mark cached?
+                // texture.cached
+                texture.componentType = GLDevice.gl.UNSIGNED_BYTE;
+                // jpeg or png?
+                texture.format = GLDevice.gl.RGBA;
+                if (image.uri !== undefined) {
+                    const isJPEG = image.uri.search( /\.jpe?g($|\?)/i ) > 0 || image.uri.search( /^data\:image\/jpeg/ ) === 0;
+                    if (isJPEG) {
+                        texture.format = GLDevice.gl.RGB;
+                    }
+                }
+                texture.upload();
+            });
+        }
+
+        // fix me: is that ok to return texture now?
+        return texture;
     }
 
     // todo: handle instancing?
