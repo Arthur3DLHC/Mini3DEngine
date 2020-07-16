@@ -10,10 +10,14 @@ export class VertexBufferAttribute {
         this.divisor = 0;
     }
 
+    // compatible with gltf file
     public static readonly defaultNamePosition = "a_position";
     public static readonly defaultNameNormal = "a_normal";
     public static readonly defaultNameTexcoord0 = "a_texcoord0";
-    // todo: tangent, binormal, skinindex, skinweight...
+    public static readonly defaultNameTangent = "a_tangent";
+    public static readonly defaultNameColor0 = "a_color0";
+    public static readonly defaultNameJoints0 = "a_joints0";
+    public static readonly defaultNameWeights0 = "a_weights0";
 
     // vertex buffer (shared? interleaved)
     public buffer: VertexBuffer;

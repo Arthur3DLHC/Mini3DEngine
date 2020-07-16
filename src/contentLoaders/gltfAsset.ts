@@ -26,6 +26,16 @@ export const GLTF_ELEMENTS_PER_TYPE: { [index: string]: number } = {
     MAT4:  16,
 };
 
+export const GLTF_EXTENSIONS = {
+    KHR_BINARY_GLTF: 'KHR_binary_glTF',
+    KHR_DRACO_MESH_COMPRESSION: 'KHR_draco_mesh_compression',
+    KHR_LIGHTS_PUNCTUAL: 'KHR_lights_punctual',
+    KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
+    KHR_MATERIALS_UNLIT: 'KHR_materials_unlit',
+    KHR_TEXTURE_TRANSFORM: 'KHR_texture_transform',
+    MSFT_TEXTURE_DDS: 'MSFT_texture_dds'
+};
+
 export class GltfAsset {
     // todo
     constructor(gltf: GlTf, baseUri: string, glbData: GLTFBinaryData | undefined,

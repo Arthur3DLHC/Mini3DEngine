@@ -1,4 +1,4 @@
-import { GltfAsset } from "./gltfAsset.js";
+import { GltfAsset, GLTF_EXTENSIONS } from "./gltfAsset.js";
 import { Scene } from "../scene/scene.js";
 import { GlTfId, GlTf, TextureInfo } from "./gltf.js";
 import { Object3D } from "../scene/object3D.js";
@@ -151,8 +151,33 @@ export class GLTFSceneBuilder {
             // geometry
             const mesh = new Mesh();
             mesh.geometry = new BufferGeometry();
+
+            if (primDef.extensions && primDef.extensions[GLTF_EXTENSIONS.KHR_DRACO_MESH_COMPRESSION]) {
+                // todo: DRACO compression
+            } else {
+                // todo: attributes, vertexbuffer, indexbuffer
+                const attributes = primDef.attributes;
+                for (const attr in attributes) {
+                    // todo: from glTF attribute name to our attribute name
+                    const accessor = attributes[attr];
+                    // todo: get data accessor
+
+                    // todo: convert to interleaved vertex buffer
+                }
+            }
     
-            // todo: attributes, vertexbuffer, indexbuffer
+            if (primDef.mode === GLDevice.gl.TRIANGLES
+                || primDef.mode === GLDevice.gl.TRIANGLE_FAN
+                || primDef.mode === GLDevice.gl.TRIANGLE_STRIP
+                || primDef.mode === undefined) {
+                
+            } else if (primDef.mode === GLDevice.gl.LINES
+                || primDef.mode === GLDevice.gl.LINE_STRIP
+                || primDef.mode === GLDevice.gl.LINE_LOOP) {
+                
+            } else if (primDef.mode === GLDevice.gl.POINTS) {
+
+            }
 
             // in gltf, one primitive only has one material
             const prim = new Primitive(0, Infinity, 0);
