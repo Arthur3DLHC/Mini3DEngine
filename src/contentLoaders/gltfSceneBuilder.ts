@@ -316,11 +316,18 @@ export class GLTFSceneBuilder {
                 texture.componentType = GLDevice.gl.UNSIGNED_BYTE;
                 // jpeg or png?
                 texture.format = GLDevice.gl.RGBA;
-                if (image.uri !== undefined) {
-                    const isJPEG = image.uri.search( /\.jpe?g($|\?)/i ) > 0 || image.uri.search( /^data\:image\/jpeg/ ) === 0;
-                    if (isJPEG) {
-                        texture.format = GLDevice.gl.RGB;
+                // if mimetype presented, use it
+                let isJPEG = false;
+                if (image.mimeType !== undefined) {
+                    // isJPEG = (image.mimeType === "image/jpeg");
+                    isJPEG = image.mimeType.search( /\.jpe?g($|\?)/i ) > 0;
+                } else {
+                    if (image.uri !== undefined) {
+                        isJPEG = image.uri.search(/\.jpe?g($|\?)/i) > 0 || image.uri.search(/^data\:image\/jpeg/) === 0;
                     }
+                }
+                if (isJPEG) {
+                    texture.format = GLDevice.gl.RGB;
                 }
                 texture.upload();
             });
