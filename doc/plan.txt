@@ -373,6 +373,9 @@ TODO:       主要类结构
                 读取mesh, material, texture
                 File Cache
 
+                Fix me: 现在的gltfAsset get()返回的是 promise 对象；是否应该改为在加载时取得所有buffer和image，然后 get 时直接返回 buffer 和 image 对象？
+                    或者保留这个机制，但是在解析和创建 scene 对象时就得按异步处理；
+
             从读取出的 gtlf 数据生成图元、mesh 的逻辑
 
                 Geometry Cache

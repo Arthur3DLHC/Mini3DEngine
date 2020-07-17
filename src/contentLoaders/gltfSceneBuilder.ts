@@ -144,9 +144,12 @@ export class GLTFSceneBuilder {
      * @param gltf 
      * @returns if mesh only has 1 primitive, return a mesh object; or return an object3d node with multiple mesh children.
      */
-    private processMesh(meshId: GlTfId, gltf: GltfAsset): Mesh | Object3D {
-        if (gltf.gltf.meshes === undefined) {
-            throw new Error("No meshes in gltf.");
+    private processMesh(meshId: GlTfId, gltf: GltfAsset): Object3D {
+        if (gltf.gltf.meshes === undefined
+            || gltf.gltf.accessors === undefined
+            || gltf.gltf.bufferViews === undefined
+            || gltf.gltf.buffers === undefined) {
+            throw new Error("No meshes, accessors or bufferviews in gltf.");
         }
         // what if no materials in gltf?
         // use a default mtl? or ignore mtls?
@@ -177,8 +180,51 @@ export class GLTFSceneBuilder {
                     const accessorId = attributes[attr];
 
                     // todo: get data accessor; get component type, byte size infos
+                    const accessor = gltf.gltf.accessors[accessorId];
+                    if (accessor === undefined) {
+                        throw new Error("Accessor not found.");
+                    }
 
-                    // todo: convert to interleaved vertex buffer data
+                    if (accessor.bufferView === undefined && accessor.sparse === undefined) {
+                        // form Three.js:
+                        // Ignore empty accessors, which may be used to declare runtime
+			            // information about attributes coming from another source (e.g. Draco
+			            // compression extension).
+                        continue;
+                    }
+
+                    const bufferViews = [];
+                    const pendingBuffers = [];
+
+                    if (accessor.bufferView !== undefined) {
+                        const bufferView = gltf.gltf.bufferViews[accessor.bufferView];
+                        bufferViews.push(bufferView);
+                        // this is a promise
+                        const buffer = gltf.bufferData.get(bufferView.buffer);
+                        pendingBuffers.push(buffer);
+                    } else {
+                        bufferViews.push(null);
+                        pendingBuffers.push(null);
+                    }
+
+                    if (accessor.sparse !== undefined) {
+                        const indicesBufferView = gltf.gltf.bufferViews[accessor.sparse.indices.bufferView];
+                        const valuesBufferView = gltf.gltf.bufferviews[accessor.sparse.values.bufferView];
+
+                        bufferViews.push(indicesBufferView);
+                        bufferViews.push(valuesBufferView);
+
+                        pendingBuffers.push(gltf.bufferData.get(indicesBufferView.buffer));
+                        pendingBuffers.push(gltf.bufferData.get(valuesBufferView.buffer));
+                    }
+
+                    // process data after all buffers have been loaded.
+                    Promise.all(pendingBuffers).then((values)=>{
+                        // create geometry here?
+                        // todo: support both interleaved and non-interleaved vertex buffer data
+                        // check by the stride size and vertex size
+                        
+                    });
                 }
             }
     
