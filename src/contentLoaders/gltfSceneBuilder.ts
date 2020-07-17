@@ -26,6 +26,17 @@ export class GLTFSceneBuilder {
 
     private _meshReferences: number[];
 
+    private static _gltfToBufferAttrNames: Map<string, string> = new Map([
+        [GLTF_ATTRIBUTES.POSITION, VertexBufferAttribute.defaultNamePosition],
+        [GLTF_ATTRIBUTES.NORMAL, VertexBufferAttribute.defaultNameNormal],
+        [GLTF_ATTRIBUTES.TANGENT, VertexBufferAttribute.defaultNameTangent],
+        [GLTF_ATTRIBUTES.TEXCOORD_0, VertexBufferAttribute.defaultNameTexcoord0],
+        [GLTF_ATTRIBUTES.TEXCOORD_1, VertexBufferAttribute.defaultNameTexcoord1],
+        [GLTF_ATTRIBUTES.COLOR_0, VertexBufferAttribute.defaultNameColor0],
+        [GLTF_ATTRIBUTES.JOINTS_0, VertexBufferAttribute.defaultNameJoints0],
+        [GLTF_ATTRIBUTES.WEIGHTS_0, VertexBufferAttribute.defaultNameWeights0],
+    ]);
+
     /**
      * build scene hierarchy from gltf asset. NOTE: don't call this before all binary datas has been loaded.
      * @param gltf the GlTf asset data
@@ -213,36 +224,43 @@ export class GLTFSceneBuilder {
     }
 
     attributeNameFromGLTF(gltfAttr: string): string {
-        switch (gltfAttr) {
-            case GLTF_ATTRIBUTES.POSITION:
-                return VertexBufferAttribute.defaultNamePosition;
-                break;
-            case GLTF_ATTRIBUTES.NORMAL:
-                return VertexBufferAttribute.defaultNameNormal;
-                break;
-            case GLTF_ATTRIBUTES.TANGENT:
-                return VertexBufferAttribute.defaultNameTangent;
-                break;
-            case GLTF_ATTRIBUTES.TEXCOORD_0:
-                return VertexBufferAttribute.defaultNameTexcoord0;
-                break;
-            case GLTF_ATTRIBUTES.TEXCOORD_1:
-                return VertexBufferAttribute.defaultNameTexcoord1;
-                break;
-            case GLTF_ATTRIBUTES.COLOR_0:
-                return VertexBufferAttribute.defaultNameColor0;
-                break;
-            case GLTF_ATTRIBUTES.JOINTS_0:
-                return VertexBufferAttribute.defaultNameJoints0;
-                break;
-            case GLTF_ATTRIBUTES.WEIGHTS_0:
-                return VertexBufferAttribute.defaultNameWeights0;
-                break;
-
-            default:
-                throw new Error("Unknown attribute:" + gltfAttr);
-                break;
+        const bufferAttr = GLTFSceneBuilder._gltfToBufferAttrNames.get(gltfAttr);
+        if (bufferAttr !== undefined) {
+            return bufferAttr;
         }
+
+        throw new Error("Unknown attribute:" + gltfAttr);
+
+        // switch (gltfAttr) {
+        //     case GLTF_ATTRIBUTES.POSITION:
+        //         return VertexBufferAttribute.defaultNamePosition;
+        //         break;
+        //     case GLTF_ATTRIBUTES.NORMAL:
+        //         return VertexBufferAttribute.defaultNameNormal;
+        //         break;
+        //     case GLTF_ATTRIBUTES.TANGENT:
+        //         return VertexBufferAttribute.defaultNameTangent;
+        //         break;
+        //     case GLTF_ATTRIBUTES.TEXCOORD_0:
+        //         return VertexBufferAttribute.defaultNameTexcoord0;
+        //         break;
+        //     case GLTF_ATTRIBUTES.TEXCOORD_1:
+        //         return VertexBufferAttribute.defaultNameTexcoord1;
+        //         break;
+        //     case GLTF_ATTRIBUTES.COLOR_0:
+        //         return VertexBufferAttribute.defaultNameColor0;
+        //         break;
+        //     case GLTF_ATTRIBUTES.JOINTS_0:
+        //         return VertexBufferAttribute.defaultNameJoints0;
+        //         break;
+        //     case GLTF_ATTRIBUTES.WEIGHTS_0:
+        //         return VertexBufferAttribute.defaultNameWeights0;
+        //         break;
+
+        //     default:
+        //         throw new Error("Unknown attribute:" + gltfAttr);
+        //         break;
+        // }
     }
 
     private processMaterial(mtlId: GlTfId, gltf: GltfAsset): StandardPBRMaterial {
