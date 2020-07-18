@@ -196,8 +196,14 @@ export class GLTFSceneBuilder {
                     // The buffer is interleaved if the stride is not the item size in bytes.
                     if (byteStride !== undefined && byteStride !== itemBytes) {
                         // todo: interleaved vertex buffer
+                        // multiple attributes share one vertex buffer
+
+                        // Each "slice" of the buffer, as defined by 'count' elements of 'byteStride' bytes, gets its own InterleavedBuffer
+				        // This makes sure that IBA.count reflects accessor.count properly
+
                     } else {
                         // todo: not interleaved vertex buffer
+
                     }
 
                     /*
