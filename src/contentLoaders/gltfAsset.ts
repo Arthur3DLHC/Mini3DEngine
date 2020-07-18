@@ -91,6 +91,29 @@ export class GltfAsset {
     }
 
     /**
+     * Do not call this before all data has already been pre-fetched
+     * @param index 
+     */
+    public bufferViewDataSync(index: GlTfId): Uint8Array {
+        if (!this.gltf.bufferViews) {
+            /* istanbul ignore next */
+            throw new Error('No buffer views found.');
+        }
+        const bufferView = this.gltf.bufferViews[index];
+        const bufferData = this.bufferData.getSync(bufferView.buffer);
+        const byteLength = bufferView.byteLength || 0;
+        const byteOffset = bufferView.byteOffset || 0;
+        
+        // For GLB files, the 'base buffer' is the whole GLB file, including the json part.
+        // Therefore we have to consider bufferData's offset within its buffer it as well.
+        // For non-GLB files it will be 0.
+        const baseBuffer = bufferData.buffer;
+        const baseBufferByteOffset = bufferData.byteOffset;
+
+        return new Uint8Array(baseBuffer, baseBufferByteOffset + byteOffset, byteLength);
+    }
+
+    /**
      * Fetch the data associated with the accessor. Equivalent to `bufferViewData` for most accessors; special cases:
      * - `accessor.bufferView` is undefined: create a buffer initialized with zeroes.
      * - `accessor.sparse` is defined: Copy underlying buffer view and apply values from `sparse`.
@@ -123,6 +146,56 @@ export class GltfAsset {
             typedArray = GLTF_COMPONENT_TYPE_ARRAYS[acc.componentType];
             bufferViewData = await this.bufferViewData(values.bufferView);
             const valueData = new typedArray((await this.bufferViewData(values.bufferView)).buffer,
+                bufferViewData.byteOffset + (values.byteOffset || 0), count * elementsPerType);
+
+            // copy base data and change it
+            if (acc.bufferView) { // no copy necessary if no bufferView since data was created above
+                data = new Uint8Array(data);
+            }
+
+            const typedData = new GLTF_COMPONENT_TYPE_ARRAYS[acc.componentType](data.buffer);
+            for (let i = 0; i < count; i++) {
+                for (let j = 0; j < elementsPerType; j++) {
+                    typedData[elementsPerType * indexData[i] + j] = valueData[elementsPerType * i + j];
+                }
+            }
+        }
+
+        return data;
+    }
+
+    /**
+     * Do not call this before all data has already been pre-fetched
+     * @param index 
+     */
+    public accessorDataSync(index: GlTfId): Uint8Array {
+        if (!this.gltf.accessors) {
+            /* istanbul ignore next */
+            throw new Error('No accessors views found.');
+        }
+        const acc = this.gltf.accessors[index];
+        const elementsPerType = GLTF_ELEMENTS_PER_TYPE[acc.type];
+        let data;
+        if (acc.bufferView !== undefined) {
+            data = this.bufferViewDataSync(acc.bufferView);
+        } else {
+            const byteSize = GLTF_COMPONENT_TYPE_ARRAYS[acc.componentType].BYTES_PER_ELEMENT *
+                elementsPerType *
+                acc.count;
+            data = new Uint8Array(byteSize);
+        }
+
+        if (acc.sparse) {
+            // parse sparse data
+            const {count, indices, values} = acc.sparse;
+            let typedArray = GLTF_COMPONENT_TYPE_ARRAYS[indices.componentType];
+            let bufferViewData = this.bufferViewDataSync(indices.bufferView);
+            const indexData = new typedArray(bufferViewData.buffer,
+                bufferViewData.byteOffset + (indices.byteOffset || 0), count);
+
+            typedArray = GLTF_COMPONENT_TYPE_ARRAYS[acc.componentType];
+            bufferViewData = this.bufferViewDataSync(values.bufferView);
+            const valueData = new typedArray((this.bufferViewDataSync(values.bufferView)).buffer,
                 bufferViewData.byteOffset + (values.byteOffset || 0), count * elementsPerType);
 
             // copy base data and change it
@@ -213,6 +286,14 @@ export class BufferData {
         if (!buffers) { return []; }
         return Promise.all(buffers.map((_, i): any => this.get(i))) as Promise<void[]>;
     }
+
+    /**
+     * Do not call this before all buffer data has been pre-fetched
+     * @param index 
+     */
+    public getSync(index: GlTfId): Uint8Array {
+        return this.bufferCache[index];
+    }
 }
 
 export class ImageData {
@@ -298,6 +379,14 @@ export class ImageData {
         const images = this.asset.gltf.images;
         if (!images) { return []; }
         return Promise.all(images.map((_, i): any => this.get(i))) as Promise<void[]>;
+    }
+
+    /**
+     * Do not call this before all images have been pre-fatched.
+     * @param index 
+     */
+    public getSync(index: GlTfId): HTMLImageElement {
+        return this.imageCache[index];
     }
 }
 

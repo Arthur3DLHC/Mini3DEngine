@@ -1,4 +1,4 @@
-import { GltfAsset, GLTF_EXTENSIONS, GLTF_ATTRIBUTES } from "./gltfAsset.js";
+import { GltfAsset, GLTF_EXTENSIONS, GLTF_ATTRIBUTES, GLTF_ELEMENTS_PER_TYPE, GLTF_COMPONENT_TYPE_ARRAYS } from "./gltfAsset.js";
 import { Scene } from "../scene/scene.js";
 import { GlTfId, GlTf, TextureInfo } from "./gltf.js";
 import { Object3D } from "../scene/object3D.js";
@@ -179,6 +179,29 @@ export class GLTFSceneBuilder {
 
                     const accessorId = attributes[attr];
 
+                    const accessorData = gltf.accessorDataSync(accessorId);
+
+                    const accessor = gltf.gltf.accessors[accessorId];
+
+			        // For VEC3: itemSize is 3, elementBytes is 4, itemBytes is 12.
+                    const itemSize = GLTF_ELEMENTS_PER_TYPE[accessor.type];
+                    const typedArray = GLTF_COMPONENT_TYPE_ARRAYS[accessor.componentType];
+
+                    const elementBytes = typedArray.BYTES_PER_ELEMENT;
+                    const itemBytes = itemSize * elementBytes;
+                    const byteOffset = accessor.byteOffset || 0;
+                    const byteStride = accessor.bufferView !== undefined ? gltf.gltf.bufferViews[ accessor.bufferView ].byteStride : undefined;
+                    const normalize: boolean = accessor.normalized === true;
+
+                    // The buffer is interleaved if the stride is not the item size in bytes.
+                    if (byteStride !== undefined && byteStride !== itemBytes) {
+                        // todo: interleaved vertex buffer
+                    } else {
+                        // todo: not interleaved vertex buffer
+                    }
+
+                    /*
+
                     // todo: get data accessor; get component type, byte size infos
                     const accessor = gltf.gltf.accessors[accessorId];
                     if (accessor === undefined) {
@@ -224,7 +247,7 @@ export class GLTFSceneBuilder {
                         // todo: support both interleaved and non-interleaved vertex buffer data
                         // check by the stride size and vertex size
                         
-                    });
+                    });*/
                 }
             }
     
@@ -424,8 +447,9 @@ export class GLTFSceneBuilder {
                 throw new Error("Image with index not found in gltf.");
             }
             // should be already loaded by calling prefetchAll
-            const imageData = gltf.imageData.get(texDef.source);
-            imageData.then((img) => {
+            //const imageData = gltf.imageData.getSync(texDef.source);
+            //imageData.then((img) => {
+            const img = gltf.imageData.getSync(texDef.source);
                 texture.width = img.width;
                 texture.height = img.height;
                 texture.depth = 1;
@@ -457,7 +481,7 @@ export class GLTFSceneBuilder {
                     texture.format = GLDevice.gl.RGB;
                 }
                 texture.upload();
-            });
+            //});
         }
 
         // fix me: is that ok to return texture now?
