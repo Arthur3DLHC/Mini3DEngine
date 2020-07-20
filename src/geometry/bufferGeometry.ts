@@ -22,6 +22,7 @@ export class BufferGeometry {
     public attributes: VertexBufferAttribute[];
 
     // vbo
+    // todo: support multiple vertex buffers? for non-interleaved buffer in glTF?
     public vertexBuffer: VertexBuffer | null;
     
     // ibo

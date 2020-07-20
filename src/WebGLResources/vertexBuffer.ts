@@ -24,6 +24,7 @@ export class VertexBuffer {
     /**
      * 为简单起见，只支持浮点数数据？
      * 如果是从 glTF 加载的，则暂时不使用此属性？
+     * 或者将此属性做成多种类型的数组（TypedArray）？
      */
     public data: Float32Array | null;
 

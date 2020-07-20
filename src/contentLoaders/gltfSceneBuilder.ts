@@ -15,6 +15,7 @@ import { GLDevice } from "../WebGLResources/glDevice.js";
 import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
+import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -167,6 +168,9 @@ export class GLTFSceneBuilder {
             const mesh = new Mesh();
             mesh.geometry = new BufferGeometry();
 
+            // use bufferview index?
+            const vertexBuffers: Map<string, VertexBuffer> = new Map<string, VertexBuffer>();
+
             if (primDef.extensions && primDef.extensions[GLTF_EXTENSIONS.KHR_DRACO_MESH_COMPRESSION]) {
                 // todo: DRACO compression
             } else {
@@ -184,7 +188,15 @@ export class GLTFSceneBuilder {
                     const accessor = gltf.gltf.accessors[accessorId];
                     // according to the gltf specification, the vertex buffer should corresbounding to the gltf bufferview?
                     // one vertex buffer for one bufferview?
-                    const bufferView = accessor.bufferView;
+                    const bufferViewIdx: number = accessor.bufferView || 0;
+                    const vbKey: string = bufferViewIdx.toString();
+                    let vb = vertexBuffers.get(vbKey);
+                    if (vb === undefined) {
+                        vb = new VertexBuffer(GLDevice.gl.STATIC_DRAW);
+                        vertexBuffers.set(vbKey, vb);
+                    }
+
+                    // todo: copy data from bufferview to vertex buffer
 
 			        // For VEC3: itemSize is 3, elementBytes is 4, itemBytes is 12.
                     const itemSize = GLTF_ELEMENTS_PER_TYPE[accessor.type];
@@ -195,8 +207,6 @@ export class GLTFSceneBuilder {
                     const byteOffset = accessor.byteOffset || 0;
                     const byteStride = accessor.bufferView !== undefined ? gltf.gltf.bufferViews[ accessor.bufferView ].byteStride : undefined;
                     const normalize: boolean = accessor.normalized === true;
-
-
 
                     // The buffer is interleaved if the stride is not the item size in bytes.
                     if (byteStride !== undefined && byteStride !== itemBytes) {
