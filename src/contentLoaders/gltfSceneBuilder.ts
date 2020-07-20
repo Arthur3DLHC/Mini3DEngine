@@ -182,6 +182,9 @@ export class GLTFSceneBuilder {
                     const accessorData = gltf.accessorDataSync(accessorId);
 
                     const accessor = gltf.gltf.accessors[accessorId];
+                    // according to the gltf specification, the vertex buffer should corresbounding to the gltf bufferview?
+                    // one vertex buffer for one bufferview?
+                    const bufferView = accessor.bufferView;
 
 			        // For VEC3: itemSize is 3, elementBytes is 4, itemBytes is 12.
                     const itemSize = GLTF_ELEMENTS_PER_TYPE[accessor.type];
@@ -192,6 +195,8 @@ export class GLTFSceneBuilder {
                     const byteOffset = accessor.byteOffset || 0;
                     const byteStride = accessor.bufferView !== undefined ? gltf.gltf.bufferViews[ accessor.bufferView ].byteStride : undefined;
                     const normalize: boolean = accessor.normalized === true;
+
+
 
                     // The buffer is interleaved if the stride is not the item size in bytes.
                     if (byteStride !== undefined && byteStride !== itemBytes) {
