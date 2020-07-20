@@ -193,10 +193,12 @@ export class GLTFSceneBuilder {
                     let vb = vertexBuffers.get(vbKey);
                     if (vb === undefined) {
                         vb = new VertexBuffer(GLDevice.gl.STATIC_DRAW);
+                        // todo: copy data from bufferview to vertex buffer
+                        
+
                         vertexBuffers.set(vbKey, vb);
                     }
 
-                    // todo: copy data from bufferview to vertex buffer
 
 			        // For VEC3: itemSize is 3, elementBytes is 4, itemBytes is 12.
                     const itemSize = GLTF_ELEMENTS_PER_TYPE[accessor.type];
