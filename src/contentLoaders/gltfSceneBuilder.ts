@@ -44,7 +44,7 @@ export class GLTFSceneBuilder {
      * @param gltf the GlTf asset data
      * @param sceneIdx 
      */
-    public build(gltf: GltfAsset, sceneIdx: number): Scene {
+    public build(gltf: GltfAsset, sceneIdx: number): Object3D {
 
         // gltf 中 scene.nodes[] 中的节点都只能是根节点
         // get gltf scene object
@@ -57,7 +57,7 @@ export class GLTFSceneBuilder {
         }
 
         // iterate through all root nodes
-        const scene = new Scene();
+        const scene = new Object3D();
 
         // clear mesh reference numbers every time.
         this._meshReferences = [];
@@ -70,6 +70,8 @@ export class GLTFSceneBuilder {
         for (const nodeID of sceneDef.nodes) {
             this.processNode(nodeID, scene, gltf);
         }
+
+        // todo: findout skelecton joints
 
         return scene;
     }
@@ -99,7 +101,6 @@ export class GLTFSceneBuilder {
             this._meshReferences[nodeDef.mesh]++;
         }
         else {
-            // todo: if is joint?
             node = new Object3D();
         }
 
