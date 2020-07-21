@@ -16,6 +16,7 @@ import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
+import { IndexBuffer } from "../WebGLResources/indexBuffer.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -232,10 +233,25 @@ export class GLTFSceneBuilder {
                 }
             }
 
-            // todo: add all vertex buffers to buffergeometry
+            for (const vertexBuffer of vertexBuffers.values()) {
+                mesh.geometry.vertexBuffers.push(vertexBuffer);
+            }
 
-            // todo: add all attributes to buffergeometry
+            for (const vertexAttribute of vertexAttributes) {
+                mesh.geometry.attributes.push(vertexAttribute);
+            }
     
+            // indices
+            if (primDef.indices !== undefined) {
+                const accessorData = gltf.accessorDataSync(primDef.indices);
+                const accessor = gltf.gltf.accessors[primDef.indices];
+                mesh.geometry.indexBuffer = new IndexBuffer(GLDevice.gl.STATIC_DRAW);
+                mesh.geometry.indexBuffer.indices = accessorData;
+                mesh.geometry.indexBuffer.componentType = accessor.componentType;
+                mesh.geometry.indexBuffer.create();
+            }
+
+            // todo: primitive draw mode
             if (primDef.mode === GLDevice.gl.TRIANGLES
                 || primDef.mode === GLDevice.gl.TRIANGLE_FAN
                 || primDef.mode === GLDevice.gl.TRIANGLE_STRIP

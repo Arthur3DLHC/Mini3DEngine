@@ -63,7 +63,7 @@ export class BufferGeometry {
             const s = Math.max(0, start);
             const c = Math.min(count, this.indexBuffer.indices.length - s);
             // drawElements 时需要用 byte 偏移, int16 = 2 bytes
-            GLDevice.gl.drawElements(mode?mode:this.drawMode, c, GLDevice.gl.UNSIGNED_SHORT, s * 2);
+            GLDevice.gl.drawElements(mode?mode:this.drawMode, c, this.indexBuffer.componentType, s * 2);
         } else {
             // draw array 时不用 byte 偏移
             const s = Math.max(0, start);
@@ -106,7 +106,7 @@ export class BufferGeometry {
             const s = Math.max(0, start);
             const c = Math.min(count, this.indexBuffer.indices.length - s);
             // drawElements 时需要用 byte 偏移, int16 = 2 bytes
-            GLDevice.gl.drawElementsInstanced(mode?mode:this.drawMode, c, GLDevice.gl.UNSIGNED_SHORT, s * 2, instanceCount);
+            GLDevice.gl.drawElementsInstanced(mode?mode:this.drawMode, c, this.indexBuffer.componentType, s * 2, instanceCount);
         } else {
             // draw array 时不用 byte 偏移
             const s = Math.max(0, start);

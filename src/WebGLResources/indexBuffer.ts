@@ -5,13 +5,16 @@ export class IndexBuffer {
         this.glBuffer = null;
         this.indices = null;
         this._usage = usage;
+        this.componentType = GLDevice.gl.UNSIGNED_SHORT;
     }
 
     public glBuffer: WebGLBuffer | null;
     /**
      * WebGL can only use 8 or 16 bit indices? no 32 bit support?
      */
-    public indices: Uint16Array | null;
+    public indices: Uint8Array | Uint16Array | null;
+
+    public componentType: GLenum;
 
     private _usage: GLenum;
 
