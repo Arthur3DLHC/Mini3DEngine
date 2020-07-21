@@ -16,6 +16,7 @@ import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
+import { IndexBuffer } from "../WebGLResources/indexBuffer.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -43,7 +44,7 @@ export class GLTFSceneBuilder {
      * @param gltf the GlTf asset data
      * @param sceneIdx 
      */
-    public build(gltf: GltfAsset, sceneIdx: number): Scene {
+    public build(gltf: GltfAsset, sceneIdx: number): Object3D {
 
         // gltf 中 scene.nodes[] 中的节点都只能是根节点
         // get gltf scene object
@@ -56,7 +57,7 @@ export class GLTFSceneBuilder {
         }
 
         // iterate through all root nodes
-        const scene = new Scene();
+        const scene = new Object3D();
 
         // clear mesh reference numbers every time.
         this._meshReferences = [];
@@ -69,6 +70,8 @@ export class GLTFSceneBuilder {
         for (const nodeID of sceneDef.nodes) {
             this.processNode(nodeID, scene, gltf);
         }
+
+        // todo: findout skelecton joints
 
         return scene;
     }
@@ -91,14 +94,13 @@ export class GLTFSceneBuilder {
             if (this._meshReferences[nodeDef.mesh] > 0) {
                 // todo: handle instancing; create a new instance referencing same geometry;
                 // and render mesh using instancing mode
-                node = this.processMesh(nodeDef.mesh, gltf);
+                node = this.processMesh(nodeDef.mesh, nodeDef.skin !== undefined, gltf);
             } else {
-                node = this.processMesh(nodeDef.mesh, gltf);
+                node = this.processMesh(nodeDef.mesh, nodeDef.skin !== undefined, gltf);
             }
             this._meshReferences[nodeDef.mesh]++;
         }
         else {
-            // todo: if is joint?
             node = new Object3D();
         }
 
@@ -145,7 +147,7 @@ export class GLTFSceneBuilder {
      * @param gltf 
      * @returns if mesh only has 1 primitive, return a mesh object; or return an object3d node with multiple mesh children.
      */
-    private processMesh(meshId: GlTfId, gltf: GltfAsset): Object3D {
+    private processMesh(meshId: GlTfId, isSkin: boolean, gltf: GltfAsset): Object3D {
         if (gltf.gltf.meshes === undefined
             || gltf.gltf.accessors === undefined
             || gltf.gltf.bufferViews === undefined
@@ -165,11 +167,11 @@ export class GLTFSceneBuilder {
 
         for (const primDef of meshDef.primitives) {
             // geometry
-            const mesh = new Mesh();
-            mesh.geometry = new BufferGeometry();
+            const geometry = new BufferGeometry();
 
             // use bufferview index?
             const vertexBuffers: Map<string, VertexBuffer> = new Map<string, VertexBuffer>();
+            const vertexAttributes: VertexBufferAttribute[] = [];
 
             if (primDef.extensions && primDef.extensions[GLTF_EXTENSIONS.KHR_DRACO_MESH_COMPRESSION]) {
                 // todo: DRACO compression
@@ -182,110 +184,95 @@ export class GLTFSceneBuilder {
                     const attrname = this.attributeNameFromGLTF(attr);
 
                     const accessorId = attributes[attr];
+                    const accessor = gltf.gltf.accessors[accessorId];
+
+                    // form Three.js:
+                    // Ignore empty accessors, which may be used to declare runtime
+                    // information about attributes coming from another source (e.g. Draco
+                    // compression extension).
+                    if (accessor.bufferView === undefined) {
+                        continue;
+                    }
 
                     const accessorData = gltf.accessorDataSync(accessorId);
 
-                    const accessor = gltf.gltf.accessors[accessorId];
                     // according to the gltf specification, the vertex buffer should corresbounding to the gltf bufferview?
                     // one vertex buffer for one bufferview?
-                    const bufferViewIdx: number = accessor.bufferView || 0;
-                    const vbKey: string = bufferViewIdx.toString();
-                    let vb = vertexBuffers.get(vbKey);
-                    if (vb === undefined) {
-                        vb = new VertexBuffer(GLDevice.gl.STATIC_DRAW);
-                        // todo: copy data from bufferview to vertex buffer
-                        
+                    const bufferViewIdx: number = accessor.bufferView;
+                    const bufferView = gltf.gltf.bufferViews[bufferViewIdx];
 
-                        vertexBuffers.set(vbKey, vb);
-                    }
-
-
-			        // For VEC3: itemSize is 3, elementBytes is 4, itemBytes is 12.
+                    // For VEC3: itemSize is 3, elementBytes is 4, itemBytes is 12.
                     const itemSize = GLTF_ELEMENTS_PER_TYPE[accessor.type];
                     const typedArray = GLTF_COMPONENT_TYPE_ARRAYS[accessor.componentType];
 
                     const elementBytes = typedArray.BYTES_PER_ELEMENT;
                     const itemBytes = itemSize * elementBytes;
                     const byteOffset = accessor.byteOffset || 0;
-                    const byteStride = accessor.bufferView !== undefined ? gltf.gltf.bufferViews[ accessor.bufferView ].byteStride : undefined;
+                    const byteStride = accessor.bufferView !== undefined ? gltf.gltf.bufferViews[accessor.bufferView].byteStride : undefined;
                     const normalize: boolean = accessor.normalized === true;
 
-                    // The buffer is interleaved if the stride is not the item size in bytes.
-                    if (byteStride !== undefined && byteStride !== itemBytes) {
-                        // todo: interleaved vertex buffer
-                        // multiple attributes share one vertex buffer
+                    const vbKey: string = bufferViewIdx.toString();
+                    let vb = vertexBuffers.get(vbKey);
+                    if (vb === undefined) {
+                        vb = new VertexBuffer(GLDevice.gl.STATIC_DRAW);
 
-                        // Each "slice" of the buffer, as defined by 'count' elements of 'byteStride' bytes, gets its own InterleavedBuffer
-				        // This makes sure that IBA.count reflects accessor.count properly
+                        // todo: copy data from bufferview to vertex buffer
+                        vb.data = accessorData;
+                        if (bufferView.byteStride) {
+                            vb.stride = bufferView.byteStride;
+                        } else {
+                            vb.stride = itemBytes;
+                        }
+                        vb.create();
 
-                    } else {
-                        // todo: not interleaved vertex buffer
-
+                        vertexBuffers.set(vbKey, vb);
                     }
 
-                    /*
-
-                    // todo: get data accessor; get component type, byte size infos
-                    const accessor = gltf.gltf.accessors[accessorId];
-                    if (accessor === undefined) {
-                        throw new Error("Accessor not found.");
-                    }
-
-                    if (accessor.bufferView === undefined && accessor.sparse === undefined) {
-                        // form Three.js:
-                        // Ignore empty accessors, which may be used to declare runtime
-			            // information about attributes coming from another source (e.g. Draco
-			            // compression extension).
-                        continue;
-                    }
-
-                    const bufferViews = [];
-                    const pendingBuffers = [];
-
-                    if (accessor.bufferView !== undefined) {
-                        const bufferView = gltf.gltf.bufferViews[accessor.bufferView];
-                        bufferViews.push(bufferView);
-                        // this is a promise
-                        const buffer = gltf.bufferData.get(bufferView.buffer);
-                        pendingBuffers.push(buffer);
-                    } else {
-                        bufferViews.push(null);
-                        pendingBuffers.push(null);
-                    }
-
-                    if (accessor.sparse !== undefined) {
-                        const indicesBufferView = gltf.gltf.bufferViews[accessor.sparse.indices.bufferView];
-                        const valuesBufferView = gltf.gltf.bufferviews[accessor.sparse.values.bufferView];
-
-                        bufferViews.push(indicesBufferView);
-                        bufferViews.push(valuesBufferView);
-
-                        pendingBuffers.push(gltf.bufferData.get(indicesBufferView.buffer));
-                        pendingBuffers.push(gltf.bufferData.get(valuesBufferView.buffer));
-                    }
-
-                    // process data after all buffers have been loaded.
-                    Promise.all(pendingBuffers).then((values)=>{
-                        // create geometry here?
-                        // todo: support both interleaved and non-interleaved vertex buffer data
-                        // check by the stride size and vertex size
-                        
-                    });*/
+                    const vbAttr = new VertexBufferAttribute(attrname, vb, itemSize, byteOffset);
+                    vertexAttributes.push(vbAttr);
                 }
             }
+
+            for (const vertexBuffer of vertexBuffers.values()) {
+                geometry.vertexBuffers.push(vertexBuffer);
+            }
+
+            for (const vertexAttribute of vertexAttributes) {
+                geometry.attributes.push(vertexAttribute);
+            }
     
+            // indices
+            if (primDef.indices !== undefined) {
+                const accessorData = gltf.accessorDataSync(primDef.indices);
+                const accessor = gltf.gltf.accessors[primDef.indices];
+                geometry.indexBuffer = new IndexBuffer(GLDevice.gl.STATIC_DRAW);
+                geometry.indexBuffer.indices = accessorData;
+                geometry.indexBuffer.componentType = accessor.componentType;
+                geometry.indexBuffer.create();
+            }
+
+            geometry.drawMode = (primDef.mode === undefined? GLDevice.gl.TRIANGLES : primDef.mode);
+
+            let mesh = new Mesh();
+
+            // todo: primitive draw mode
             if (primDef.mode === GLDevice.gl.TRIANGLES
                 || primDef.mode === GLDevice.gl.TRIANGLE_FAN
                 || primDef.mode === GLDevice.gl.TRIANGLE_STRIP
                 || primDef.mode === undefined) {
-                
+                // todo: is this a skin mesh?
+                mesh = new Mesh();
+
             } else if (primDef.mode === GLDevice.gl.LINES
                 || primDef.mode === GLDevice.gl.LINE_STRIP
                 || primDef.mode === GLDevice.gl.LINE_LOOP) {
+                mesh = new Mesh();
                 
             } else if (primDef.mode === GLDevice.gl.POINTS) {
-
+                mesh = new Mesh();
             }
+
+            mesh.geometry = geometry;
 
             // in gltf, one primitive only has one material
             const prim = new Primitive(0, Infinity, 0);

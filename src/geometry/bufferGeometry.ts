@@ -11,7 +11,7 @@ import { BoundingBox } from "../math/boundingBox.js";
 export class BufferGeometry {
     public constructor() {
         this.attributes = [];
-        this.vertexBuffer = null;
+        this.vertexBuffers = [];
         this.indexBuffer = null;
         this.primitives = [];
         this.drawMode = GLDevice.gl.TRIANGLES;
@@ -23,7 +23,7 @@ export class BufferGeometry {
 
     // vbo
     // todo: support multiple vertex buffers? for non-interleaved buffer in glTF?
-    public vertexBuffer: VertexBuffer | null;
+    public vertexBuffers: VertexBuffer[];
     
     // ibo
     public indexBuffer: IndexBuffer | null;
@@ -37,12 +37,23 @@ export class BufferGeometry {
     public boundingSphere: BoundingSphere;
 
     public draw(start: number, count: number, attribLocations: Map<string, number>, mode: GLenum|null = null) {
-        if (!this.vertexBuffer || !this.vertexBuffer.data || !this.vertexBuffer.glBuffer) {
+        // if (!this.vertexBuffer || !this.vertexBuffer.data || !this.vertexBuffer.glBuffer) {
+        //     return;
+        // }
+        if (this.vertexBuffers.length <= 0 || this.attributes.length <= 0) {
+            // todo: log error? or throw exception?
+            console.warn("BufferGeometry.draw(): No vertex buffer or attributes found.");
             return;
         }
         GLGeometryBuffers.clearVertexAttributes();
-        GLGeometryBuffers.bindVertexBuffer(this.vertexBuffer);
+
+        // GLGeometryBuffers.bindVertexBuffer(this.vertexBuffer);
+        // 在 OpenGL 中只要将 VertexBufferObject 绑定到 Vertex attribute pointer 上，就可以直接用后者绘制了，不用再绑定 VBO
         for (const attr of this.attributes) {
+            if (attr.buffer.data === null || attr.buffer.glBuffer === null) {
+                throw new Error("Vertex buffer is empty or not created");
+            }
+            GLGeometryBuffers.bindVertexBuffer(attr.buffer);
             GLGeometryBuffers.setVertexAttribute(attr, attribLocations);
         }
         GLGeometryBuffers.disableUnusedAttributes();
@@ -52,11 +63,11 @@ export class BufferGeometry {
             const s = Math.max(0, start);
             const c = Math.min(count, this.indexBuffer.indices.length - s);
             // drawElements 时需要用 byte 偏移, int16 = 2 bytes
-            GLDevice.gl.drawElements(mode?mode:this.drawMode, c, GLDevice.gl.UNSIGNED_SHORT, s * 2);
+            GLDevice.gl.drawElements(mode?mode:this.drawMode, c, this.indexBuffer.componentType, s * 2);
         } else {
             // draw array 时不用 byte 偏移
             const s = Math.max(0, start);
-            const c = Math.min(count, this.vertexBuffer.data.length - s);
+            const c = Math.min(count, this.vertexBuffers[0].vertexCount - s);
             GLDevice.gl.drawArrays(mode?mode:this.drawMode, s, c);
         }
     }
@@ -64,13 +75,21 @@ export class BufferGeometry {
     // todo: draw instanced?
     // pass in attributes of instancing data?
     public drawInstaces(start: number, count: number, attribLocations: Map<string, number>, instanceAttribs: VertexBufferAttribute[], instanceCount: number, mode: GLenum|null = null) {
-        if (!this.vertexBuffer || !this.vertexBuffer.data || !this.vertexBuffer.glBuffer || instanceAttribs.length <= 0) {
+        if (this.vertexBuffers.length <= 0 || this.attributes.length <= 0  || instanceAttribs.length <= 0) {
+            // todo: log error? or throw exception?
+            console.warn("BufferGeometry.draw(): No vertex buffer or attributes found.");
             return;
         }
+        // if (!this.vertexBuffer || !this.vertexBuffer.data || !this.vertexBuffer.glBuffer || instanceAttribs.length <= 0) {
+        //     return;
+        // }
         GLGeometryBuffers.clearVertexAttributes();
         // bind geometry vertex buffer
-        GLGeometryBuffers.bindVertexBuffer(this.vertexBuffer);
         for (const attr of this.attributes) {
+            if (attr.buffer.data === null || attr.buffer.glBuffer === null) {
+                throw new Error("Vertex buffer is empty or not created");
+            }
+            GLGeometryBuffers.bindVertexBuffer(attr.buffer);
             GLGeometryBuffers.setVertexAttribute(attr, attribLocations);
         }
 
@@ -87,20 +106,23 @@ export class BufferGeometry {
             const s = Math.max(0, start);
             const c = Math.min(count, this.indexBuffer.indices.length - s);
             // drawElements 时需要用 byte 偏移, int16 = 2 bytes
-            GLDevice.gl.drawElementsInstanced(mode?mode:this.drawMode, c, GLDevice.gl.UNSIGNED_SHORT, s * 2, instanceCount);
+            GLDevice.gl.drawElementsInstanced(mode?mode:this.drawMode, c, this.indexBuffer.componentType, s * 2, instanceCount);
         } else {
             // draw array 时不用 byte 偏移
             const s = Math.max(0, start);
-            const c = Math.min(count, this.vertexBuffer.data.length - s);
+            const c = Math.min(count, this.vertexBuffers[0].vertexCount - s);
             GLDevice.gl.drawArraysInstanced(mode?mode:this.drawMode, s, c, instanceCount);
         }
     }
 
     public destroy() {
-        if (this.vertexBuffer) {
-            this.vertexBuffer.release();
-            this.vertexBuffer = null;
+        for (const vertexBuffer of this.vertexBuffers) {
+            if (vertexBuffer) {
+                vertexBuffer.release();
+            }
         }
+        this.vertexBuffers = [];
+
         if (this.indexBuffer) {
             this.indexBuffer.release();
             this.indexBuffer = null;

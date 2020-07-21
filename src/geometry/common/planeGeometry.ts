@@ -13,13 +13,14 @@ export class PlaneGeometry extends BufferGeometry {
         this._widthSeg = Math.max(1, widthSegments);
         this._heightSeg = Math.max(1, heightSegments);
 
-        this.vertexBuffer = new VertexBuffer(GLDevice.gl.STATIC_DRAW);
+        const vertexBuffer = new VertexBuffer(GLDevice.gl.STATIC_DRAW);
+        this.vertexBuffers.push(vertexBuffer);
         this.indexBuffer = new IndexBuffer(GLDevice.gl.STATIC_DRAW);
 
         const floats = 8;
 
-        this.vertexBuffer.stride = floats * 4;
-        this.vertexBuffer.data = new Float32Array(floats * (this._widthSeg + 1) * (this._heightSeg + 1));
+        vertexBuffer.stride = floats * 4;
+        vertexBuffer.data = new Float32Array(floats * (this._widthSeg + 1) * (this._heightSeg + 1));
 
         const halfWidth = this._width * 0.5;
         const halfHeight = this._height * 0.5;
@@ -31,17 +32,17 @@ export class PlaneGeometry extends BufferGeometry {
                 const s = i / this._widthSeg;
                 const x = -halfWidth + s * this._width;
                 const idx = (j * (this._widthSeg + 1) + i) * floats;
-                this.vertexBuffer.data[idx + 0] = x;
-                this.vertexBuffer.data[idx + 1] = 0;
-                this.vertexBuffer.data[idx + 2] = z;
-                this.vertexBuffer.data[idx + 3] = 0;
-                this.vertexBuffer.data[idx + 4] = 1;
-                this.vertexBuffer.data[idx + 5] = 0;
-                this.vertexBuffer.data[idx + 6] = s;
-                this.vertexBuffer.data[idx + 7] = t;
+                vertexBuffer.data[idx + 0] = x;
+                vertexBuffer.data[idx + 1] = 0;
+                vertexBuffer.data[idx + 2] = z;
+                vertexBuffer.data[idx + 3] = 0;
+                vertexBuffer.data[idx + 4] = 1;
+                vertexBuffer.data[idx + 5] = 0;
+                vertexBuffer.data[idx + 6] = s;
+                vertexBuffer.data[idx + 7] = t;
             }
         }
-        this.vertexBuffer.create();
+        vertexBuffer.create();
         const indices: number[] = [];
         // a   b
         // c   d
@@ -63,9 +64,9 @@ export class PlaneGeometry extends BufferGeometry {
         this.indexBuffer.create();
 
         let curOffset = 0;
-        curOffset = this.addAttribute(VertexBufferAttribute.defaultNamePosition, this.vertexBuffer, 3, curOffset);
-        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameNormal, this.vertexBuffer, 3, curOffset);
-        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameTexcoord0, this.vertexBuffer, 2, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNamePosition, vertexBuffer, 3, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameNormal, vertexBuffer, 3, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameTexcoord0, vertexBuffer, 2, curOffset);
 
         const grp = new Primitive();
         this.primitives.push(grp);
