@@ -92,9 +92,9 @@ export class GLTFSceneBuilder {
             if (this._meshReferences[nodeDef.mesh] > 0) {
                 // todo: handle instancing; create a new instance referencing same geometry;
                 // and render mesh using instancing mode
-                node = this.processMesh(nodeDef.mesh, gltf);
+                node = this.processMesh(nodeDef.mesh, nodeDef.skin !== undefined, gltf);
             } else {
-                node = this.processMesh(nodeDef.mesh, gltf);
+                node = this.processMesh(nodeDef.mesh, nodeDef.skin !== undefined, gltf);
             }
             this._meshReferences[nodeDef.mesh]++;
         }
@@ -146,7 +146,7 @@ export class GLTFSceneBuilder {
      * @param gltf 
      * @returns if mesh only has 1 primitive, return a mesh object; or return an object3d node with multiple mesh children.
      */
-    private processMesh(meshId: GlTfId, gltf: GltfAsset): Object3D {
+    private processMesh(meshId: GlTfId, isSkin: boolean, gltf: GltfAsset): Object3D {
         if (gltf.gltf.meshes === undefined
             || gltf.gltf.accessors === undefined
             || gltf.gltf.bufferViews === undefined
@@ -256,7 +256,8 @@ export class GLTFSceneBuilder {
                 || primDef.mode === GLDevice.gl.TRIANGLE_FAN
                 || primDef.mode === GLDevice.gl.TRIANGLE_STRIP
                 || primDef.mode === undefined) {
-                
+                // is this a skin mesh?
+
             } else if (primDef.mode === GLDevice.gl.LINES
                 || primDef.mode === GLDevice.gl.LINE_STRIP
                 || primDef.mode === GLDevice.gl.LINE_LOOP) {
