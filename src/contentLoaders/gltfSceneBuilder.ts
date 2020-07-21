@@ -166,8 +166,7 @@ export class GLTFSceneBuilder {
 
         for (const primDef of meshDef.primitives) {
             // geometry
-            const mesh = new Mesh();
-            mesh.geometry = new BufferGeometry();
+            const geometry = new BufferGeometry();
 
             // use bufferview index?
             const vertexBuffers: Map<string, VertexBuffer> = new Map<string, VertexBuffer>();
@@ -234,37 +233,45 @@ export class GLTFSceneBuilder {
             }
 
             for (const vertexBuffer of vertexBuffers.values()) {
-                mesh.geometry.vertexBuffers.push(vertexBuffer);
+                geometry.vertexBuffers.push(vertexBuffer);
             }
 
             for (const vertexAttribute of vertexAttributes) {
-                mesh.geometry.attributes.push(vertexAttribute);
+                geometry.attributes.push(vertexAttribute);
             }
     
             // indices
             if (primDef.indices !== undefined) {
                 const accessorData = gltf.accessorDataSync(primDef.indices);
                 const accessor = gltf.gltf.accessors[primDef.indices];
-                mesh.geometry.indexBuffer = new IndexBuffer(GLDevice.gl.STATIC_DRAW);
-                mesh.geometry.indexBuffer.indices = accessorData;
-                mesh.geometry.indexBuffer.componentType = accessor.componentType;
-                mesh.geometry.indexBuffer.create();
+                geometry.indexBuffer = new IndexBuffer(GLDevice.gl.STATIC_DRAW);
+                geometry.indexBuffer.indices = accessorData;
+                geometry.indexBuffer.componentType = accessor.componentType;
+                geometry.indexBuffer.create();
             }
+
+            geometry.drawMode = (primDef.mode === undefined? GLDevice.gl.TRIANGLES : primDef.mode);
+
+            let mesh = new Mesh();
 
             // todo: primitive draw mode
             if (primDef.mode === GLDevice.gl.TRIANGLES
                 || primDef.mode === GLDevice.gl.TRIANGLE_FAN
                 || primDef.mode === GLDevice.gl.TRIANGLE_STRIP
                 || primDef.mode === undefined) {
-                // is this a skin mesh?
+                // todo: is this a skin mesh?
+                mesh = new Mesh();
 
             } else if (primDef.mode === GLDevice.gl.LINES
                 || primDef.mode === GLDevice.gl.LINE_STRIP
                 || primDef.mode === GLDevice.gl.LINE_LOOP) {
+                mesh = new Mesh();
                 
             } else if (primDef.mode === GLDevice.gl.POINTS) {
-
+                mesh = new Mesh();
             }
+
+            mesh.geometry = geometry;
 
             // in gltf, one primitive only has one material
             const prim = new Primitive(0, Infinity, 0);
