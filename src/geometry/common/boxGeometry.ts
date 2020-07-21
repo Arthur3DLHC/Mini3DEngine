@@ -22,14 +22,15 @@ export class BoxGeometry extends BufferGeometry {
         this._height = Math.max(height, 0);
         this._depth = Math.max(depth, 0);
 
-        this.vertexBuffer = new VertexBuffer(GLDevice.gl.STATIC_DRAW);
+        const vertexBuffer = new VertexBuffer(GLDevice.gl.STATIC_DRAW)
+        this.vertexBuffers.push(vertexBuffer);
         this.indexBuffer = new IndexBuffer(GLDevice.gl.STATIC_DRAW);
 
-        this.vertexBuffer.stride = 8 * 4;
+        vertexBuffer.stride = 8 * 4;
         const x = this._width * 0.5;
         const y = this._height * 0.5;
         const z = this._depth * 0.5;
-        this.vertexBuffer.data = new Float32Array([
+        vertexBuffer.data = new Float32Array([
             // -x plane, 4 points
             -x, -y, -z,     -1, 0, 0,   0, 0,
             -x,  y, -z,     -1, 0, 0,   0, 1,
@@ -61,7 +62,7 @@ export class BoxGeometry extends BufferGeometry {
              x,  y,  z,     0, 0, 1,    1, 1,
              x, -y,  z,     0, 0, 1,    1, 0,
         ]);
-        this.vertexBuffer.create();
+        vertexBuffer.create();
         this.indexBuffer.indices = new Uint16Array([
             1, 0, 2, 2, 0, 3,
             5, 4, 6, 6, 4, 7,
@@ -73,9 +74,9 @@ export class BoxGeometry extends BufferGeometry {
         this.indexBuffer.create();
 
         let curOffset = 0;
-        curOffset = this.addAttribute(VertexBufferAttribute.defaultNamePosition, this.vertexBuffer, 3, curOffset);
-        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameNormal, this.vertexBuffer, 3, curOffset);
-        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameTexcoord0, this.vertexBuffer, 2, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNamePosition, vertexBuffer, 3, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameNormal, vertexBuffer, 3, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameTexcoord0, vertexBuffer, 2, curOffset);
 
         const grp = new Primitive();
         this.primitives.push(grp);

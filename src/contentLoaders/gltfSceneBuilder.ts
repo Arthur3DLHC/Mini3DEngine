@@ -170,6 +170,7 @@ export class GLTFSceneBuilder {
 
             // use bufferview index?
             const vertexBuffers: Map<string, VertexBuffer> = new Map<string, VertexBuffer>();
+            const vertexAttributes: VertexBufferAttribute[] = [];
 
             if (primDef.extensions && primDef.extensions[GLTF_EXTENSIONS.KHR_DRACO_MESH_COMPRESSION]) {
                 // todo: DRACO compression
@@ -182,95 +183,58 @@ export class GLTFSceneBuilder {
                     const attrname = this.attributeNameFromGLTF(attr);
 
                     const accessorId = attributes[attr];
+                    const accessor = gltf.gltf.accessors[accessorId];
+
+                    // form Three.js:
+                    // Ignore empty accessors, which may be used to declare runtime
+                    // information about attributes coming from another source (e.g. Draco
+                    // compression extension).
+                    if (accessor.bufferView === undefined) {
+                        continue;
+                    }
 
                     const accessorData = gltf.accessorDataSync(accessorId);
 
-                    const accessor = gltf.gltf.accessors[accessorId];
                     // according to the gltf specification, the vertex buffer should corresbounding to the gltf bufferview?
                     // one vertex buffer for one bufferview?
-                    const bufferViewIdx: number = accessor.bufferView || 0;
-                    const vbKey: string = bufferViewIdx.toString();
-                    let vb = vertexBuffers.get(vbKey);
-                    if (vb === undefined) {
-                        vb = new VertexBuffer(GLDevice.gl.STATIC_DRAW);
-                        vertexBuffers.set(vbKey, vb);
-                    }
+                    const bufferViewIdx: number = accessor.bufferView;
+                    const bufferView = gltf.gltf.bufferViews[bufferViewIdx];
 
-                    // todo: copy data from bufferview to vertex buffer
-
-			        // For VEC3: itemSize is 3, elementBytes is 4, itemBytes is 12.
+                    // For VEC3: itemSize is 3, elementBytes is 4, itemBytes is 12.
                     const itemSize = GLTF_ELEMENTS_PER_TYPE[accessor.type];
                     const typedArray = GLTF_COMPONENT_TYPE_ARRAYS[accessor.componentType];
 
                     const elementBytes = typedArray.BYTES_PER_ELEMENT;
                     const itemBytes = itemSize * elementBytes;
                     const byteOffset = accessor.byteOffset || 0;
-                    const byteStride = accessor.bufferView !== undefined ? gltf.gltf.bufferViews[ accessor.bufferView ].byteStride : undefined;
+                    const byteStride = accessor.bufferView !== undefined ? gltf.gltf.bufferViews[accessor.bufferView].byteStride : undefined;
                     const normalize: boolean = accessor.normalized === true;
 
-                    // The buffer is interleaved if the stride is not the item size in bytes.
-                    if (byteStride !== undefined && byteStride !== itemBytes) {
-                        // todo: interleaved vertex buffer
-                        // multiple attributes share one vertex buffer
+                    const vbKey: string = bufferViewIdx.toString();
+                    let vb = vertexBuffers.get(vbKey);
+                    if (vb === undefined) {
+                        vb = new VertexBuffer(GLDevice.gl.STATIC_DRAW);
 
-                        // Each "slice" of the buffer, as defined by 'count' elements of 'byteStride' bytes, gets its own InterleavedBuffer
-				        // This makes sure that IBA.count reflects accessor.count properly
+                        // todo: copy data from bufferview to vertex buffer
+                        vb.data = accessorData;
+                        if (bufferView.byteStride) {
+                            vb.stride = bufferView.byteStride;
+                        } else {
+                            vb.stride = itemBytes;
+                        }
+                        vb.create();
 
-                    } else {
-                        // todo: not interleaved vertex buffer
-
+                        vertexBuffers.set(vbKey, vb);
                     }
 
-                    /*
-
-                    // todo: get data accessor; get component type, byte size infos
-                    const accessor = gltf.gltf.accessors[accessorId];
-                    if (accessor === undefined) {
-                        throw new Error("Accessor not found.");
-                    }
-
-                    if (accessor.bufferView === undefined && accessor.sparse === undefined) {
-                        // form Three.js:
-                        // Ignore empty accessors, which may be used to declare runtime
-			            // information about attributes coming from another source (e.g. Draco
-			            // compression extension).
-                        continue;
-                    }
-
-                    const bufferViews = [];
-                    const pendingBuffers = [];
-
-                    if (accessor.bufferView !== undefined) {
-                        const bufferView = gltf.gltf.bufferViews[accessor.bufferView];
-                        bufferViews.push(bufferView);
-                        // this is a promise
-                        const buffer = gltf.bufferData.get(bufferView.buffer);
-                        pendingBuffers.push(buffer);
-                    } else {
-                        bufferViews.push(null);
-                        pendingBuffers.push(null);
-                    }
-
-                    if (accessor.sparse !== undefined) {
-                        const indicesBufferView = gltf.gltf.bufferViews[accessor.sparse.indices.bufferView];
-                        const valuesBufferView = gltf.gltf.bufferviews[accessor.sparse.values.bufferView];
-
-                        bufferViews.push(indicesBufferView);
-                        bufferViews.push(valuesBufferView);
-
-                        pendingBuffers.push(gltf.bufferData.get(indicesBufferView.buffer));
-                        pendingBuffers.push(gltf.bufferData.get(valuesBufferView.buffer));
-                    }
-
-                    // process data after all buffers have been loaded.
-                    Promise.all(pendingBuffers).then((values)=>{
-                        // create geometry here?
-                        // todo: support both interleaved and non-interleaved vertex buffer data
-                        // check by the stride size and vertex size
-                        
-                    });*/
+                    const vbAttr = new VertexBufferAttribute(attrname, vb, itemSize, byteOffset);
+                    vertexAttributes.push(vbAttr);
                 }
             }
+
+            // todo: add all vertex buffers to buffergeometry
+
+            // todo: add all attributes to buffergeometry
     
             if (primDef.mode === GLDevice.gl.TRIANGLES
                 || primDef.mode === GLDevice.gl.TRIANGLE_FAN

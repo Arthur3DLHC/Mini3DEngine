@@ -26,11 +26,11 @@ export class VertexBuffer {
      * 如果是从 glTF 加载的，则暂时不使用此属性？
      * 或者将此属性做成多种类型的数组（TypedArray）？
      */
-    public data: Float32Array | null;
+    public data: Float32Array | Uint8Array | null;
 
     public get vertexCount(): number {
         if (this.data && this.stride > 0) {
-            return this.data.length / (this.stride / 4);
+            return this.data.byteLength / this.stride;
         }
         return 0;
     }

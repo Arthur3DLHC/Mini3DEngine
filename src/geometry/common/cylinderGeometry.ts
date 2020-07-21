@@ -13,14 +13,15 @@ export class CylinderGeometry extends BufferGeometry {
         this._height = Math.max(0, height);
         this._segments = Math.max(3, Math.floor(segments));
 
-        this.vertexBuffer = new VertexBuffer(GLDevice.gl.STATIC_DRAW);
+        const vertexBuffer = new VertexBuffer(GLDevice.gl.STATIC_DRAW);
+        this.vertexBuffers.push(vertexBuffer);
         this.indexBuffer = new IndexBuffer(GLDevice.gl.STATIC_DRAW);
 
         // floats per vertex
         const floatCount = 8;
 
-        this.vertexBuffer.stride = floatCount * 4;
-        this.vertexBuffer.data = new Float32Array(floatCount * ((this._segments + 1) * 4 + 2));
+        vertexBuffer.stride = floatCount * 4;
+        vertexBuffer.data = new Float32Array(floatCount * ((this._segments + 1) * 4 + 2));
         // todo: fill vertex data
         // side
         const y = this._height * 0.5;
@@ -36,21 +37,21 @@ export class CylinderGeometry extends BufferGeometry {
             const bottomCapIdx = floatCount * ((this._segments + 1) * 3 + i);
 
             // side
-            this.addVertex(this.vertexBuffer.data, topIdx, x, y, z, x / this._radius, 0, z / this._radius, s, 1);
-            this.addVertex(this.vertexBuffer.data, bottomIdx, x, -y, z, x / this._radius, 0, z / this._radius, s, 0);
+            this.addVertex(vertexBuffer.data, topIdx, x, y, z, x / this._radius, 0, z / this._radius, s, 1);
+            this.addVertex(vertexBuffer.data, bottomIdx, x, -y, z, x / this._radius, 0, z / this._radius, s, 0);
 
             // top cap
-            this.addVertex(this.vertexBuffer.data, topCapIdx, x, y, z, 0, 1, 0, s, 0);
+            this.addVertex(vertexBuffer.data, topCapIdx, x, y, z, 0, 1, 0, s, 0);
             // bottom cap
-            this.addVertex(this.vertexBuffer.data, bottomCapIdx, x, -y, z, 0, -1, 0, s, 0);
+            this.addVertex(vertexBuffer.data, bottomCapIdx, x, -y, z, 0, -1, 0, s, 0);
         }
         const topCenterPtIdx = floatCount * ((this._segments + 1) * 4 + 0);
-        this.addVertex(this.vertexBuffer.data, topCenterPtIdx, 0, y, 0, 0, 1, 0, 0.5, 1);
+        this.addVertex(vertexBuffer.data, topCenterPtIdx, 0, y, 0, 0, 1, 0, 0.5, 1);
 
         const bottomCenterPtIdx = floatCount * ((this._segments + 1) * 4 + 1);
-        this.addVertex(this.vertexBuffer.data, bottomCenterPtIdx, 0, -y, 0, 0, -1, 0, 0.5, 1);
+        this.addVertex(vertexBuffer.data, bottomCenterPtIdx, 0, -y, 0, 0, -1, 0, 0.5, 1);
 
-        this.vertexBuffer.create();
+        vertexBuffer.create();
 
         // todo: fill index data
         const indices: number[] = [];
@@ -92,9 +93,9 @@ export class CylinderGeometry extends BufferGeometry {
         this.indexBuffer.create();
 
         let curOffset = 0;
-        curOffset = this.addAttribute(VertexBufferAttribute.defaultNamePosition, this.vertexBuffer, 3, curOffset);
-        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameNormal, this.vertexBuffer, 3, curOffset);
-        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameTexcoord0, this.vertexBuffer, 2, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNamePosition, vertexBuffer, 3, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameNormal, vertexBuffer, 3, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameTexcoord0, vertexBuffer, 2, curOffset);
 
         const grp = new Primitive();
         this.primitives.push(grp);
