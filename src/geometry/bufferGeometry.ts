@@ -16,6 +16,7 @@ export class BufferGeometry {
         this.primitives = [];
         this.drawMode = GLDevice.gl.TRIANGLES;
         this.boundingSphere = new BoundingSphere();
+        this.inCache = false;
     }
 
     // vertex attributes
@@ -35,6 +36,11 @@ export class BufferGeometry {
     public drawMode: GLenum;
 
     public boundingSphere: BoundingSphere;
+
+    /**
+     * if in cache, do not destroy by mesh; should destroy while clear cache.
+     */
+    public inCache: boolean;
 
     public draw(start: number, count: number, attribLocations: Map<string, number>, mode: GLenum|null = null) {
         // if (!this.vertexBuffer || !this.vertexBuffer.data || !this.vertexBuffer.glBuffer) {

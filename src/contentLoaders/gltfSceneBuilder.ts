@@ -167,6 +167,7 @@ export class GLTFSceneBuilder {
 
         for (const primDef of meshDef.primitives) {
             // geometry
+            // todo: use a global geometry cache, to share between all objects created from this gltf file.
             const geometry = new BufferGeometry();
 
             // use bufferview index?
