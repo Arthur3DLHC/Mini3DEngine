@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture2D } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "../common/behaviors/autoRotateBehavior.js";
 import vec4 from "../../lib/tsm/vec4.js";
@@ -256,9 +256,9 @@ window.onload = () => {
     
         // test load texture
         if(textureUrl !== undefined) {
-            planeMtl.colorMap = textureLoader.load(textureUrl, (texture: Texture2D)=>{
+            planeMtl.colorMap = textureLoader.load(textureUrl, (texture: Texture)=>{
                 planeMtl.colorMapAmount = 1.0;
-            });
+            }) as Texture2D;
         }
     
         planeMesh.materials.push(planeMtl);

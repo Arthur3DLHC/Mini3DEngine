@@ -17,6 +17,7 @@ import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { IndexBuffer } from "../WebGLResources/indexBuffer.js";
+import { GeometryCache } from "../geometry/geometryCache.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -165,93 +166,112 @@ export class GLTFSceneBuilder {
         // need to use multiple meshes
         const meshes: Mesh[] = [];
 
+        let iprim: number = 0;
         for (const primDef of meshDef.primitives) {
             // geometry
-            const geometry = new BufferGeometry();
+            // todo: use a global geometry cache, to share between all objects created from this gltf file.
+            // key: gltffileurl.meshid.primid?
+            const geometryKey: string = gltf.uri + ".mesh" + meshId.toString() + ".prim" + iprim.toString();
 
-            // use bufferview index?
-            const vertexBuffers: Map<string, VertexBuffer> = new Map<string, VertexBuffer>();
-            const vertexAttributes: VertexBufferAttribute[] = [];
-
-            if (primDef.extensions && primDef.extensions[GLTF_EXTENSIONS.KHR_DRACO_MESH_COMPRESSION]) {
-                // todo: DRACO compression
+            let geometry: BufferGeometry;
+            let cached = GeometryCache.instance.get(geometryKey);
+            if (cached !== undefined) {
+                geometry = cached;
             } else {
-                // todo: attributes, vertexbuffer, indexbuffer
-                const attributes = primDef.attributes;
-                for (const attr in attributes) {
-                    // todo: from glTF attribute name to our attribute name
-                    // attr is key string
-                    const attrname = this.attributeNameFromGLTF(attr);
+                geometry = new BufferGeometry();
+                GeometryCache.instance.add(geometryKey, geometry);
+                geometry.inCache = true;
+                
+                // use bufferview index?
+                const vertexBuffers: Map<string, VertexBuffer> = new Map<string, VertexBuffer>();
+                const vertexAttributes: VertexBufferAttribute[] = [];
 
-                    const accessorId = attributes[attr];
-                    const accessor = gltf.gltf.accessors[accessorId];
+                if (primDef.extensions && primDef.extensions[GLTF_EXTENSIONS.KHR_DRACO_MESH_COMPRESSION]) {
+                    // todo: DRACO compression
+                } else {
+                    // todo: attributes, vertexbuffer, indexbuffer
+                    const attributes = primDef.attributes;
+                    for (const attr in attributes) {
+                        // todo: from glTF attribute name to our attribute name
+                        // attr is key string
+                        const attrname = this.attributeNameFromGLTF(attr);
 
-                    // form Three.js:
-                    // Ignore empty accessors, which may be used to declare runtime
-                    // information about attributes coming from another source (e.g. Draco
-                    // compression extension).
-                    if (accessor.bufferView === undefined) {
-                        continue;
-                    }
+                        const accessorId = attributes[attr];
+                        const accessor = gltf.gltf.accessors[accessorId];
 
-                    const accessorData = gltf.accessorDataSync(accessorId);
-
-                    // according to the gltf specification, the vertex buffer should corresbounding to the gltf bufferview?
-                    // one vertex buffer for one bufferview?
-                    const bufferViewIdx: number = accessor.bufferView;
-                    const bufferView = gltf.gltf.bufferViews[bufferViewIdx];
-
-                    // For VEC3: itemSize is 3, elementBytes is 4, itemBytes is 12.
-                    const itemSize = GLTF_ELEMENTS_PER_TYPE[accessor.type];
-                    const typedArray = GLTF_COMPONENT_TYPE_ARRAYS[accessor.componentType];
-
-                    const elementBytes = typedArray.BYTES_PER_ELEMENT;
-                    const itemBytes = itemSize * elementBytes;
-                    const byteOffset = accessor.byteOffset || 0;
-                    const byteStride = accessor.bufferView !== undefined ? gltf.gltf.bufferViews[accessor.bufferView].byteStride : undefined;
-                    const normalize: boolean = accessor.normalized === true;
-
-                    const vbKey: string = bufferViewIdx.toString();
-                    let vb = vertexBuffers.get(vbKey);
-                    if (vb === undefined) {
-                        vb = new VertexBuffer(GLDevice.gl.STATIC_DRAW);
-
-                        // todo: copy data from bufferview to vertex buffer
-                        vb.data = accessorData;
-                        if (bufferView.byteStride) {
-                            vb.stride = bufferView.byteStride;
-                        } else {
-                            vb.stride = itemBytes;
+                        // form Three.js:
+                        // Ignore empty accessors, which may be used to declare runtime
+                        // information about attributes coming from another source (e.g. Draco
+                        // compression extension).
+                        if (accessor.bufferView === undefined) {
+                            continue;
                         }
-                        vb.create();
 
-                        vertexBuffers.set(vbKey, vb);
+                        const accessorData = gltf.accessorDataSync(accessorId);
+
+                        // according to the gltf specification, the vertex buffer should corresbounding to the gltf bufferview?
+                        // one vertex buffer for one bufferview?
+                        const bufferViewIdx: number = accessor.bufferView;
+                        const bufferView = gltf.gltf.bufferViews[bufferViewIdx];
+
+                        // For VEC3: itemSize is 3, elementBytes is 4, itemBytes is 12.
+                        const itemSize = GLTF_ELEMENTS_PER_TYPE[accessor.type];
+                        const typedArray = GLTF_COMPONENT_TYPE_ARRAYS[accessor.componentType];
+
+                        const elementBytes = typedArray.BYTES_PER_ELEMENT;
+                        const itemBytes = itemSize * elementBytes;
+                        const byteOffset = accessor.byteOffset || 0;
+                        const byteStride = accessor.bufferView !== undefined ? gltf.gltf.bufferViews[accessor.bufferView].byteStride : undefined;
+                        const normalize: boolean = accessor.normalized === true;
+
+                        const vbKey: string = bufferViewIdx.toString();
+                        let vb = vertexBuffers.get(vbKey);
+                        if (vb === undefined) {
+                            vb = new VertexBuffer(GLDevice.gl.STATIC_DRAW);
+
+                            // todo: copy data from bufferview to vertex buffer
+                            vb.data = accessorData;
+                            if (bufferView.byteStride) {
+                                vb.stride = bufferView.byteStride;
+                            } else {
+                                vb.stride = itemBytes;
+                            }
+                            vb.create();
+
+                            vertexBuffers.set(vbKey, vb);
+                        }
+
+                        const vbAttr = new VertexBufferAttribute(attrname, vb, itemSize, byteOffset);
+                        vertexAttributes.push(vbAttr);
                     }
-
-                    const vbAttr = new VertexBufferAttribute(attrname, vb, itemSize, byteOffset);
-                    vertexAttributes.push(vbAttr);
                 }
+
+                for (const vertexBuffer of vertexBuffers.values()) {
+                    geometry.vertexBuffers.push(vertexBuffer);
+                }
+
+                for (const vertexAttribute of vertexAttributes) {
+                    geometry.attributes.push(vertexAttribute);
+                }
+
+                // indices
+                if (primDef.indices !== undefined) {
+                    const accessorData = gltf.accessorDataSync(primDef.indices);
+                    const accessor = gltf.gltf.accessors[primDef.indices];
+                    geometry.indexBuffer = new IndexBuffer(GLDevice.gl.STATIC_DRAW);
+                    geometry.indexBuffer.indices = accessorData;
+                    geometry.indexBuffer.componentType = accessor.componentType;
+                    geometry.indexBuffer.create();
+                }
+
+                geometry.drawMode = (primDef.mode === undefined ? GLDevice.gl.TRIANGLES : primDef.mode);
+
+                // in gltf, one primitive only has one material
+                const prim = new Primitive(0, Infinity, 0);
+                geometry.primitives.push(prim);
             }
 
-            for (const vertexBuffer of vertexBuffers.values()) {
-                geometry.vertexBuffers.push(vertexBuffer);
-            }
-
-            for (const vertexAttribute of vertexAttributes) {
-                geometry.attributes.push(vertexAttribute);
-            }
-    
-            // indices
-            if (primDef.indices !== undefined) {
-                const accessorData = gltf.accessorDataSync(primDef.indices);
-                const accessor = gltf.gltf.accessors[primDef.indices];
-                geometry.indexBuffer = new IndexBuffer(GLDevice.gl.STATIC_DRAW);
-                geometry.indexBuffer.indices = accessorData;
-                geometry.indexBuffer.componentType = accessor.componentType;
-                geometry.indexBuffer.create();
-            }
-
-            geometry.drawMode = (primDef.mode === undefined? GLDevice.gl.TRIANGLES : primDef.mode);
+            iprim++;
 
             let mesh = new Mesh();
 
@@ -273,10 +293,6 @@ export class GLTFSceneBuilder {
             }
 
             mesh.geometry = geometry;
-
-            // in gltf, one primitive only has one material
-            const prim = new Primitive(0, Infinity, 0);
-            mesh.geometry.primitives.push(prim);
 
             // material
             if(primDef.material !== undefined) {

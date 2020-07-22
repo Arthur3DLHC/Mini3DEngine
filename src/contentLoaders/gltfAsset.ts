@@ -49,9 +49,8 @@ export const GLTF_EXTENSIONS = {
 
 export class GltfAsset {
     // todo
-    constructor(gltf: GlTf, baseUri: string, glbData: GLTFBinaryData | undefined,
-        manager: LoadingManager = new LoadingManager()) {
-
+    constructor(gltf: GlTf, baseUri: string, uri: string, glbData: GLTFBinaryData | undefined, manager: LoadingManager = new LoadingManager()) {
+        this.uri = uri;
         this.gltf = gltf;
         this.glbData = glbData;
         this.bufferData = new BufferData(this, baseUri, manager);
@@ -65,6 +64,7 @@ export class GltfAsset {
     public bufferData: BufferData;
     /** Helper for accessing image data */
     public imageData: ImageData;
+    public uri: string;
 
     /**
      * Fetch the data for a buffer view. Pass in the `bufferView` property of an

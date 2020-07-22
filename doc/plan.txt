@@ -269,8 +269,7 @@ TODO:       主要类结构
                     SSR Blur 过强了问题
                         bilateral filter 是否应该也考虑法线？
 
------------------------------------------------------
-                    对比两种 SSR 的 shader 的效果和性能
+                    TODO: 对比两种 SSR 的 shader 的效果和性能
                         Unity 5 的
                             优化更好一些，但是不太科学；使用的 roughness 计算反射的强度；
                             最后整合效果时通过 roughness 决定 SSR 的模糊半径
@@ -292,7 +291,7 @@ TODO:       主要类结构
 
             性能：检查渲染 cubemap 用了多长时间？能否优化？
             显式FPS的功能；SSR 是否太耗性能了？性能计时器，统计各过程用了多少毫秒？
-                TODO: 合并 SSR 的 shader 在低端显卡上十分耗性能，检查原因。
+                合并 SSR 的 shader 在低端显卡上十分耗性能，检查原因。
                     原因：笔记本的浏览器使用的是核显，不是独显。
 
             Subsurface scattering
@@ -325,14 +324,21 @@ TODO:       主要类结构
                     webgl 什么时候才能支持 cubmap array =.=
 
                 
-            ** Dithered soft shadow?
+            TODO: Dithered soft shadow?
                 使用一个 blue noise dither texture；在做 shadowmap 取样时根据像素屏幕坐标取 dither 偏移量，应用到 shadowmap uv 上？
                 或者使用程序生成的 noise texture?
                 使用 blue noise 或 halton sequence？
-                改为使用纹理，扩大取样点数量？
+                效果不太好；
+                    改为使用纹理，扩大取样点数量？
+                    或者使用多采样 PCF？
+                    参考 Babylon.js src\Shaders\ShadersInclude\shadowsFragmentFunctions.fx computeShadowWithPCF3 函数？
+                    https://mynameismjp.wordpress.com/2013/09/10/shadow-maps/
+                    https://github.com/TheRealMJP/Shadows
 
-            半透明物体的绘制？
+            TODO: 半透明物体的绘制？
                 需要由远到近排序？按照物体中心点；
+
+-----------------------------------------------------
 
             文件加载机制
                 使用Promise, async, await
@@ -388,6 +394,8 @@ TODO:       主要类结构
                     shader中应该改为将 baseColor 和 baseColorMap 相乘？
 
                 Object3D 更新变换时使用分开的 SRT？
+
+                测试加载绘制 gltf 模型
 
                 读取light, decal, envprobe, irradiance volume;
             

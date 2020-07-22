@@ -2,12 +2,13 @@
 
 import { LoadingManager } from "./loadingmanager.js";
 import { BaseLoader } from "./baseLoader.js";
-import { Texture2D } from "../WebGLResources/textures/texture2D.js";
+import { Texture } from "../WebGLResources/textures/texture.js";
 import { ImageLoader } from "./imageLoader.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 import { Cache } from "./cache.js";
 import { TextureCache } from "../WebGLResources/textureCache.js";
+import { Texture2D } from "../mini3DEngine.js";
 
 export class TextureLoader extends BaseLoader {
     public constructor(manager: LoadingManager) {
@@ -15,16 +16,18 @@ export class TextureLoader extends BaseLoader {
     }
 
     // load texture from url, call callback function when loaded
-    public load(url: string, onTexLoad?: ( texture: Texture2D ) => void,
+    public load(url: string, onTexLoad?: ( texture: Texture ) => void,
     onProgress?: ( event: ProgressEvent ) => void,
-    onError?: ( event: ErrorEvent ) => void): Texture2D {
+    onError?: ( event: ErrorEvent ) => void): Texture | undefined {
         const texKey = "tex:" + url;
         let cached = TextureCache.instance.get(texKey);
         if (cached !== undefined) {
             this.manager.itemStart(texKey);
             setTimeout(()=>{
                 if (onTexLoad !== undefined) {
-                    onTexLoad(cached);
+                    if (cached !== undefined) {
+                        onTexLoad(cached);
+                    }
                 }
                 this.manager.itemEnd(texKey);
             }, 0);

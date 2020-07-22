@@ -1,7 +1,7 @@
-import { Texture } from "./textures/texture";
+import { Texture } from "./textures/texture.js";
 
 /**
- * Hardware resource caches
+ * texture caches
  */
 export class TextureCache {
     private constructor() {
@@ -19,17 +19,17 @@ export class TextureCache {
     public enabled: Boolean = true;
     private textures: Map<string, Texture> = new Map<string, Texture>();
 
-    public add(key: string, file: any) {
+    public add(key: string, file: Texture) {
 		if ( this.enabled === false ) return;
         this.textures.set(key, file);
     }
 
-    public get(key: string): any {
-		if ( this.enabled === false ) return;
+    public get(key: string): Texture | undefined {
+		if ( this.enabled === false ) return undefined;
         return this.textures.get(key);
     }
 
-    public remove(key: string, release: Boolean = true) {
+    public remove(key: string, release: boolean = true) {
         const tex = this.textures.get(key);
         if (tex !== undefined) {
             if (release) {
@@ -39,7 +39,7 @@ export class TextureCache {
         }
     }
 
-    public clear(release: Boolean = true) {
+    public clear(release: boolean = true) {
         if (release) {
             for (const tex of this.textures.values()) {
                 tex.release();
