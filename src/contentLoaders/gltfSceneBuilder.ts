@@ -180,6 +180,8 @@ export class GLTFSceneBuilder {
             } else {
                 geometry = new BufferGeometry();
                 GeometryCache.instance.add(geometryKey, geometry);
+                geometry.inCache = true;
+                
                 // use bufferview index?
                 const vertexBuffers: Map<string, VertexBuffer> = new Map<string, VertexBuffer>();
                 const vertexAttributes: VertexBufferAttribute[] = [];
