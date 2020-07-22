@@ -332,6 +332,8 @@ TODO:       主要类结构
                     改为使用纹理，扩大取样点数量？
                     或者使用多采样 PCF？
                     参考 Babylon.js src\Shaders\ShadersInclude\shadowsFragmentFunctions.fx computeShadowWithPCF3 函数？
+                    https://mynameismjp.wordpress.com/2013/09/10/shadow-maps/
+                    https://github.com/TheRealMJP/Shadows
 
             TODO: 半透明物体的绘制？
                 需要由远到近排序？按照物体中心点；
