@@ -17,6 +17,7 @@ import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { IndexBuffer } from "../WebGLResources/indexBuffer.js";
+import { GeometryCache } from "../geometry/geometryCache.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -165,10 +166,23 @@ export class GLTFSceneBuilder {
         // need to use multiple meshes
         const meshes: Mesh[] = [];
 
+        let iprim: number = 0;
         for (const primDef of meshDef.primitives) {
             // geometry
             // todo: use a global geometry cache, to share between all objects created from this gltf file.
-            const geometry = new BufferGeometry();
+            // key: gltffileurl.meshid.primid?
+            const geometryKey: string = gltf.uri + ".mesh" + meshId.toString() + ".prim" + iprim.toString();
+
+            let geometry: BufferGeometry;
+            let cached = GeometryCache.instance.get(geometryKey);
+            if (cached !== undefined) {
+                geometry = cached;
+            } else {
+                geometry = new BufferGeometry();
+                GeometryCache.instance.add(geometryKey, geometry);
+            }
+
+            iprim++;
 
             // use bufferview index?
             const vertexBuffers: Map<string, VertexBuffer> = new Map<string, VertexBuffer>();

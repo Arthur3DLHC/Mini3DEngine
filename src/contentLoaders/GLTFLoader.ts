@@ -31,14 +31,14 @@ export class GLTFLoader {
         const loader = new FileLoader(this._manager);
         loader.responseType = "arraybuffer";
         const data = await loader.load(url, onProgress);
-        const ret = await this.parse(data, path);
+        const ret = await this.parse(data, path, url);
 
         this._manager.itemEnd(url);
 
         return ret;
     }
 
-    private async parse(data: ArrayBuffer, path: string): Promise<GltfAsset> {
+    private async parse(data: ArrayBuffer, path: string, uri: string): Promise<GltfAsset> {
         let content: string | null = null;
         // tslint:disable-next-line:no-unnecessary-initializer
         let glbData: GLTFBinaryData | undefined = undefined;
@@ -62,7 +62,7 @@ export class GLTFLoader {
                 // this will returen a rejected promise
                 throw new Error('Unsupported asset. glTF versions >=2.0 are supported.');
             }
-            return new GltfAsset(json, path, glbData, this._manager);
+            return new GltfAsset(json, path, uri, glbData, this._manager);
         } else {
             // this will returen a rejected promise
             throw new Error("Faild parsing gltf data.");
