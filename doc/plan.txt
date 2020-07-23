@@ -396,6 +396,7 @@ TODO:       主要类结构
                 Object3D 更新变换时使用分开的 SRT？
 
                 测试加载绘制 gltf 模型
+                    下载一些官方的示例模型测试；
 
                 读取light, decal, envprobe, irradiance volume;
             
@@ -410,6 +411,8 @@ TODO:       主要类结构
                     能否通过 promise 的方式返回？
                     所有资源加载完后再开始逻辑循环？
                     切换场景时清空资源缓存，更新要加载的资源列表，调用 load 方法?
+
+            解析 Draco 压缩过的模型？
                 
         大场景相关
             Decals
