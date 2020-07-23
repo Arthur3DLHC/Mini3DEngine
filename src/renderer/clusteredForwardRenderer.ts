@@ -117,7 +117,7 @@ export class ClusteredForwardRenderer {
         this._rectTransform = new mat4();
 
         this._skyboxGeom = new BoxGeometry(2, 2, 2);
-
+        this._skyboxTransform = new mat4();
         // main output
         // todo: handle size change
 
@@ -347,6 +347,7 @@ export class ClusteredForwardRenderer {
 
     // a box geometry to render skybox
     private _skyboxGeom: BoxGeometry;
+    private _skyboxTransform: mat4;
 
     // todo: a unit wireframe box geometry for draw bounding boxes; used by occlusion query pass
 
@@ -1116,6 +1117,26 @@ export class ClusteredForwardRenderer {
         if (this._samplerUniformsScreenRect && texture !== null) {
             GLTextures.setTextureAt(this._numReservedTextures, null, texture.target);
         }
+    }
+
+    private renderSkyBox(cubemap: TextureCube, camPos: vec3) {
+        // do not do depth test, culling; (same as screen space rect)
+        this.setRenderStateSet(this._renderStatesScrRectOpaque);
+        GLPrograms.useProgram(this._skyboxProgram);
+        // transform matrix - follow camera
+        this._skyboxTransform.setTranslation(camPos);
+        this._renderContext.fillUniformBuffersPerObjectByValues(this._skyboxTransform, this._skyboxTransform, new vec4([1,1,1,1]));
+
+        GLTextures.setTextureAt(this._numReservedTextures, cubemap, GLDevice.gl.TEXTURE_CUBE_MAP);
+        let location = this._skyboxProgram.getUniformLocation("s_skybox");
+        if (location !== null) {
+            GLDevice.gl.uniform1i(location, this._numReservedTextures);
+        }
+
+        this._skyboxGeom.draw(0, Infinity, this._skyboxProgram.attributes);
+
+        // unbind texture
+        GLTextures.setTextureAt(this._numReservedTextures, null, GLDevice.gl.TEXTURE_CUBE_MAP);
     }
 
     private fetchVisibleLights() {
