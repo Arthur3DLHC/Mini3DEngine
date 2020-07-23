@@ -747,6 +747,14 @@ export class ClusteredForwardRenderer {
             //gl.disable(gl.BLEND);
             this.renderDepthPrepass(this._frustum);
             //gl.colorMask(true, true, true, true);
+
+            // sky box
+            if (scene.background !== null) {
+                if (scene.background instanceof TextureCube) {
+                    this.renderSkyBox(scene.background, camera.worldTransform.getTranslation());
+                }
+            }
+
             this.renderOpaque(this._frustum);
             // this.renderTransparent();
 
