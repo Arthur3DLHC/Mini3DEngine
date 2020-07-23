@@ -26,6 +26,8 @@ import screen_rect_vs from "./shaders/screen_Rect_vs.glsl.js";
 import screen_rect_fs from "./shaders/screen_rect_fs.glsl.js";
 import default_pbr_vs from "./shaders/default_pbr_vs.glsl.js";
 import default_pbr_fs from "./shaders/default_pbr_fs.glsl.js";
+import skybox_vs from "./shaders/skybox_vs.glsl.js";
+import skybox_fs from "./shaders/skybox_fs.glsl.js";
 // modules
 import { Scene } from "../scene/scene.js";
 import { RenderList } from "./renderList.js";
@@ -72,6 +74,7 @@ import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 import { CubemapProcessor } from "./cubemapProcessor.js";
 import { PostProcessor } from "./postProcessor.js";
 import { SubsurfaceProcessor } from "./subsurfaceProcessor.js";
+import { BoxGeometry } from "../geometry/common/boxGeometry.js";
 
 export class ClusteredForwardRenderer {
 
@@ -113,6 +116,8 @@ export class ClusteredForwardRenderer {
         this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
         this._rectTransform = new mat4();
 
+        this._skyboxGeom = new BoxGeometry(2, 2, 2);
+        this._skyboxTransform = new mat4();
         // main output
         // todo: handle size change
 
@@ -273,6 +278,12 @@ export class ClusteredForwardRenderer {
         this._screenRectProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["screen_rect_fs"]);
         this._screenRectProgram.build();
 
+        this._skyboxProgram = new ShaderProgram();
+        this._skyboxProgram.name = "skybox";
+        this._skyboxProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["skybox_vs"]);
+        this._skyboxProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["skybox_fs"]);
+        this._skyboxProgram.build();
+
         this._samplerUniformsStdPBR = new SamplerUniforms(this._stdPBRProgram);
         this._samplerUniformsScreenRect = new SamplerUniforms(this._screenRectProgram);
 
@@ -285,6 +296,7 @@ export class ClusteredForwardRenderer {
         this._renderContext.bindUniformBlocks(this._depthPrepassProgram);
         this._renderContext.bindUniformBlocks(this._occlusionQueryProgram);
         this._renderContext.bindUniformBlocks(this._screenRectProgram);
+        this._renderContext.bindUniformBlocks(this._skyboxProgram);
 
         this._frustum = new Frustum();
 
@@ -329,10 +341,16 @@ export class ClusteredForwardRenderer {
 
     private _curDefaultRenderStates: RenderStateSet | null;
 
-    // a geometry to render screen space rectangles?
+    // a geometry to render screen space rectangles
     private _rectGeom: PlaneGeometry;
     private _rectTransform: mat4;
-    // todo: a unit box geometry for draw bounding boxes; used by occlusion query pass
+
+    // a box geometry to render skybox
+    private _skyboxGeom: BoxGeometry;
+    private _skyboxTransform: mat4;
+
+    // todo: a unit wireframe box geometry for draw bounding boxes; used by occlusion query pass
+
 
     // todo: system textures: shadowmap atlas, decal atlas, envMap array, irradiance volumes
     // todo: system texture unit numbers
@@ -384,6 +402,7 @@ export class ClusteredForwardRenderer {
     private _depthPrepassProgram: ShaderProgram;
     private _occlusionQueryProgram: ShaderProgram;
     private _screenRectProgram: ShaderProgram;
+    private _skyboxProgram: ShaderProgram;
 
     // sampler uniforms
     private _samplerUniformsStdPBR: SamplerUniforms | null;
@@ -476,6 +495,8 @@ export class ClusteredForwardRenderer {
         GLPrograms.shaderCodes["single_color_fs"] = single_color_fs;
         GLPrograms.shaderCodes["default_pbr_vs"] = default_pbr_vs;
         GLPrograms.shaderCodes["default_pbr_fs"] = default_pbr_fs;
+        GLPrograms.shaderCodes["skybox_vs"] = skybox_vs;
+        GLPrograms.shaderCodes["skybox_fs"] = skybox_fs;
     }
 
     private dispatchObjects(scene: Scene, statics: boolean) {
@@ -726,6 +747,14 @@ export class ClusteredForwardRenderer {
             //gl.disable(gl.BLEND);
             this.renderDepthPrepass(this._frustum);
             //gl.colorMask(true, true, true, true);
+
+            // sky box
+            if (scene.background !== null) {
+                if (scene.background instanceof TextureCube) {
+                    this.renderSkyBox(scene.background, camera.worldTransform.getTranslation());
+                }
+            }
+
             this.renderOpaque(this._frustum);
             // this.renderTransparent();
 
@@ -1096,6 +1125,26 @@ export class ClusteredForwardRenderer {
         if (this._samplerUniformsScreenRect && texture !== null) {
             GLTextures.setTextureAt(this._numReservedTextures, null, texture.target);
         }
+    }
+
+    private renderSkyBox(cubemap: TextureCube, camPos: vec3) {
+        // do not do depth test, culling; (same as screen space rect)
+        this.setRenderStateSet(this._renderStatesScrRectOpaque);
+        GLPrograms.useProgram(this._skyboxProgram);
+        // transform matrix - follow camera
+        this._skyboxTransform.setTranslation(camPos);
+        this._renderContext.fillUniformBuffersPerObjectByValues(this._skyboxTransform, this._skyboxTransform, new vec4([1,1,1,1]));
+
+        GLTextures.setTextureAt(this._numReservedTextures, cubemap, GLDevice.gl.TEXTURE_CUBE_MAP);
+        let location = this._skyboxProgram.getUniformLocation("s_skybox");
+        if (location !== null) {
+            GLDevice.gl.uniform1i(location, this._numReservedTextures);
+        }
+
+        this._skyboxGeom.draw(0, Infinity, this._skyboxProgram.attributes);
+
+        // unbind texture
+        GLTextures.setTextureAt(this._numReservedTextures, null, GLDevice.gl.TEXTURE_CUBE_MAP);
     }
 
     private fetchVisibleLights() {

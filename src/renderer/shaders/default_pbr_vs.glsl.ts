@@ -26,13 +26,13 @@ out vec2 ex_texcoord;
 
 void main(void)
 {
-    vec4 worldPosition = localToWorld(vec4(a_position, 1));
+    vec4 worldPosition = localToWorld(vec4(a_position, 1.0));
     ex_worldPosition = worldPosition.xyz;
     ex_hPosition = viewToProj(worldToView(worldPosition));
     gl_Position = ex_hPosition;
     ex_color = u_object.color;
     // todo: transform normal to view space
-    ex_worldNormal = localToWorld(vec4(a_normal, 0)).xyz;
+    ex_worldNormal = localToWorld(vec4(a_normal, 0.0)).xyz;
     ex_texcoord = a_texcoord0;
 }
 

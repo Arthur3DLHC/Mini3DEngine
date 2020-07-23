@@ -2,10 +2,12 @@ import { Texture } from "./texture.js";
 import { GLDevice } from "../glDevice.js";
 import mat4 from "../../../lib/tsm/mat4.js";
 import vec3 from "../../../lib/tsm/vec3.js";
+import { GLTextures } from "../glTextures.js";
 
 export class TextureCube extends Texture {
     public constructor() {
         super();
+        this.images = [];
     }
 
     public get target(): GLenum {
@@ -24,7 +26,10 @@ export class TextureCube extends Texture {
         }
     }
 
-    // todo: source，长图的形式？
+    /**
+     * cube texture 不使用基类的 image 属性
+     */
+    public images: HTMLImageElement[];    
 
     public create() {
         // create gl texture
@@ -32,6 +37,40 @@ export class TextureCube extends Texture {
         throw new Error("Not implemented.");
     }
     public upload() {
+        if (this.images.length < 6) {
+            return;
+        }
+
+        const gl = GLDevice.gl;
+
+        if (!this.glTexture) {
+            this.glTexture = gl.createTexture();
+        }
+
+        gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.glTexture);
+
+        const internalFmt = GLTextures.internalFormatFrom(this.format, this.componentType);
+
+        // todo: upload images to every face
+        // by target
+        const targets: GLenum[] = [
+            GLDevice.gl.TEXTURE_CUBE_MAP_POSITIVE_X,
+            GLDevice.gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
+            GLDevice.gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
+            GLDevice.gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
+            GLDevice.gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
+            GLDevice.gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,
+        ];
+
+        for(let i = 0; i < 6; i++) {
+            let img = this.images[i];
+            gl.texImage2D(targets[i], 0, internalFmt, img.width, img.height, 0, this.format, this.componentType, img);
+        }
+
+        // todo: mipmaps?
+
+        gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+
         throw new Error("Not implemented.");
     }
 
