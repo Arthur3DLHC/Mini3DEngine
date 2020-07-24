@@ -7,6 +7,9 @@ precision lowp samplerCube;
 uniform samplerCube s_skybox;
 
 in vec3 ex_worldDir;
+in vec3 ex_normal;
+in vec2 ex_texcoord;
+
 #include <output_final>
 
 void main(void) {
@@ -14,6 +17,7 @@ void main(void) {
 
     FinalOutput o = defaultFinalOutput();
 
+    //o.color = vec4(1.0, 0.0, 0.0, 1.0);
     o.color = texColor;
     o.normal = vec3(0.0, 0.0, 1.0);
     o.specular = vec3(0.0);

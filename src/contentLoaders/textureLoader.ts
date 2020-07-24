@@ -32,7 +32,7 @@ export class TextureLoader extends BaseLoader {
                 this.manager.itemEnd(texKey);
             }, 0);
             return cached;
-        }        
+        }
 
         const texture = new Texture2D();
         const loader = new ImageLoader(this.manager);
@@ -69,4 +69,30 @@ export class TextureLoader extends BaseLoader {
 
         return texture;
     }
+
+    // todo: function that use promise to load texture?
+    /*
+    public loadPromise(url: string): Promise<Texture> {
+        const texKey = "tex:" + url;
+        let cached = TextureCache.instance.get(texKey);
+        if (cached !== undefined) {
+            this.manager.itemStart(texKey);
+            setTimeout(()=>{
+                this.manager.itemEnd(texKey);
+            }, 0);
+            return Promise.resolve(cached);
+        }
+
+        const loader = new ImageLoader(this.manager);
+
+        loader.crossOrigin = this.crossOrigin;
+        loader.path = this.path;
+
+        const promise: Promise<Texture> = new Promise((resolve, reject) => {
+            
+
+        });
+        return promise;
+    }
+    */
 }

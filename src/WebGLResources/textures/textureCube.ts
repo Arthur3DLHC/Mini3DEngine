@@ -29,7 +29,8 @@ export class TextureCube extends Texture {
     /**
      * cube texture 不使用基类的 image 属性
      */
-    public images: HTMLImageElement[];    
+    public images: HTMLImageElement[];
+    public isShadowMap: boolean = false;
 
     public create() {
         // create gl texture
@@ -67,11 +68,45 @@ export class TextureCube extends Texture {
             gl.texImage2D(targets[i], 0, internalFmt, img.width, img.height, 0, this.format, this.componentType, img);
         }
 
+        this.setTexParameters(gl);
+
         // todo: mipmaps?
+        if (this.mipLevels > 1) {
+            gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+        }
 
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+    }
 
-        throw new Error("Not implemented.");
+    private setTexParameters(gl: WebGL2RenderingContext) {
+        if (this.format === gl.DEPTH_COMPONENT || this.format === gl.DEPTH_STENCIL && this.isShadowMap) {
+            // enable texture compare, so sampler2DShadow can work
+            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_COMPARE_MODE, gl.COMPARE_REF_TO_TEXTURE);
+            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_COMPARE_FUNC, gl.LEQUAL);
+            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR); // PCF shadow
+            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        }
+        else {
+            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_COMPARE_MODE, gl.NONE);
+            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_COMPARE_FUNC, gl.ALWAYS);
+            // set sampler state
+            // 设置一次后，会记录在纹理对象中；下次修改之前，只要绑定了此纹理，自动应用它记录的 sampler state
+            if (this.samplerState) {
+                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, this.samplerState.minFilter);
+                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, this.samplerState.magFilter);
+                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, this.samplerState.wrapS);
+                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, this.samplerState.wrapT);
+            }
+            else {
+                // default for frame buffer objects
+                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            }
+        }
     }
 
     // todo: define cube face ids

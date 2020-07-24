@@ -118,6 +118,7 @@ export class ClusteredForwardRenderer {
 
         this._skyboxGeom = new BoxGeometry(2, 2, 2);
         this._skyboxTransform = new mat4();
+        this._skyboxTransform.setIdentity();
         // main output
         // todo: handle size change
 
@@ -672,7 +673,7 @@ export class ClusteredForwardRenderer {
             this._renderContext.fillUniformBuffersPerScene();
 
             // todo: bind shaddowmaps only, and render cubemaps
-            this.updateCubemaps();
+            this.updateCubemaps(scene);
 
             GLDevice.renderTarget = this._mainFBO[this._currFrameFBOIdx];
 
@@ -1274,7 +1275,7 @@ export class ClusteredForwardRenderer {
         }
     }
 
-    private updateCubemaps() {
+    private updateCubemaps(scene: Scene) {
         console.log("updating cubemaps...");
 
         if (this._envMapArray.glTexture) {
@@ -1377,6 +1378,14 @@ export class ClusteredForwardRenderer {
                 // is that necessary to render decals ? maybe not;
                 // todo: if not first time, fill envprobes, and set env texture
                 this._renderContext.fillUniformBuffersPerView(cubefaceCamera, true, false, false, false, false);
+
+                if (scene.background !== undefined) {
+                    if (scene.background instanceof TextureCube) {
+                        this.renderSkyBox(scene.background, envprobe.worldTransform.getTranslation());
+                    }
+                }
+
+                this.setRenderStateSet(this._renderStatesOpaque);
 
                 // render items in renderlist
                 // only render static items; (there should be only static meshes in renderlist now)
