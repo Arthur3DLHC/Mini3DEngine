@@ -68,6 +68,9 @@ export class TextureCube extends Texture {
         }
 
         // todo: mipmaps?
+        if (this.mipLevels > 1) {
+            gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+        }
 
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
 
