@@ -118,6 +118,7 @@ export class ClusteredForwardRenderer {
 
         this._skyboxGeom = new BoxGeometry(2, 2, 2);
         this._skyboxTransform = new mat4();
+        this._skyboxTransform.setIdentity();
         // main output
         // todo: handle size change
 
@@ -1378,6 +1379,13 @@ export class ClusteredForwardRenderer {
                 // todo: if not first time, fill envprobes, and set env texture
                 this._renderContext.fillUniformBuffersPerView(cubefaceCamera, true, false, false, false, false);
 
+                if (this._currentScene !== null) {
+                    if (this._currentScene.background !== undefined) {
+                        if (this._currentScene.background instanceof TextureCube) {
+                            this.renderSkyBox(this._currentScene.background, envprobe.worldTransform.getTranslation());
+                        }
+                    }
+                }
                 // render items in renderlist
                 // only render static items; (there should be only static meshes in renderlist now)
                 // fix me: is that necessary to use depth prepass and occlusion query?

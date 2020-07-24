@@ -48,15 +48,28 @@ export class Texture2D extends Texture {
         const internalFmt = GLTextures.internalFormatFrom(this.format, this.componentType);
         gl.texImage2D(gl.TEXTURE_2D, 0, internalFmt, this.width, this.height, 0, this.format, this.componentType, null);
 
+        this.setTexParameters(gl);
+
+        // anisotropy not supported by webgl?
+        // gl.texParameteri(gl.TEXTURE_2D, gl.texture_max_)
+        if (this.mipLevels > 1) {
+            gl.generateMipmap(gl.TEXTURE_2D);
+        }
+
+        gl.bindTexture(gl.TEXTURE_2D, null);
+    }
+
+    private setTexParameters(gl: WebGL2RenderingContext) {
         if (this.format === gl.DEPTH_COMPONENT || this.format === gl.DEPTH_STENCIL && this.isShadowMap) {
             // enable texture compare, so sampler2DShadow can work
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_MODE, gl.COMPARE_REF_TO_TEXTURE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_FUNC, gl.LEQUAL);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);  // PCF shadow
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); // PCF shadow
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        } else {
+        }
+        else {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_MODE, gl.NONE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_FUNC, gl.ALWAYS);
             // set sampler state
@@ -66,7 +79,8 @@ export class Texture2D extends Texture {
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this.samplerState.magFilter);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, this.samplerState.wrapS);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, this.samplerState.wrapT);
-            } else {
+            }
+            else {
                 // default for frame buffer objects
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -74,14 +88,6 @@ export class Texture2D extends Texture {
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             }
         }
-
-        // anisotropy not supported by webgl?
-        // gl.texParameteri(gl.TEXTURE_2D, gl.texture_max_)
-        if (this.mipLevels > 1) {
-            gl.generateMipmap(gl.TEXTURE_2D);
-        }
-
-        gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
     public upload() {
@@ -108,6 +114,8 @@ export class Texture2D extends Texture {
             // todo: check data format match?
             gl.texImage2D(gl.TEXTURE_2D, 0, internalFmt, this.width, this.height, 0, this.format, this.componentType, this.image);
         }
+
+        this.setTexParameters(gl);
 
         // todo: upload mipmaps
         if (this.mipLevels > 1) {

@@ -188,18 +188,19 @@ window.onload = () => {
 
     // todo: load skybox textures and start gameloop while all loaded.
     const envmapUrls: string[] = [
-        "./textures/sky-px.jpg",
-        "./textures/sky-nx.jpg",
-        "./textures/sky-py.jpg",
-        "./textures/sky-ny.jpg",
-        "./textures/sky-pz.jpg",
-        "./textures/sky-nz.jpg",
+        "./textures/skyboxes/ballroom/px.png",
+        "./textures/skyboxes/ballroom/nx.png",
+        "./textures/skyboxes/ballroom/py.png",
+        "./textures/skyboxes/ballroom/ny.png",
+        "./textures/skyboxes/ballroom/pz.png",
+        "./textures/skyboxes/ballroom/nz.png",
     ];
 
     const skyboxTexture: TextureCube = new TextureCube();
 
     for(let i = 0; i < 6; i++) {
-        skyboxTexture.images[i] = imageLoader.load(envmapUrls[i], (img) => {
+        skyboxTexture.images[i] = imageLoader.load(envmapUrls[i], undefined, undefined,(ev) => {
+            console.error("failed loading image.");
         });
     }
     
