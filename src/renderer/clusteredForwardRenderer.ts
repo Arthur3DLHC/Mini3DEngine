@@ -673,7 +673,7 @@ export class ClusteredForwardRenderer {
             this._renderContext.fillUniformBuffersPerScene();
 
             // todo: bind shaddowmaps only, and render cubemaps
-            this.updateCubemaps();
+            this.updateCubemaps(scene);
 
             GLDevice.renderTarget = this._mainFBO[this._currFrameFBOIdx];
 
@@ -1275,7 +1275,7 @@ export class ClusteredForwardRenderer {
         }
     }
 
-    private updateCubemaps() {
+    private updateCubemaps(scene: Scene) {
         console.log("updating cubemaps...");
 
         if (this._envMapArray.glTexture) {
@@ -1379,13 +1379,14 @@ export class ClusteredForwardRenderer {
                 // todo: if not first time, fill envprobes, and set env texture
                 this._renderContext.fillUniformBuffersPerView(cubefaceCamera, true, false, false, false, false);
 
-                if (this._currentScene !== null) {
-                    if (this._currentScene.background !== undefined) {
-                        if (this._currentScene.background instanceof TextureCube) {
-                            this.renderSkyBox(this._currentScene.background, envprobe.worldTransform.getTranslation());
-                        }
+                if (scene.background !== undefined) {
+                    if (scene.background instanceof TextureCube) {
+                        this.renderSkyBox(scene.background, envprobe.worldTransform.getTranslation());
                     }
                 }
+
+                this.setRenderStateSet(this._renderStatesOpaque);
+
                 // render items in renderlist
                 // only render static items; (there should be only static meshes in renderlist now)
                 // fix me: is that necessary to use depth prepass and occlusion query?
