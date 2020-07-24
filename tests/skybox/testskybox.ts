@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "../common/behaviors/autoRotateBehavior.js";
 import vec4 from "../../lib/tsm/vec4.js";
@@ -204,8 +204,14 @@ window.onload = () => {
     }
     
     loadingManager.onLoad = () => {
-        
-        skyboxTexture.create();
+        skyboxTexture.componentType = GLDevice.gl.UNSIGNED_BYTE;
+        skyboxTexture.format = GLDevice.gl.RGB;
+        skyboxTexture.depth = 1;
+        skyboxTexture.width = skyboxTexture.images[0].width;
+        skyboxTexture.height = skyboxTexture.images[0].height;
+        skyboxTexture.mipLevels = 1;
+        skyboxTexture.samplerState = new SamplerState();
+        skyboxTexture.upload();
         scene.background = skyboxTexture;
 
         Clock.instance.start();
