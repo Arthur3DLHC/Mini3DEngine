@@ -20,6 +20,7 @@ window.onload = () => {
     camera.aspect = canvas.width / canvas.height;
     camera.far = 20;
     camera.localTransform.fromTranslation(new vec3([0, 0, 8]));
+    camera.autoUpdateTransform = false;
 
     // first person view controller
     const fpsBehavior = new FirstPersonViewBehavior(camera);
@@ -55,6 +56,7 @@ window.onload = () => {
     boxMesh.geometry = new BoxGeometry(1, 1, 1);
     boxMesh.castShadow = true;
     boxMesh.isStatic = false;
+    boxMesh.autoUpdateTransform = false; // let the AutoRotateBehavior work.
     // boxMesh.localTransform.fromTranslation(new vec3([0, 0, -5]));
     const boxMtl = new StandardPBRMaterial();
     boxMtl.color = new vec4([1.0, 1.0, 0.0, 1.0]);
@@ -74,6 +76,7 @@ window.onload = () => {
     sphereMesh.geometry = new SphereGeometry(1, 16, 8);
     sphereMesh.castShadow = true;
     sphereMesh.isStatic = false;
+    sphereMesh.autoUpdateTransform = false;
     const sphereMtl = new StandardPBRMaterial();
     sphereMtl.color = new vec4([1.0, 0.0, 0.0, 1.0]);
     sphereMtl.metallic = 0.8;
@@ -95,6 +98,7 @@ window.onload = () => {
     cylinderMesh.geometry = new CylinderGeometry(1, 2, 24);
     cylinderMesh.castShadow = true;
     cylinderMesh.isStatic = true;
+    cylinderMesh.autoUpdateTransform = false;
     const cylinderMtl = new StandardPBRMaterial();
     cylinderMtl.color = new vec4([0.0, 1.0, 0.0, 1.0]);
     cylinderMtl.emissive = new vec4([0.5, 0.5, 0.5, 1]);
@@ -116,6 +120,7 @@ window.onload = () => {
     planeMesh.geometry = new PlaneGeometry(20, 20, 1, 1);
     planeMesh.castShadow = true;
     planeMesh.isStatic = true;
+    planeMesh.autoUpdateTransform = false;
     const planeMtl = new StandardPBRMaterial();
     planeMtl.color = new vec4([0.0, 0.0, 1.0, 1.0]);
     planeMtl.metallic = 0.0;
@@ -149,6 +154,7 @@ window.onload = () => {
     // 测试动态光源的阴影
     const spotLight01 = new SpotLight();
     spotLight01.isStatic = true;
+    spotLight01.autoUpdateTransform = false;    // let the behavior work
     spotLight01.on = true;
     spotLight01.color = new vec4([100, 100, 100, 1]);
     spotLight01.range = 10;
@@ -164,6 +170,7 @@ window.onload = () => {
 
     const dirLight01 = new DirectionalLight();
     dirLight01.isStatic = true;
+    dirLight01.autoUpdateTransform = false; // let the behavior work
     dirLight01.on = true;
     dirLight01.color = new vec4([3,3,3,1]);
     dirLight01.radius = 5;

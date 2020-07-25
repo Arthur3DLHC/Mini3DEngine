@@ -1288,6 +1288,7 @@ export class ClusteredForwardRenderer {
         GLTextures.setTextureAt(this._envMapArrayUnit, null, gl.TEXTURE_2D_ARRAY);
 
         const cubefaceCamera = new Camera();
+        cubefaceCamera.autoUpdateTransform = false;
         // because objects will be transformed to envprobe local space,
         // and the envprobe's radius is represented by its scale transform,
         // so we can use a unique projection frustum with far plane at 1

@@ -17,6 +17,7 @@ window.onload = () => {
     const camera = new PerspectiveCamera();
     camera.aspect = canvas.width / canvas.height;
     camera.localTransform.fromTranslation(new vec3([0, 0, 5]));
+    camera.autoUpdateTransform = false;
     scene.attachChild(camera);
 
     // todo: test multiple objects in scene at same time

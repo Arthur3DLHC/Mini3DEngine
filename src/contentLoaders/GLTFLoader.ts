@@ -33,6 +33,10 @@ export class GLTFLoader {
         const data = await loader.load(url, onProgress);
         const ret = await this.parse(data, path, url);
 
+        // lhc: prefetchall here?
+        // how to check if ret is avaliable?
+        await ret.preFetchAll();
+
         this._manager.itemEnd(url);
 
         return ret;
