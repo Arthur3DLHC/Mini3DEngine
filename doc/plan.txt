@@ -338,13 +338,14 @@ TODO:       主要类结构
             TODO: 半透明物体的绘制？
                 需要由远到近排序？按照物体中心点；
 
+-----------------------------------------------------
+
             场景天空盒？
                 skybox shader
                 创建和加载 cubemap 的功能；实现 TextureCube
                 绘制场景时最先绘制天空盒；
+                    Fix me: 是否应该将天空盒放到 RenderContext 里，在 FetchRenderObjects 时从 scene 里取出？
                 更新 cubemap 时，也绘制一下天空盒；
-
------------------------------------------------------
 
             文件加载机制
                 使用Promise, async, await
