@@ -408,8 +408,11 @@ TODO:       主要类结构
 
 
             骨骼皮肤动画
-                从 glTF 加载
-                shader 绘制
+                从 glTF 加载：skin 和 animation
+                SkinMesh类
+                skinmeshshader
+                动画插值器；
+                动画数据对象
 
             资源加载器
                 资源列表和资源计数？
