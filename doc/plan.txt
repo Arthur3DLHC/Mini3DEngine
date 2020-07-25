@@ -399,7 +399,7 @@ TODO:       主要类结构
                 材质
                     shader中应该改为将 baseColor 和 baseColorMap 相乘？
 
-                ** Object3D 更新变换时使用分开的 SRT？
+                Object3D 更新变换时使用分开的 SRT？
                     使用 quaterion 表示旋转
 
                 测试加载绘制 gltf 模型
