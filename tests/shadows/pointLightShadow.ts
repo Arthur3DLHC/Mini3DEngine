@@ -21,6 +21,7 @@ window.onload = () => {
     camera.aspect = canvas.width / canvas.height;
     camera.far = 20;
     camera.localTransform.fromTranslation(new vec3([0, 0, 2]));
+    camera.autoUpdateTransform = false;
 
     // first person view controller
     const fpsBehavior = new FirstPersonViewBehavior(camera);
@@ -56,6 +57,7 @@ window.onload = () => {
     boxMesh.geometry = new BoxGeometry(0.25, 0.25, 0.25);
     boxMesh.castShadow = true;
     boxMesh.isStatic = false;
+    boxMesh.autoUpdateTransform = false; // let the AutoRotateBehavior work.
     // boxMesh.localTransform.fromTranslation(new vec3([0, 0, -5]));
     const boxMtl = new StandardPBRMaterial();
     boxMtl.color = new vec4([1.0, 1.0, 0.0, 1.0]);
@@ -75,6 +77,7 @@ window.onload = () => {
     sphereMesh.geometry = new SphereGeometry(0.2, 16, 8);
     sphereMesh.castShadow = true;
     sphereMesh.isStatic = false;
+    sphereMesh.autoUpdateTransform = false;
     const sphereMtl = new StandardPBRMaterial();
     sphereMtl.color = new vec4([1.0, 0.0, 0.0, 1.0]);
     sphereMtl.metallic = 0.8;
@@ -96,6 +99,7 @@ window.onload = () => {
     cylinderMesh.geometry = new CylinderGeometry(0.25, 0.5, 24);
     cylinderMesh.castShadow = true;
     cylinderMesh.isStatic = true;
+    cylinderMesh.autoUpdateTransform = false;
     const cylinderMtl = new StandardPBRMaterial();
     cylinderMtl.color = new vec4([0.0, 1.0, 0.0, 1.0]);
     cylinderMtl.emissive = new vec4([0.5, 0.5, 0.5, 1]);
@@ -147,6 +151,7 @@ window.onload = () => {
 
     const pointLight01 = new PointLight();
     pointLight01.isStatic = true;
+    pointLight01.autoUpdateTransform = false;
     pointLight01.on = true;
     pointLight01.castShadow = true;
     // if (pointLight01.shadow) {
@@ -189,6 +194,7 @@ function addPlane(name: string, matPlaneTran: mat4, matPlaneRot: mat4, wallColor
     planeMesh.geometry = new PlaneGeometry(4, 4, 1, 1);
     planeMesh.castShadow = true;
     planeMesh.isStatic = true;
+    planeMesh.autoUpdateTransform = false;
     const planeMtl = new StandardPBRMaterial();
     planeMtl.color = wallColor.copy();
     planeMtl.metallic = 0.05;

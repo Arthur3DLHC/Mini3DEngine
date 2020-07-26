@@ -14,6 +14,7 @@ export class Object3D {
         this.color = new vec4([1,1,1,1]);
         this._active = true;
         this.isStatic = false;
+        this.autoUpdateTransform = false;
         this.behaviors = [];
         this.parent = null;
         this._children = [];
@@ -58,8 +59,16 @@ export class Object3D {
     // todo: prev frame world transform? for temporal effects?
     public worldTransformPrev: mat4;
 
+    /** 是否自动根据 SRT 更新 localTransform */
+    public autoUpdateTransform: boolean;
+
+    // 以下三个属性主要用于播放动画
+    
+    /** 位移。注意：要通过设置此值变换对象，需启用 Object3D.autoUpdateTransform, 或手动调用 Object3D.updateLocalTransform */
     public translation: vec3;
+    /** 旋转。注意：要通过设置此值变换对象，需启用 Object3D.autoUpdateTransform, 或手动调用 Object3D.updateLocalTransform */
     public rotation: quat;
+    /** 缩放。注意：要通过设置此值变换对象，需启用 Object3D.autoUpdateTransform, 或手动调用 Object3D.updateLocalTransform */
     public scale: vec3;
 
     private _moved: boolean;
@@ -160,6 +169,11 @@ export class Object3D {
         }
     }
 
+    public updateLocalTransform() {
+        this.localTransform.compose(this.translation, this.rotation, this.scale);
+        // todo: mark local transform dirty?
+    }
+
     public updateWorldTransform(updateParents: boolean, updateChildren: boolean) {
         // todo: only update transforms when dirty?
         if (this._active === false) {
@@ -170,7 +184,9 @@ export class Object3D {
             this.parent.updateWorldTransform(true, false);
         }
 
-        // 
+        if (this.autoUpdateTransform) {
+            this.updateLocalTransform();
+        }
 
         // record prev transform
         this.worldTransform.copy(this.worldTransformPrev);

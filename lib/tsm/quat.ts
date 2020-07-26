@@ -253,6 +253,7 @@ export default class quat {
         return this
     }
 
+    /** rotate a 3d vector */
     multiplyVec3(vector: vec3, dest?: vec3): vec3 {
         if (!dest) { dest = new vec3() }
 
@@ -264,6 +265,9 @@ export default class quat {
         const qy = this.y
         const qz = this.z
         const qw = this.w
+
+        // p' = q * p * q.inverse()
+        // * means quat.multiply() 
 
         const ix = qw * x + qy * z - qz * y
         const iy = qw * y + qz * x - qx * z
@@ -500,7 +504,7 @@ export default class quat {
     }
 
     static fromAxisAngle(axis: vec3, angle: number, dest?: quat): quat {
-        if (!dest) { dest = new quat() }
+        if (!dest) { dest = new quat(); }
 
         angle *= 0.5
         const sin = Math.sin(angle)
@@ -513,4 +517,72 @@ export default class quat {
         return dest
     }
 
+    /**
+     * create a quaternion from euler angles
+     * @param xRot rotation around x axis, in radians
+     * @param yRot rotation around y axis, in radians
+     * @param zRot rotation around z axis, in radians
+     * @param order "XYZ","YXZ","ZXY","ZYX","YZX","XZY"
+     * @param dest quaterion to receive the result
+     */
+    static fromEuler(xRot: number, yRot: number, zRot: number, order: string, dest?: quat): quat {
+        if (!dest) { dest = new quat(); }
+
+        var cos = Math.cos;
+		var sin = Math.sin;
+
+		var c1 = cos( xRot / 2 );
+		var c2 = cos( yRot / 2 );
+		var c3 = cos( zRot / 2 );
+
+		var s1 = sin( xRot / 2 );
+		var s2 = sin( yRot / 2 );
+		var s3 = sin( zRot / 2 );
+
+		if ( order === 'XYZ' ) {
+
+			dest.x = s1 * c2 * c3 + c1 * s2 * s3;
+			dest.y = c1 * s2 * c3 - s1 * c2 * s3;
+			dest.z = c1 * c2 * s3 + s1 * s2 * c3;
+			dest.w = c1 * c2 * c3 - s1 * s2 * s3;
+
+		} else if ( order === 'YXZ' ) {
+
+			dest.x = s1 * c2 * c3 + c1 * s2 * s3;
+			dest.y = c1 * s2 * c3 - s1 * c2 * s3;
+			dest.z = c1 * c2 * s3 - s1 * s2 * c3;
+			dest.w = c1 * c2 * c3 + s1 * s2 * s3;
+
+		} else if ( order === 'ZXY' ) {
+
+			dest.x = s1 * c2 * c3 - c1 * s2 * s3;
+			dest.y = c1 * s2 * c3 + s1 * c2 * s3;
+			dest.z = c1 * c2 * s3 + s1 * s2 * c3;
+			dest.w = c1 * c2 * c3 - s1 * s2 * s3;
+
+		} else if ( order === 'ZYX' ) {
+
+			dest.x = s1 * c2 * c3 - c1 * s2 * s3;
+			dest.y = c1 * s2 * c3 + s1 * c2 * s3;
+			dest.z = c1 * c2 * s3 - s1 * s2 * c3;
+			dest.w = c1 * c2 * c3 + s1 * s2 * s3;
+
+		} else if ( order === 'YZX' ) {
+
+			dest.x = s1 * c2 * c3 + c1 * s2 * s3;
+			dest.y = c1 * s2 * c3 + s1 * c2 * s3;
+			dest.z = c1 * c2 * s3 - s1 * s2 * c3;
+			dest.w = c1 * c2 * c3 - s1 * s2 * s3;
+
+		} else if ( order === 'XZY' ) {
+
+			dest.x = s1 * c2 * c3 - c1 * s2 * s3;
+			dest.y = c1 * s2 * c3 - s1 * c2 * s3;
+			dest.z = c1 * c2 * s3 + s1 * s2 * c3;
+			dest.w = c1 * c2 * c3 + s1 * s2 * s3;
+
+		}
+
+        return dest;
+    }
 }

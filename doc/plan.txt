@@ -340,6 +340,13 @@ TODO:       主要类结构
 
 -----------------------------------------------------
 
+            场景天空盒？
+                skybox shader
+                创建和加载 cubemap 的功能；实现 TextureCube
+                绘制场景时最先绘制天空盒；
+                    Fix me: 是否应该将天空盒放到 RenderContext 里，在 FetchRenderObjects 时从 scene 里取出？
+                更新 cubemap 时，也绘制一下天空盒；
+
             文件加载机制
                 使用Promise, async, await
                 参考 https://github.com/bwasty/gltf-loader-ts
@@ -393,23 +400,22 @@ TODO:       主要类结构
                 材质
                     shader中应该改为将 baseColor 和 baseColorMap 相乘？
 
-                ** Object3D 更新变换时使用分开的 SRT？
+                Object3D 更新变换时使用分开的 SRT？
+                    使用 quaterion 表示旋转
 
                 测试加载绘制 gltf 模型
                     下载一些官方的示例模型测试；
                 
 
                 读取light, decal, envprobe, irradiance volume;
-            
-            场景天空盒？
-                skybox shader
-                创建和加载 cubemap 的功能；实现 TextureCube
-                绘制场景时最先绘制天空盒；
-                更新 cubemap 时，也绘制一下天空盒；
+
 
             骨骼皮肤动画
-                从 glTF 加载
-                shader 绘制
+                从 glTF 加载：skin 和 animation
+                SkinMesh类
+                skinmeshshader
+                动画插值器；
+                动画数据对象
 
             资源加载器
                 资源列表和资源计数？
