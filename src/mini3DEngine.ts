@@ -1,6 +1,9 @@
 // TODO: export all public classes of engine
 export * from "./contentLoaders/baseLoader.js";
 export * from "./contentLoaders/cache.js";
+export * from "./contentLoaders/gltfAsset.js";
+export * from "./contentLoaders/GLTFLoader.js";
+export * from "./contentLoaders/gltfSceneBuilder.js";
 export * from "./contentLoaders/imageLoader.js";
 export * from "./contentLoaders/loadingManager.js";
 export * from "./contentLoaders/textureLoader.js";
