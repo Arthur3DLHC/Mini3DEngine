@@ -7,11 +7,12 @@ import { TextureCube } from "../WebGLResources/textures/textureCube.js";
 
 /**
  * current rendering context, including cameras, visible lights, decals, cubemaps...
+ * things that will influence renderable objects
  */
 export class RenderContext {
     public constructor() {
         this.cameras = [];
-        this.skybox = null;
+        // this.skybox = null;
         this.staticLights = [];
         this.staticDecals = [];
         this.dynamicLights = [];
@@ -28,7 +29,7 @@ export class RenderContext {
         this._curIrradianceVolumeIndex = 0;
     }
     public cameras: Camera[];
-    public skybox: TextureCube | null;
+    // public skybox: TextureCube | null;
     public staticLights: BaseLight[];
     public staticDecals: Decal[];
     public dynamicLights: BaseLight[];
@@ -46,7 +47,7 @@ export class RenderContext {
 
     public clear(statics: boolean, dynamics: boolean) {
         this._curCameraIndex = 0;
-        this.skybox = null;
+        // this.skybox = null;
         if (statics) {
             this._curStaticLightIndex = 0;
             this._curStaticDecalIndex = 0;
