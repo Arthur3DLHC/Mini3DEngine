@@ -261,6 +261,7 @@ export class GLTFSceneBuilder {
                     geometry.indexBuffer = new IndexBuffer(GLDevice.gl.STATIC_DRAW);
                     geometry.indexBuffer.indices = accessorData;
                     geometry.indexBuffer.componentType = accessor.componentType;
+                    geometry.indexBuffer.count = accessor.count;
                     geometry.indexBuffer.create();
                 }
 
