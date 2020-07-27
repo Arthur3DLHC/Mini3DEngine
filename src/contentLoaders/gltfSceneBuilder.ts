@@ -63,7 +63,7 @@ export class GLTFSceneBuilder {
         // clear mesh reference numbers every time.
         this._meshReferences = [];
         if (gltf.gltf.meshes !== undefined) {
-            for (let i = 0; i < gltf.gltf.meshes?.length; i++) {
+            for (let i = 0; i < gltf.gltf.meshes.length; i++) {
                 this._meshReferences.push(0);
             }   
         }
@@ -476,37 +476,40 @@ export class GLTFSceneBuilder {
             //const imageData = gltf.imageData.getSync(texDef.source);
             //imageData.then((img) => {
             const img = gltf.imageData.getSync(texDef.source);
-                texture.width = img.width;
-                texture.height = img.height;
-                texture.depth = 1;
+            texture.width = img.width;
+            texture.height = img.height;
+            texture.depth = 1;
+            texture.mipLevels = 1;
+
+            if (texture.samplerState !== null) {
                 // decide generate mipmaps by sample state
-                if (texture.samplerState?.magFilter === GLDevice.gl.LINEAR_MIPMAP_LINEAR
-                    || texture.samplerState?.magFilter === GLDevice.gl.LINEAR_MIPMAP_NEAREST
-                    || texture.samplerState?.magFilter === GLDevice.gl.NEAREST_MIPMAP_LINEAR
-                    || texture.samplerState?.magFilter === GLDevice.gl.NEAREST_MIPMAP_NEAREST) {
+                if (texture.samplerState.magFilter === GLDevice.gl.LINEAR_MIPMAP_LINEAR
+                    || texture.samplerState.magFilter === GLDevice.gl.LINEAR_MIPMAP_NEAREST
+                    || texture.samplerState.magFilter === GLDevice.gl.NEAREST_MIPMAP_LINEAR
+                    || texture.samplerState.magFilter === GLDevice.gl.NEAREST_MIPMAP_NEAREST) {
                     texture.mipLevels = 1024;
-                } else {
-                    texture.mipLevels = 1;
                 }
-                // fix me: mark cached?
-                // texture.cached
-                texture.componentType = GLDevice.gl.UNSIGNED_BYTE;
-                // jpeg or png?
-                texture.format = GLDevice.gl.RGBA;
-                // if mimetype presented, use it
-                let isJPEG = false;
-                if (image.mimeType !== undefined) {
-                    // isJPEG = (image.mimeType === "image/jpeg");
-                    isJPEG = image.mimeType.search( /\.jpe?g($|\?)/i ) > 0;
-                } else {
-                    if (image.uri !== undefined) {
-                        isJPEG = image.uri.search(/\.jpe?g($|\?)/i) > 0 || image.uri.search(/^data\:image\/jpeg/) === 0;
-                    }
+            }
+
+            // fix me: mark cached?
+            // texture.cached
+            texture.componentType = GLDevice.gl.UNSIGNED_BYTE;
+            // jpeg or png?
+            texture.format = GLDevice.gl.RGBA;
+            // if mimetype presented, use it
+            let isJPEG = false;
+            if (image.mimeType !== undefined) {
+                // isJPEG = (image.mimeType === "image/jpeg");
+                isJPEG = image.mimeType.search(/\.jpe?g($|\?)/i) > 0;
+            } else {
+                if (image.uri !== undefined) {
+                    isJPEG = image.uri.search(/\.jpe?g($|\?)/i) > 0 || image.uri.search(/^data\:image\/jpeg/) === 0;
                 }
-                if (isJPEG) {
-                    texture.format = GLDevice.gl.RGB;
-                }
-                texture.upload();
+            }
+            if (isJPEG) {
+                texture.format = GLDevice.gl.RGB;
+            }
+            texture.upload();
             //});
         }
 

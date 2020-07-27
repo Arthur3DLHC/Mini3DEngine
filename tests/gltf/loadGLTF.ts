@@ -103,7 +103,7 @@ window.onload = () => {
 
     // todo: test load gltf file then create 3d object
     // todo: adjust the way that promise and loadingManager cooperate
-    const promise = gltfLoader.load("./models/test.gltf");
+    const promise = gltfLoader.load("./models/Box/glTF/Box.gltf");
 
     promise.then((gltfAsset) => {
         // todo: load skybox textures and start gameloop while all loaded.
@@ -144,10 +144,6 @@ window.onload = () => {
             });
         }
     });
-
-    
-
-
 
     function addEnvProbe(name: string, size: number, position: vec3, scene: Scene) {
         const probe = new EnvironmentProbe();

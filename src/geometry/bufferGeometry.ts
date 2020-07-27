@@ -7,6 +7,7 @@ import { GLGeometryBuffers } from "../WebGLResources/glGeometryBuffers.js";
 import { BoundingSphere } from "../math/boundingSphere.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { BoundingBox } from "../math/boundingBox.js";
+import { COMPONENT_BYTE_SIZES } from "../WebGLResources/componentSize.js";
 
 export class BufferGeometry {
     public constructor() {
@@ -67,9 +68,10 @@ export class BufferGeometry {
         if (this.indexBuffer && this.indexBuffer.indices && this.indexBuffer.glBuffer) {
             GLGeometryBuffers.bindIndexBuffer(this.indexBuffer);
             const s = Math.max(0, start);
-            const c = Math.min(count, this.indexBuffer.indices.length - s);
+            const c = Math.min(count, this.indexBuffer.count - s);
             // drawElements 时需要用 byte 偏移, int16 = 2 bytes
-            GLDevice.gl.drawElements(mode?mode:this.drawMode, c, this.indexBuffer.componentType, s * 2);
+            const byteOffset = s * COMPONENT_BYTE_SIZES[this.indexBuffer.componentType];
+            GLDevice.gl.drawElements(mode?mode:this.drawMode, c, this.indexBuffer.componentType, byteOffset);
         } else {
             // draw array 时不用 byte 偏移
             const s = Math.max(0, start);
@@ -110,9 +112,10 @@ export class BufferGeometry {
         if (this.indexBuffer && this.indexBuffer.indices && this.indexBuffer.glBuffer) {
             GLGeometryBuffers.bindIndexBuffer(this.indexBuffer);
             const s = Math.max(0, start);
-            const c = Math.min(count, this.indexBuffer.indices.length - s);
+            const c = Math.min(count, this.indexBuffer.count - s);
             // drawElements 时需要用 byte 偏移, int16 = 2 bytes
-            GLDevice.gl.drawElementsInstanced(mode?mode:this.drawMode, c, this.indexBuffer.componentType, s * 2, instanceCount);
+            const byteOffset = s * COMPONENT_BYTE_SIZES[this.indexBuffer.componentType];
+            GLDevice.gl.drawElementsInstanced(mode?mode:this.drawMode, c, this.indexBuffer.componentType, byteOffset, instanceCount);
         } else {
             // draw array 时不用 byte 偏移
             const s = Math.max(0, start);
