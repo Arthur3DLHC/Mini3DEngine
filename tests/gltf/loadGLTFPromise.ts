@@ -4,6 +4,10 @@ import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
 import { FirstPersonViewBehavior } from "../common/behaviors/firstPersonViewBehavior.js";
 
+/**
+ * Load gltf files using promise
+ */
+
 window.onload = () => {
     const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
     if (!canvas) {
