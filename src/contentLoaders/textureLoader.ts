@@ -71,7 +71,6 @@ export class TextureLoader extends BaseLoader {
     }
 
     // todo: function that use promise to load texture?
-    /*
     public loadPromise(url: string): Promise<Texture> {
         const texKey = "tex:" + url;
         let cached = TextureCache.instance.get(texKey);
@@ -83,16 +82,39 @@ export class TextureLoader extends BaseLoader {
             return Promise.resolve(cached);
         }
 
-        const loader = new ImageLoader(this.manager);
-
-        loader.crossOrigin = this.crossOrigin;
-        loader.path = this.path;
-
         const promise: Promise<Texture> = new Promise((resolve, reject) => {
-            
+            const loader = new ImageLoader(this.manager);
 
+            loader.crossOrigin = this.crossOrigin;
+            loader.path = this.path;
+
+            loader.loadPromise(url).then((image) => {
+                const texture = new Texture2D();
+                texture.image = image;
+                // todo: width, height, depth, mips, format...
+                texture.width = image.width;
+                texture.height = image.height;
+                texture.depth = 1;
+                texture.mipLevels = 1024;
+                const isJPEG = url.search( /\.jpe?g($|\?)/i ) > 0 || url.search( /^data\:image\/jpeg/ ) === 0;
+                if (isJPEG) {
+                    texture.format = GLDevice.gl.RGB;
+                } else {
+                    texture.format = GLDevice.gl.RGBA;
+                }
+                texture.componentType = GLDevice.gl.UNSIGNED_BYTE;
+                texture.samplerState = new SamplerState(GLDevice.gl.REPEAT, GLDevice.gl.REPEAT, GLDevice.gl.LINEAR_MIPMAP_LINEAR, GLDevice.gl.LINEAR_MIPMAP_LINEAR);
+                // todo: texture cache?
+                texture.cached = true;
+                // upload to vidmem now? or add a 'needUpdate' flag and upload in render loop?
+                texture.upload();
+                TextureCache.instance.add(texKey, texture);
+
+                resolve(texture);
+            }).catch((reason) => {
+                reject(reason);
+            });
         });
         return promise;
     }
-    */
 }

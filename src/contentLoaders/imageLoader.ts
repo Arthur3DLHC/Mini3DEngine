@@ -87,7 +87,7 @@ export class ImageLoader extends BaseLoader {
             setTimeout(() => {
                 this.manager.itemEnd(url);
             }, 0);
-            return cached;
+            return Promise.resolve(cached);
         }
 
         return new Promise((resolve, reject) => {
@@ -109,7 +109,7 @@ export class ImageLoader extends BaseLoader {
     
                 self.manager.itemError(url);
                 self.manager.itemEnd(url);
-                reject(image);
+                reject(event);
             }
     
             image.addEventListener('load', onImageLoad, false);
