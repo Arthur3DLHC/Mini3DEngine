@@ -102,10 +102,9 @@ window.onload = () => {
 
     // todo: test load gltf file then create 3d object
     // todo: adjust the way that promise and loadingManager cooperate
-    const loadings: (Promise<GltfAsset>|Promise<HTMLImageElement>)[] = [];
     const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/Box/glTF/Box.gltf");
-    loadings.push(gltfPromise);
 
+    const imagePromises: (Promise<HTMLImageElement>)[] = [];
     const envmapUrls: string[] = [
         "./textures/skyboxes/ballroom/px.png",
         "./textures/skyboxes/ballroom/nx.png",
@@ -116,32 +115,38 @@ window.onload = () => {
     ];
     for (let i = 0; i < 6; i++) {
         const imgPromise: Promise<HTMLImageElement> = imageLoader.loadPromise(envmapUrls[i]);
-        loadings.push(imgPromise);
+        imagePromises.push(imgPromise);
     }
 
+    const imagesPromise = Promise.all(imagePromises);
+
     // fix me: type error
-    Promise.all(loadings).then(loaded=>{
+    Promise.all([gltfPromise, imagesPromise]).then((loaded) => {
         const skyboxTexture: TextureCube = new TextureCube();
 
-        loadingManager.onLoad = () => {
-            skyboxTexture.componentType = GLDevice.gl.UNSIGNED_BYTE;
-            skyboxTexture.format = GLDevice.gl.RGB;
-            skyboxTexture.depth = 1;
-            skyboxTexture.width = skyboxTexture.images[0].width;
-            skyboxTexture.height = skyboxTexture.images[0].height;
-            skyboxTexture.mipLevels = 1;
-            skyboxTexture.samplerState = new SamplerState();
-            skyboxTexture.upload();
-            scene.background = skyboxTexture;
-
-            // gltf asset should has been already loaded?
-            const builder = new GLTFSceneBuilder();
-            const gltfScene = builder.build(gltfAsset, 0);
-            scene.attachChild(gltfScene);
-    
-            Clock.instance.start();
-            requestAnimationFrame(gameLoop);
+        for(let i = 0; i < 6; i++) {
+            skyboxTexture.images[i] = loaded[1][i];
         }
+
+        skyboxTexture.componentType = GLDevice.gl.UNSIGNED_BYTE;
+        skyboxTexture.format = GLDevice.gl.RGB;
+        skyboxTexture.depth = 1;
+        skyboxTexture.width = skyboxTexture.images[0].width;
+        skyboxTexture.height = skyboxTexture.images[0].height;
+        skyboxTexture.mipLevels = 1;
+        skyboxTexture.samplerState = new SamplerState();
+        skyboxTexture.upload();
+        scene.background = skyboxTexture;
+        
+        // gltf asset should has been already loaded?
+        const builder = new GLTFSceneBuilder();
+        const gltfScene = builder.build(loaded[0], 0);
+        scene.attachChild(gltfScene);
+
+        Clock.instance.start();
+        requestAnimationFrame(gameLoop);
+
+
     });
 
     function addEnvProbe(name: string, size: number, position: vec3, scene: Scene) {
