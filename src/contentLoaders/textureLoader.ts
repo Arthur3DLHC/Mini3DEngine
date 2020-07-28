@@ -48,7 +48,6 @@ export class TextureLoader extends BaseLoader {
 
         loader.load(url, (image)=>{
             texture.image = image;
-            // todo: width, height, depth, mips, format...
             texture.width = image.width;
             texture.height = image.height;
             texture.depth = 1;
@@ -61,7 +60,6 @@ export class TextureLoader extends BaseLoader {
             }
             texture.componentType = GLDevice.gl.UNSIGNED_BYTE;
             texture.samplerState = new SamplerState(GLDevice.gl.REPEAT, GLDevice.gl.REPEAT, GLDevice.gl.LINEAR_MIPMAP_LINEAR, GLDevice.gl.LINEAR_MIPMAP_LINEAR);
-            // todo: texture cache?
             texture.cached = true;
             // upload to vidmem now? or add a 'needUpdate' flag and upload in render loop?
             texture.upload();
@@ -100,7 +98,6 @@ export class TextureLoader extends BaseLoader {
             loader.loadPromise(url).then((image) => {
                 const texture = new Texture2D();
                 texture.image = image;
-                // todo: width, height, depth, mips, format...
                 texture.width = image.width;
                 texture.height = image.height;
                 texture.depth = 1;
@@ -113,9 +110,7 @@ export class TextureLoader extends BaseLoader {
                 }
                 texture.componentType = GLDevice.gl.UNSIGNED_BYTE;
                 texture.samplerState = new SamplerState(GLDevice.gl.REPEAT, GLDevice.gl.REPEAT, GLDevice.gl.LINEAR_MIPMAP_LINEAR, GLDevice.gl.LINEAR_MIPMAP_LINEAR);
-                // todo: texture cache?
                 texture.cached = true;
-                // upload to vidmem now? or add a 'needUpdate' flag and upload in render loop?
                 texture.upload();
                 TextureCache.instance.add(texKey, texture);
 
