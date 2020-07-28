@@ -15,7 +15,13 @@ export class TextureLoader extends BaseLoader {
         super(manager);
     }
 
-    // load texture from url, call callback function when loaded
+    /**
+     * load texture from url, call callback function when loaded
+     * @param url 
+     * @param onTexLoad 
+     * @param onProgress 
+     * @param onError 
+     */
     public load(url: string, onTexLoad?: ( texture: Texture ) => void,
     onProgress?: ( event: ProgressEvent ) => void,
     onError?: ( event: ErrorEvent ) => void): Texture | undefined {
@@ -70,7 +76,10 @@ export class TextureLoader extends BaseLoader {
         return texture;
     }
 
-    // todo: function that use promise to load texture?
+    /**
+     * load texture, return promise
+     * @param url 
+     */
     public loadPromise(url: string): Promise<Texture> {
         const texKey = "tex:" + url;
         let cached = TextureCache.instance.get(texKey);

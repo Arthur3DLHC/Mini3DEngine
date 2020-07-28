@@ -12,6 +12,13 @@ export class ImageLoader extends BaseLoader {
         super(manager);
     }
 
+    /**
+     * load image, with callbacks
+     * @param url 
+     * @param onImgLoad 
+     * @param onProgress 
+     * @param onError 
+     */
     public load(url: string, 
         onImgLoad?:(image: HTMLImageElement)=>void,
         onProgress?:(event: ProgressEvent)=>void,
@@ -73,7 +80,7 @@ export class ImageLoader extends BaseLoader {
     }
 
     /**
-     * load function returns a promise
+     * load image, returns a promise
      * @param url 
      */
     public loadPromise(url: string): Promise<HTMLImageElement> {
