@@ -371,6 +371,7 @@ TODO:       主要类结构
                 Texture Cache;
                 加载完贴图再生成 environment probe；模型也是
                     等场景中的所有模型贴图都加载完了，再将 Scene 赋给 Renderer？
+                考虑使用 Promise 机制？
 
             GLTFLoader
                 从 Blender 导出测试用的模型

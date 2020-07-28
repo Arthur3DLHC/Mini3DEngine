@@ -71,4 +71,58 @@ export class ImageLoader extends BaseLoader {
         image.src = url;
         return image;
     }
+
+    /**
+     * load function returns a promise
+     * @param url 
+     */
+    public loadPromise(url: string): Promise<HTMLImageElement> {
+        if (this.path !== undefined) { url = this.path + url; }
+        url = this.manager.resolveURL(url);
+
+        let cached = Cache.get(url);
+        if (cached !== undefined) {
+            // is this necessary?
+            this.manager.itemStart(url);
+            setTimeout(() => {
+                this.manager.itemEnd(url);
+            }, 0);
+            return cached;
+        }
+
+        return new Promise((resolve, reject) => {
+            const image = document.createElementNS('http://www.w3.org/1999/xhtml', 'img') as HTMLImageElement;
+            const self = this;
+    
+            function onImageLoad() {
+                image.removeEventListener('load', onImageLoad, false);
+                image.removeEventListener('error', onImageError, false);
+    
+                Cache.add(url, image);
+                self.manager.itemEnd(url);
+                resolve(image);
+            }
+    
+            function onImageError(event: ErrorEvent) {
+                image.removeEventListener('load', onImageLoad, false);
+                image.removeEventListener('error', onImageError, false);
+    
+                self.manager.itemError(url);
+                self.manager.itemEnd(url);
+                reject(image);
+            }
+    
+            image.addEventListener('load', onImageLoad, false);
+            image.addEventListener('error', onImageError, false);
+    
+            if ( url.substr( 0, 5 ) !== 'data:' ) {
+    
+                if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
+    
+            }
+            
+            self.manager.itemStart(url);
+            image.src = url;
+        });
+    }
 }
