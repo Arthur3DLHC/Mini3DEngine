@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
@@ -100,24 +100,27 @@ window.onload = () => {
         requestAnimationFrame(gameLoop);
     }
 
-       
-
-
     // todo: test load gltf file then create 3d object
     // todo: adjust the way that promise and loadingManager cooperate
-    const promise = gltfLoader.load("./models/Box/glTF/Box.gltf");
+    const loadings: (Promise<GltfAsset>|Promise<HTMLImageElement>)[] = [];
+    const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/Box/glTF/Box.gltf");
+    loadings.push(gltfPromise);
 
-    promise.then((gltfAsset) => {
-        // todo: load skybox textures and start gameloop while all loaded.
-        const envmapUrls: string[] = [
-            "./textures/skyboxes/ballroom/px.png",
-            "./textures/skyboxes/ballroom/nx.png",
-            "./textures/skyboxes/ballroom/py.png",
-            "./textures/skyboxes/ballroom/ny.png",
-            "./textures/skyboxes/ballroom/pz.png",
-            "./textures/skyboxes/ballroom/nz.png",
-        ];
+    const envmapUrls: string[] = [
+        "./textures/skyboxes/ballroom/px.png",
+        "./textures/skyboxes/ballroom/nx.png",
+        "./textures/skyboxes/ballroom/py.png",
+        "./textures/skyboxes/ballroom/ny.png",
+        "./textures/skyboxes/ballroom/pz.png",
+        "./textures/skyboxes/ballroom/nz.png",
+    ];
+    for (let i = 0; i < 6; i++) {
+        const imgPromise: Promise<HTMLImageElement> = imageLoader.loadPromise(envmapUrls[i]);
+        loadings.push(imgPromise);
+    }
 
+    // fix me: type error
+    Promise.all(loadings).then(loaded=>{
         const skyboxTexture: TextureCube = new TextureCube();
 
         loadingManager.onLoad = () => {
@@ -138,12 +141,6 @@ window.onload = () => {
     
             Clock.instance.start();
             requestAnimationFrame(gameLoop);
-        }
-
-        for (let i = 0; i < 6; i++) {
-            skyboxTexture.images[i] = imageLoader.load(envmapUrls[i], undefined, undefined, (ev) => {
-                console.error("failed loading image.");
-            });
         }
     });
 
