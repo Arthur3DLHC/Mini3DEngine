@@ -1,6 +1,6 @@
 import { GltfAsset, GLTF_EXTENSIONS, GLTF_ATTRIBUTES, GLTF_ELEMENTS_PER_TYPE, GLTF_COMPONENT_TYPE_ARRAYS } from "./gltfAsset.js";
 import { Scene } from "../scene/scene.js";
-import { GlTfId, GlTf, TextureInfo } from "./gltf.js";
+import { GlTfId, GlTf, TextureInfo, MaterialNormalTextureInfo } from "./gltf.js";
 import { Object3D } from "../scene/object3D.js";
 import { Mesh } from "../scene/mesh.js";
 import vec3 from "../../lib/tsm/vec3.js";
@@ -427,7 +427,7 @@ export class GLTFSceneBuilder {
             // normal texture and amount
             if (mtlDef.normalTexture !== undefined) {
                 mtl.normalMapAmount = 1;
-                mtl.normalMap = this.processTexture(mtlDef.normalTexture.index, gltf);
+                mtl.normalMap = this.processTexture(mtlDef.normalTexture, gltf);
             }
 
             // todo: subsurface? save in gltf extra?
@@ -443,13 +443,17 @@ export class GLTFSceneBuilder {
         return ret;
     }
 
-    private processTexture(textureInfo: TextureInfo, gltf: GltfAsset): Texture2D {
+    private processTexture(textureInfo: TextureInfo | MaterialNormalTextureInfo | MaterialNormalTextureInfo, gltf: GltfAsset): Texture2D {
         if (gltf.gltf.textures === undefined) {
             throw new Error("No textures in gltf.");
         }
 
         if (gltf.gltf.images === undefined) {
             throw new Error("No images in gltf.");
+        }
+
+        if (textureInfo.index === undefined) {
+            throw new Error("No index in texture info.");
         }
 
         const texDef = gltf.gltf.textures[textureInfo.index];

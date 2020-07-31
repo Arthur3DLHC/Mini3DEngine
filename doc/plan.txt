@@ -409,7 +409,7 @@ TODO:       主要类结构
 
                 测试加载绘制 gltf 模型
                     下载一些官方的示例模型测试；
-                
+                    支持metallicRoughtness贴图；
 
                 读取light, decal, envprobe, irradiance volume;
 
