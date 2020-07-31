@@ -477,6 +477,7 @@ export class GLTFSceneBuilder {
             //const imageData = gltf.imageData.getSync(texDef.source);
             //imageData.then((img) => {
             const img = gltf.imageData.getSync(texDef.source);
+            texture.image = img;
             texture.width = img.width;
             texture.height = img.height;
             texture.depth = 1;
@@ -484,10 +485,12 @@ export class GLTFSceneBuilder {
 
             if (texture.samplerState !== null) {
                 // decide generate mipmaps by sample state
-                if (texture.samplerState.magFilter === GLDevice.gl.LINEAR_MIPMAP_LINEAR
-                    || texture.samplerState.magFilter === GLDevice.gl.LINEAR_MIPMAP_NEAREST
-                    || texture.samplerState.magFilter === GLDevice.gl.NEAREST_MIPMAP_LINEAR
-                    || texture.samplerState.magFilter === GLDevice.gl.NEAREST_MIPMAP_NEAREST) {
+                // only need to check minFilter, because mip-mapping only appear when minify
+                // (according to gltf specification)
+                if (texture.samplerState.minFilter === GLDevice.gl.LINEAR_MIPMAP_LINEAR
+                    || texture.samplerState.minFilter === GLDevice.gl.LINEAR_MIPMAP_NEAREST
+                    || texture.samplerState.minFilter === GLDevice.gl.NEAREST_MIPMAP_LINEAR
+                    || texture.samplerState.minFilter === GLDevice.gl.NEAREST_MIPMAP_NEAREST) {
                     texture.mipLevels = 1024;
                 }
             }

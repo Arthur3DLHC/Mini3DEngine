@@ -400,6 +400,9 @@ TODO:       主要类结构
 
                 材质
                     shader中应该改为将 baseColor 和 baseColorMap 相乘？
+                    支持法线贴图？
+                        没有法线贴图时的处理？
+                        顶点没有 tangent 时的处理？
 
                 Object3D 更新变换时使用分开的 SRT？
                     使用 quaterion 表示旋转
@@ -426,6 +429,7 @@ TODO:       主要类结构
                     所有资源加载完后再开始逻辑循环？
                     切换场景时清空资源缓存，更新要加载的资源列表，调用 load 方法?
                 考虑统一使用 Promise.all 实现？
+                    需要将不同的资源分类；Promise.all 仅支持列表中元素为同一类型；
 
             解析 Draco 压缩过的模型？
                 
