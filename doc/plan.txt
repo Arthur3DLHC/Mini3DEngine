@@ -403,6 +403,10 @@ TODO:       主要类结构
                     支持法线贴图？
                         没有法线贴图时的处理？
                         顶点没有 tangent 时的处理？
+                        顶点有和没有 tangent 使用不同的 shader 预编译分支？
+                        如果没有 tangent, 则使用 http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html 的方法在 pixel shader 中变换光源到视空间？还是统一用世界空间计算？
+                        参考：  Khronos group gltf sampler viewer: src\shaders\pbr.frag
+                                Three.js: examples\jsm\nodes\misc\NormalMapNode.js
 
                 Object3D 更新变换时使用分开的 SRT？
                     使用 quaterion 表示旋转
