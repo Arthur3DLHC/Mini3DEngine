@@ -41,12 +41,21 @@ vec3 getBaseColor() {
 
 vec3 getEmissive() {
     // todo: emissive map
-    return u_material.emissive.rgb;
+    vec3 ret = u_material.emissive.rgb;
+    if(u_material.emissiveMapAmount > 0.0) {
+        vec3 texColor = texture(s_emissiveMap, ex_texcoord).rgb;
+        ret = mix(ret, texColor, u_material.emissiveMapAmount);
+    }
+    return ret;
 }
 
 vec2 getMetallicRoughness() {
     // todo: roughness matallic map
     vec2 ret = vec2(u_material.metallic, u_material.roughness);
+    if(u_material.metallicMapAmount + u_material.roughnessMapAmount > 0.0) {
+        vec2 texColor = texture(s_metallicRoughnessMap, ex_texcoord).rg;
+        ret = mix(ret, texColor, vec2(u_material.metallicMapAmount, u_material.roughnessMapAmount));
+    }
     return clamp(ret, vec2(0.0), vec2(1.0));
 }
 
