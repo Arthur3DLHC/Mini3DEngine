@@ -29,7 +29,12 @@ in vec2 ex_texcoord;
 vec3 getNormal() {
     // todo: check if normalmap have been present
     // todo: return tangent and binormal for anisotropic lighting in future
-    return normalize(ex_worldNormal);
+    vec3 normal = ex_worldNormal;
+    if(u_material.normalMapAmount > 0.0) {
+        // Are there tangents in vertex data?
+        
+    }
+    return normalize(normal);
 }
 
 vec3 getBaseColor() {
