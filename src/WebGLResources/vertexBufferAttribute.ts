@@ -68,7 +68,7 @@ export class VertexBufferAttribute {
         // const dataView = new DataView(this.buffer.data.buffer);
 
         // todo: may have other types? such as Uint32 color?
-        const typebuffer = new Float32Array(this.buffer.data.buffer);
+        const typebuffer = new Float32Array(this.buffer.data.buffer, this.buffer.data.byteOffset);
 
         const strideInFloats = this.buffer.stride / 4;
         const offsetInFloats = this.offset / 4;
