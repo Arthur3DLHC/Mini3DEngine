@@ -241,7 +241,7 @@ export class GLTFSceneBuilder {
                             vertexBuffers.set(vbKey, vb);
                         }
 
-                        const vbAttr = new VertexBufferAttribute(attrname, vb, itemSize, byteOffset);
+                        const vbAttr = new VertexBufferAttribute(attrname, vb, itemSize, accessor.componentType, byteOffset);
                         vertexAttributes.push(vbAttr);
                     }
                 }
@@ -270,6 +270,8 @@ export class GLTFSceneBuilder {
                 // in gltf, one primitive only has one material
                 const prim = new Primitive(0, Infinity, 0);
                 geometry.primitives.push(prim);
+
+                geometry.computeBoundingSphere();
             }
 
             iprim++;

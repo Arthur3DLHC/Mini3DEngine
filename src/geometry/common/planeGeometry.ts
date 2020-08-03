@@ -64,9 +64,9 @@ export class PlaneGeometry extends BufferGeometry {
         this.indexBuffer.create();
 
         let curOffset = 0;
-        curOffset = this.addAttribute(VertexBufferAttribute.defaultNamePosition, vertexBuffer, 3, curOffset);
-        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameNormal, vertexBuffer, 3, curOffset);
-        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameTexcoord0, vertexBuffer, 2, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNamePosition, vertexBuffer, 3, GLDevice.gl.FLOAT, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameNormal, vertexBuffer, 3, GLDevice.gl.FLOAT, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameTexcoord0, vertexBuffer, 2, GLDevice.gl.FLOAT, curOffset);
 
         const grp = new Primitive();
         this.primitives.push(grp);

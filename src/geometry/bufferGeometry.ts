@@ -177,8 +177,8 @@ export class BufferGeometry {
      * @param size number elements of this attribute
      * @param offset offset in bytes
      */
-    protected addAttribute(name: string, vertexBuffer: VertexBuffer, size: number, offset: number): number {
-        this.attributes.push(new VertexBufferAttribute(name, vertexBuffer, size, offset));
-        return offset + size * 4;
+    protected addAttribute(name: string, vertexBuffer: VertexBuffer, size: number, componentType: GLenum, offset: number): number {
+        this.attributes.push(new VertexBufferAttribute(name, vertexBuffer, size, componentType, offset));
+        return offset + size * COMPONENT_BYTE_SIZES[componentType];
     }
 }

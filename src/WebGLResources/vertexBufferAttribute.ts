@@ -1,10 +1,11 @@
 import { VertexBuffer } from "./vertexBuffer.js";
 
 export class VertexBufferAttribute {
-    public constructor(name: string, buffer: VertexBuffer, size: number, offset: number) {
+    public constructor(name: string, buffer: VertexBuffer, size: number, componentType: GLenum, offset: number) {
         this.name = name;
         this.buffer = buffer;
         this.size = size;
+        this.componentType = componentType;
         this.offset = offset;
         this.locationOffset = 0;
         this.divisor = 0;
@@ -35,6 +36,11 @@ export class VertexBufferAttribute {
     public size: number;
 
     /**
+     * component type
+     */
+    public componentType: GLenum;
+
+    /**
      * offset in bytes
      */
     public offset: number;
@@ -58,11 +64,29 @@ export class VertexBufferAttribute {
         if (this.buffer.data === null) {
             throw new Error("no data in vertex buffer");
         }
+
+        // const dataView = new DataView(this.buffer.data.buffer);
+
+        // todo: may have other types? such as Uint32 color?
+        const typebuffer = new Float32Array(this.buffer.data.buffer);
+
         const strideInFloats = this.buffer.stride / 4;
         const offsetInFloats = this.offset / 4;
         const startIdx = index * strideInFloats + offsetInFloats;
+
         for (let i = 0; i < this.size; i++) {
-            result[i] = this.buffer.data[startIdx + i];
+            // let val: number = 0;
+            // switch(this.componentType) {
+            //     case 5125:
+            //         val = dataView.getUint32(index * this.buffer.stride + this.offset + i * 4);
+            //         break;
+            //     case 5126:
+            //         val = dataView.getFloat32(index * this.buffer.stride + this.offset + i * 4);
+            //         break;
+            // }
+            //result[i] = val;
+            //result[i] = this.buffer.data[startIdx + i];
+            result[i] = typebuffer[startIdx + i];
         }
     }
 }
