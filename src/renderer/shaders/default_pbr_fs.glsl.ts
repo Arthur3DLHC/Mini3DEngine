@@ -26,15 +26,49 @@ in vec3 ex_worldNormal;
 in vec4 ex_color;
 in vec2 ex_texcoord;
 
-vec3 getNormal() {
+vec3 getNormal(vec3 v) {
     // todo: check if normalmap have been present
     // todo: return tangent and binormal for anisotropic lighting in future
-    vec3 normal = ex_worldNormal;
+    vec3 normal = normalize(ex_worldNormal);
     if(u_material.normalMapAmount > 0.0) {
-        // Are there tangents in vertex data?
-        
+        // todo: check are there tangents in vertex data?
+        // different vertex format use different shader?
+
+        // for now, always calculate tangent and binormal by derivative functions
+        // http://hacksoflife.blogspot.com/2009/11/per-pixel-tangent-space-normal-mapping.html
+        // and
+        // https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/master/src/shaders/pbr.frag
+        // getNormalInfo() function
+
+        vec3 uv = vec3(ex_texcoord, 0.0);
+        vec3 uv_dx = dFdx(uv);
+        vec3 uv_dy = dFdy(uv);
+
+        vec3 t_ = (uv_dy.t * dFdx(ex_worldPosition) - uv_dx.t * dFdy(ex_worldPosition)) /
+                    (uv_dx.s * uv_dy.t - uv_dy.s * uv_dx.t);
+
+        vec3 n, t, b, ng;
+
+        //ng = normalize(ex_worldNormal);
+        ng = normal;
+        t = normalize(t_ - ng * dot(ng, t_));
+        b = cross(ng, t);
+
+        // For a back-facing surface, the tangential basis vectors are negated.
+        float facing = step(0.0, dot(v, ng)) * 2.0 - 1.0;
+        t *= facing;
+        b *= facing;
+        ng *= facing;
+
+        // todo: anisoptry
+        // todo: normal map scale; use u_material.normalMapAmount?
+        vec3 texn = texture(s_normalMap, ex_texcoord).rgb * 2.0 - vec3(1.0);
+        texn *= vec3(u_material.normalMapAmount, u_material.normalMapAmount, 1.0);
+        texn = mat3(t, b, ng) * normalize(texn);
+        normal = texn;
+        // normal = mix(normal, texn, u_material.normalMapAmount);
     }
-    return normalize(normal);
+    return normal;
 }
 
 vec3 getBaseColor() {
@@ -74,8 +108,8 @@ void main(void)
     FinalOutput o = defaultFinalOutput();
     // o.color = ex_color;
 
-    vec3 n = getNormal();
     vec3 v = normalize(u_view.position - ex_worldPosition);
+    vec3 n = getNormal(v);
     float NdotV = clampedDot(n, v);
 
     vec3 baseColor = getBaseColor();

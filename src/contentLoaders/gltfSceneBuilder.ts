@@ -427,6 +427,9 @@ export class GLTFSceneBuilder {
             // normal texture and amount
             if (mtlDef.normalTexture !== undefined) {
                 mtl.normalMapAmount = 1;
+                if(mtlDef.normalTexture.scale !== undefined) {
+                    mtl.normalMapAmount = mtlDef.normalTexture.scale;
+                }
                 mtl.normalMap = this.processTexture(mtlDef.normalTexture, gltf);
             }
 
