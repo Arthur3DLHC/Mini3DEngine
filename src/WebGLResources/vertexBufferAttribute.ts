@@ -1,4 +1,5 @@
 import { VertexBuffer } from "./vertexBuffer.js";
+import { GLDevice } from "./glDevice.js";
 
 export class VertexBufferAttribute {
     public constructor(name: string, buffer: VertexBuffer, size: number, componentType: GLenum, offset: number) {
@@ -68,25 +69,29 @@ export class VertexBufferAttribute {
         // const dataView = new DataView(this.buffer.data.buffer);
 
         // todo: may have other types? such as Uint32 color?
-        const typebuffer = new Float32Array(this.buffer.data.buffer, this.buffer.data.byteOffset);
+        if(this.componentType === GLDevice.gl.FLOAT) {
+            const typebuffer = new Float32Array(this.buffer.data.buffer, this.buffer.data.byteOffset);
 
-        const strideInFloats = this.buffer.stride / 4;
-        const offsetInFloats = this.offset / 4;
-        const startIdx = index * strideInFloats + offsetInFloats;
-
-        for (let i = 0; i < this.size; i++) {
-            // let val: number = 0;
-            // switch(this.componentType) {
-            //     case 5125:
-            //         val = dataView.getUint32(index * this.buffer.stride + this.offset + i * 4);
-            //         break;
-            //     case 5126:
-            //         val = dataView.getFloat32(index * this.buffer.stride + this.offset + i * 4);
-            //         break;
-            // }
-            //result[i] = val;
-            //result[i] = this.buffer.data[startIdx + i];
-            result[i] = typebuffer[startIdx + i];
+            const strideInFloats = this.buffer.stride / 4;
+            const offsetInFloats = this.offset / 4;
+            const startIdx = index * strideInFloats + offsetInFloats;
+    
+            for (let i = 0; i < this.size; i++) {
+                // let val: number = 0;
+                // switch(this.componentType) {
+                //     case 5125:
+                //         val = dataView.getUint32(index * this.buffer.stride + this.offset + i * 4);
+                //         break;
+                //     case 5126:
+                //         val = dataView.getFloat32(index * this.buffer.stride + this.offset + i * 4);
+                //         break;
+                // }
+                //result[i] = val;
+                //result[i] = this.buffer.data[startIdx + i];
+                result[i] = typebuffer[startIdx + i];
+            }
+        } else {
+            throw new Error("Not implemented.");
         }
     }
 }
