@@ -70,7 +70,7 @@ export class VertexBufferAttribute {
 
         // todo: may have other types? such as Uint32 color?
         if(this.componentType === GLDevice.gl.FLOAT) {
-            const typebuffer = new Float32Array(this.buffer.data.buffer, this.buffer.data.byteOffset);
+            const typebuffer = new Float32Array(this.buffer.data.buffer, this.buffer.data.byteOffset, this.buffer.data.byteLength / 4);
 
             const strideInFloats = this.buffer.stride / 4;
             const offsetInFloats = this.offset / 4;
