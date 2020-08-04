@@ -129,6 +129,7 @@ export class GLTFSceneBuilder {
             }
 
             // todo: update local matrix or update it later when scene update every frame?
+            node.updateLocalTransform();
         }
 
         if (nodeDef.children !== undefined) {

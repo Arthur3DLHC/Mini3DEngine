@@ -241,6 +241,8 @@ export class ClusteredForwardRenderer {
 
         this.registerShaderCodes();
 
+        console.log("building shaders...");
+
         // todo: import default shader code strings and create shader objects
         this._colorProgram = new ShaderProgram();
         this._colorProgram.name = "single_color";
@@ -301,11 +303,17 @@ export class ClusteredForwardRenderer {
 
         this._frustum = new Frustum();
 
+        console.log("creating postprocessor...");
+
         this._postprocessor = new PostProcessor(this._renderContext,
             this._sceneDepthTexture, this._sceneNormalTexture, this._sceneSpecularRoughnessTexture,
             this._envMapArrayUnit, this._specularDFGUnit);
 
+        console.log("creating subsufaceprocessor...");
+
         this._subsurfProcessor = new SubsurfaceProcessor();
+
+        console.log("clustered forward renderer created.");
     }
 
     private _renderListDepthPrepass: RenderList;

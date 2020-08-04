@@ -23,7 +23,7 @@ export class Object3D {
         this.worldTransformPrev = mat4.identity.copy();
         this.translation = new vec3([0,0,0]);
         this.rotation = quat.identity;
-        this.scale = new vec3([0,0,0]);
+        this.scale = new vec3([1,1,1]);
         this._moved = false;
         this.castShadow = false;
         this.receiveShadow = false;

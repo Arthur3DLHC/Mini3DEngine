@@ -202,7 +202,7 @@ export class UniformBuffer {
         }
         // 用当前 buffer 数据创建glUniformBuffer对象
         this._bufferData = new Float32Array(this._data);
-        console.log("build uniform buffer [" + this.name + "] with byte size: " + this._bufferData.byteLength );
+        // console.log("build uniform buffer [" + this.name + "] with byte size: " + this._bufferData.byteLength );
         const gl = GLDevice.gl;
         this.glBuffer = gl.createBuffer();
         gl.bindBuffer(gl.UNIFORM_BUFFER, this.glBuffer);

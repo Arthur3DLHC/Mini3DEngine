@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset, Object3D } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
@@ -100,11 +100,15 @@ window.onload = () => {
         requestAnimationFrame(gameLoop);
     }
 
+    console.log("loading gltf model...");
+
     // todo: adjust the way that promise and loadingManager cooperate
     // const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/Box/glTF/Box.gltf");
     // const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/BoxInterleaved/glTF/BoxInterleaved.gltf");
     // const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/BoxTextured/glTF/BoxTextured.gltf");
     const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/DamagedHelmet/glTF/DamagedHelmet.gltf");
+
+    console.log("loading skybox...");
 
     const imagePromises: (Promise<HTMLImageElement>)[] = [];
     const envmapUrls: string[] = [
@@ -141,9 +145,15 @@ window.onload = () => {
         scene.background = skyboxTexture;
         
         // gltf asset should has been already loaded?
+        console.log("building gltf scene...");
+
         const builder = new GLTFSceneBuilder();
         const gltfScene = builder.build(loaded[0], 0);
         scene.attachChild(gltfScene);
+
+        prepareGLTFScene(gltfScene);
+
+        console.log("start game loop...");
 
         Clock.instance.start();
         requestAnimationFrame(gameLoop);
@@ -161,6 +171,15 @@ window.onload = () => {
         probesrt.transform.copy(probe.localTransform);
     
         scene.attachChild(probe);
+    }
+
+    function prepareGLTFScene(gltfScene: Object3D) {
+        gltfScene.isStatic = true;
+        
+        if (gltfScene instanceof Mesh) {
+            gltfScene.castShadow = true;
+            gltfScene.receiveShadow = true;
+        }
     }
 }
 
