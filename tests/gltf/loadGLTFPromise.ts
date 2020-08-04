@@ -173,12 +173,16 @@ window.onload = () => {
         scene.attachChild(probe);
     }
 
-    function prepareGLTFScene(gltfScene: Object3D) {
-        gltfScene.isStatic = true;
+    function prepareGLTFScene(gltfNode: Object3D) {
+        gltfNode.isStatic = true;
         
-        if (gltfScene instanceof Mesh) {
-            gltfScene.castShadow = true;
-            gltfScene.receiveShadow = true;
+        if (gltfNode instanceof Mesh) {
+            gltfNode.castShadow = true;
+            gltfNode.receiveShadow = true;
+        }
+
+        for (const child of gltfNode.children) {
+            prepareGLTFScene(child);
         }
     }
 }
