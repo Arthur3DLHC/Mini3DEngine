@@ -8,8 +8,6 @@ export default /** glsl */`
 #include <uniforms_view>
 #include <uniforms_object>
 
-// todo: include common funcitons?
-#include <function_transforms>
 
 // vertex attribute
 // 使用<attribs>规定的vertex attribute
@@ -26,6 +24,10 @@ in vec4 a_weights0;             // joint weights
 #include <function_skin>
 
 #endif
+
+// todo: include common funcitons?
+
+#include <function_transforms>
 
 // vertex output
 out vec4 ex_hPosition;
