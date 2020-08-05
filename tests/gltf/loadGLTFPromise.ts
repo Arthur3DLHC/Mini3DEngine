@@ -106,8 +106,8 @@ window.onload = () => {
     // const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/Box/glTF/Box.gltf");
     // const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/BoxInterleaved/glTF/BoxInterleaved.gltf");
     // const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/BoxTextured/glTF/BoxTextured.gltf");
-    // const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/DamagedHelmet/glTF/DamagedHelmet.gltf");
-    const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/std_female/std_female_anim.gltf");
+    const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/DamagedHelmet/glTF/DamagedHelmet.gltf");
+    // const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/std_female/std_female_anim.gltf");
 
     console.log("loading skybox...");
 
