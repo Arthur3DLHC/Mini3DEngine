@@ -11,6 +11,7 @@ import function_get_items from "./shaders/shaderIncludes/function_get_items.glsl
 import function_ibl from "./shaders/shaderIncludes/function_ibl.glsl.js";
 import function_punctual_lights from "./shaders/shaderIncludes/function_punctual_lights.glsl.js";
 import function_shadow from "./shaders/shaderIncludes/function_shadow.glsl.js";
+import function_skin from "./shaders/shaderIncludes/function_skin.glsl.js";
 import function_subsurface from "./shaders/shaderIncludes/function_subsurface.glsl.js";
 import function_tonemap from "./shaders/shaderIncludes/function_tonemap.glsl.js";
 import function_brdf_pbr from "./shaders/shaderIncludes/function_brdf_pbr.glsl.js";
@@ -75,6 +76,7 @@ import { CubemapProcessor } from "./cubemapProcessor.js";
 import { PostProcessor } from "./postProcessor.js";
 import { SubsurfaceProcessor } from "./subsurfaceProcessor.js";
 import { BoxGeometry } from "../geometry/common/boxGeometry.js";
+import { SkinMesh } from "../scene/skinMesh.js";
 
 export class ClusteredForwardRenderer {
 
@@ -244,6 +246,7 @@ export class ClusteredForwardRenderer {
         console.log("building shaders...");
 
         // todo: import default shader code strings and create shader objects
+        // todo: make a string-keyed shader cache?
         this._colorProgram = new ShaderProgram();
         this._colorProgram.name = "single_color";
         this._colorProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["single_color_vs"]);
@@ -255,6 +258,12 @@ export class ClusteredForwardRenderer {
         this._stdPBRProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["default_pbr_vs"]);
         this._stdPBRProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["default_pbr_fs"]);
         this._stdPBRProgram.build();
+
+        this._stdPBRSkinProgram = new ShaderProgram();
+        this._stdPBRSkinProgram.name = "default_pbr_skin";
+        this._stdPBRSkinProgram.vertexShaderCode = GLPrograms.processSourceCode("#define USE_SKINNING 1\n" + GLPrograms.shaderCodes["default_pbr_vs"]);
+        this._stdPBRSkinProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["default_pbr_fs"]);
+        this._stdPBRSkinProgram.build();
 
         this._shadowProgram = new ShaderProgram();
         this._shadowProgram.name = "shadow";
@@ -288,6 +297,7 @@ export class ClusteredForwardRenderer {
         this._skyboxProgram.build();
 
         this._samplerUniformsStdPBR = new SamplerUniforms(this._stdPBRProgram);
+        this._samplerUniformsStdPBRSkin = new SamplerUniforms(this._stdPBRSkinProgram);
         this._samplerUniformsScreenRect = new SamplerUniforms(this._screenRectProgram);
 
         // todo: bind uniform blocks?
@@ -295,6 +305,7 @@ export class ClusteredForwardRenderer {
         // or need to bind to every programs?
         this._renderContext.bindUniformBlocks(this._colorProgram);
         this._renderContext.bindUniformBlocks(this._stdPBRProgram);
+        this._renderContext.bindUniformBlocks(this._stdPBRSkinProgram);
         this._renderContext.bindUniformBlocks(this._shadowProgram);
         this._renderContext.bindUniformBlocks(this._depthPrepassProgram);
         this._renderContext.bindUniformBlocks(this._occlusionQueryProgram);
@@ -406,6 +417,7 @@ export class ClusteredForwardRenderer {
     // default shader programs
     // or put them into render phases?
     private _stdPBRProgram: ShaderProgram;
+    private _stdPBRSkinProgram: ShaderProgram;
     private _colorProgram: ShaderProgram;
     private _shadowProgram: ShaderProgram;
     private _depthPrepassProgram: ShaderProgram;
@@ -415,6 +427,7 @@ export class ClusteredForwardRenderer {
 
     // sampler uniforms
     private _samplerUniformsStdPBR: SamplerUniforms | null;
+    private _samplerUniformsStdPBRSkin: SamplerUniforms | null;
     private _samplerUniformsScreenRect: SamplerUniforms | null;
 
     private _frustum: Frustum;
@@ -487,6 +500,7 @@ export class ClusteredForwardRenderer {
         GLPrograms.shaderCodes["function_ibl"] = function_ibl;
         GLPrograms.shaderCodes["function_punctual_lights"] = function_punctual_lights;
         GLPrograms.shaderCodes["function_shadow"] = function_shadow;
+        GLPrograms.shaderCodes["function_skin"] = function_skin;
         GLPrograms.shaderCodes["function_subsurface"] = function_subsurface;
         GLPrograms.shaderCodes["function_tonemap"] = function_tonemap;
         GLPrograms.shaderCodes["function_brdf_pbr"] = function_brdf_pbr;
@@ -622,27 +636,33 @@ export class ClusteredForwardRenderer {
         GLTextures.setTextureAt(this._irradianceVolumeAtlasUnit, this._irradianceVolumeAtlas.texture);
     }
 
-    private bindTexturesPerMaterial(material: Material | null) {
+    private bindTexturesPerMaterial(material: Material | null, useSkin: boolean) {
+        // todo: skinning
+        let samplerUniforms = this._samplerUniformsStdPBR;
+        if (useSkin) {
+            samplerUniforms = this._samplerUniformsStdPBRSkin;
+        }
+        
         // if pbr mtl
         if (material instanceof StandardPBRMaterial) {
             // todo: need to bind per scene texture units to uniforms too?
-            if (this._samplerUniformsStdPBR) {
+            if (samplerUniforms) {
                 // this._samplerUniformsStdPBR.setTextureUnit("s_shadowAtlasStatic", this._shadowmapAtlasStaticUnit);
-                this._samplerUniformsStdPBR.setTextureUnit("s_shadowAtlas", this._shadowmapAtlasUnit);
-                this._samplerUniformsStdPBR.setTextureUnit("s_decalAtlas", this._decalAtlasUnit);
-                this._samplerUniformsStdPBR.setTextureUnit("s_envMapArray", this._envMapArrayUnit);
-                this._samplerUniformsStdPBR.setTextureUnit("s_specularDFG", this._specularDFGUnit);
-                this._samplerUniformsStdPBR.setTextureUnit("s_irrVolAtlas", this._irradianceVolumeAtlasUnit);
+                samplerUniforms.setTextureUnit("s_shadowAtlas", this._shadowmapAtlasUnit);
+                samplerUniforms.setTextureUnit("s_decalAtlas", this._decalAtlasUnit);
+                samplerUniforms.setTextureUnit("s_envMapArray", this._envMapArrayUnit);
+                samplerUniforms.setTextureUnit("s_specularDFG", this._specularDFGUnit);
+                samplerUniforms.setTextureUnit("s_irrVolAtlas", this._irradianceVolumeAtlasUnit);
 
                 GLTextures.setStartUnit(this._numReservedTextures);
                 const pbrMtl = material as StandardPBRMaterial;
-                this._samplerUniformsStdPBR.setTexture("s_baseColorMap", pbrMtl.colorMap);
-                this._samplerUniformsStdPBR.setTexture("s_metallicRoughnessMap", pbrMtl.metallicRoughnessMap);
-                this._samplerUniformsStdPBR.setTexture("s_emissiveMap", pbrMtl.emissiveMap);
-                this._samplerUniformsStdPBR.setTexture("s_normalMap", pbrMtl.normalMap);
-                this._samplerUniformsStdPBR.setTexture("s_occlusionMap", pbrMtl.occlusionMap);
+                samplerUniforms.setTexture("s_baseColorMap", pbrMtl.colorMap);
+                samplerUniforms.setTexture("s_metallicRoughnessMap", pbrMtl.metallicRoughnessMap);
+                samplerUniforms.setTexture("s_emissiveMap", pbrMtl.emissiveMap);
+                samplerUniforms.setTexture("s_normalMap", pbrMtl.normalMap);
+                samplerUniforms.setTexture("s_occlusionMap", pbrMtl.occlusionMap);
                 if (pbrMtl.subsurface > 0) {
-                    this._samplerUniformsStdPBR.setTexture("s_subsurfBRDF", this._subsurfProcessor.preIntegratedBRDFTexture);
+                    samplerUniforms.setTexture("s_subsurfBRDF", this._subsurfProcessor.preIntegratedBRDFTexture);
                 }
             }        
         } else {
@@ -886,6 +906,8 @@ export class ClusteredForwardRenderer {
                     continue;
                 }
 
+                const isSkin = item.object instanceof SkinMesh;
+
                 // item may be animated
                 //if (this._currentObject !== item.object) {
                     this._renderContext.fillUniformBuffersPerObject(item);
@@ -898,14 +920,18 @@ export class ClusteredForwardRenderer {
 
                     // todo: use program of ShaderMaterial?
                     if (item.material instanceof StandardPBRMaterial) {
-                        GLPrograms.useProgram(this._stdPBRProgram);
+                        if (isSkin) {
+                            GLPrograms.useProgram(this._stdPBRSkinProgram);
+                        } else {
+                            GLPrograms.useProgram(this._stdPBRProgram);
+                        }
                     } else if (item.material instanceof ShaderMaterial) {
                         if (item.material.program) {
                             GLPrograms.useProgram(item.material.program);
                         }
                     }
                     this._renderContext.fillUniformBuffersPerMaterial(item.material);
-                    this.bindTexturesPerMaterial(item.material);
+                    this.bindTexturesPerMaterial(item.material, isSkin);
 
                     // todo: set sampler index for sampler uniform locations of program
                 }

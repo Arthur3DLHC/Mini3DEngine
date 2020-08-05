@@ -18,6 +18,15 @@ in vec3 a_position;
 in vec3 a_normal;
 in vec2 a_texcoord0;
 
+#ifdef USE_SKINNING
+
+in vec4 a_joints0;              // joint indices
+in vec4 a_weights0;             // joint weights
+
+#include <function_skin>
+
+#endif
+
 // vertex output
 out vec4 ex_hPosition;
 out vec3 ex_worldPosition;      // because all lights, decals, cubemaps, irrvols are in world space, we transform position, normal to world space.
