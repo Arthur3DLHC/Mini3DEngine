@@ -2,6 +2,8 @@
  * functions for shadowmap sampling.
  */
 export default /** glsl */`
+    #define SHADOWATLAS_SIZE 4096.0
+    #define SHADOWATLAS_TEXELSIZE 0.000244140625    // 1.0 / 4096
 
     vec4 getPointLightShadowmapRect(int faceId, Light light) {
         if (faceId < 3) {
@@ -64,5 +66,34 @@ export default /** glsl */`
         float A = -(f + n)/(f - n);
         float B = -2.0 * f * n / (f - n);
         return vec4(posView.x, posView.y, (posView.z) * A + B, -posView.z);
+    }
+
+    // https://github.com/BabylonJS/Babylon.js/blob/master/src/Shaders/ShadersInclude/shadowsFragmentFunctions.fx
+    float shadowPCF3(sampler2DShadow shadowSampler, vec3 shadowCoord) {
+        
+        vec2 uv = shadowCoord.xy * SHADOWATLAS_SIZE;       	// uv in texel units
+        uv += vec2(0.5);									// offset of half to be in the center of the texel
+        vec2 st = fract(uv);								// how far from the center
+        vec2 base_uv = floor(uv) - vec2(0.5);				// texel coord
+        base_uv *= SHADOWATLAS_TEXELSIZE;				    // move back to uv coords
+
+        // Equation resolved to fit in a 3*3 distribution like 
+        // 1 2 1
+        // 2 4 2 
+        // 1 2 1
+
+        vec2 uvw0 = vec2(3.0) - 2.0 * st;
+        vec2 uvw1 = vec2(1.0) + 2.0 * st;
+        vec2 u = vec2((2. - st.x) / uvw0.x - 1., st.x / uvw1.x + 1.) * SHADOWATLAS_TEXELSIZE;
+        vec2 v = vec2((2. - st.y) / uvw0.y - 1., st.y / uvw1.y + 1.) * SHADOWATLAS_TEXELSIZE;
+
+        float shadow = 0.;
+        shadow += uvw0.x * uvw0.y * texture(shadowSampler, vec3(base_uv.xy + vec2(u[0], v[0]), shadowCoord.z));
+        shadow += uvw1.x * uvw0.y * texture(shadowSampler, vec3(base_uv.xy + vec2(u[1], v[0]), shadowCoord.z));
+        shadow += uvw0.x * uvw1.y * texture(shadowSampler, vec3(base_uv.xy + vec2(u[0], v[1]), shadowCoord.z));
+        shadow += uvw1.x * uvw1.y * texture(shadowSampler, vec3(base_uv.xy + vec2(u[1], v[1]), shadowCoord.z));
+        shadow = shadow / 16.;
+
+        return shadow;
     }
 `;

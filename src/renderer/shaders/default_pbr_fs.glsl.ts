@@ -103,6 +103,17 @@ float getOpacity() {
     return mix(u_material.baseColor.a, texOp, u_material.colorMapAmount);
 }
 
+// dither offset for shadowmap
+// need to calculate screen space uv?
+// fix me: is it better to use a 4x4 texture? only need to do 1 texture sampling.
+vec2 getDither() {
+    vec2 scrUV = ex_hPosition.xy / ex_hPosition.w * vec2(0.5) + vec2(0.5);
+    uvec2 scrXY = uvec2(scrUV * u_view.viewport.zw);
+    uvec2 ditherIdx = scrXY % uvec2(4u, 4u);
+    vec2 dither = vec2(u_ditherPattern.randX[ditherIdx.x][ditherIdx.y], u_ditherPattern.randY[ditherIdx.x][ditherIdx.y]);
+    return dither;
+}
+
 void main(void)
 {
     FinalOutput o = defaultFinalOutput();
@@ -123,13 +134,7 @@ void main(void)
         curvature = calcCurvature(n, ex_worldPosition);
     }
 
-    // dither offset for shadowmap
-    // need to calculate screen space uv?
-    // fix me: is it better to use a 4x4 texture? only need to do 1 texture sampling.
-    vec2 scrUV = ex_hPosition.xy / ex_hPosition.w * vec2(0.5) + vec2(0.5);
-    uvec2 scrXY = uvec2(scrUV * u_view.viewport.zw);
-    uvec2 ditherIdx = scrXY % uvec2(4u, 4u);
-    vec2 dither = vec2(u_ditherPattern.randX[ditherIdx.x][ditherIdx.y], u_ditherPattern.randY[ditherIdx.x][ditherIdx.y]);
+    // vec2 dither = getDither();
 
     // simple default f0
     vec3 f0 = vec3(0.04);
@@ -206,10 +211,13 @@ void main(void)
                 shadowCoord = shadowCoord * vec3(rect.z * 0.5, rect.w * 0.5, 0.5)
                                          + vec3(rect.z * 0.5 + rect.x, rect.w * 0.5 + rect.y, 0.5);
             }
-            // todo: dither the shadowcoord uv?
-            vec2 offset = (dither - vec2(0.5)) / 1024.0; // shadow atlas texture size / 4
-            shadowCoord.xy += offset;
-            shadow = texture(s_shadowAtlas, shadowCoord);
+            // dither the shadowcoord uv?
+            // effect is not very good; consider use linear pcf?
+            shadow = shadowPCF3(s_shadowAtlas, shadowCoord);
+
+            // vec2 offset = (dither - vec2(0.5)) / 1024.0; // shadow atlas texture size / 4
+            // shadowCoord.xy += offset;
+            // shadow = texture(s_shadowAtlas, shadowCoord);
             if(shadow < 0.001 && u_material.subsurface < 0.01) {
                 continue;
             }
