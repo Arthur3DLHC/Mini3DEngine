@@ -358,9 +358,7 @@ TODO:       主要类结构
                 Fix me: 现在的gltfAsset get()返回的是 promise 对象；是否应该改为在加载时取得所有buffer和image，然后 get 时直接返回 buffer 和 image 对象？
                     或者保留这个机制，但是在解析和创建 scene 对象时就得按异步处理；
 
------------------------------------------------------
-
-            TODO: Dithered soft shadow?
+            Dithered soft shadow?
                 使用一个 blue noise dither texture；在做 shadowmap 取样时根据像素屏幕坐标取 dither 偏移量，应用到 shadowmap uv 上？
                 或者使用程序生成的 noise texture?
                 使用 blue noise 或 halton sequence？
@@ -370,6 +368,8 @@ TODO:       主要类结构
                     参考 Babylon.js src\Shaders\ShadersInclude\shadowsFragmentFunctions.fx computeShadowWithPCF3 函数？
                     https://mynameismjp.wordpress.com/2013/09/10/shadow-maps/
                     https://github.com/TheRealMJP/Shadows
+
+-----------------------------------------------------
 
             文件加载机制
                 使用Promise, async, await
@@ -416,11 +416,13 @@ TODO:       主要类结构
                 网页加载很慢的原因：shader编译很慢；
 
             骨骼皮肤动画
+                Skin shader
+                SkinMesh类
+                Update joint matrices and pass in uniforms
+                
                 从 glTF 加载：skin 和 animation
                 动画插值器；
                 动画数据对象
-                SkinMesh类
-                skinmeshshader
 
             资源加载器
                 资源列表和资源计数？
