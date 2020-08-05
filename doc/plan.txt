@@ -402,6 +402,7 @@ TODO:       主要类结构
                         如果没有 tangent, 则使用 http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html 的方法在 pixel shader 中变换光源到视空间？还是统一用世界空间计算？
                         参考：  Khronos group gltf sampler viewer: src\shaders\pbr.frag
                                 Three.js: examples\jsm\nodes\misc\NormalMapNode.js
+                    * 光滑的物体似乎环境反射过清晰了问题？
 
                 Object3D 更新变换时使用分开的 SRT？
                     使用 quaterion 表示旋转
@@ -449,6 +450,7 @@ TODO:       主要类结构
                         Cubemap 或 Shadowmap 渲染，设为 false；分辨率较低，而且是类似 bake 阶段，无需 Clustered
 
             Instancing
+                GLTF中共享网格的节点设为用 Instancing
                 can use in mat4 in vertex shader for attribute input;
 
             测试 Occlusion query?
