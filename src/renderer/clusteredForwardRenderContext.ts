@@ -22,6 +22,7 @@ import { Clock } from "../scene/clock.js";
 import { TextureCube } from "../WebGLResources/textures/textureCube.js";
 import { Halton } from "../math/halton.js";
 import { Hammersley } from "../math/Hammersley.js";
+import { SkinMesh } from "../scene/skinMesh.js";
 
 export class ClusteredForwardRenderContext extends RenderContext {
     public constructor() {
@@ -619,6 +620,15 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubObject.setMat4("matWorld", item.object.worldTransform);
         this._ubObject.setMat4("matWorldPrev", item.object.worldTransformPrev);
         this._ubObject.setVec4("color", item.object.color);
+        if (item.object instanceof SkinMesh) {
+            // fix me: need to copy all matrices to a float32array?
+            const skinMesh = item.object as SkinMesh;
+            this._buffer.seek(0);
+            for (let i = 0; i < skinMesh.jointMatrices.length; i++) {
+                this._buffer.addArray(skinMesh.jointMatrices[i].values);
+            }
+            this._ubObject.setUniform("matBones", this._tmpData, this._buffer.length);
+        }
         this._ubObject.update();
 
         // todo: object skin transforms, if skinmesh
