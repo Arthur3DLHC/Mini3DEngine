@@ -425,8 +425,13 @@ TODO:       主要类结构
 
                         而 gltf-sample-viewer 中传入每个 joint 的 normalmatrix，略复杂：
                         src\shaders\animation.glsl
+
+                    *** depth prepass, shadow skin shader.
+                    
                 SkinMesh类
                 Update joint matrices and pass in uniforms
+
+                绘制 SkinMesh 时，需要使用 skin shader
                 
                 从 glTF 加载：skin 和 animation
                 动画插值器；
