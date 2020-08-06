@@ -180,15 +180,37 @@ export class GLTFSceneBuilder {
         if (gltf.gltf.skins === undefined) {
             throw new Error("Skin data not found.");
         }
-        const skin = gltf.gltf.skins[skinIdx];
+        const skinDef = gltf.gltf.skins[skinIdx];
         
         // load bind pose matrices
+        // stored in accessor data in gltf
+        // need to copy to an float32array?
+        if (skinDef.inverseBindMatrices !== undefined ) {
+            const data = gltf.accessorDataSync(skinDef.inverseBindMatrices);
+            const floatArray: Float32Array = new Float32Array(data.buffer, data.byteOffset, data.length / 4);
+            // copy float elems to mat4
+            const numMatrices = floatArray.length / 16;
+            if( numMatrices !== skinDef.joints.length) {
+                throw new Error("Joints count and bind matrices count mismatch");
+            }
+            for (let i = 0; i < numMatrices; i++) {
+                const elemArray = floatArray.subarray(i * 16, i * 16 + 16);
+                const values: number[] = [];
+                for(let e = 0; e < 16; e++) values[e] = elemArray[e];
+                const matrix = new mat4(values);
+                mesh.inverseBindMatrices.push(matrix);
+            }
+        } else {
+            console.warn("No inverseBindMatrices in gltf file");
+        }
 
-        // find nodes?
-    }
+        // find joint nodes?
+        for (const jointIdx of skinDef.joints) {
+            mesh.joints.push(nodes[jointIdx]);
+        }
 
-    private processJoint() {
-
+        // whether need to ref to the root node of skeleton?
+        // skinDef.skeleton;
     }
 
     /**

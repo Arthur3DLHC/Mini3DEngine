@@ -7,7 +7,7 @@ export class SkinMesh extends Mesh {
     public jointMatrices: mat4[] = [];
 
     // todo: bind pose matrices, should be cached?
-    public bindPoseMatrices: mat4[] = [];
+    public inverseBindMatrices: mat4[] = [];
 
     public updateJointMatrices(){
 
