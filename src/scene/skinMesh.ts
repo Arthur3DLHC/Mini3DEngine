@@ -20,4 +20,15 @@ export class SkinMesh extends Mesh {
             // because we do not multiply the world matrix of parent node in shader.
         }
     }
+
+    public static updateSkinMeshes(obj: Object3D) {
+        if (obj instanceof SkinMesh) {
+            const skinMesh = obj as SkinMesh;
+            skinMesh.updateJointMatrices();
+        }
+
+        for (const child of obj.children) {
+            SkinMesh.updateSkinMeshes(child);
+        }
+    }
 }
