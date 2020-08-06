@@ -1,6 +1,6 @@
 import { GltfAsset, GLTF_EXTENSIONS, GLTF_ATTRIBUTES, GLTF_ELEMENTS_PER_TYPE, GLTF_COMPONENT_TYPE_ARRAYS } from "./gltfAsset.js";
 import { Scene } from "../scene/scene.js";
-import { GlTfId, GlTf, TextureInfo, MaterialNormalTextureInfo } from "./gltf.js";
+import { GlTfId, GlTf, TextureInfo, MaterialNormalTextureInfo, Node } from "./gltf.js";
 import { Object3D } from "../scene/object3D.js";
 import { Mesh } from "../scene/mesh.js";
 import vec3 from "../../lib/tsm/vec3.js";
@@ -18,6 +18,7 @@ import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.j
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { IndexBuffer } from "../WebGLResources/indexBuffer.js";
 import { GeometryCache } from "../geometry/geometryCache.js";
+import { SkinMesh } from "../scene/skinMesh.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -68,27 +69,48 @@ export class GLTFSceneBuilder {
             }   
         }
 
-        for (const nodeID of sceneDef.nodes) {
-            this.processNode(nodeID, scene, gltf);
+        // set a temp node array first? for joints?
+        const nodes: Object3D[] = [];
+
+        for (const nodeDef of gltf.gltf.nodes) {
+            nodes.push(this.processNode(nodeDef, gltf));
         }
 
-        // todo: findout skelecton joints
+        // sceneDef.nodes is array of root node indices in the scene
+        for (const nodeID of sceneDef.nodes) {
+            // this.processNode(nodeID, scene, gltf);
+            this.createNodeHierarchy(nodeID, scene, nodes, gltf);
+        }
+
+        // todo: process skin meshes; findout skelecton joints
+        let iNode = 0;
+        for (const nodeDef of gltf.gltf.nodes) {
+            if (nodeDef.skin !== undefined) {
+                this.processSkin(nodes[iNode], nodeDef.skin, nodes, gltf);
+            }
+            iNode++;
+        }
 
         return scene;
     }
 
-    private processNode(nodeId: GlTfId, parentObject: Object3D, gltf: GltfAsset) {
-        // todo: check if node is mesh, joint?
-        // todo: iterate childs
+    private createNodeHierarchy(nodeId: GlTfId, parentObject: Object3D, nodes: Object3D[], gltf: GltfAsset) {
         if (gltf.gltf.nodes === undefined) {
-            throw new Error("No nodes in gltf.");
+            throw new Error("Nodes not found");
         }
-
         const nodeDef = gltf.gltf.nodes[nodeId];
+        const node = nodes[nodeId];
 
-        if (nodeDef === undefined) {
-            throw new Error("Node not found.");
+        parentObject.attachChild(node);
+
+        if (nodeDef.children !== undefined) {
+            for (const childId of nodeDef.children) {
+                this.createNodeHierarchy(childId, node, nodes, gltf);
+            }
         }
+    }
+
+    private processNode(nodeDef: Node, gltf: GltfAsset): Object3D {
 
         let node: Object3D;
         if (nodeDef.mesh !== undefined) {
@@ -105,7 +127,7 @@ export class GLTFSceneBuilder {
             node = new Object3D();
         }
 
-        parentObject.attachChild(node);
+        // parentObject.attachChild(node);
 
         // todo: node transform
         // todo: hold translation, rotation, scale in Object3D？
@@ -132,11 +154,37 @@ export class GLTFSceneBuilder {
             node.updateLocalTransform();
         }
 
-        if (nodeDef.children !== undefined) {
-            for (const childId of nodeDef.children) {
-                this.processNode(childId, node, gltf);
+        return node;
+
+        //if (nodeDef.children !== undefined) {
+        //    for (const childId of nodeDef.children) {
+        //        this.processNode(childId, node, gltf);
+        //    }
+        //}
+    }
+
+    private processSkin(node: Object3D, skinIdx: number, nodes: Object3D[], gltf: GltfAsset) {
+        if (node instanceof SkinMesh) {
+            this.addSkinInfo(node, skinIdx, nodes, gltf);
+        } else {
+            // an mesh group?
+            for (const child of node.children) {
+                if (child instanceof SkinMesh) {
+                    this.addSkinInfo(child, skinIdx, nodes, gltf);
+                }
             }
         }
+    }
+
+    private addSkinInfo(mesh: SkinMesh, skinIdx: number, nodes: Object3D[], gltf: GltfAsset) {
+        if (gltf.gltf.skins === undefined) {
+            throw new Error("Skin data not found.");
+        }
+        const skin = gltf.gltf.skins[skinIdx];
+        
+        // load bind pose matrices
+
+        // find nodes?
     }
 
     private processJoint() {
@@ -285,15 +333,18 @@ export class GLTFSceneBuilder {
                 || primDef.mode === GLDevice.gl.TRIANGLE_STRIP
                 || primDef.mode === undefined) {
                 // todo: is this a skin mesh?
-                mesh = new Mesh();
+                if (isSkin) {
+                    mesh = new SkinMesh();
+                    // todo: read skin info?
 
+                }
             } else if (primDef.mode === GLDevice.gl.LINES
                 || primDef.mode === GLDevice.gl.LINE_STRIP
                 || primDef.mode === GLDevice.gl.LINE_LOOP) {
-                mesh = new Mesh();
+                // mesh = new Mesh();
                 
             } else if (primDef.mode === GLDevice.gl.POINTS) {
-                mesh = new Mesh();
+                // mesh = new Mesh();
             }
 
             mesh.geometry = geometry;

@@ -43,7 +43,6 @@ void main(void)
     ex_hPosition = viewToProj(worldToView(worldPosition));
     gl_Position = ex_hPosition;
     ex_color = u_object.color;
-    // todo: transform normal to view space
     ex_worldNormal = localToWorld(vec4(a_normal, 0.0)).xyz;
     ex_texcoord = a_texcoord0;
 }
