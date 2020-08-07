@@ -259,11 +259,11 @@ export class ClusteredForwardRenderer {
         this._stdPBRProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["default_pbr_fs"]);
         this._stdPBRProgram.build();
 
-        this._stdPBRSkinProgram = new ShaderProgram();
-        this._stdPBRSkinProgram.name = "default_pbr_skin";
-        this._stdPBRSkinProgram.vertexShaderCode = GLPrograms.processSourceCode("#define USE_SKINNING 1\n" + GLPrograms.shaderCodes["default_pbr_vs"]);
-        this._stdPBRSkinProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["default_pbr_fs"]);
-        this._stdPBRSkinProgram.build();
+        // this._stdPBRSkinProgram = new ShaderProgram();
+        // this._stdPBRSkinProgram.name = "default_pbr_skin";
+        // this._stdPBRSkinProgram.vertexShaderCode = GLPrograms.processSourceCode("#define USE_SKINNING 1\n" + GLPrograms.shaderCodes["default_pbr_vs"]);
+        // this._stdPBRSkinProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["default_pbr_fs"]);
+        // this._stdPBRSkinProgram.build();
 
         this._shadowProgram = new ShaderProgram();
         this._shadowProgram.name = "shadow";
@@ -297,7 +297,7 @@ export class ClusteredForwardRenderer {
         this._skyboxProgram.build();
 
         this._samplerUniformsStdPBR = new SamplerUniforms(this._stdPBRProgram);
-        this._samplerUniformsStdPBRSkin = new SamplerUniforms(this._stdPBRSkinProgram);
+        //this._samplerUniformsStdPBRSkin = new SamplerUniforms(this._stdPBRSkinProgram);
         this._samplerUniformsScreenRect = new SamplerUniforms(this._screenRectProgram);
 
         // todo: bind uniform blocks?
@@ -305,7 +305,7 @@ export class ClusteredForwardRenderer {
         // or need to bind to every programs?
         this._renderContext.bindUniformBlocks(this._colorProgram);
         this._renderContext.bindUniformBlocks(this._stdPBRProgram);
-        this._renderContext.bindUniformBlocks(this._stdPBRSkinProgram);
+        //this._renderContext.bindUniformBlocks(this._stdPBRSkinProgram);
         this._renderContext.bindUniformBlocks(this._shadowProgram);
         this._renderContext.bindUniformBlocks(this._depthPrepassProgram);
         this._renderContext.bindUniformBlocks(this._occlusionQueryProgram);
@@ -417,7 +417,7 @@ export class ClusteredForwardRenderer {
     // default shader programs
     // or put them into render phases?
     private _stdPBRProgram: ShaderProgram;
-    private _stdPBRSkinProgram: ShaderProgram;
+    // private _stdPBRSkinProgram: ShaderProgram;
     private _colorProgram: ShaderProgram;
     private _shadowProgram: ShaderProgram;
     private _depthPrepassProgram: ShaderProgram;
@@ -427,7 +427,7 @@ export class ClusteredForwardRenderer {
 
     // sampler uniforms
     private _samplerUniformsStdPBR: SamplerUniforms | null;
-    private _samplerUniformsStdPBRSkin: SamplerUniforms | null;
+    // private _samplerUniformsStdPBRSkin: SamplerUniforms | null;
     private _samplerUniformsScreenRect: SamplerUniforms | null;
 
     private _frustum: Frustum;
@@ -639,9 +639,9 @@ export class ClusteredForwardRenderer {
     private bindTexturesPerMaterial(material: Material | null, useSkin: boolean) {
         // todo: skinning
         let samplerUniforms = this._samplerUniformsStdPBR;
-        if (useSkin) {
-            samplerUniforms = this._samplerUniformsStdPBRSkin;
-        }
+        // if (useSkin) {
+        //     samplerUniforms = this._samplerUniformsStdPBRSkin;
+        // }
         
         // if pbr mtl
         if (material instanceof StandardPBRMaterial) {
@@ -920,11 +920,11 @@ export class ClusteredForwardRenderer {
 
                     // todo: use program of ShaderMaterial?
                     if (item.material instanceof StandardPBRMaterial) {
-                        if (isSkin) {
-                            GLPrograms.useProgram(this._stdPBRSkinProgram);
-                        } else {
+                        // if (isSkin) {
+                        //     GLPrograms.useProgram(this._stdPBRSkinProgram);
+                        // } else {
                             GLPrograms.useProgram(this._stdPBRProgram);
-                        }
+                        //}
                     } else if (item.material instanceof ShaderMaterial) {
                         if (item.material.program) {
                             GLPrograms.useProgram(item.material.program);

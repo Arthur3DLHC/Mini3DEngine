@@ -5,14 +5,14 @@ export default /** glsl */`
 #include <uniforms_view>
 #include <uniforms_object>
 
-#include <function_transforms>
-
 // vertex attribute
 // 使用<attribs>规定的vertex attribute
 in vec3 a_position;
 // 不需要法线和纹理坐标
 in vec3 a_normal;
 in vec2 a_texcoord0;
+
+#include <function_transforms>
 
 out vec3 ex_worldDir;
 out vec3 ex_normal;

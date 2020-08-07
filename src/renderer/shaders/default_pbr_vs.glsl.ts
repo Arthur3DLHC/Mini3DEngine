@@ -16,14 +16,14 @@ in vec3 a_position;
 in vec3 a_normal;
 in vec2 a_texcoord0;
 
-#ifdef USE_SKINNING
+// #ifdef USE_SKINNING
 
 in vec4 a_joints0;              // joint indices
 in vec4 a_weights0;             // joint weights
 
 #include <function_skin>
 
-#endif
+// #endif
 
 // todo: include common funcitons?
 
@@ -38,12 +38,12 @@ out vec2 ex_texcoord;
 
 void main(void)
 {
-    vec4 worldPosition = localToWorld(vec4(a_position, 1.0));
+    vec4 worldPosition = localToWorldCheckSkin(vec4(a_position, 1.0));
     ex_worldPosition = worldPosition.xyz;
     ex_hPosition = viewToProj(worldToView(worldPosition));
     gl_Position = ex_hPosition;
     ex_color = u_object.color;
-    ex_worldNormal = localToWorld(vec4(a_normal, 0.0)).xyz;
+    ex_worldNormal = localToWorldCheckSkin(vec4(a_normal, 0.0)).xyz;
     ex_texcoord = a_texcoord0;
 }
 

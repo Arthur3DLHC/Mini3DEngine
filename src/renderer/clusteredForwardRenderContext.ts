@@ -155,6 +155,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubObject.addMat4("matWorld", matIdentity);
         this._ubObject.addMat4("matWorldPrev", matIdentity);
         this._ubObject.addVec4("color", new vec4());
+        this._ubObject.addVec4("props", new vec4());
         // this._ubObject.addFloat("tag", 0);
         this._ubObject.addUniform("matBones", ClusteredForwardRenderContext.MAX_BONES * 16);
         this._ubObject.addUniform("matPrevBones", ClusteredForwardRenderContext.MAX_BONES * 16);
@@ -620,15 +621,23 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubObject.setMat4("matWorld", item.object.worldTransform);
         this._ubObject.setMat4("matWorldPrev", item.object.worldTransformPrev);
         this._ubObject.setVec4("color", item.object.color);
+
+        // object properties
+        // this._tmpColor.x = item.object.tag;
+        this._tmpColor.y = 0;           // num skin joints
+
         if (item.object instanceof SkinMesh) {
             // fix me: need to copy all matrices to a float32array?
             const skinMesh = item.object as SkinMesh;
+            this._tmpColor.y = skinMesh.jointMatrices.length;
+
             this._buffer.seek(0);
             for (let i = 0; i < skinMesh.jointMatrices.length; i++) {
                 this._buffer.addArray(skinMesh.jointMatrices[i].values);
             }
             this._ubObject.setUniform("matBones", this._tmpData, this._buffer.length);
         }
+        this._ubObject.setVec4("props", this._tmpColor);
         this._ubObject.update();
 
         // todo: object skin transforms, if skinmesh

@@ -432,6 +432,7 @@ TODO:       主要类结构
                 Update joint matrices and pass in uniforms
 
                 绘制 SkinMesh 时，需要使用 skin shader
+                    或者改成动态分支，可以简单一点，不用编译多份shader
                 
                 从 glTF 加载：skin 和 animation
                 动画插值器；

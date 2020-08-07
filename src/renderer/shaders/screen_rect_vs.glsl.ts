@@ -8,13 +8,13 @@ export default /** glsl */`
 #include <uniforms_view>
 #include <uniforms_object>
 
-// todo: include common funcitons?
-#include <function_transforms>
-
 // vertex attribute
 // 使用<attribs>规定的vertex attribute
 in vec3 a_position;
 in vec2 a_texcoord0;
+
+// todo: include common funcitons?
+#include <function_transforms>
 
 // vertex output
 out vec4 ex_color;
