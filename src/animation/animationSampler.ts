@@ -10,8 +10,37 @@ export enum Interpolation {
     CUBICSPLINE,
 }
 
+/**
+ * animation sampler
+ * not cached, 1 per animating object
+ */
 export class AnimationSampler {
     public data: AnimationData | null = null;
+    /** floats count per key */
+    public set stride(val: number){
+        this._stride = val;
+        this._tmpValue.length = val;
+    }
+    public get stride(): number {
+        return this._stride;
+    }
     // public dataType: string = DataTypes.SCALAR;      // use path to determine?
     public interpolation: Interpolation = Interpolation.LINEAR;
+
+    private _curKeyIndex: number = 0;
+    private _tmpValue: number[] = [0];
+    private _stride: number = 1;
+
+    // todo: interpolator
+
+    // todo: current keyframe index?
+
+    // when query a new time, search start from current keyframe.
+
+    public evaluate(time: number): number[] {
+        if (this.data === null) {
+            throw new Error("No animation data in sampler");
+        }
+        return this._tmpValue;
+    }
 }
