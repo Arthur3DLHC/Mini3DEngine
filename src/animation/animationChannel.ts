@@ -22,4 +22,7 @@ export class AnimationChannel {
     public path: string = AnimTargetPath.translation;
 
     public sampler: AnimationSampler | null = null;
+
+    // todo: functions
+    // sampler animation and apply to target
 }
