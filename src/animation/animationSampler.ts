@@ -2,7 +2,7 @@
  * animation frames data
  */
 
-import { AnimationData } from "./animationData.js";
+import { KeyframeTrack } from "./keyframeTrack.js";
 
 export enum Interpolation {
     LINEAR,
@@ -12,10 +12,10 @@ export enum Interpolation {
 
 /**
  * animation sampler
- * not cached, 1 per animating object
+ * not cached, 1 per animating channel
  */
 export class AnimationSampler {
-    public data: AnimationData | null = null;
+    public keyframes: KeyframeTrack | null = null;
     /** floats count per key */
     public set stride(val: number){
         this._stride = val;
@@ -38,7 +38,7 @@ export class AnimationSampler {
     // when query a new time, search start from current keyframe.
 
     public evaluate(time: number): number[] {
-        if (this.data === null) {
+        if (this.keyframes === null) {
             throw new Error("No animation data in sampler");
         }
         return this._tmpValue;

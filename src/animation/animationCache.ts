@@ -1,4 +1,4 @@
-import { AnimationData } from "./animationData.js";
+import { AnimationClip } from "./AnimationClip.js";
 
 /**
  * put animation frames data in cache
@@ -17,14 +17,14 @@ export class AnimationCache {
     }
 
     public enabled: boolean = true;
-    private _animations: Map<string, AnimationData> = new Map<string, AnimationData>();
+    private _animations: Map<string, AnimationClip> = new Map<string, AnimationClip>();
 
-    public add(key: string, anim: AnimationData) {
+    public add(key: string, anim: AnimationClip) {
         if(!this.enabled) return;
         this._animations.set(key, anim);
     }
 
-    public get(key: string): AnimationData | undefined {
+    public get(key: string): AnimationClip | undefined {
         if(!this.enabled) return;
         return this._animations.get(key);
     }
