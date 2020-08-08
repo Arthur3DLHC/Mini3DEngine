@@ -36,8 +36,6 @@ export class AnimationSampler {
 
     // todo: interpolator
 
-    // todo: current keyframe index?
-
     // when query a new time, search start from current keyframe.
 
     public evaluate(time: number): number[] {
