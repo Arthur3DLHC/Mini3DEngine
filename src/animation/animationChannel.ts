@@ -31,13 +31,13 @@ export class AnimationChannel {
         this.path = _path;
         switch (this.path) {
             case AnimTargetPath.scale:
-                this._tmpVec3 = this.target.scale;
+                this._targetVec3 = this.target.scale;
                 break;
             case AnimTargetPath.rotation:
-                this._tmpQuat = this.target.rotation;
+                this._targetQuat = this.target.rotation;
                 break;
             case AnimTargetPath.translation:
-                this._tmpVec3 = this.target.translation;
+                this._targetVec3 = this.target.translation;
                 break;
             case AnimTargetPath.weights:
                 break;
@@ -51,24 +51,38 @@ export class AnimationChannel {
 
     public sampler: AnimationSampler;
 
-    private _tmpVec3: vec3 | undefined;
-    private _tmpQuat: quat | undefined;
+    private _targetVec3: vec3 | undefined;
+    private _targetQuat: quat | undefined;
 
     // todo: functions
     // sampler animation and apply to target
     public apply(time: number, weight: number, mode: AnimationApplyMode) {
         const value = this.sampler.evaluate(time);
-        if (this._tmpQuat !== undefined) {
-            
-        } else if (this._tmpVec3 !== undefined) {
+        if (this._targetQuat !== undefined) {
+            // use 'nlerp' of quaternion? less accurate, less computation
+            // https://keithmaggio.wordpress.com/2011/02/15/math-magician-lerp-slerp-and-nlerp/
+            // https://www.gamedev.net/forums/topic/645242-quaternions-and-animation-blending-questions/
+            // NOTE: need to normalize after all quaternions are mixed together
             if (mode == AnimationApplyMode.replace) {
-                this._tmpVec3.x = value[0] * weight;
-                this._tmpVec3.y = value[1] * weight;
-                this._tmpVec3.z = value[2] * weight;
+                this._targetQuat.x = value[0] * weight;
+                this._targetQuat.y = value[1] * weight;
+                this._targetQuat.z = value[2] * weight;
+                this._targetQuat.w = value[3] * weight;
             } else {
-                this._tmpVec3.x = this._tmpVec3.x + value[0] * weight;
-                this._tmpVec3.y = this._tmpVec3.y + value[1] * weight;
-                this._tmpVec3.z = this._tmpVec3.z + value[2] * weight;
+                this._targetQuat.x = this._targetQuat.x + value[0] * weight;
+                this._targetQuat.y = this._targetQuat.y + value[1] * weight;
+                this._targetQuat.z = this._targetQuat.z + value[2] * weight;
+                this._targetQuat.w = this._targetQuat.w + value[3] * weight;
+            }
+        } else if (this._targetVec3 !== undefined) {
+            if (mode == AnimationApplyMode.replace) {
+                this._targetVec3.x = value[0] * weight;
+                this._targetVec3.y = value[1] * weight;
+                this._targetVec3.z = value[2] * weight;
+            } else {
+                this._targetVec3.x = this._targetVec3.x + value[0] * weight;
+                this._targetVec3.y = this._targetVec3.y + value[1] * weight;
+                this._targetVec3.z = this._targetVec3.z + value[2] * weight;
             }
         }
     }
