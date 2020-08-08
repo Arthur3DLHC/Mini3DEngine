@@ -15,6 +15,8 @@ export class AnimationAction {
 
     private _curPlaybackTime: number;
 
+    // todo: anim blend weight
+
     public update(time: number, deltaTime: number) {
         // todo: update internal anim time, according to playback speeds and so on
         this._curPlaybackTime += deltaTime;

@@ -15,7 +15,10 @@ export enum Interpolation {
  * not cached, 1 per animating channel
  */
 export class AnimationSampler {
-    public keyframes: KeyframeTrack | null = null;
+    public constructor(_keyframes: KeyframeTrack) {
+        this.keyframes = _keyframes;
+    }
+    public keyframes: KeyframeTrack;
     /** floats count per key */
     public set stride(val: number){
         this._stride = val;
@@ -41,6 +44,10 @@ export class AnimationSampler {
         if (this.keyframes === null) {
             throw new Error("No animation data in sampler");
         }
+
+        // find the keyframes before and after the time
+        // then interpolate them
+
         return this._tmpValue;
     }
 }
