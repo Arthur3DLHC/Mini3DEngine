@@ -83,10 +83,6 @@ export default class vec3 {
         this.z = 0
     }
 
-    init(values?: [number, number, number]) {
-        
-    }
-
     copy(dest?: vec3): vec3 {
         if (!dest) { dest = new vec3() }
 
