@@ -8,8 +8,13 @@ export class AnimationClip {
         this.name = name;
         this.tracks = tracks;
 
-        // todo: get duration
+        // todo: calc duration
         this._duration = 0;
+        for (const track of tracks) {
+            for (const time of track.input) {
+                this._duration = Math.max(this._duration, time);
+            }
+        }
     }
     public name: string = "";
     public tracks: KeyframeTrack[] = [];

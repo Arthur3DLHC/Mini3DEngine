@@ -34,9 +34,23 @@ export class AnimationAction {
     public update(time: number, deltaTime: number) {
         // todo: update internal anim time, according to playback speeds and so on
         this._curPlaybackTime += deltaTime * this._speed;
-        // loop?
 
-        // check duration
+        // check animation direction (forward or backward)
+        // deltaTime should always > 0?
+        if (this.LoopMode === AnimationLoopMode.Once) {
+            this._curPlaybackTime = Math.max(0, this._curPlaybackTime);
+            this._curPlaybackTime = Math.min(this._curPlaybackTime, this._clip.duration);
+        } else if (this.LoopMode === AnimationLoopMode.Repeat) {
+            if (this._speed > 0) {
+                while (this._curPlaybackTime > this._clip.duration) {
+                    this._curPlaybackTime -= this._clip.duration;
+                }
+            } else {
+                while (this._curPlaybackTime < 0) {
+                    this._curPlaybackTime += this._clip.duration;
+                }
+            }
+        }
 
         for (const channel of this._channels) {
             channel.apply(this._curPlaybackTime, this._weight, AnimationApplyMode.replace);
