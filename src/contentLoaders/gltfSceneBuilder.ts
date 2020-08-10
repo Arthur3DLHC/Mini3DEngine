@@ -648,9 +648,7 @@ export class GLTFSceneBuilder {
         const channels: AnimationChannel[] = [];
         for (const channelDef of animDef.channels) {
             // target node and property
-            if (channelDef.target.node !== undefined) {
-                
-            } else {
+            if (channelDef.target.node === undefined) {
                 throw new Error("Channel has no target node.")
             }
 
@@ -678,9 +676,7 @@ export class GLTFSceneBuilder {
             const channel: AnimationChannel = new AnimationChannel(nodes[channelDef.target.node], channelDef.target.path, sampler);
             channels.push(channel);
         }
-        const animAction: AnimationAction = new AnimationAction(animClip, channels);
-
-        return animAction;
+        return new AnimationAction(animClip, channels);
     }
     // todo: handle instancing?
 }
