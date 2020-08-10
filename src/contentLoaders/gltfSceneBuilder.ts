@@ -20,6 +20,11 @@ import { IndexBuffer } from "../WebGLResources/indexBuffer.js";
 import { GeometryCache } from "../geometry/geometryCache.js";
 import { SkinMesh } from "../scene/skinMesh.js";
 import { AnimationClip } from "../animation/animationClip.js";
+import { AnimationCache } from "../animation/animationCache.js";
+import { KeyframeTrack } from "../animation/keyframeTrack.js";
+import { AnimationChannel } from "../animation/animationChannel.js";
+import { AnimationAction } from "../animation/animationAction.js";
+import { AnimationSampler } from "../animation/animationSampler.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -47,7 +52,7 @@ export class GLTFSceneBuilder {
      * @param gltf the GlTf asset data
      * @param sceneIdx 
      */
-    public build(gltf: GltfAsset, sceneIdx: number, animations?: AnimationClip[]): Object3D {
+    public build(gltf: GltfAsset, sceneIdx: number, animations?: AnimationAction[]): Object3D {
 
         // gltf 中 scene.nodes[] 中的节点都只能是根节点
         // get gltf scene object
@@ -95,8 +100,9 @@ export class GLTFSceneBuilder {
         if (animations !== undefined && gltf.gltf.animations !== undefined) {
             // try to read animations
             animations.length = 0;
+            let ianim = 0;
             for (const animDef of gltf.gltf.animations) {
-                animations.push(this.processAnimation(animDef, nodes, gltf));
+                animations.push(this.processAnimation(ianim++, animDef, nodes, gltf));
             }
         }
 
@@ -613,8 +619,41 @@ export class GLTFSceneBuilder {
         return texture;
     }
 
-    private processAnimation(animDef: Animation, nodes: Object3D[], gltf: GltfAsset): AnimationClip {
-        throw new Error("Method not implemented");
+    private processAnimation(idx: number, animDef: Animation, nodes: Object3D[], gltf: GltfAsset): AnimationAction {
+        // cache?
+        const animKey: string = gltf.uri + ".anim" + idx;
+        let animClip = AnimationCache.instance.get(animKey);
+        if (animClip === undefined) {
+            // todo: load keyframe tracks from gltf?
+            const tracks: KeyframeTrack[] = [];
+
+            // note: different samplers(KeyframeTracks) may share same input data.
+
+            animClip = new AnimationClip(animDef.name || "", tracks);
+        }
+        
+        // create anim channels and samplers
+        const channels: AnimationChannel[] = [];
+        for (const channelDef of animDef.channels) {
+            // target node and property
+            if (channelDef.target.node !== undefined) {
+                
+            } else {
+                throw new Error("Channel has no target node.")
+            }
+
+            // sampler
+            const samplerDef = animDef.samplers[channelDef.sampler];
+            const sampler: AnimationSampler = new AnimationSampler(animClip.tracks[samplerDef.output]);
+            
+            // keyframe data
+
+            const channel: AnimationChannel = new AnimationChannel(nodes[channelDef.target.node], channelDef.target.path, sampler);
+            channels.push(channel);
+        }
+        const animAction: AnimationAction = new AnimationAction(animClip, channels);
+
+        return animAction;
     }
     // todo: handle instancing?
 }
