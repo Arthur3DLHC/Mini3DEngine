@@ -1,6 +1,6 @@
 import { GltfAsset, GLTF_EXTENSIONS, GLTF_ATTRIBUTES, GLTF_ELEMENTS_PER_TYPE, GLTF_COMPONENT_TYPE_ARRAYS } from "./gltfAsset.js";
 import { Scene } from "../scene/scene.js";
-import { GlTfId, GlTf, TextureInfo, MaterialNormalTextureInfo, Node } from "./gltf.js";
+import { GlTfId, GlTf, TextureInfo, MaterialNormalTextureInfo, Node, Animation } from "./gltf.js";
 import { Object3D } from "../scene/object3D.js";
 import { Mesh } from "../scene/mesh.js";
 import vec3 from "../../lib/tsm/vec3.js";
@@ -19,6 +19,7 @@ import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { IndexBuffer } from "../WebGLResources/indexBuffer.js";
 import { GeometryCache } from "../geometry/geometryCache.js";
 import { SkinMesh } from "../scene/skinMesh.js";
+import { AnimationClip } from "../animation/animationClip.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -46,7 +47,7 @@ export class GLTFSceneBuilder {
      * @param gltf the GlTf asset data
      * @param sceneIdx 
      */
-    public build(gltf: GltfAsset, sceneIdx: number): Object3D {
+    public build(gltf: GltfAsset, sceneIdx: number, animations?: AnimationClip[]): Object3D {
 
         // gltf 中 scene.nodes[] 中的节点都只能是根节点
         // get gltf scene object
@@ -89,6 +90,14 @@ export class GLTFSceneBuilder {
                 this.processSkin(nodes[iNode], nodeDef.skin, nodes, gltf);
             }
             iNode++;
+        }
+
+        if (animations !== undefined && gltf.gltf.animations !== undefined) {
+            // try to read animations
+            animations.length = 0;
+            for (const animDef of gltf.gltf.animations) {
+                animations.push(this.processAnimation(animDef, nodes, gltf));
+            }
         }
 
         return scene;
@@ -604,5 +613,8 @@ export class GLTFSceneBuilder {
         return texture;
     }
 
+    private processAnimation(animDef: Animation, nodes: Object3D[], gltf: GltfAsset): AnimationClip {
+        throw new Error("Method not implemented");
+    }
     // todo: handle instancing?
 }
