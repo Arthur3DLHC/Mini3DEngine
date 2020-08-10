@@ -22,9 +22,9 @@ import { SkinMesh } from "../scene/skinMesh.js";
 import { AnimationClip } from "../animation/animationClip.js";
 import { AnimationCache } from "../animation/animationCache.js";
 import { KeyframeTrack } from "../animation/keyframeTrack.js";
-import { AnimationChannel } from "../animation/animationChannel.js";
+import { AnimationChannel, AnimTargetPathDataType } from "../animation/animationChannel.js";
 import { AnimationAction } from "../animation/animationAction.js";
-import { AnimationSampler } from "../animation/animationSampler.js";
+import { AnimationSampler, Interpolation } from "../animation/animationSampler.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -627,14 +627,21 @@ export class GLTFSceneBuilder {
             // todo: load keyframe tracks from gltf?
             const tracks: KeyframeTrack[] = [];
 
-            // accessor data
-            for (const samplerDef of animDef.samplers) {
-                
-            }
-
             // note: different samplers(KeyframeTracks) may share same input data.
+            for (const samplerDef of animDef.samplers) {
+                // accessor data
+                const inputBytes = gltf.accessorDataSync(samplerDef.input);
+                const outputBytes = gltf.accessorDataSync(samplerDef.output);
 
+                // convert to Float32Array (will not copy, only ref to original data)
+                const inputFloats = new Float32Array(inputBytes.buffer, inputBytes.byteOffset, inputBytes.length / 4);
+                const outputFloats = new Float32Array(outputBytes.buffer, outputBytes.byteOffset, outputBytes.length / 4);
+
+                const track = new KeyframeTrack(inputFloats, outputFloats);
+                tracks.push(track);
+            }
             animClip = new AnimationClip(animDef.name || "", tracks);
+            AnimationCache.instance.add(animKey, animClip);
         }
         
         // create anim channels and samplers
@@ -650,6 +657,24 @@ export class GLTFSceneBuilder {
             // sampler idx === keyframetrack idx
             const samplerDef = animDef.samplers[channelDef.sampler];
             const sampler: AnimationSampler = new AnimationSampler(animClip.tracks[channelDef.sampler]);
+            
+            // stride and interpolation
+            const animDataType = AnimTargetPathDataType[channelDef.target.path];
+            sampler.stride = GLTF_ELEMENTS_PER_TYPE[animDataType];
+
+            switch (samplerDef.interpolation) {
+                case "LINEAR":
+                    sampler.interpolation = Interpolation.LINEAR;
+                    break;
+                case "STEP":
+                    sampler.interpolation = Interpolation.STEP;
+                    break;
+                case "CUBICSPLINE":
+                    sampler.interpolation = Interpolation.CUBICSPLINE;
+                    break;
+                default:
+                    break;
+            }
             const channel: AnimationChannel = new AnimationChannel(nodes[channelDef.target.node], channelDef.target.path, sampler);
             channels.push(channel);
         }
