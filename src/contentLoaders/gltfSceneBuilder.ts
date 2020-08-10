@@ -627,6 +627,11 @@ export class GLTFSceneBuilder {
             // todo: load keyframe tracks from gltf?
             const tracks: KeyframeTrack[] = [];
 
+            // accessor data
+            for (const samplerDef of animDef.samplers) {
+                
+            }
+
             // note: different samplers(KeyframeTracks) may share same input data.
 
             animClip = new AnimationClip(animDef.name || "", tracks);
@@ -642,12 +647,9 @@ export class GLTFSceneBuilder {
                 throw new Error("Channel has no target node.")
             }
 
-            // sampler
+            // sampler idx === keyframetrack idx
             const samplerDef = animDef.samplers[channelDef.sampler];
-            const sampler: AnimationSampler = new AnimationSampler(animClip.tracks[samplerDef.output]);
-            
-            // keyframe data
-
+            const sampler: AnimationSampler = new AnimationSampler(animClip.tracks[channelDef.sampler]);
             const channel: AnimationChannel = new AnimationChannel(nodes[channelDef.target.node], channelDef.target.path, sampler);
             channels.push(channel);
         }
