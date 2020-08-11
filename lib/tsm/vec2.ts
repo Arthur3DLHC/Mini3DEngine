@@ -52,6 +52,10 @@ export default class vec2 {
         return this._values[index]
     }
 
+    setAt(index: number, value: number) {
+        this._values[index] = value;
+    }
+
     reset(): void {
         this.x = 0
         this.y = 0

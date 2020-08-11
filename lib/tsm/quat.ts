@@ -94,6 +94,10 @@ export default class quat {
         return this.values[index]
     }
 
+    setAt(index: number, value: number) {
+        this.values[index] = value;
+    }
+
     reset(): void {
         for (let i = 0; i < 4; i++) {
             this.values[i] = 0

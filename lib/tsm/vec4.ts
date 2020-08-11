@@ -169,6 +169,10 @@ export default class vec4 {
     at(index: number): number {
         return this._values[index]
     }
+    
+    setAt(index: number, value: number) {
+        this._values[index] = value;
+    }
 
     reset(): void {
         this.x = 0

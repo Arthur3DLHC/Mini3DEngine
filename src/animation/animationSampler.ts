@@ -3,6 +3,8 @@
  */
 
 import { KeyframeTrack } from "./keyframeTrack.js";
+import quat from "../../lib/tsm/quat.js";
+import vec3 from "../../lib/tsm/vec3.js";
 
 export enum Interpolation {
     LINEAR,
@@ -33,6 +35,14 @@ export class AnimationSampler {
     private _curKeyIndex: number = 0;
     private _tmpValue: number[] = [0];
     private _stride: number = 1;
+
+    private _prevQuat: quat = new quat();
+    private _nextQuat: quat = new quat();
+    private _resultQuat: quat = new quat();
+
+    private _prevVec: vec3 = new vec3();
+    private _nextVec: vec3 = new vec3();
+    private _resultVec: vec3 = new vec3();
 
     // todo: interpolator
 
@@ -75,14 +85,48 @@ export class AnimationSampler {
             nextKeyIdx = Math.max(nextKeyIdx, 0);
         }
 
+        curKeyTime = input[this._curKeyIndex];
+
         // todo: interpolate
+        const dt = input[nextKeyIdx] - curKeyTime;
+        const t = (time - curKeyTime) / dt;
         // how about quaternion?
         if (isQuaternion) {
-            
-        } else {
+            // use slerp of two quaternions
+            this.getQuat(this._curKeyIndex, this._prevQuat);
+            this.getQuat(nextKeyIdx, this._nextQuat);
 
+            quat.mix(this._prevQuat, this._nextQuat, t, this._resultQuat);
+            for (let i = 0; i < 4; i++) {
+                this._tmpValue[i] = this._resultQuat.at(i);
+            }
+        } else {
+            this.getVec(this._curKeyIndex, this._prevVec);
+            this.getVec(nextKeyIdx, this._nextVec);
+
+            vec3.mix(this._prevVec, this._nextVec, t, this._resultVec);
+            for (let i = 0; i < 3; i++) {
+                this._tmpValue[i] = this._resultVec.at(i);
+            }
         }
 
         return this._tmpValue;
+    }
+
+    private getVec(index: number, result: vec3) {
+        const output = this.keyframes.output;
+        const start = index * 3;
+        result.x = output[start];
+        result.y = output[start + 1];
+        result.z = output[start + 2];
+    }
+
+    private getQuat(index: number, result: quat) {
+        const output = this.keyframes.output;
+        const start = index * 4;
+        result.x = output[start];
+        result.y = output[start + 1];
+        result.z = output[start + 2];
+        result.w = output[start + 3];
     }
 }
