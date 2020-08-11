@@ -57,7 +57,7 @@ export class AnimationChannel {
     // todo: functions
     // sampler animation and apply to target
     public apply(time: number, weight: number, mode: AnimationApplyMode) {
-        const value = this.sampler.evaluate(time);
+        const value = this.sampler.evaluate(time, this.path === AnimTargetPath.rotation);
         if (this._targetQuat !== undefined) {
             // use 'nlerp' of quaternion? less accurate, less computation
             // https://keithmaggio.wordpress.com/2011/02/15/math-magician-lerp-slerp-and-nlerp/
