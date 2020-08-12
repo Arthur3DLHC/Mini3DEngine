@@ -473,6 +473,13 @@ export default class quat {
         return dest
     }
 
+    /**
+     * deprecated: this function seems has problems.
+     * @param q1 
+     * @param q2 
+     * @param time 
+     * @param dest 
+     */
     static mix(q1: quat, q2: quat, time: number, dest?: quat): quat {
         if (!dest) { dest = new quat() }
 
@@ -507,6 +514,14 @@ export default class quat {
         return dest
     }
 
+    /**
+     * from http://glmatrix.net/docs/quat.js.html#line296
+     * https://github.com/toji/gl-matrix/blob/master/src/quat.js
+     * @param a 
+     * @param b 
+     * @param t 
+     * @param dest 
+     */
     static slerp(a: quat, b: quat, t: number, dest?: quat): quat {
         if (!dest) { dest = new quat() }
 
