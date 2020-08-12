@@ -91,7 +91,7 @@ vec3 getEmissive() {
 vec2 getMetallicRoughness() {
     // todo: roughness matallic map
     vec2 ret = vec2(u_material.metallic, u_material.roughness);
-    if(u_material.metallicMapAmount + u_material.roughnessMapAmount > 0.0) {
+    if(u_material.metallicMapAmount + u_material.roughnessMapAmount > 0.001) {
         vec2 texColor = texture(s_metallicRoughnessMap, ex_texcoord).rg;
         ret = mix(ret, texColor, vec2(u_material.metallicMapAmount, u_material.roughnessMapAmount));
     }
@@ -318,8 +318,10 @@ void main(void)
     if (totalWeight > 0.0) {
         // debug output envmap
         // o.color.rgb += reflection * 0.5 / totalWeight;
-        f_diffuse += iblDiffuse / totalWeight;
         // f_specular += iblSpecular / totalWeight;
+        // f_diffuse += vec3(0.5);
+
+        f_diffuse += iblDiffuse / totalWeight;
     }
     // todo: opacity for transparent surfaces;
     // todo: tone mapping? linear space to sRGB space?

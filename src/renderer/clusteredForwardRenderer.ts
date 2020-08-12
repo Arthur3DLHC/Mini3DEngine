@@ -320,6 +320,9 @@ export class ClusteredForwardRenderer {
             this._sceneDepthTexture, this._sceneNormalTexture, this._sceneSpecularRoughnessTexture,
             this._envMapArrayUnit, this._specularDFGUnit);
 
+        // this._postprocessor.ssr.enable = false;
+        // this._postprocessor.ssao.enable = false;
+
         console.log("creating subsufaceprocessor...");
 
         this._subsurfProcessor = new SubsurfaceProcessor();

@@ -27,6 +27,7 @@ window.onload = () => {
     const renderer = new ClusteredForwardRenderer();
     const scene = new Scene();
     const camera = new PerspectiveCamera();
+    camera.fov = 45;
     camera.aspect = canvas.width / canvas.height;
     camera.far = 20;
     camera.localTransform.fromTranslation(new vec3([0, 0, 2]));
@@ -65,7 +66,7 @@ window.onload = () => {
     dirLight01.autoUpdateTransform = false; // let the behaivor work
     dirLight01.on = true;
     dirLight01.color = new vec4([3,3,3,1]);
-    dirLight01.radius = 5;
+    dirLight01.radius = 2;
     dirLight01.castShadow = true;
     (dirLight01.shadow as DirectionalLightShadow).distance = 15;
     const dirLightLookAt = new LookatBehavior(dirLight01);

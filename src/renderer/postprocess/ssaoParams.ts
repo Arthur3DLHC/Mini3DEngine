@@ -43,8 +43,8 @@ export class SSAOParams {
     public kernels: Float32Array;
 
     public enable: boolean = true;
-    public radius: number = 0.5;              // meters
-    public minDistance: number = 0.005;     // -1, 1 range
+    public radius: number = 0.4;              // meters
+    public minDistance: number = 0.0005;     // -1, 1 range
     public maxDistance: number = 0.01;       // -1, 1 range
     public blurSize: number = 1.0;          // px
     public intensiy: number = 1.0;
