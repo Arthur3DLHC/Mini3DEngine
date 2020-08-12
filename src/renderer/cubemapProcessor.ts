@@ -17,6 +17,7 @@ import { GLDevice } from "../WebGLResources/glDevice.js";
 import { GLTextures } from "../WebGLResources/glTextures.js";
 import { PlaneGeometry } from "../geometry/common/planeGeometry.js";
 import { Texture2D } from "../WebGLResources/textures/texture2D.js";
+import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 
 /**
  * generate specular mipmaps of cubemaps (texture2darray)
