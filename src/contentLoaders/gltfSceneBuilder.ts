@@ -214,6 +214,7 @@ export class GLTFSceneBuilder {
                 for(let e = 0; e < 16; e++) values[e] = elemArray[e];
                 const matrix = new mat4(values);
                 mesh.inverseBindMatrices.push(matrix);
+                mesh.jointMatrices.push(mat4.identity.copy());
             }
         } else {
             console.warn("No inverseBindMatrices in gltf file");

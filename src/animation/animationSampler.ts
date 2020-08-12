@@ -40,7 +40,8 @@ export class AnimationSampler {
                 this._interpolator = this.stepInterpolation;
                 break;
             case Interpolation.LINEAR:
-                this._interpolator = this.linearInterpolation;
+                // this._interpolator = this.linearInterpolation;
+                this._interpolator = this.stepInterpolation;
                 break;
             case Interpolation.CUBICSPLINE:
                 this._interpolator = this.cubicSplineInterpolation;
@@ -83,6 +84,7 @@ export class AnimationSampler {
             this.getQuat(nextKey, this._nextQuat);
 
             quat.mix(this._prevQuat, this._nextQuat, t, this._resultQuat);
+            this._resultQuat.normalize();
             for (let i = 0; i < 4; i++) {
                 this._resultValue[i] = this._resultQuat.at(i);
             }
@@ -131,9 +133,7 @@ export class AnimationSampler {
             }
             this._curKeyIndex = nextKeyIdx - 1;
             nextKeyIdx = Math.min(input.length - 1);
-        }
-
-        if (time < curKeyTime) {
+        } else if (time < curKeyTime) {
             for (nextKeyIdx = this._curKeyIndex; nextKeyIdx >= 0; nextKeyIdx--) {
                 if (input[nextKeyIdx] < time) {
                     break;
@@ -144,13 +144,8 @@ export class AnimationSampler {
         }
 
         if (this._curKeyIndex === nextKeyIdx) {
-            if (isQuaternion) {
-                const begin = this._curKeyIndex * 4;
-                for (let i = 0; i < 4; i++) this._resultValue[i] = output[begin + i];
-            } else {
-                const begin = this._curKeyIndex * 3;
-                for (let i = 0; i < 3; i++) this._resultValue[i] = output[begin + i];
-            }
+            const begin = this._curKeyIndex * this.stride;
+            for (let i = 0; i < this.stride; i++) this._resultValue[i] = output[begin + i];
             return this._resultValue;
         }
 
