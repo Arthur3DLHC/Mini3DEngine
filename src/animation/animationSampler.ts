@@ -37,14 +37,14 @@ export class AnimationSampler {
         this._interpolation = val;
         switch (val) {
             case Interpolation.STEP:
-                this._interpolator = this.stepInterpolation;
+                this._interpolate = this.stepInterpolation;
                 break;
             case Interpolation.LINEAR:
-                // this._interpolator = this.linearInterpolation;
-                this._interpolator = this.stepInterpolation;
+                this._interpolate = this.linearInterpolation;
+                // this._interpolator = this.stepInterpolation;
                 break;
             case Interpolation.CUBICSPLINE:
-                this._interpolator = this.cubicSplineInterpolation;
+                this._interpolate = this.cubicSplineInterpolation;
                 break;
             default:
                 break;
@@ -83,7 +83,8 @@ export class AnimationSampler {
             this.getQuat(prevKey, this._prevQuat);
             this.getQuat(nextKey, this._nextQuat);
 
-            quat.mix(this._prevQuat, this._nextQuat, t, this._resultQuat);
+            // quat.mix(this._prevQuat, this._nextQuat, t, this._resultQuat);
+            quat.slerp(this._prevQuat, this._nextQuat, t, this._resultQuat);
             this._resultQuat.normalize();
             for (let i = 0; i < 4; i++) {
                 this._resultValue[i] = this._resultQuat.at(i);
@@ -104,7 +105,7 @@ export class AnimationSampler {
 
     }
 
-    private _interpolator: (prevKey: number, nextKey: number, t: number, isQuaternion: boolean) => void = this.linearInterpolation;
+    private _interpolate: (prevKey: number, nextKey: number, t: number, isQuaternion: boolean) => void = this.linearInterpolation;
 
     // when query a new time, search start from current keyframe.
 
@@ -156,7 +157,7 @@ export class AnimationSampler {
         let t = (time - curKeyTime) / dt;
         t = Math.max(0, Math.min(1, t));
 
-        this._interpolator(this._curKeyIndex, nextKeyIdx, t, isQuaternion);
+        this._interpolate(this._curKeyIndex, nextKeyIdx, t, isQuaternion);
 
         return this._resultValue;
     }

@@ -507,6 +507,52 @@ export default class quat {
         return dest
     }
 
+    static slerp(a: quat, b: quat, t: number, dest?: quat): quat {
+        if (!dest) { dest = new quat() }
+
+        // benchmarks:
+        //    http://jsperf.com/quaternion-slerp-implementations
+        let ax = a.values[0],
+            ay = a.values[1],
+            az = a.values[2],
+            aw = a.values[3];
+        let bx = b.values[0],
+            by = b.values[1],
+            bz = b.values[2],
+            bw = b.values[3];
+        let omega, cosom, sinom, scale0, scale1;
+        // calc cosine
+        cosom = ax * bx + ay * by + az * bz + aw * bw;
+        // adjust signs (if necessary)
+        if (cosom < 0.0) {
+            cosom = -cosom;
+            bx = -bx;
+            by = -by;
+            bz = -bz;
+            bw = -bw;
+        }
+        // calculate coefficients
+        if (1.0 - cosom > epsilon) {
+            // standard case (slerp)
+            omega = Math.acos(cosom);
+            sinom = Math.sin(omega);
+            scale0 = Math.sin((1.0 - t) * omega) / sinom;
+            scale1 = Math.sin(t * omega) / sinom;
+        } else {
+            // "from" and "to" quaternions are very close
+            //  ... so we can do a linear interpolation
+            scale0 = 1.0 - t;
+            scale1 = t;
+        }
+        // calculate final values
+        dest.x = scale0 * ax + scale1 * bx;
+        dest.y = scale0 * ay + scale1 * by;
+        dest.z = scale0 * az + scale1 * bz;
+        dest.w = scale0 * aw + scale1 * bw;
+
+        return dest;
+    }
+
     static fromAxisAngle(axis: vec3, angle: number, dest?: quat): quat {
         if (!dest) { dest = new quat(); }
 
