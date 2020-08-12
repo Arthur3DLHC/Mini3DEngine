@@ -221,6 +221,8 @@ export class GLTFSceneBuilder {
 
         // find joint nodes?
         for (const jointIdx of skinDef.joints) {
+            // my not have animation
+            // nodes[jointIdx].autoUpdateTransform = true;
             mesh.joints.push(nodes[jointIdx]);
         }
 
@@ -673,6 +675,10 @@ export class GLTFSceneBuilder {
                 default:
                     break;
             }
+            
+            // if have animation, auto update local matrix by SRT
+            nodes[channelDef.target.node].autoUpdateTransform = true;
+
             const channel: AnimationChannel = new AnimationChannel(nodes[channelDef.target.node], channelDef.target.path, sampler);
             channels.push(channel);
         }
