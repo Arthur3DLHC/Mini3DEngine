@@ -133,7 +133,7 @@ export class AnimationSampler {
                 }
             }
             this._curKeyIndex = nextKeyIdx - 1;
-            nextKeyIdx = Math.min(input.length - 1);
+            nextKeyIdx = Math.min(nextKeyIdx, input.length - 1);
         } else if (time < curKeyTime) {
             for (nextKeyIdx = this._curKeyIndex; nextKeyIdx >= 0; nextKeyIdx--) {
                 if (input[nextKeyIdx] < time) {
