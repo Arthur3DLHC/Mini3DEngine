@@ -17,6 +17,7 @@ export class AnimationAction {
         this._curPlaybackTime = 0;
         this._speed = 1;
         this._weight = 1;
+        this._isPlaying = false;
         this.LoopMode = AnimationLoopMode.Repeat;
     }
 
@@ -31,25 +32,49 @@ export class AnimationAction {
     // todo: anim blend weight
     private _weight: number;
 
-    // todo: functions: play, pause, stop...
+    private _isPlaying: boolean;
+
+    // todo: functions: play, stop, fadein, fadeout...
+    public play() {
+        this._isPlaying = true;
+    }
+
+    public stop() {
+        this._isPlaying = false;
+    }
+
+    public reset() {
+        this._curPlaybackTime = 0;
+        this._weight = 1;
+    }
+
+    public fadeIn(duration: number) {
+
+    }
+
+    public fadeOut(duration: number) {
+
+    }
 
     public update(time: number, deltaTime: number) {
         // todo: update internal anim time, according to playback speeds and so on
-        this._curPlaybackTime += deltaTime * this._speed;
+        if (this._isPlaying) {
+            this._curPlaybackTime += deltaTime * this._speed;
 
-        // check animation direction (forward or backward)
-        // deltaTime should always > 0?
-        if (this.LoopMode === AnimationLoopMode.Once) {
-            this._curPlaybackTime = Math.max(0, this._curPlaybackTime);
-            this._curPlaybackTime = Math.min(this._curPlaybackTime, this._clip.duration);
-        } else if (this.LoopMode === AnimationLoopMode.Repeat) {
-            if (this._speed > 0) {
-                while (this._curPlaybackTime > this._clip.duration) {
-                    this._curPlaybackTime -= this._clip.duration;
-                }
-            } else {
-                while (this._curPlaybackTime < 0) {
-                    this._curPlaybackTime += this._clip.duration;
+            // check animation direction (forward or backward)
+            // deltaTime should always > 0?
+            if (this.LoopMode === AnimationLoopMode.Once) {
+                this._curPlaybackTime = Math.max(0, this._curPlaybackTime);
+                this._curPlaybackTime = Math.min(this._curPlaybackTime, this._clip.duration);
+            } else if (this.LoopMode === AnimationLoopMode.Repeat) {
+                if (this._speed > 0) {
+                    while (this._curPlaybackTime > this._clip.duration) {
+                        this._curPlaybackTime -= this._clip.duration;
+                    }
+                } else {
+                    while (this._curPlaybackTime < 0) {
+                        this._curPlaybackTime += this._clip.duration;
+                    }
                 }
             }
         }

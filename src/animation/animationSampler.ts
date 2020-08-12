@@ -24,16 +24,35 @@ export class AnimationSampler {
     /** floats count per key */
     public set stride(val: number){
         this._stride = val;
-        this._tmpValue.length = val;
+        this._resultValue.length = val;
     }
     public get stride(): number {
         return this._stride;
     }
     // public dataType: string = DataTypes.SCALAR;      // use path to determine?
-    public interpolation: Interpolation = Interpolation.LINEAR;
+    public get interpolation(): Interpolation {
+        return this._interpolation;
+    }
+    public set interpolation(val: Interpolation) {
+        this._interpolation = val;
+        switch (val) {
+            case Interpolation.STEP:
+                this._interpolator = this.stepInterpolation;
+                break;
+            case Interpolation.LINEAR:
+                this._interpolator = this.linearInterpolation;
+                break;
+            case Interpolation.CUBICSPLINE:
+                this._interpolator = this.cubicSplineInterpolation;
+                break;
+            default:
+                break;
+        }
+    }
+    private _interpolation: Interpolation = Interpolation.LINEAR;
 
     private _curKeyIndex: number = 0;
-    private _tmpValue: number[] = [0];
+    private _resultValue: number[] = [0];
     private _stride: number = 1;
 
     private _prevQuat: quat = new quat();
@@ -45,6 +64,45 @@ export class AnimationSampler {
     private _resultVec: vec3 = new vec3();
 
     // todo: interpolator
+    private stepInterpolation(prevKey: number, nextKey: number, t: number, isQuaternion: boolean) {
+        const output = this.keyframes.output;
+        if (isQuaternion) {
+            const begin = this._curKeyIndex * 4;
+            for (let i = 0; i < 4; i++) this._resultValue[i] = output[begin + i];
+        } else {
+            const begin = this._curKeyIndex * 3;
+            for (let i = 0; i < 3; i++) this._resultValue[i] = output[begin + i];
+        }
+    }
+
+    private linearInterpolation(prevKey: number, nextKey: number, t: number, isQuaternion: boolean) {
+        if (isQuaternion) {
+
+            // use slerp of two quaternions
+            this.getQuat(prevKey, this._prevQuat);
+            this.getQuat(nextKey, this._nextQuat);
+
+            quat.mix(this._prevQuat, this._nextQuat, t, this._resultQuat);
+            for (let i = 0; i < 4; i++) {
+                this._resultValue[i] = this._resultQuat.at(i);
+            }
+
+        } else {
+            this.getVec(prevKey, this._prevVec);
+            this.getVec(nextKey, this._nextVec);
+
+            vec3.mix(this._prevVec, this._nextVec, t, this._resultVec);
+            for (let i = 0; i < 3; i++) {
+                this._resultValue[i] = this._resultVec.at(i);
+            }
+        }
+    }
+
+    private cubicSplineInterpolation(prevKey: number, nextKey: number, t: number, isQuaternion: boolean) {
+
+    }
+
+    private _interpolator: (prevKey: number, nextKey: number, t: number, isQuaternion: boolean) => void = this.linearInterpolation;
 
     // when query a new time, search start from current keyframe.
 
@@ -58,9 +116,9 @@ export class AnimationSampler {
 
         if (time === curKeyTime) {
             for(let i = 0; i < this.stride; i++) {
-                this._tmpValue[i] = output[this._curKeyIndex * this.stride + i];
+                this._resultValue[i] = output[this._curKeyIndex * this.stride + i];
             }
-            return this._tmpValue;
+            return this._resultValue;
         }
 
         let nextKeyIdx = this._curKeyIndex;
@@ -85,32 +143,27 @@ export class AnimationSampler {
             nextKeyIdx = Math.max(nextKeyIdx, 0);
         }
 
+        if (this._curKeyIndex === nextKeyIdx) {
+            if (isQuaternion) {
+                const begin = this._curKeyIndex * 4;
+                for (let i = 0; i < 4; i++) this._resultValue[i] = output[begin + i];
+            } else {
+                const begin = this._curKeyIndex * 3;
+                for (let i = 0; i < 3; i++) this._resultValue[i] = output[begin + i];
+            }
+            return this._resultValue;
+        }
+
         curKeyTime = input[this._curKeyIndex];
 
         // todo: interpolate
         const dt = input[nextKeyIdx] - curKeyTime;
-        const t = (time - curKeyTime) / dt;
-        // how about quaternion?
-        if (isQuaternion) {
-            // use slerp of two quaternions
-            this.getQuat(this._curKeyIndex, this._prevQuat);
-            this.getQuat(nextKeyIdx, this._nextQuat);
+        let t = (time - curKeyTime) / dt;
+        t = Math.max(0, Math.min(1, t));
 
-            quat.mix(this._prevQuat, this._nextQuat, t, this._resultQuat);
-            for (let i = 0; i < 4; i++) {
-                this._tmpValue[i] = this._resultQuat.at(i);
-            }
-        } else {
-            this.getVec(this._curKeyIndex, this._prevVec);
-            this.getVec(nextKeyIdx, this._nextVec);
+        this._interpolator(this._curKeyIndex, nextKeyIdx, t, isQuaternion);
 
-            vec3.mix(this._prevVec, this._nextVec, t, this._resultVec);
-            for (let i = 0; i < 3; i++) {
-                this._tmpValue[i] = this._resultVec.at(i);
-            }
-        }
-
-        return this._tmpValue;
+        return this._resultValue;
     }
 
     private getVec(index: number, result: vec3) {
