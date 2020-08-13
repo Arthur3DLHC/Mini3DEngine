@@ -45,6 +45,7 @@ void main(void)
 
     int adjFaceIdx = 0;
     vec2 adjuv = uv;    // uv in cube face
+    // note: OpenGL use right-handed coordinate space
     // find adjacent cube face, and calc opposite texel uv
     if (faceIdx == CUBE_FACE_POSITIVE_X) {
         if (uv.x < edgeWidth) {// left
@@ -66,15 +67,15 @@ void main(void)
             // need swap xy
             adjuv.y = uv.x;
             adjuv.x = uv.y;
-            //sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
-            //weight += 1.0;
+            sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
+            weight += 1.0;
         } else if(uv.y > 1.0 - edgeWidth) {// top
             adjFaceIdx = CUBE_FACE_POSITIVE_Y;
             // need swap xy
-            adjuv.y = 1.0 - uv.x;
-            adjuv.x = 1.0 - uv.y;
-            //sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
-            //weight += 1.0;
+            adjuv.y = uv.x;
+            adjuv.x = uv.y;
+            sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
+            weight += 1.0;
         }
 
     } else if (faceIdx == CUBE_FACE_NEGATIVE_X) {
@@ -97,26 +98,26 @@ void main(void)
             // need swap xy
             adjuv.y = 1.0 - uv.x;
             adjuv.x = 1.0 - uv.y;
-            //sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
-            //weight += 1.0;
+            sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
+            weight += 1.0;
         } else if(uv.y > 1.0 - edgeWidth) {// top
             adjFaceIdx = CUBE_FACE_POSITIVE_Y;
             // need swap xy
-            adjuv.y = uv.x;
-            adjuv.x = uv.y;
-            //sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
-            //weight += 1.0;
+            adjuv.y = 1.0 - uv.x;
+            adjuv.x = 1.0 - uv.y;
+            sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
+            weight += 1.0;
         }
     } else if (faceIdx == CUBE_FACE_POSITIVE_Y) {
         if (uv.x < edgeWidth) {// left
-            adjFaceIdx = CUBE_FACE_POSITIVE_X;
+            adjFaceIdx = CUBE_FACE_NEGATIVE_X;
             // need swap xy
             adjuv.y = 1.0 - uv.x;
             adjuv.x = 1.0 - uv.y;
             sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
             weight += 1.0;
         } else if(uv.x > 1.0 - edgeWidth) {// right
-            adjFaceIdx = CUBE_FACE_NEGATIVE_X;
+            adjFaceIdx = CUBE_FACE_POSITIVE_X;
             adjuv.y = uv.x;
             adjuv.x = uv.y;
             sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
@@ -138,29 +139,29 @@ void main(void)
         }
     } else if (faceIdx == CUBE_FACE_NEGATIVE_Y) {
         if (uv.x < edgeWidth) {// left
-            adjFaceIdx = CUBE_FACE_POSITIVE_X;  // same as posY
-            adjuv.y = uv.x;
-            adjuv.x = uv.y;
-            sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
-            weight += 1.0;
-        } else if(uv.x > 1.0 - edgeWidth) {// right
             adjFaceIdx = CUBE_FACE_NEGATIVE_X;  // same as posY
             adjuv.y = 1.0 - uv.x;
             adjuv.x = 1.0 - uv.y;
+            sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
+            weight += 1.0;
+        } else if(uv.x > 1.0 - edgeWidth) {// right
+            adjFaceIdx = CUBE_FACE_POSITIVE_X;  // same as posY
+            adjuv.y = uv.x;
+            adjuv.x = uv.y;
             sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
             weight += 1.0;
         }
 
         if(uv.y < edgeWidth) {// bottom
             adjFaceIdx = CUBE_FACE_POSITIVE_Z;
-            adjuv.x = clamp(1.0 - uv.x, 0.0, 1.0);
-            adjuv.y = uv.y;
+            adjuv.x = uv.x;
+            adjuv.y = 1.0 - uv.y;
             sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
             weight += 1.0;
         } else if(uv.y > 1.0 - edgeWidth) {// top
             adjFaceIdx = CUBE_FACE_NEGATIVE_Z;
-            adjuv.x = uv.x;
-            adjuv.y = 1.0 - uv.y;
+            adjuv.x = clamp(1.0 - uv.x, 0.0, 1.0);
+            adjuv.y = uv.y;
             sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
             weight += 1.0;
         }
@@ -182,17 +183,17 @@ void main(void)
         if(uv.y < edgeWidth) {// bottom
             adjFaceIdx = CUBE_FACE_NEGATIVE_Y;
             // do not need swap xy
-            adjuv.x = clamp(1.0 - uv.x, 0.0, 1.0);
-            adjuv.y = uv.y;
-            //sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
-            //weight += 1.0;
+            adjuv.x = uv.x;
+            adjuv.y = 1.0 - uv.y;
+            sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
+            weight += 1.0;
         } else if(uv.y > 1.0 - edgeWidth) {// top
             adjFaceIdx = CUBE_FACE_POSITIVE_Y;
             // do not need swap xy
             adjuv.x = clamp(1.0 - uv.x, 0.0, 1.0);
             adjuv.y = uv.y;
-            //sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
-            //weight += 1.0;
+            sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
+            weight += 1.0;
         }
     } else if (faceIdx == CUBE_FACE_NEGATIVE_Z) {
         if (uv.x < edgeWidth) {// left
@@ -211,16 +212,16 @@ void main(void)
 
         if(uv.y < edgeWidth) {// bottom
             adjFaceIdx = CUBE_FACE_NEGATIVE_Y;
-            adjuv.x = uv.x;
-            adjuv.y = 1.0 - uv.y;
-            //sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
-            //weight += 1.0;
+            adjuv.x = 1.0 - uv.x;
+            adjuv.y = uv.y;
+            sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
+            weight += 1.0;
         } else if(uv.y > 1.0 - edgeWidth) {// top
             adjFaceIdx = CUBE_FACE_POSITIVE_Y;
             adjuv.x = uv.x;
             adjuv.y = 1.0 - uv.y;
-            //sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
-            //weight += 1.0;
+            sumColor += textureLod(s_source, vec3(adjuv, float(adjFaceIdx)), u_level);
+            weight += 1.0;
         }
     }
 
