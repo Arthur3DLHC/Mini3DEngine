@@ -106,8 +106,8 @@ window.onload = () => {
         sphereMesh.autoUpdateTransform = false;
         const sphereMtl = new StandardPBRMaterial();
         sphereMtl.color = new vec4([1.0, 1.0, 1.0, 1.0]);
-        sphereMtl.metallic = 0.9;
-        sphereMtl.roughness = 0.1;
+        sphereMtl.metallic = 0.05;
+        sphereMtl.roughness = 0.95;
         sphereMesh.materials.push(sphereMtl);
     
         scene.attachChild(sphereMesh);

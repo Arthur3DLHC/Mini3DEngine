@@ -304,6 +304,9 @@ void main(void)
         float weight = 1.0 / (distxradius * distxradius);
 
         // IBL diffuse part
+
+        // TODO: use ambient cube ?
+
         int envIdx = int(i - envmapStart);
         iblDiffuse += getIBLRadianceLambertian(s_envMapArray, envIdx, n, albedoColor) * weight;
         
