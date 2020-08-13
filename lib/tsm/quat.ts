@@ -568,6 +568,12 @@ export default class quat {
         return dest;
     }
 
+    /**
+     * create a quaternion from rotation axis and angle
+     * @param axis 
+     * @param angle in radians
+     * @param dest 
+     */
     static fromAxisAngle(axis: vec3, angle: number, dest?: quat): quat {
         if (!dest) { dest = new quat(); }
 

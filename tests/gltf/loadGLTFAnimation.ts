@@ -5,6 +5,7 @@ import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
 import { FirstPersonViewBehavior } from "../common/behaviors/firstPersonViewBehavior.js";
 import { SkinMesh } from "../../src/scene/skinMesh.js";
 import { AnimationAction, AnimationLoopMode } from "../../src/animation/animationAction.js";
+import quat from "../../lib/tsm/quat.js";
 
 /**
  * Load gltf files using promise
@@ -30,13 +31,13 @@ window.onload = () => {
     camera.fov = 45;
     camera.aspect = canvas.width / canvas.height;
     camera.far = 20;
-    camera.localTransform.fromTranslation(new vec3([0, 0, 2]));
+    camera.localTransform.fromTranslation(new vec3([0, 1.7, 2]));
     camera.autoUpdateTransform = false;
 
     // first person view controller
     const fpsBehavior = new FirstPersonViewBehavior(camera);
     camera.behaviors.push(fpsBehavior);
-    fpsBehavior.position = new vec3([0, 0, 2]);
+    fpsBehavior.position = new vec3([0, 1.7, 2]);
     scene.attachChild(camera);
 
     window.onmousedown = (ev: MouseEvent) => {
@@ -65,10 +66,12 @@ window.onload = () => {
     dirLight01.isStatic = true;
     dirLight01.autoUpdateTransform = false; // let the behaivor work
     dirLight01.on = true;
-    dirLight01.color = new vec4([3,3,3,1]);
+    dirLight01.color = new vec4([2,2,2,1]);
     dirLight01.radius = 2;
     dirLight01.castShadow = true;
-    (dirLight01.shadow as DirectionalLightShadow).distance = 15;
+    const shadow = (dirLight01.shadow as DirectionalLightShadow);
+    shadow.distance = 10;
+    shadow.radius = 2;
     const dirLightLookAt = new LookatBehavior(dirLight01);
     dirLight01.behaviors.push(dirLightLookAt);
     dirLightLookAt.position = new vec3([5, 5, 5]);
@@ -160,6 +163,8 @@ window.onload = () => {
 
         const builder = new GLTFSceneBuilder();
         const gltfScene = builder.build(loaded[0], 0, actions);
+        gltfScene.rotation = quat.fromAxisAngle(new vec3([0, 1, 0]), Math.PI);
+        gltfScene.autoUpdateTransform = true;
         scene.attachChild(gltfScene);
 
         prepareGLTFScene(gltfScene);
