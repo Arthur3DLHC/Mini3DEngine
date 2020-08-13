@@ -1342,8 +1342,8 @@ export class ClusteredForwardRenderer {
         this._envMapArray.mipLevels = 6;
         this._envMapArray.format = gl.RGBA;
         this._envMapArray.componentType = gl.HALF_FLOAT;
-        // this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.LINEAR_MIPMAP_LINEAR, gl.LINEAR_MIPMAP_LINEAR);
-        this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.NEAREST_MIPMAP_NEAREST, gl.NEAREST_MIPMAP_NEAREST);
+        this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.LINEAR_MIPMAP_LINEAR, gl.LINEAR_MIPMAP_LINEAR);
+        // this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.NEAREST_MIPMAP_NEAREST, gl.NEAREST_MIPMAP_NEAREST);
 
         this._envMapArray.create();
 

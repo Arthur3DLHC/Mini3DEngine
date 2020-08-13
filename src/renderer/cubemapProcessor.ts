@@ -89,7 +89,7 @@ export class CubemapProcessor {
 
         // render to temp texture and fbo for edge fixing
         const tmpTexture = new Texture2DArray(dest.width, dest.height, 6, 1024, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT, false);
-        tmpTexture.samplerState = new SamplerState(GLDevice.gl.MIRRORED_REPEAT, GLDevice.gl.MIRRORED_REPEAT, GLDevice.gl.LINEAR, GLDevice.gl.LINEAR);
+        tmpTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.LINEAR, GLDevice.gl.LINEAR);
         tmpTexture.create();
         const tmpFBO = new FrameBuffer();
         const destFBO = new FrameBuffer();
@@ -241,7 +241,7 @@ export class CubemapProcessor {
         // render to temp texture and fbo for edge fixing
         const size = dest.getLevelSize(CubemapProcessor.diffuseMipLevel);
         const tmpTexture = new Texture2DArray(size.x, size.y, 6, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT, false);
-        tmpTexture.samplerState = new SamplerState(GLDevice.gl.MIRRORED_REPEAT, GLDevice.gl.MIRRORED_REPEAT, GLDevice.gl.LINEAR, GLDevice.gl.LINEAR);
+        tmpTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.LINEAR, GLDevice.gl.LINEAR);
         tmpTexture.create();
         const tmpFBO = new FrameBuffer();
         const destFBO = new FrameBuffer();

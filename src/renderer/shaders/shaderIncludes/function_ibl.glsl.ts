@@ -11,8 +11,8 @@ const float PI = 3.1415926536898;
 // diffuseColor is (1 - F) * (1 - metalic)
 vec3 getIBLRadianceLambertian(sampler2DArray s, int envmapIdx, vec3 n, vec3 diffuseColor)
 {
-    // vec3 diffuseLight = textureCubeArrayLod(s, n, envmapIdx, DIFFUSE_MIP_LEVEL).rgb;
-    vec3 diffuseLight = textureCubeArrayLod(s, n, envmapIdx, 1.0).rgb;
+    vec3 diffuseLight = textureCubeArrayLod(s, n, envmapIdx, DIFFUSE_MIP_LEVEL).rgb;
+    // vec3 diffuseLight = textureCubeArrayLod(s, n, envmapIdx, 1.0).rgb;
 
     //#ifndef USE_HDR
     //    diffuseLight = sRGBToLinear(diffuseLight);
