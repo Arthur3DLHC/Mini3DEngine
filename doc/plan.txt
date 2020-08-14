@@ -340,6 +340,8 @@ TODO:       主要类结构
                 绘制场景时最先绘制天空盒；
                     Fix me: 是否应该将天空盒放到 RenderContext 里，在 FetchRenderObjects 时从 scene 里取出？
                 更新 cubemap 时，也绘制一下天空盒；
+                HDR Cubemap 工具：https://matheowis.github.io/HDRI-to-CubeMap/
+                HDR 资源：https://hdrihaven.com/hdris/
 
             GLTFLoader
                 从 Blender 导出测试用的模型
