@@ -181,6 +181,8 @@ window.onload = () => {
             let actidx = 0;
             for (const act of actions) {
                 // click callback
+                // NOTE: can not all constructor of HTMLElements in TypeScript.
+                // Can only call document.createElement()
                 const actionItem: HTMLDivElement = document.createElement("div");
                 actionItem.id = "action_" + actidx;
                 actionItem.innerHTML = act.name;
