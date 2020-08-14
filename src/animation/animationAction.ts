@@ -23,6 +23,14 @@ export class AnimationAction {
 
     public LoopMode: AnimationLoopMode;
 
+    public get name(): string {
+        return this._clip.name;
+    }
+
+    public get duration(): number {
+        return this._clip.duration;
+    }
+
     private _clip: AnimationClip;
     private _channels: AnimationChannel[];
 

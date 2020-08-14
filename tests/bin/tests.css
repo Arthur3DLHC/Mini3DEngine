@@ -8,6 +8,18 @@
     color:white;
     background: rgba(0,0,0,0.5);
 }
+.controlPanelTitle {
+    color:white;
+    background: black;
+}
+.actionList {
+    color: white;
+    background: transparent;
+}
+.actionItem {
+    color:white;
+    background: rgba(0,0,0,0.5);
+}
 .infoPanel {
     z-index: 1;
     left: 10px;

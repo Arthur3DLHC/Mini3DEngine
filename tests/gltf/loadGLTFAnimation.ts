@@ -169,10 +169,34 @@ window.onload = () => {
 
         prepareGLTFScene(gltfScene);
 
+        // todo: add all action names to action list UI
+        const actionList: HTMLDivElement = document.getElementById("actionList") as HTMLDivElement;
+        actionList.innerHTML = "";
+
         if (actions.length > 0) {
             curAction = actions[0];
             curAction.LoopMode = AnimationLoopMode.Repeat;
             curAction.play();
+
+            let actidx = 0;
+            for (const act of actions) {
+                // click callback
+                const actionItem: HTMLDivElement = document.createElement("div");
+                actionItem.id = "action_" + actidx;
+                actionItem.innerHTML = act.name;
+                actionItem.className = "actionItem";
+                actionItem.onclick = (ev: MouseEvent) => {
+                    if (curAction !== undefined) {
+                        curAction.stop();
+                        curAction.reset();
+                    }
+                    curAction = act;
+                    curAction.LoopMode = AnimationLoopMode.Repeat;
+                    curAction.play();
+                }
+                actionList.appendChild(actionItem);
+                actidx++;
+            }
         }
 
         console.log("start game loop...");
