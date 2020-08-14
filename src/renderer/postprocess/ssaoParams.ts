@@ -25,6 +25,8 @@ export class SSAOParams {
             data[i * 3 + 1] = Hammersley.get(1, i, 3, numPixels) * 2.0 - 1.0;
             data[i * 3 + 2] = Hammersley.get(2, i, 5, numPixels) * 2.0 - 1.0;
         }
+
+        console.info("SSAO noise:" + data);
         
         // simplex noise
         // blue noise?
@@ -78,14 +80,16 @@ export class SSAOParams {
             // sample.normalize();
 
             // vary length
-            let scale = i / SSAOParams.numKernels;
+            let scale = (i + 1) / SSAOParams.numKernels;
             scale *= scale;
-            scale = 0.1 + 0.9 * scale;      // lerp(0.1, 1, scale)
+            // scale = 0.1 + 0.9 * scale;      // lerp(0.1, 1, scale)
             sample.scale(scale);
 
             this.kernels[i * 3] = sample.x;
             this.kernels[i * 3 + 1] = sample.y;
             this.kernels[i * 3 + 2] = sample.z;
         }
+
+        console.info("SSAO Kernels:" + this.kernels);
     }
 }

@@ -160,8 +160,9 @@ export class PostProcessor {
         this._renderStates.cullState = RenderStateCache.instance.getCullState(false, GLDevice.gl.BACK);
         this._renderStates.depthState = RenderStateCache.instance.getDepthStencilState(false, false, GLDevice.gl.ALWAYS);
 
+        // multiply ssao with scene color
+        // srccolor * destcolor + destcolor * 0
         this._ssaoBlurBlendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.DST_COLOR, GLDevice.gl.ZERO);
-        // this._compositeBlendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
         
         // use color ADD blend mode
         // diffuse + specular

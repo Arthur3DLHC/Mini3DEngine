@@ -113,6 +113,9 @@ void main(void) {
     sumAO /= sumWeight.x;
     sumColor /= sumWeight.y;
 
+    // o_color = vec4(sumAO, sumAO, sumAO, 1.0);
+    // return;
+
     vec4 projectedPos = vec4(ex_texcoord * 2.0 - 1.0, texture(s_sceneDepth, ex_texcoord).r * 2.0 - 1.0, 1.0);
     uint cluster = clusterOfPixel(projectedPos);
     // Position in view

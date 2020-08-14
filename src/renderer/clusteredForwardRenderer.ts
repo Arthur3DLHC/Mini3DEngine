@@ -322,6 +322,7 @@ export class ClusteredForwardRenderer {
 
         // this._postprocessor.ssr.enable = false;
         // this._postprocessor.ssao.enable = false;
+        this._postprocessor.ssao.radius = 0.2;
 
         console.log("creating subsufaceprocessor...");
 
