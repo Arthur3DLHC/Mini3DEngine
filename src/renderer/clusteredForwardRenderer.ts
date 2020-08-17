@@ -819,8 +819,10 @@ export class ClusteredForwardRenderer {
             // envmap:
             // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, false);
             // debug output diffuse Riemann sum result
+            
             this.renderScreenRect(0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, CubemapProcessor.diffuseMipLevel, false);
             this.renderScreenRect(128.0 / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 2, CubemapProcessor.diffuseMipLevel, false);
+            
             // todo: debug outpu specular LD parts and DFG parts
             // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, 4, false);
             // this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._subsurfProcessor.preIntegratedBRDFTexture, 1, 0, 0, false);
@@ -852,7 +854,6 @@ export class ClusteredForwardRenderer {
         }
 
         // occlusion query objects, query for next frame;
-        /*
         if (this._renderListOpaqueOcclusionQuery.ItemCount > 0) {
             this.setRenderStateSet(this._renderStatesOpaqueOcclusion);
             GLPrograms.useProgram(this._occlusionQueryProgram);
@@ -860,9 +861,8 @@ export class ClusteredForwardRenderer {
 
             // occlusion query objects, render according to last frame query result
             this.setRenderStateSet(this._renderStatesOpaque);
-            this.renderItems(this._renderListOpaqueOcclusionQuery, false, true);
+            this.renderItems(this._renderListOpaqueOcclusionQuery, frustum, false, true);
         }
-        */
     }
     private renderTransparent(frustum: Frustum) {
         // non occlusion query objects

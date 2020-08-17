@@ -318,7 +318,6 @@ export class GLTFSceneBuilder {
                         if (vb === undefined) {
                             vb = new VertexBuffer(GLDevice.gl.STATIC_DRAW);
 
-                            // todo: copy data from bufferview to vertex buffer
                             vb.data = accessorData;
                             if (bufferView.byteStride) {
                                 vb.stride = bufferView.byteStride;
@@ -375,8 +374,6 @@ export class GLTFSceneBuilder {
                 // todo: is this a skin mesh?
                 if (isSkin) {
                     mesh = new SkinMesh();
-                    // todo: read skin info?
-
                 }
             } else if (primDef.mode === GLDevice.gl.LINES
                 || primDef.mode === GLDevice.gl.LINE_STRIP
