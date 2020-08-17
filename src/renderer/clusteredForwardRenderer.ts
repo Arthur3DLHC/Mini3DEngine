@@ -1036,18 +1036,18 @@ export class ClusteredForwardRenderer {
     }
 
     private renderItemBoundingBoxes(renderList: RenderList, occlusionQuery: boolean = false) {
-        /*
         // render bounding boxes only, ignore all materials
         // 是每个 object 一个 boundingbox，还是每个 renderitem 一个？
         // 如果 occlusionQuery === true，需要检查对象是否有 queryID，如果没有就创建一个。
+        const gl = GLDevice.gl;
         for (let i = 0; i < renderList.ItemCount; i++) {
             const item = renderList.getItemAt(i);
             if (item) {
                 if (occlusionQuery) {
-                    if (!item.object.occlusionQueryID) {
+                    if (item.object.occlusionQueryID === null) {
                         item.object.occlusionQueryID = gl.createQuery();
                     }
-                    if (item.object.occlusionQueryID) {
+                    if (item.object.occlusionQueryID !== null) {
                         gl.beginQuery(gl.ANY_SAMPLES_PASSED, item.object.occlusionQueryID);
                     }
                 }
@@ -1057,13 +1057,12 @@ export class ClusteredForwardRenderer {
                 // 是否应该在 object 上记录一个 occlusion query 帧号，如果本帧已经 query 过，就不用再 query 了
                 // 因为一个 object 可能会提供多个 renderItem
                 if (occlusionQuery) {
-                    if (item.object.occlusionQueryID) {
+                    if (item.object.occlusionQueryID !== null) {
                         gl.endQuery(gl.ANY_SAMPLES_PASSED);
                     }
                 }
             }
         }
-        */
     }
     /**
      * render a rectangle in screen space

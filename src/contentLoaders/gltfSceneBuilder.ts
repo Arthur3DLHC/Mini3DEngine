@@ -359,7 +359,7 @@ export class GLTFSceneBuilder {
                 const prim = new Primitive(0, Infinity, 0);
                 geometry.primitives.push(prim);
 
-                geometry.computeBoundingSphere();
+                geometry.computeBounding();
             }
 
             iprim++;

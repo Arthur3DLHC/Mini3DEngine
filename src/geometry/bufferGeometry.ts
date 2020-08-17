@@ -17,6 +17,7 @@ export class BufferGeometry {
         this.primitives = [];
         this.drawMode = GLDevice.gl.TRIANGLES;
         this.boundingSphere = new BoundingSphere();
+        this.boundingBox = new BoundingBox();
         this.inCache = false;
     }
 
@@ -36,7 +37,15 @@ export class BufferGeometry {
     // todo: geometry type?
     public drawMode: GLenum;
 
+    /**
+     * for frustom culling
+     */
     public boundingSphere: BoundingSphere;
+
+    /**
+     * for occlusion query
+     */
+    public boundingBox: BoundingBox;
 
     /**
      * if in cache, do not destroy by mesh; should destroy while clear cache.
@@ -138,9 +147,9 @@ export class BufferGeometry {
         }
     }
     
-    public computeBoundingSphere() {
+    public computeBounding() {
         // get the position attribute first
-        const box = new BoundingBox();
+        this.boundingBox.reset();
         const vp: vec3 = new vec3();
         const positions = this.attributes.find(e => e.name === VertexBufferAttribute.defaultNamePosition);
         if (positions) {
@@ -153,11 +162,11 @@ export class BufferGeometry {
                 vp.x = p[0];
                 vp.y = p[1];
                 vp.z = p[2];
-                box.expandByPoint(vp);
+                this.boundingBox.expandByPoint(vp);
             }
 
             // iterate all positions, calculate max distance to center (radius)
-            this.boundingSphere.center = box.center;
+            this.boundingSphere.center = this.boundingBox.center;
             let distSq = 0;
             for (let i = 0; i < positions.buffer.vertexCount; i++) {
                 positions.getVertex(i, p);

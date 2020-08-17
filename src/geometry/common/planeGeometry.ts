@@ -71,7 +71,7 @@ export class PlaneGeometry extends BufferGeometry {
         const grp = new Primitive();
         this.primitives.push(grp);
 
-        this.computeBoundingSphere();
+        this.computeBounding();
        
     }
 

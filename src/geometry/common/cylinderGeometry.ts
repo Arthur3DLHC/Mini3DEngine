@@ -100,7 +100,7 @@ export class CylinderGeometry extends BufferGeometry {
         const grp = new Primitive();
         this.primitives.push(grp);
 
-        this.computeBoundingSphere();
+        this.computeBounding();
     }
 
     private _radius: number;
