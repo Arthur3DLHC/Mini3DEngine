@@ -77,6 +77,7 @@ import { PostProcessor } from "./postProcessor.js";
 import { SubsurfaceProcessor } from "./subsurfaceProcessor.js";
 import { BoxGeometry } from "../geometry/common/boxGeometry.js";
 import { SkinMesh } from "../scene/skinMesh.js";
+import mat3 from "../../lib/tsm/mat3.js";
 
 export class ClusteredForwardRenderer {
 
@@ -119,8 +120,11 @@ export class ClusteredForwardRenderer {
         this._rectTransform = new mat4();
 
         this._skyboxGeom = new BoxGeometry(2, 2, 2);
-        this._skyboxTransform = new mat4();
-        this._skyboxTransform.setIdentity();
+        this._skyboxTransform = mat4.identity.copy();
+
+        this._boundingBoxGeom = new BoxGeometry(1, 1, 1);
+        this._boundingBoxTransform = mat4.identity.copy();
+
         // main output
         // todo: handle size change
 
@@ -373,8 +377,9 @@ export class ClusteredForwardRenderer {
     private _skyboxGeom: BoxGeometry;
     private _skyboxTransform: mat4;
 
-    // todo: a unit wireframe box geometry for draw bounding boxes; used by occlusion query pass
-
+    // todo: a unit box geometry for draw bounding boxes; used by occlusion query pass
+    private _boundingBoxGeom: BoxGeometry;
+    private _boundingBoxTransform: mat4;
 
     // todo: system textures: shadowmap atlas, decal atlas, envMap array, irradiance volumes
     // todo: system texture unit numbers
@@ -1039,7 +1044,15 @@ export class ClusteredForwardRenderer {
         // render bounding boxes only, ignore all materials
         // 是每个 object 一个 boundingbox，还是每个 renderitem 一个？
         // 如果 occlusionQuery === true，需要检查对象是否有 queryID，如果没有就创建一个。
+        if (GLPrograms.currProgram === null) {
+            return;
+        }
+        
         const gl = GLDevice.gl;
+
+        let boxScale = new vec3();
+        const boxLocalTranMat = new mat4();
+        const boxLocalScaleMat = new mat4();
         for (let i = 0; i < renderList.ItemCount; i++) {
             const item = renderList.getItemAt(i);
             if (item) {
@@ -1053,7 +1066,22 @@ export class ClusteredForwardRenderer {
                 }
                 // todo: draw bounding box
                 // get local bouding box of object, then calculate the transform, fill it to the object world transform uniform.
+                const boundingBox = item.geometry.boundingBox;
+                boxLocalTranMat.fromTranslation(boundingBox.center);
+
+                boundingBox.maxPoint.copy(boxScale);
+                boxScale.subtract(boundingBox.minPoint);
+
+                boxLocalScaleMat.fromScaling(boxScale);
+
+                mat4.product(boxLocalTranMat, boxLocalScaleMat, this._boundingBoxTransform);
+                mat4.product(item.object.worldTransform, this._boundingBoxTransform, this._boundingBoxTransform);
+
+                // item.object.worldTransform
+                this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one);
                 
+                this._boundingBoxGeom.draw(0, Infinity, GLPrograms.currProgram.attributes);
+
                 // 是否应该在 object 上记录一个 occlusion query 帧号，如果本帧已经 query 过，就不用再 query 了
                 // 因为一个 object 可能会提供多个 renderItem
                 if (occlusionQuery) {
