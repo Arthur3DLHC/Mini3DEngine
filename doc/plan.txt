@@ -457,6 +457,8 @@ TODO:       主要类结构
                 考虑统一使用 Promise.all 实现？
                     需要将不同的资源分类；Promise.all 仅支持列表中元素为同一类型；
 
+            优化 tsm 库？
+
             EnvProbe 多遍 Bake
                 需要多使用一套临时 Cubemap array texture?
 

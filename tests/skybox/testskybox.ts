@@ -86,7 +86,7 @@ window.onload = () => {
         sphereMesh.autoUpdateTransform = false;
         const sphereMtl = new StandardPBRMaterial();
         sphereMtl.color = new vec4([1.0, 1.0, 1.0, 1.0]);
-        sphereMtl.metallic = 0.1;
+        sphereMtl.metallic = 0.9;
         sphereMtl.roughness = 0.5;
         sphereMtl.subsurface = 0.15;
         sphereMtl.subsurfaceColor = new vec3([0.4, 0.06, 0.0]);

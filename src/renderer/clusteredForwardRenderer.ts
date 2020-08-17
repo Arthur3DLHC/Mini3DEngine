@@ -1353,6 +1353,10 @@ export class ClusteredForwardRenderer {
     private updateCubemaps(scene: Scene) {
         console.log("updating cubemaps...");
 
+        // use a temp envmap array first
+        // render envprobes, process specular and diffuse part to the envmap array,
+        // then assign it as envprobes, for next bounce time.
+
         if (this._envMapArray.glTexture) {
             this._envMapArray.release();
         }
@@ -1385,7 +1389,7 @@ export class ClusteredForwardRenderer {
 
         this._envMapArray.create();
 
-        // use a temp texturearray and fbo to render cubemaps?
+        // use a temp texturearray and fbo to render cubemaps
         const tmpEnvMapArray = new Texture2DArray();
 
         tmpEnvMapArray.width = this._renderContext.envmapSize;// * 6;
@@ -1411,79 +1415,90 @@ export class ClusteredForwardRenderer {
         const envMapFBO = new FrameBuffer();
         envMapFBO.depthStencilTexture = envMapDepthTexture;
 
-        // todo: repeat several times to simulate multiple bounces
-
-        // iterate all envprobes
-        for (let ienvprobe = 0; ienvprobe < this._renderContext.envprobeCount; ienvprobe++) {
-            const envprobe = this._renderContext.envProbes[ienvprobe];
-
-            envprobe.worldTransform.copy(matWorldToProbe);
-            matWorldToProbe.inverse();
-
-            for(let iface = 0; iface < 6; iface++) {
-                // todo: set the cubemap texture array layer as render target
-                envMapFBO.attachTexture(0, tmpEnvMapArray, 0, ienvprobe * 6 + iface);
-                envMapFBO.prepare();
-                // need to force set, or the target will be set to null in prepare() function
-                GLDevice.renderTarget = envMapFBO;
-                // GLDevice.forceSetRenderTarget(this._envmapFBO);
-
-                const x = 0; //iface * this._renderContext.envmapSize;
-                const y = 0;
-                const width = this._renderContext.envmapSize;
-                const height = this._renderContext.envmapSize;
-                gl.viewport(x, y, width, height);
-                gl.scissor(x, y, width, height);
-
-                // set render state
-                this.setRenderStateSet(this._renderStatesOpaque);
-
-                // clear
-                GLDevice.clearColor = envprobe.backgroundColor;
-                GLDevice.clearDepth = 1.0;
-                GLDevice.clear(true, true, false);
-
-                // todo: setup cube face camera properties
-                // transform objects to local space of envprobe first
-                // then apply cube face view matrix
-                const matFaceView = TextureCube.getFaceViewMatrix(iface);
-                mat4.product(matFaceView, matWorldToProbe, cubefaceCamera.viewTransform);
-                mat4.product(cubefaceCamera.projTransform, cubefaceCamera.viewTransform, matViewProj);
-                this._frustum.setFromProjectionMatrix(matViewProj);
-                // set uniforms per view
-                // will fill all visible lights, decals, envprobes;
-                // is that necessary to render decals ? maybe not;
-                // todo: if not first time, fill envprobes, and set env texture
-                this._renderContext.fillUniformBuffersPerView(cubefaceCamera, true, false, false, false, false);
-
-                if (scene.background !== undefined) {
-                    if (scene.background instanceof TextureCube) {
-                        this.renderSkyBox(scene.background, envprobe.worldTransform.getTranslation());
-                    }
-                }
-
-                this.setRenderStateSet(this._renderStatesOpaque);
-
-                // render items in renderlist
-                // only render static items; (there should be only static meshes in renderlist now)
-                // fix me: is that necessary to use depth prepass and occlusion query?
-                // no after effects?
-                this.renderItems(this._renderListOpaque, this._frustum, false, false, false, true);
-                // is that necessary to render transparent objects? yes, it is...
-            }
-
-            // todo: downsample all cubemaps and generate mipmaps
-        }
-
-        GLTextures.setTextureAt(this._envMapArrayUnit, null, gl.TEXTURE_2D_ARRAY);
-
         const cubeProc = new CubemapProcessor();
 
-        cubeProc.processSpecularLD(tmpEnvMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
-        cubeProc.processDiffuse(tmpEnvMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
-        // todo: Spherical Harmonic?
+        // todo: repeat several times to simulate multiple bounces
+        const numBounces = 2;
+        for (let ibounce = 0; ibounce < numBounces; ibounce++) {
+            // if first bounce, do not use envprobes;
+            // other times, use envprobes generate by last time
 
-        cubeProc.processSpecularDFG(this._specularDFG);
+            if  (ibounce === 0) {
+                GLTextures.setTextureAt(this._envMapArrayUnit, null, gl.TEXTURE_2D_ARRAY);
+            } else {
+                GLTextures.setTextureAt(this._envMapArrayUnit, this._envMapArray, gl.TEXTURE_2D_ARRAY);
+            }
+
+            // iterate all envprobes
+            for (let ienvprobe = 0; ienvprobe < this._renderContext.envprobeCount; ienvprobe++) {
+                const envprobe = this._renderContext.envProbes[ienvprobe];
+
+                envprobe.worldTransform.copy(matWorldToProbe);
+                matWorldToProbe.inverse();
+
+                for (let iface = 0; iface < 6; iface++) {
+                    // todo: set the cubemap texture array layer as render target
+                    envMapFBO.attachTexture(0, tmpEnvMapArray, 0, ienvprobe * 6 + iface);
+                    envMapFBO.prepare();
+                    // need to force set, or the target will be set to null in prepare() function
+                    GLDevice.renderTarget = envMapFBO;
+                    // GLDevice.forceSetRenderTarget(this._envmapFBO);
+
+                    const x = 0; //iface * this._renderContext.envmapSize;
+                    const y = 0;
+                    const width = this._renderContext.envmapSize;
+                    const height = this._renderContext.envmapSize;
+                    gl.viewport(x, y, width, height);
+                    gl.scissor(x, y, width, height);
+
+                    // set render state
+                    this.setRenderStateSet(this._renderStatesOpaque);
+
+                    // clear
+                    GLDevice.clearColor = envprobe.backgroundColor;
+                    GLDevice.clearDepth = 1.0;
+                    GLDevice.clear(true, true, false);
+
+                    // todo: setup cube face camera properties
+                    // transform objects to local space of envprobe first
+                    // then apply cube face view matrix
+                    const matFaceView = TextureCube.getFaceViewMatrix(iface);
+                    mat4.product(matFaceView, matWorldToProbe, cubefaceCamera.viewTransform);
+                    mat4.product(cubefaceCamera.projTransform, cubefaceCamera.viewTransform, matViewProj);
+                    this._frustum.setFromProjectionMatrix(matViewProj);
+                    // set uniforms per view
+                    // will fill all visible lights, decals, envprobes;
+                    // is that necessary to render decals ? maybe not;
+                    // todo: if not first time, fill envprobes, and set env texture
+                    this._renderContext.fillUniformBuffersPerView(cubefaceCamera, true, false, ibounce !== 0, false, false);
+
+                    if (scene.background !== undefined) {
+                        if (scene.background instanceof TextureCube) {
+                            this.renderSkyBox(scene.background, envprobe.worldTransform.getTranslation());
+                        }
+                    }
+
+                    this.setRenderStateSet(this._renderStatesOpaque);
+
+                    // render items in renderlist
+                    // only render static items; (there should be only static meshes in renderlist now)
+                    // fix me: is that necessary to use depth prepass and occlusion query?
+                    // no after effects?
+                    this.renderItems(this._renderListOpaque, this._frustum, false, false, false, true);
+                    // is that necessary to render transparent objects? yes, it is...
+                }
+
+                // todo: downsample all cubemaps and generate mipmaps
+            }
+
+            GLTextures.setTextureAt(this._envMapArrayUnit, null, gl.TEXTURE_2D_ARRAY);
+
+            cubeProc.processSpecularLD(tmpEnvMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
+            cubeProc.processDiffuse(tmpEnvMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
+            // todo: Spherical Harmonic?
+
+            cubeProc.processSpecularDFG(this._specularDFG);
+        }
 
         cubeProc.release();
 
