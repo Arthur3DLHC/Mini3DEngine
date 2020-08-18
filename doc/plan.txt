@@ -479,6 +479,7 @@ TODO:       主要类结构
             Instancing
                 GLTF中共享网格的节点设为用 Instancing
                 can use in mat4 in vertex shader for attribute input;
+                Cache shaders by key: shader file pathes and macros?
 
             测试 Occlusion query?
                 调试绘制：Occlusion test 失败的，画一个不会被遮挡的线框 box？或者用不同颜色线框区分被遮挡/无遮挡的物体
