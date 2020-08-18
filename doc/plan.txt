@@ -467,6 +467,8 @@ TODO:       主要类结构
             GameScene 管理
                 参考 Phaser 和 PIXI.js？
 
+            通过 bayer dither 提升 SSAO 的质量
+
         大场景相关
             Decals
 
