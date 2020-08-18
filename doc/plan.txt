@@ -459,13 +459,13 @@ TODO:       主要类结构
 
             优化 tsm 库？
 
-
-
             解析 Draco 压缩过的模型？
 
             TODO: 半透明物体的绘制？
                 需要由远到近排序？按照物体中心点；
 
+            GameScene 管理
+                参考 Phaser 和 PIXI.js？
 
         大场景相关
             Decals
