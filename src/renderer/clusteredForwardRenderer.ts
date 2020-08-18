@@ -444,6 +444,8 @@ export class ClusteredForwardRenderer {
     private _postprocessor: PostProcessor;
     private _subsurfProcessor: SubsurfaceProcessor;
 
+    public get postprocessor(): PostProcessor { return this._postprocessor; }    
+
     private createRenderStates() {
         const gl = GLDevice.gl;
         this._renderStatesShadow.depthState = RenderStateCache.instance.getDepthStencilState(true, true, gl.LEQUAL);

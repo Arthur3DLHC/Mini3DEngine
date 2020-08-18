@@ -218,7 +218,7 @@ TODO:       主要类结构
                         0, 1, 2, 3 : specular
                         4: 4x4, diffuse；或者用 1x1 ambient cube? 取样时算法简单一些
                     能否/是否有必要多次渲染envmap，模拟光线多次反射的机制？
-
+                    EnvProbe 多遍 Bake
                 image based lighting
                     shader 中使用的时候，在取样边缘点时从其它面取样过滤？能否预先处理一下 cubemap，将边缘处扩展一下，填充其它面的对应像素？
 
@@ -459,8 +459,7 @@ TODO:       主要类结构
 
             优化 tsm 库？
 
-            EnvProbe 多遍 Bake
-                需要多使用一套临时 Cubemap array texture?
+
 
             解析 Draco 压缩过的模型？
 

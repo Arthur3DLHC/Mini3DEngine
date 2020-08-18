@@ -16,6 +16,7 @@ window.onload = () => {
     GLDevice.initialize(canvas);
 
     const renderer = new ClusteredForwardRenderer();
+    renderer.postprocessor.ssao.radius = 0.4;
     const scene = new Scene();
     const camera = new PerspectiveCamera();
     camera.aspect = canvas.width / canvas.height;
