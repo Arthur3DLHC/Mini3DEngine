@@ -30,6 +30,10 @@ void main(void) {
     // hardcode the gaussian blur weights for left top 3x3 kernels of a 5x5 kernel matrix
     // because the weights are symmertrical
 
+    // debug
+    // o_color = texture(s_aoTex, ex_texcoord);
+    // return;
+
     mat3 kernel = mat3(
         0.003765, 0.015019, 0.023792,
         0.015019, 0.059912, 0.094907,
@@ -55,7 +59,7 @@ void main(void) {
 
     for(int i = 0; i < 5; i++) {
         for(int j = 0; j < 5; j++) {
-            vec2 offset = vec2((float(i) - 4.0), float(j) - 4.0) * u_offset;
+            vec2 offset = vec2((float(i) - 2.0), float(j) - 2.0) * u_offset;
             vec2 uv = clamp(ex_texcoord + offset, vec2(0.0), vec2(1.0));
             float d = getLinearDepth(uv);
             int ki = kernelIdx[i];
@@ -76,8 +80,7 @@ void main(void) {
     // vec3 sourceColor = texture(s_sceneColor, ex_texcoord).rgb;
     o_color = vec4(sumColor, 1.0);
 
-    // debug
-    // o_color = texture(s_aoTex, ex_texcoord);
+
 }
 
 `;
