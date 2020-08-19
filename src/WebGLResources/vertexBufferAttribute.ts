@@ -2,14 +2,25 @@ import { VertexBuffer } from "./vertexBuffer.js";
 import { GLDevice } from "./glDevice.js";
 
 export class VertexBufferAttribute {
-    public constructor(name: string, buffer: VertexBuffer, size: number, componentType: GLenum, offset: number) {
+    /**
+     * 
+     * @param name 
+     * @param buffer 
+     * @param size number of components
+     * @param componentType 
+     * @param offset 
+     */
+    public constructor(name: string, buffer: VertexBuffer, size: number, componentType: GLenum, offset: number, locationOffset?: number) {
         this.name = name;
         this.buffer = buffer;
         this.size = size;
         this.componentType = componentType;
         this.offset = offset;
-        this.locationOffset = 0;
         this.divisor = 0;
+        this.locationOffset = 0;
+        if (locationOffset !== undefined) {
+            this.locationOffset = locationOffset;
+        }
     }
 
     // compatible with gltf file
@@ -21,6 +32,9 @@ export class VertexBufferAttribute {
     public static readonly defaultNameColor0 = "a_color0";
     public static readonly defaultNameJoints0 = "a_joints0";
     public static readonly defaultNameWeights0 = "a_weights0";
+
+    public static readonly defaultNameInstMatrix = "a_instanceMatrix";
+    public static readonly defaultNameInstColor = "a_instanceColor";
 
     // vertex buffer (shared? interleaved)
     public buffer: VertexBuffer;
@@ -53,6 +67,7 @@ export class VertexBufferAttribute {
 
     /**
      * if not zero, instanced.
+     * (if 0, vertex attrib advances per vertex; if not 0, vertex attrib advances per divisor instances)
      */
     public divisor: number;
 
