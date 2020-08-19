@@ -162,7 +162,9 @@ export class PostProcessor {
 
         // multiply ssao with scene color
         // srccolor * destcolor + destcolor * 0
-        this._ssaoBlurBlendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.DST_COLOR, GLDevice.gl.ZERO);
+        // this._ssaoBlurBlendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.DST_COLOR, GLDevice.gl.ZERO);
+        // debug ssao
+        this._ssaoBlurBlendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.DST_COLOR, GLDevice.gl.ZERO);
         
         // use color ADD blend mode
         // diffuse + specular

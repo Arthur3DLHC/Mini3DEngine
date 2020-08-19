@@ -18,19 +18,29 @@ export class SSAOParams {
         //for(let i = 0; i < numPixels * 3; i++) {
         //    data[i] = Math.random() * 2.0 - 1.0;
         //}
+
         // hammersley
+        /*
         for(let i = 0; i < numPixels; i++) {
             // base 必须使用质数
             data[i * 3 + 0] = Hammersley.get(0, i, 2, numPixels) * 2.0 - 1.0;
             data[i * 3 + 1] = Hammersley.get(1, i, 3, numPixels) * 2.0 - 1.0;
             data[i * 3 + 2] = Hammersley.get(2, i, 5, numPixels) * 2.0 - 1.0;
         }
-
-        console.info("SSAO noise:" + data);
+        */
         
         // simplex noise
         // blue noise?
+
         // rotation disk (sin and cos values)
+        for(let i = 0; i < numPixels; i++) {
+            const angle = i * 2.0 * Math.PI / numPixels;
+            data[i * 3 + 0] = Math.sin(angle);
+            data[i * 3 + 1] = Math.cos(angle);
+            data[i * 3 + 2] = 0;        // rotate along z axis, so z is zero
+        }
+
+        console.info("SSAO noise:" + data);
 
         this.noiseTexture.image = data;
 
@@ -65,11 +75,11 @@ export class SSAOParams {
         for(let i = 0; i < SSAOParams.numKernels; i++) {
             // test: use halton sequence
             let phi = Halton.get(i + offset, 2) * Math.PI;          // hemisphere, pitch
-            let theta = Halton.get(i + offset, 3) * Math.PI * 2;    // yaw
+            let theta = Halton.get(i + offset, 3) * Math.PI * 2;        // yaw
 
-            sample.z = Math.cos(phi);
-            sample.x = Math.sin(phi) * Math.cos(theta);
-            sample.y = Math.sin(phi) * Math.sin(theta);
+            sample.z = Math.sin(phi);
+            sample.x = Math.cos(phi) * Math.cos(theta);
+            sample.y = Math.cos(phi) * Math.sin(theta);
 
             // test: use plain random values, same as three.js
             // hemisphere
@@ -81,7 +91,7 @@ export class SSAOParams {
 
             // vary length
             let scale = (i + 1) / SSAOParams.numKernels;
-            scale *= scale;
+            // scale *= scale;
             // scale = 0.1 + 0.9 * scale;      // lerp(0.1, 1, scale)
             sample.scale(scale);
 
