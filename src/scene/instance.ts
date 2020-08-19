@@ -2,11 +2,19 @@ import { Object3D } from "./object3D.js";
 import { InstancedMesh } from "./instancedMesh.js";
 
 export class Instance extends Object3D {
-    public constructor(mesh: InstancedMesh) {
+/**
+ * 
+ * @param mesh instanced mesh this instance belongs to
+ * @param index instance (matrix) index
+ */
+    public constructor(mesh: InstancedMesh, index: number) {
         super();
         this.mesh = mesh;
+        this._index = index;
     }
     public mesh: InstancedMesh;
+
+    private _index: number;
 
     // fix me: how to update mesh instance matrices after world transform updated?
     // if this instance is static, update only once while building the scene
