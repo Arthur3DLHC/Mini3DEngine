@@ -187,7 +187,7 @@ export class GLTFSceneBuilder {
             if (this._meshReferences[nodeDef.mesh] > 0) {
                 // todo: handle instancing; create a new instance referencing same geometry;
                 // and render mesh using instancing mode
-                if (instancing) {
+                if (instancing && nodeDef.skin === undefined) {
                     // instanced mesh groups. should be generated before
                     let instGroup = this._instancedMeshGroups[nodeDef.mesh];
                     if (instGroup === undefined) {
