@@ -33,7 +33,6 @@ export class GLTFSceneBuilder {
         this._meshReferences = [];
         this._instancedMeshGroupCounts = [];
         this._instancedMeshGroups = [];
-        this._instancedMeshCurIndices = [];
     }
 
     // todo: extension parser?
@@ -47,12 +46,11 @@ export class GLTFSceneBuilder {
     private _instancedMeshGroupCounts: Map<number, number>[];
 
     /**
-     * if mesh references > 1, this is the instanced mesh object.
+     * array of instance groups
      * instanced meshes should be grouped by occlusion group ID.
+     * key: instanceGroupId; value: instancedMesh or a node with instanceMeshes as children 
      */
     private _instancedMeshGroups: Map<number, Object3D>[];
-
-    private _instancedMeshCurIndices: Map<number, number>[];
 
     private static _gltfToBufferAttrNames: Map<string, string> = new Map([
         [GLTF_ATTRIBUTES.POSITION, VertexBufferAttribute.defaultNamePosition],
@@ -95,6 +93,7 @@ export class GLTFSceneBuilder {
             }   
         }
 
+        this._instancedMeshGroupCounts = [];
         this._instancedMeshGroups = [];
 
         if (instancing) {
