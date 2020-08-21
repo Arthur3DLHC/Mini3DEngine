@@ -25,16 +25,34 @@ import { KeyframeTrack } from "../animation/keyframeTrack.js";
 import { AnimationChannel, AnimTargetPathDataType } from "../animation/animationChannel.js";
 import { AnimationAction } from "../animation/animationAction.js";
 import { AnimationSampler, Interpolation } from "../animation/animationSampler.js";
+import { InstancedMesh } from "../scene/instancedMesh.js";
+import { Instance } from "../scene/instance.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
         this._meshReferences = [];
+        this._instancedMeshGroupCounts = [];
+        this._instancedMeshGroups = [];
+        this._instancedMeshCurIndices = [];
     }
 
     // todo: extension parser?
     // todo: custom extra parser?
 
     private _meshReferences: number[];
+
+    /**
+     * key: instanceGroupId; value: instance count in that group
+     */
+    private _instancedMeshGroupCounts: Map<number, number>[];
+
+    /**
+     * if mesh references > 1, this is the instanced mesh object.
+     * instanced meshes should be grouped by occlusion group ID.
+     */
+    private _instancedMeshGroups: Map<number, Object3D>[];
+
+    private _instancedMeshCurIndices: Map<number, number>[];
 
     private static _gltfToBufferAttrNames: Map<string, string> = new Map([
         [GLTF_ATTRIBUTES.POSITION, VertexBufferAttribute.defaultNamePosition],
@@ -50,9 +68,11 @@ export class GLTFSceneBuilder {
     /**
      * build scene hierarchy from gltf asset. NOTE: don't call this before all binary datas has been loaded.
      * @param gltf the GlTf asset data
-     * @param sceneIdx 
+     * @param sceneIdx index of scene in gltf
+     * @param animations an array to receive animaitons loaded from gltf, is presidented
+     * @param instancing use instanced mesh for meshes shared by multiple nodes in gltf. this is usually for optimizing display of large level scenes
      */
-    public build(gltf: GltfAsset, sceneIdx: number, animations?: AnimationAction[]): Object3D {
+    public build(gltf: GltfAsset, sceneIdx: number, animations?: AnimationAction[], instancing: boolean = false): Object3D {
 
         // gltf 中 scene.nodes[] 中的节点都只能是根节点
         // get gltf scene object
@@ -75,11 +95,46 @@ export class GLTFSceneBuilder {
             }   
         }
 
+        this._instancedMeshGroups = [];
+
+        if (instancing) {
+            // todo: sum mesh reference count; split by instancing groups?
+            // if is skinned mesh, do not use instancing;
+            for (const nodeDef of gltf.gltf.nodes) {
+                if (nodeDef.mesh !== undefined) {
+                    if (this._meshReferences[nodeDef.mesh] > 0) {   // is an instanced mesh
+                        // get or add the instance groups of this mesh
+                        let instGroupCount = this._instancedMeshGroupCounts[nodeDef.mesh];
+                        if (instGroupCount === undefined) {
+                            instGroupCount = new Map<number, number>();
+                            this._instancedMeshGroupCounts[nodeDef.mesh] = instGroupCount;
+                        }
+
+                        // fetch instance group id from gltf, or use default
+                        let instGroupId: number = 0;
+                        if (nodeDef.extras.instanceGroup !== undefined && nodeDef.extras.instanceGroup instanceof Number) {
+                            instGroupId = nodeDef.extras.instanceGroup;
+                        }
+
+                        // get or increase the instance count of the node's group
+                        let instCount = instGroupCount.get(instGroupId);
+                        if (instCount === undefined) {
+                            instCount = 1;
+                            instGroupCount.set(instGroupId, instCount);
+                        } else {
+                            instGroupCount.set(instGroupId, instCount + 1);
+                        }
+                    }
+                    this._meshReferences[nodeDef.mesh]++;
+                }
+            }
+        }
+
         // set a temp node array first? for joints?
         const nodes: Object3D[] = [];
 
         for (const nodeDef of gltf.gltf.nodes) {
-            nodes.push(this.processNode(nodeDef, gltf));
+            nodes.push(this.processNode(nodeDef, gltf, instancing));
         }
 
         // sceneDef.nodes is array of root node indices in the scene
@@ -125,14 +180,68 @@ export class GLTFSceneBuilder {
         }
     }
 
-    private processNode(nodeDef: Node, gltf: GltfAsset): Object3D {
+    private processNode(nodeDef: Node, gltf: GltfAsset, instancing: boolean): Object3D {
 
         let node: Object3D;
         if (nodeDef.mesh !== undefined) {
             if (this._meshReferences[nodeDef.mesh] > 0) {
                 // todo: handle instancing; create a new instance referencing same geometry;
                 // and render mesh using instancing mode
-                node = this.processMesh(nodeDef.mesh, nodeDef.skin !== undefined, gltf);
+                if (instancing) {
+                    // instanced mesh groups. should be generated before
+                    let instGroup = this._instancedMeshGroups[nodeDef.mesh];
+                    if (instGroup === undefined) {
+                        throw new Error("Instance group not found: " + nodeDef.mesh);
+                    }
+
+                    let instCounts = this._instancedMeshGroupCounts[nodeDef.mesh];
+                    if (instCounts === undefined) {
+                        throw new Error("Instance group not found: " + nodeDef.mesh);
+                    }
+
+                    // retrive the group id of node
+                    let instGroupId: number = 0;
+                    if (nodeDef.extras.instanceGroup !== undefined && nodeDef.extras.instanceGroup instanceof Number) {
+                        instGroupId = nodeDef.extras.instanceGroup;
+                    }
+
+                    let count = instCounts.get(instGroupId);
+
+                    // instanced mesh with groupid
+                    // maybe a instanced mesh array
+                    let instMesh = instGroup.get(instGroupId);
+                    if (instMesh === undefined) {
+                        // todo: need to know how map instances in this group
+                        // instMesh = this.processInstancedMesh(nodeDef.mesh, )
+                        instMesh = this.processMesh(nodeDef.mesh, nodeDef.skin !== undefined, gltf, count);
+                        instGroup.set(instGroupId, instMesh);
+                    }
+
+                    // todo: add this node to instance matrix of instanced mesh
+                    if (instMesh instanceof InstancedMesh) {
+                        const m = instMesh as InstancedMesh;
+                        // create an instance node? is that necessary?
+                        node = new Instance(m, m.curInstanceCount);
+                        // todo: read node transforms
+                        m.curInstanceCount++;
+                    } else {
+                        node = new Object3D();
+                        // todo: read node transforms
+                        // todo: iterate all child meshes, add correspounding child instance nodes
+                        for (const child of instMesh.children) {
+                            if (child instanceof InstancedMesh) {
+                                const m = child as InstancedMesh;
+                                // create an instance node? is that necessary?
+                                const childNode = new Instance(m, m.curInstanceCount);
+                                node.attachChild(childNode);
+                                m.curInstanceCount++;
+                            }
+                        }
+                    }
+                } else {
+                    // just create a new mesh; it will share same cached geometry with other nodes
+                    node = this.processMesh(nodeDef.mesh, nodeDef.skin !== undefined, gltf);
+                }
             } else {
                 node = this.processMesh(nodeDef.mesh, nodeDef.skin !== undefined, gltf);
             }
@@ -237,7 +346,7 @@ export class GLTFSceneBuilder {
      * @param gltf 
      * @returns if mesh only has 1 primitive, return a mesh object; or return an object3d node with multiple mesh children.
      */
-    private processMesh(meshId: GlTfId, isSkin: boolean, gltf: GltfAsset): Object3D {
+    private processMesh(meshId: GlTfId, isSkin: boolean, gltf: GltfAsset, numInstances: number = 1): Object3D {
         if (gltf.gltf.meshes === undefined
             || gltf.gltf.accessors === undefined
             || gltf.gltf.bufferViews === undefined

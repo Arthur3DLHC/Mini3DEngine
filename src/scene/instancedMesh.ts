@@ -6,9 +6,10 @@ import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 
 export class InstancedMesh extends Mesh {
-    public constructor(instanceCount: number, hasColor: boolean, extraFloats: number, isStatic: boolean) {
+    public constructor(maxInstanceCount: number, hasColor: boolean, extraFloats: number, isStatic: boolean) {
         super();
-        this._instanceCount = instanceCount;
+        this.curInstanceCount = 0;
+        this._maxInstanceCount = maxInstanceCount;
         this._hasColor = hasColor;
         this._extraFloats = extraFloats;
         this._instFloatSize = 16;
@@ -16,7 +17,7 @@ export class InstancedMesh extends Mesh {
             this._instFloatSize += 4;
         }
         this._instFloatSize += extraFloats;
-        this._instanceData = new Float32Array(instanceCount * this._instFloatSize);
+        this._instanceData = new Float32Array(maxInstanceCount * this._instFloatSize);
         this._vertexBuffer = new VertexBuffer(isStatic? GLDevice.gl.STATIC_DRAW : GLDevice.gl.DYNAMIC_DRAW);
         this._attributes = [];
 
@@ -36,7 +37,7 @@ export class InstancedMesh extends Mesh {
     }
     private _instanceData: Float32Array;
     private _instFloatSize: number;
-    private _instanceCount: number;
+    private _maxInstanceCount: number;
 
     // todo: vertex buffer containing instance data
     private _vertexBuffer: VertexBuffer;
@@ -46,6 +47,11 @@ export class InstancedMesh extends Mesh {
     private _hasColor: boolean;
     private _extraFloats: number;
     private _dirty: boolean;
+
+    public curInstanceCount: number;
+    public get maxInstanceCount(): number {
+        return this._maxInstanceCount;
+    }
 
     public setMatrixOf(instanceIdx: number, matrix: mat4) {
         const start = instanceIdx * this._instFloatSize;
