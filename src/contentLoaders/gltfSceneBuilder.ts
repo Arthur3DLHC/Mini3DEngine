@@ -188,55 +188,7 @@ export class GLTFSceneBuilder {
                 // and render mesh using instancing mode
                 if (instancing && nodeDef.skin === undefined) {
                     // instanced mesh groups. should be generated before
-                    let instGroup = this._instancedMeshGroups[nodeDef.mesh];
-                    if (instGroup === undefined) {
-                        throw new Error("Instance group not found: " + nodeDef.mesh);
-                    }
-
-                    let instCounts = this._instancedMeshGroupCounts[nodeDef.mesh];
-                    if (instCounts === undefined) {
-                        throw new Error("Instance group not found: " + nodeDef.mesh);
-                    }
-
-                    // retrive the group id of node
-                    let instGroupId: number = 0;
-                    if (nodeDef.extras.instanceGroup !== undefined && nodeDef.extras.instanceGroup instanceof Number) {
-                        instGroupId = nodeDef.extras.instanceGroup;
-                    }
-
-                    let count = instCounts.get(instGroupId);
-
-                    // instanced mesh with groupid
-                    // maybe a instanced mesh array
-                    let instMesh = instGroup.get(instGroupId);
-                    if (instMesh === undefined) {
-                        // todo: need to know how map instances in this group
-                        // instMesh = this.processInstancedMesh(nodeDef.mesh, )
-                        instMesh = this.processMesh(nodeDef.mesh, nodeDef.skin !== undefined, gltf, count);
-                        instGroup.set(instGroupId, instMesh);
-                    }
-
-                    // todo: add this node to instance matrix of instanced mesh
-                    if (instMesh instanceof InstancedMesh) {
-                        const m = instMesh as InstancedMesh;
-                        // create an instance node? is that necessary?
-                        node = new Instance(m, m.curInstanceCount);
-                        // todo: read node transforms
-                        m.curInstanceCount++;
-                    } else {
-                        node = new Object3D();
-                        // todo: read node transforms
-                        // todo: iterate all child meshes, add correspounding child instance nodes
-                        for (const child of instMesh.children) {
-                            if (child instanceof InstancedMesh) {
-                                const m = child as InstancedMesh;
-                                // create an instance node? is that necessary?
-                                const childNode = new Instance(m, m.curInstanceCount);
-                                node.attachChild(childNode);
-                                m.curInstanceCount++;
-                            }
-                        }
-                    }
+                    node = this.processInstance(nodeDef, gltf);
                 } else {
                     // just create a new mesh; it will share same cached geometry with other nodes
                     node = this.processMesh(nodeDef.mesh, nodeDef.skin !== undefined, gltf);
@@ -284,6 +236,64 @@ export class GLTFSceneBuilder {
         //        this.processNode(childId, node, gltf);
         //    }
         //}
+    }
+
+    private processInstance(nodeDef: Node, gltf: GltfAsset): Object3D {
+        if (nodeDef.mesh === undefined) {
+            throw new Error("Node does not have mesh index");
+        }
+        let node: Object3D;
+        let instGroup = this._instancedMeshGroups[nodeDef.mesh];
+        if (instGroup === undefined) {
+            throw new Error("Instance group not found: " + nodeDef.mesh);
+        }
+
+        let instCounts = this._instancedMeshGroupCounts[nodeDef.mesh];
+        if (instCounts === undefined) {
+            throw new Error("Instance group not found: " + nodeDef.mesh);
+        }
+
+        // retrive the group id of node
+        let instGroupId: number = 0;
+        if (nodeDef.extras.instanceGroup !== undefined && nodeDef.extras.instanceGroup instanceof Number) {
+            instGroupId = nodeDef.extras.instanceGroup;
+        }
+
+        let count = instCounts.get(instGroupId);
+
+        // instanced mesh with groupid
+        // maybe a instanced mesh array
+        let instMesh = instGroup.get(instGroupId);
+        if (instMesh === undefined) {
+            // todo: need to know how map instances in this group
+            // instMesh = this.processInstancedMesh(nodeDef.mesh, )
+            instMesh = this.processMesh(nodeDef.mesh, nodeDef.skin !== undefined, gltf, count);
+            instGroup.set(instGroupId, instMesh);
+        }
+
+        // todo: add this node to instance matrix of instanced mesh
+        if (instMesh instanceof InstancedMesh) {
+            const m = instMesh as InstancedMesh;
+            // create an instance node? is that necessary?
+            node = new Instance(m, m.curInstanceCount);
+            // todo: read node transforms
+            m.curInstanceCount++;
+        }
+        else {
+            node = new Object3D();
+            // todo: read node transforms
+            // todo: iterate all child meshes, add correspounding child instance nodes
+            for (const child of instMesh.children) {
+                if (child instanceof InstancedMesh) {
+                    const m = child as InstancedMesh;
+                    // create an instance node? is that necessary?
+                    const childNode = new Instance(m, m.curInstanceCount);
+                    node.attachChild(childNode);
+                    m.curInstanceCount++;
+                }
+            }
+        }
+        return node;
     }
 
     private processSkin(node: Object3D, skinIdx: number, nodes: Object3D[], gltf: GltfAsset) {
@@ -472,7 +482,13 @@ export class GLTFSceneBuilder {
 
             iprim++;
 
-            let mesh = new Mesh();
+            let mesh: Mesh;
+
+            if (numInstances > 1) {
+                mesh = new InstancedMesh(numInstances, false, 0, true);
+            } else {
+                mesh = new Mesh;
+            }
 
             // todo: primitive draw mode
             if (primDef.mode === GLDevice.gl.TRIANGLES
