@@ -793,6 +793,7 @@ export class ClusteredForwardRenderer {
             this.getOcclusionQueryResults();
 
             // todo: sort the renderlists first?
+            // sort transparent items only? from far to near; and renderItem.renderOrder;
 
            // gl.colorMask(false, false, false, false);
             //gl.depthFunc(gl.LEQUAL);
@@ -808,7 +809,7 @@ export class ClusteredForwardRenderer {
             }
 
             this.renderOpaque(this._frustum);
-            // this.renderTransparent();
+            this.renderTransparent(this._frustum);
 
             // todo: render sprites
 

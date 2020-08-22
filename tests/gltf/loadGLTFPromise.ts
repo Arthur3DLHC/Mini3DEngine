@@ -63,8 +63,8 @@ window.onload = () => {
     dirLight01.isStatic = true;
     dirLight01.autoUpdateTransform = false; // let the behaivor work
     dirLight01.on = true;
-    dirLight01.color = new vec4([3,3,3,1]);
-    dirLight01.radius = 5;
+    dirLight01.color = new vec4([1,1,1,1]);
+    dirLight01.radius = 2;
     dirLight01.castShadow = true;
     (dirLight01.shadow as DirectionalLightShadow).distance = 15;
     const dirLightLookAt = new LookatBehavior(dirLight01);
