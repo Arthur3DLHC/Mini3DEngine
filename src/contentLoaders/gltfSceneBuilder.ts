@@ -111,7 +111,7 @@ export class GLTFSceneBuilder {
 
                         // fetch instance group id from gltf, or use default
                         let instGroupId: number = 0;
-                        if (nodeDef.extras.instanceGroup !== undefined && nodeDef.extras.instanceGroup instanceof Number) {
+                        if (nodeDef.extras.instanceGroup !== undefined) {
                             instGroupId = nodeDef.extras.instanceGroup;
                         }
 
@@ -260,7 +260,7 @@ export class GLTFSceneBuilder {
 
         // retrive the group id of node
         let instGroupId: number = 0;
-        if (nodeDef.extras.instanceGroup !== undefined && nodeDef.extras.instanceGroup instanceof Number) {
+        if (nodeDef.extras.instanceGroup !== undefined) {
             instGroupId = nodeDef.extras.instanceGroup;
         }
 
@@ -270,8 +270,6 @@ export class GLTFSceneBuilder {
         // maybe a instanced mesh array
         let instMesh = instGroup.get(instGroupId);
         if (instMesh === undefined) {
-            // todo: need to know how map instances in this group
-            // instMesh = this.processInstancedMesh(nodeDef.mesh, )
             instMesh = this.processMesh(nodeDef.mesh, nodeDef.skin !== undefined, gltf, count);
             instGroup.set(instGroupId, instMesh);
         }
@@ -281,13 +279,11 @@ export class GLTFSceneBuilder {
             const m = instMesh as InstancedMesh;
             // create an instance node? is that necessary?
             node = new Instance(m, m.curInstanceCount);
-            // todo: read node transforms
             this.processNodeTransform(nodeDef, node);
             m.curInstanceCount++;
         }
         else {
             node = new Object3D();
-            // todo: read node transforms
             this.processNodeTransform(nodeDef, node);
             // todo: iterate all child meshes, add correspounding child instance nodes
             for (const child of instMesh.children) {

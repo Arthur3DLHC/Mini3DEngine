@@ -22,5 +22,11 @@ export class Instance extends Object3D {
     // how to hide invisible instances? use all zero matrix and color to indicate?
     // while instance is moved or show/hide, set a 'instanceDirty' flag on instancedMesh?
 
+    protected onWorldTransformUpdated() {
+        if (this.moved) {
+            this.mesh.setMatrixOf(this._index, this.worldTransform);
+        }
+    }
+
     // how to do the frustum culling for instanced mesh? or do not need to do that?
 }

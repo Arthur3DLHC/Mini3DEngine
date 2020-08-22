@@ -4,6 +4,7 @@ import vec4 from "../../lib/tsm/vec4.js";
 import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
+import { Object3D } from "./object3D.js";
 
 export class InstancedMesh extends Mesh {
     public constructor(maxInstanceCount: number, hasColor: boolean, extraFloats: number, isStatic: boolean) {
@@ -79,7 +80,7 @@ export class InstancedMesh extends Mesh {
         }
     }
 
-    public updateVertexBuffer() {
+    public updateInstanceVertexBuffer() {
         if (this._dirty) {
             // todo: copy the data to instance vertex buffer
             this._vertexBuffer.stride = this._instFloatSize * 4;
@@ -92,6 +93,24 @@ export class InstancedMesh extends Mesh {
                 this._vertexBuffer.update();
             }
             this._dirty = false;
+        }
+    }
+
+    // fix me: should update vertex buffer when providePrimitive?
+
+    /**
+     * update all instance matrices of static instanced meshes in the scene
+     * this should only be called once after the scene has been built and updated for first time?
+     * @param scene the scene contains instanced meshes
+     */
+    public static updateInstancedMeshes(obj: Object3D) {
+        if (obj instanceof InstancedMesh) {
+            const instMesh = obj as InstancedMesh;
+            instMesh.updateInstanceVertexBuffer();
+        }
+
+        for (const child of obj.children) {
+            InstancedMesh.updateInstancedMeshes(child);
         }
     }
 }

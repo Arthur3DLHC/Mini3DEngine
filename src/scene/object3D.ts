@@ -199,6 +199,8 @@ export class Object3D {
 
         this._moved = ! this.worldTransformPrev.equals(this.worldTransform);
 
+        this.onWorldTransformUpdated();
+
         if( updateChildren ) {
             for (const child of this._children) {
                 child.updateWorldTransform(false, true);
@@ -227,5 +229,9 @@ export class Object3D {
                 child.destroy(destroyChildren);
             }
         }
+    }
+
+    protected onWorldTransformUpdated() {
+        // subclass can do things
     }
 }
