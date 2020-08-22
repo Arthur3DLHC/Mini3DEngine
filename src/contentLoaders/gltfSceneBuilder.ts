@@ -206,13 +206,26 @@ export class GLTFSceneBuilder {
 
         // todo: node transform
         // todo: hold translation, rotation, scale in Object3D？
+        this.processNodeTransform(nodeDef, node);
+
+        return node;
+
+        //if (nodeDef.children !== undefined) {
+        //    for (const childId of nodeDef.children) {
+        //        this.processNode(childId, node, gltf);
+        //    }
+        //}
+    }
+
+    private processNodeTransform(nodeDef: Node, node: Object3D) {
         if (nodeDef.matrix !== undefined) {
             node.localTransform.init(nodeDef.matrix);
             // todo: decompose matrix ?
             node.localTransform.getScaling(node.scale);
             node.localTransform.getRotation(node.rotation);
             node.localTransform.getTranslation(node.translation);
-        } else {
+        }
+        else {
             if (nodeDef.translation !== undefined) {
                 node.translation = new vec3([nodeDef.translation[0], nodeDef.translation[1], nodeDef.translation[2]]);
             }
@@ -228,14 +241,6 @@ export class GLTFSceneBuilder {
             // todo: update local matrix or update it later when scene update every frame?
             node.updateLocalTransform();
         }
-
-        return node;
-
-        //if (nodeDef.children !== undefined) {
-        //    for (const childId of nodeDef.children) {
-        //        this.processNode(childId, node, gltf);
-        //    }
-        //}
     }
 
     private processInstance(nodeDef: Node, gltf: GltfAsset): Object3D {
@@ -277,11 +282,13 @@ export class GLTFSceneBuilder {
             // create an instance node? is that necessary?
             node = new Instance(m, m.curInstanceCount);
             // todo: read node transforms
+            this.processNodeTransform(nodeDef, node);
             m.curInstanceCount++;
         }
         else {
             node = new Object3D();
             // todo: read node transforms
+            this.processNodeTransform(nodeDef, node);
             // todo: iterate all child meshes, add correspounding child instance nodes
             for (const child of instMesh.children) {
                 if (child instanceof InstancedMesh) {

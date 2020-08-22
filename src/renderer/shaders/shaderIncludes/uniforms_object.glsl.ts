@@ -9,18 +9,9 @@ export default /** glsl */`
         mat4 matWorld;
         mat4 matWorldPrev;
         vec4 color;     // or use colortint and coloradd?
-        vec4 props;     // x: tag(objectID) y: numBones z: unused w: unused
-        // float tag; 
+        vec4 props;     // x: tag(objectID) y: numBones z: instanced w: unused
         mat4 matBones[MAX_BONES];
         mat4 matBonesPrev[MAX_BONES];
 
     } u_object;
-    // fix me: 是否可以统一用一个 uniform block？避免block过多
-    /*
-    uniform ObjectSkin
-    {
-        vec4 color;     // or use colortint and coloradd?
-        float tag; 
-    } u_objectSkin;
-    */
 `;

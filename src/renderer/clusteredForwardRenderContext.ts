@@ -23,6 +23,7 @@ import { TextureCube } from "../WebGLResources/textures/textureCube.js";
 import { Halton } from "../math/halton.js";
 import { Hammersley } from "../math/Hammersley.js";
 import { SkinMesh } from "../scene/skinMesh.js";
+import { InstancedMesh } from "../scene/instancedMesh.js";
 
 export class ClusteredForwardRenderContext extends RenderContext {
     public constructor() {
@@ -625,6 +626,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         // object properties
         // this._tmpColor.x = item.object.tag;
         this._tmpColor.y = 0;           // num skin joints
+        this._tmpColor.z = 0;           // use instancing
 
         if (item.object instanceof SkinMesh) {
             // fix me: need to copy all matrices to a float32array?
@@ -636,6 +638,9 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 this._buffer.addArray(skinMesh.jointMatrices[i].values);
             }
             this._ubObject.setUniform("matBones", this._tmpData, this._buffer.length);
+        }
+        else if(item.object instanceof InstancedMesh) {
+            this._tmpColor.z = 1;
         }
         this._ubObject.setVec4("props", this._tmpColor);
         this._ubObject.update();

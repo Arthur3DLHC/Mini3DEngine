@@ -9,6 +9,7 @@ import function_cubemap from "./shaders/shaderIncludes/function_cubemap.glsl.js"
 import function_depth from "./shaders/shaderIncludes/function_depth.glsl.js";
 import function_get_items from "./shaders/shaderIncludes/function_get_items.glsl.js";
 import function_ibl from "./shaders/shaderIncludes/function_ibl.glsl.js";
+import function_instance from "./shaders/shaderIncludes/function_instance.glsl.js";
 import function_punctual_lights from "./shaders/shaderIncludes/function_punctual_lights.glsl.js";
 import function_shadow from "./shaders/shaderIncludes/function_shadow.glsl.js";
 import function_skin from "./shaders/shaderIncludes/function_skin.glsl.js";
@@ -509,6 +510,7 @@ export class ClusteredForwardRenderer {
         GLPrograms.shaderCodes["function_depth"] = function_depth;
         GLPrograms.shaderCodes["function_get_items"] = function_get_items;
         GLPrograms.shaderCodes["function_ibl"] = function_ibl;
+        GLPrograms.shaderCodes["function_instance"] = function_instance;
         GLPrograms.shaderCodes["function_punctual_lights"] = function_punctual_lights;
         GLPrograms.shaderCodes["function_shadow"] = function_shadow;
         GLPrograms.shaderCodes["function_skin"] = function_skin;
@@ -1078,6 +1080,9 @@ export class ClusteredForwardRenderer {
                 }
                 // todo: draw bounding box
                 // get local bouding box of object, then calculate the transform, fill it to the object world transform uniform.
+
+                // fix me: instanced mesh bounding box? should contains all instances of this mesh.
+                // if instances are static, can the bounding box only calculated once and be cached?
                 const boundingBox = item.geometry.boundingBox;
                 boxLocalTranMat.fromTranslation(boundingBox.center);
 

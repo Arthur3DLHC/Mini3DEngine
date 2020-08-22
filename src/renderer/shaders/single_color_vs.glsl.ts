@@ -18,16 +18,27 @@ in vec2 a_texcoord0;
 in vec4 a_joints0;              // joint indices
 in vec4 a_weights0;             // joint weights
 
-// todo: include common funcitons?
+// vertex attribute instancing?
+in mat4 a_instanceMatrix;
+in vec4 a_instanceColor;
+
 #include <function_skin>
 #include <function_transforms>
+#include <function_instance>
 
 // vertex output
 out vec4 ex_color;
 
 void main(void)
 {
-    gl_Position = viewToProj(worldToView(localToWorldCheckSkin(vec4(a_position, 1))));
+    vec4 worldPosition = vec4(0.);
+    vec4 localPosition = vec4(a_position, 1.0);
+    if (useInstancing()) {
+        worldPosition = localToWorldInst(localPosition);
+    } else {
+        worldPosition = localToWorldCheckSkin(localPosition);
+    }
+    gl_Position = viewToProj(worldToView(worldPosition));
     ex_color = u_object.color;
 }
 
