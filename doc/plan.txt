@@ -371,7 +371,6 @@ TODO:       主要类结构
                     https://mynameismjp.wordpress.com/2013/09/10/shadow-maps/
                     https://github.com/TheRealMJP/Shadows
 
------------------------------------------------------
 
             文件加载机制
                 使用Promise, async, await
@@ -461,12 +460,15 @@ TODO:       主要类结构
 
             解析 Draco 压缩过的模型？
 
+-----------------------------------------------------
+
             半透明物体的绘制？
                 需要由远到近排序？按照物体中心点；
                 先测试不排序的绘制；
 
             GameScene 管理
                 参考 Phaser 和 PIXI.js？
+                H-Game Demo 场景管理
 
         大场景相关
             Instancing
