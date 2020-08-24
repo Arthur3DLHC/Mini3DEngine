@@ -619,10 +619,9 @@ export class ClusteredForwardRenderContext extends RenderContext {
     }
 
     public fillUniformBuffersPerObject(item: RenderItem) {
-        this._ubObject.setMat4("matWorld", item.object.worldTransform);
-        this._ubObject.setMat4("matWorldPrev", item.object.worldTransformPrev);
-        this._ubObject.setVec4("color", item.object.color);
 
+        let matWorld = item.object.worldTransform;
+        let matWorldPrev = item.object.worldTransformPrev
         // object properties
         // this._tmpColor.x = item.object.tag;
         this._tmpColor.y = 0;           // num skin joints
@@ -640,8 +639,14 @@ export class ClusteredForwardRenderContext extends RenderContext {
             this._ubObject.setUniform("matBones", this._tmpData, this._buffer.length);
         }
         else if(item.object instanceof InstancedMesh) {
+            // this is important ! for instanced meshes, must pass in identity !!
+            matWorld = mat4.identity;
+            matWorldPrev = mat4.identity;
             this._tmpColor.z = 1;
         }
+        this._ubObject.setMat4("matWorld", matWorld);
+        this._ubObject.setMat4("matWorldPrev", matWorldPrev);
+        this._ubObject.setVec4("color", item.object.color);
         this._ubObject.setVec4("props", this._tmpColor);
         this._ubObject.update();
 

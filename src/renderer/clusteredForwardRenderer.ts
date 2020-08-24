@@ -1112,12 +1112,22 @@ export class ClusteredForwardRenderer {
                 boxLocalScaleMat.fromScaling(boxScale);
 
                 mat4.product(boxLocalTranMat, boxLocalScaleMat, this._boundingBoxTransform);
-                mat4.product(item.object.worldTransform, this._boundingBoxTransform, this._boundingBoxTransform);
 
-                // item.object.worldTransform
-                this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one);
+                if (item.object instanceof InstancedMesh) {
+                    const instMesh = item.object as InstancedMesh;
+
+                    // let this._boundingBoxTransform only contains local transform of bounding box
+                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one);
                 
-                this._boundingBoxGeom.draw(0, Infinity, GLPrograms.currProgram.attributes);
+                    this._boundingBoxGeom.drawInstaces(0, Infinity, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
+
+                } else {
+                    mat4.product(item.object.worldTransform, this._boundingBoxTransform, this._boundingBoxTransform);
+
+                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one);
+                
+                    this._boundingBoxGeom.draw(0, Infinity, GLPrograms.currProgram.attributes);
+                }
 
                 // 是否应该在 object 上记录一个 occlusion query 帧号，如果本帧已经 query 过，就不用再 query 了
                 // 因为一个 object 可能会提供多个 renderItem
