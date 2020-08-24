@@ -33,6 +33,8 @@ export * from "./scene/behavior.js";
 export * from "./scene/clock.js";
 export * from "./scene/decal.js";
 export * from "./scene/environmentProbe.js";
+export * from "./scene/instance.js";
+export * from "./scene/instancedMesh.js";
 export * from "./scene/irradianceVolume.js";
 export * from "./scene/lights/baseLight.js";
 export * from "./scene/lights/directionalLight.js";
