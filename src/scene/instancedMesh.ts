@@ -5,6 +5,7 @@ import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.j
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { Object3D } from "./object3D.js";
+import { BoundingSphere } from "../math/boundingSphere.js";
 
 export class InstancedMesh extends Mesh {
     public constructor(maxInstanceCount: number, hasColor: boolean, extraFloats: number, isStatic: boolean) {
@@ -35,19 +36,21 @@ export class InstancedMesh extends Mesh {
         }
 
         this._dirty = false;
+
+        this._boundingSphere = new BoundingSphere();
     }
     private _instanceData: Float32Array;
     private _instFloatSize: number;
     private _maxInstanceCount: number;
 
-    // todo: vertex buffer containing instance data
     private _vertexBuffer: VertexBuffer;
     private _attributes: VertexBufferAttribute[];
-    // todo: instance vertex attributes
 
     private _hasColor: boolean;
     private _extraFloats: number;
     private _dirty: boolean;
+
+    private _boundingSphere: BoundingSphere;
 
     public curInstanceCount: number;
     public get maxInstanceCount(): number {
@@ -95,6 +98,11 @@ export class InstancedMesh extends Mesh {
             }
             this._dirty = false;
         }
+    }
+
+    public updateBoundingSphere() {
+        // todo: calculate an entire bounding sphere containing all instances
+        
     }
 
     public destroy(destroyChildren: boolean) {

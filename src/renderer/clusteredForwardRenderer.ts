@@ -577,6 +577,7 @@ export class ClusteredForwardRenderer {
                 }
             } else if (object instanceof Mesh) {
                 // check if it has moved or animated
+                // todo: how to check instanced meshes?
                 if (! object.worldTransformPrev.equals(object.worldTransform)) {
                     this._objectsMoved[this._curNumMovedObjects] = object;
                     this._curNumMovedObjects++;
@@ -925,10 +926,15 @@ export class ClusteredForwardRenderer {
                     continue;
                 }
 
-                // todo frustum culling
-                item.geometry.boundingSphere.transform(item.object.worldTransform, sphere);
-                if (!frustum.intersectsSphere(sphere)) {
-                    continue;
+                // frustum culling
+                if (item.object instanceof InstancedMesh) {
+                    // fix me: how to cull instances?
+                    // use a whole bounding sphere? or axis aligned bounding box?
+                } else {
+                    item.geometry.boundingSphere.transform(item.object.worldTransform, sphere);
+                    if (!frustum.intersectsSphere(sphere)) {
+                        continue;
+                    }
                 }
 
                 const isSkin = item.object instanceof SkinMesh;
@@ -1093,8 +1099,10 @@ export class ClusteredForwardRenderer {
                 // todo: draw bounding box
                 // get local bouding box of object, then calculate the transform, fill it to the object world transform uniform.
 
-                // fix me: instanced mesh bounding box? should contains all instances of this mesh.
-                // if instances are static, can the bounding box only calculated once and be cached?
+                // fix me: instanced mesh bounding box? 
+                // draw instanced also?
+                // how to apply local scale and translation matrix ? use u_object.matWorld ?
+
                 const boundingBox = item.geometry.boundingBox;
                 boxLocalTranMat.fromTranslation(boundingBox.center);
 
