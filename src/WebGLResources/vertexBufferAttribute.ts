@@ -10,13 +10,13 @@ export class VertexBufferAttribute {
      * @param componentType 
      * @param offset 
      */
-    public constructor(name: string, buffer: VertexBuffer, size: number, componentType: GLenum, offset: number, locationOffset?: number) {
+    public constructor(name: string, buffer: VertexBuffer, size: number, componentType: GLenum, offset: number, locationOffset?: number, divisor: number = 0) {
         this.name = name;
         this.buffer = buffer;
         this.size = size;
         this.componentType = componentType;
         this.offset = offset;
-        this.divisor = 0;
+        this.divisor = divisor;
         this.locationOffset = 0;
         if (locationOffset !== undefined) {
             this.locationOffset = locationOffset;

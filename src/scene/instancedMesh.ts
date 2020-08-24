@@ -24,14 +24,14 @@ export class InstancedMesh extends Mesh {
 
         // todo: create vertex attributes
         // mat4 a_instanceMatrix
-        this._attributes.push(new VertexBufferAttribute("a_instanceMatrix", this._vertexBuffer, 4, GLDevice.gl.FLOAT, 0, 0));
-        this._attributes.push(new VertexBufferAttribute("a_instanceMatrix", this._vertexBuffer, 4, GLDevice.gl.FLOAT, 16, 1));
-        this._attributes.push(new VertexBufferAttribute("a_instanceMatrix", this._vertexBuffer, 4, GLDevice.gl.FLOAT, 32, 2));
-        this._attributes.push(new VertexBufferAttribute("a_instanceMatrix", this._vertexBuffer, 4, GLDevice.gl.FLOAT, 48, 3));
+        this._attributes.push(new VertexBufferAttribute("a_instanceMatrix", this._vertexBuffer, 4, GLDevice.gl.FLOAT, 0, 0, 1));
+        this._attributes.push(new VertexBufferAttribute("a_instanceMatrix", this._vertexBuffer, 4, GLDevice.gl.FLOAT, 16, 1, 1));
+        this._attributes.push(new VertexBufferAttribute("a_instanceMatrix", this._vertexBuffer, 4, GLDevice.gl.FLOAT, 32, 2, 1));
+        this._attributes.push(new VertexBufferAttribute("a_instanceMatrix", this._vertexBuffer, 4, GLDevice.gl.FLOAT, 48, 3, 1));
 
         // vec4 a_instanceColor
         if (hasColor) {
-            this._attributes.push(new VertexBufferAttribute("a_instanceColor", this._vertexBuffer, 4, GLDevice.gl.FLOAT, 64));
+            this._attributes.push(new VertexBufferAttribute("a_instanceColor", this._vertexBuffer, 4, GLDevice.gl.FLOAT, 64, 0, 1));
         }
 
         this._dirty = false;
@@ -53,6 +53,7 @@ export class InstancedMesh extends Mesh {
     public get maxInstanceCount(): number {
         return this._maxInstanceCount;
     }
+    public get instanceAttributes(): VertexBufferAttribute[] {return this._attributes;}
 
     public setMatrixOf(instanceIdx: number, matrix: mat4) {
         const start = instanceIdx * this._instFloatSize;
@@ -94,6 +95,13 @@ export class InstancedMesh extends Mesh {
             }
             this._dirty = false;
         }
+    }
+
+    public destroy(destroyChildren: boolean) {
+        if (this._vertexBuffer !== undefined) {
+            this._vertexBuffer.release();
+        }
+        super.destroy(destroyChildren);
     }
 
     // fix me: should update vertex buffer when providePrimitive?

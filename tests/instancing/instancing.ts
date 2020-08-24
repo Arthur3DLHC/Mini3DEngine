@@ -80,7 +80,7 @@ window.onload = () => {
 
         // translation: 10 x 10
         const matTran: mat4 = mat4.identity.copy();
-        matTran.fromTranslation(new vec3([Math.floor(i / 10), 0, i % 10]));
+        matTran.fromTranslation(new vec3([Math.floor(i / 10), 1, i % 10]));
 
         // update instance matrix
         const matInst: mat4 = new mat4();
@@ -88,11 +88,12 @@ window.onload = () => {
 
         boxMesh.setMatrixOf(i, matInst);
     }
+    boxMesh.curInstanceCount = boxMesh.maxInstanceCount;
     boxMesh.updateInstanceVertexBuffer();
     scene.attachChild(boxMesh);
     
-    const cylinderMesh = new Mesh();
-    cylinderMesh.name = "cylinder01";
+    const cylinderMesh = new InstancedMesh(100, false, 0, true);
+    cylinderMesh.name = "cylinders";
     cylinderMesh.localTransform.fromTranslation(new vec3([0.75, 0, 0]));
     cylinderMesh.geometry = new CylinderGeometry(0.25, 0.5, 24);
     cylinderMesh.castShadow = true;
@@ -105,9 +106,26 @@ window.onload = () => {
     cylinderMtl.roughness = 0.6;
     cylinderMesh.materials.push(cylinderMtl);
 
+    for (let i = 0; i < cylinderMesh.maxInstanceCount; i++) {
+        // rotation
+        const matRot: mat4 = mat4.identity.copy();
+        matRot.fromYRotation(i * 0.01);
+
+        // translation: 10 x 10
+        const matTran: mat4 = mat4.identity.copy();
+        matTran.fromTranslation(new vec3([Math.floor(i / 10), 3, i % 10]));
+
+        // update instance matrix
+        const matInst: mat4 = new mat4();
+        mat4.product(matTran, matRot, matInst);
+
+        cylinderMesh.setMatrixOf(i, matInst);
+    }
+    cylinderMesh.curInstanceCount = cylinderMesh.maxInstanceCount;
+    cylinderMesh.updateInstanceVertexBuffer();
     scene.attachChild(cylinderMesh);
 
-    // plane for check shadows of instanced meshes.
+    // plane for check shadows of instanced meshes, and inst/uninst meshes draw together.
     const matPlaneRot = new mat4();
     const matPlaneTran = new mat4();
 

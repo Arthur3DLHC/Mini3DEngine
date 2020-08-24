@@ -79,6 +79,7 @@ import { SubsurfaceProcessor } from "./subsurfaceProcessor.js";
 import { BoxGeometry } from "../geometry/common/boxGeometry.js";
 import { SkinMesh } from "../scene/skinMesh.js";
 import mat3 from "../../lib/tsm/mat3.js";
+import { InstancedMesh } from "../mini3DEngine.js";
 
 export class ClusteredForwardRenderer {
 
@@ -961,7 +962,12 @@ export class ClusteredForwardRenderer {
                 }
                 // draw item geometry
                 if (GLPrograms.currProgram) {
-                    item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
+                    if (item.object instanceof InstancedMesh) {
+                        const instMesh = item.object as InstancedMesh;
+                        item.geometry.drawInstaces(item.startIndex, item.count, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
+                    } else {
+                        item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
+                    }
                 }
                 // restore default renderstates for next item.
                 if (this._curDefaultRenderStates) {
@@ -1035,7 +1041,12 @@ export class ClusteredForwardRenderer {
 
                         // draw item geometry
                         if (GLPrograms.currProgram) {
-                            item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
+                            if (item.object instanceof InstancedMesh) {
+                                const instMesh = item.object as InstancedMesh;
+                                item.geometry.drawInstaces(item.startIndex, item.count, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
+                            } else {
+                                item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
+                            }
                         }
                         this._currentObject = item.object;
                     }
