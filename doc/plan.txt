@@ -466,6 +466,7 @@ TODO:       主要类结构
                 需要由远到近排序？按照物体中心点；
                 先测试不排序的绘制；
                 是否使用OIT？
+                测试半透明物体的 Demo
 
             GameScene 管理
                 参考 Phaser 和 PIXI.js？
