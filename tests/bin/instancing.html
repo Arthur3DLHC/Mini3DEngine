@@ -1,15 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-        <title>Instancing Demo</title>
-    </head>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>Instancing Demo</title>
+    <link rel="stylesheet" type="text/css" href="tests.css">
+</head>
 
 <body>
     <script type="module" src="js/tests/instancing/instancing.js"></script>
     <div>
+        <div id="infoPanel" class="infoPanel">FPS: 0</div>
+        <div id="ctrlPanel" class="controlPanel">
+            <div class="controlPanelTitle">Control Panel</div>
+            <div id="ckbEnableInstancing" class="actionList">
+                *Instancing
+            </div>
+        </div>
         <canvas id="mainCanvas" width="1280" height="720"></canvas>
     </div>
     <div id="infoPanel">FPS: 0</div>
