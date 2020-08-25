@@ -2,6 +2,7 @@ import { Object3D } from "./object3D.js";
 import { Material } from "./materials/material.js";
 import { BufferGeometry } from "../geometry/bufferGeometry.js";
 import { RenderList } from "../renderer/renderList.js";
+import { BoundingSphere } from "../math/boundingSphere.js";
 
 export class Mesh extends Object3D {
     public constructor() {
@@ -14,6 +15,12 @@ export class Mesh extends Object3D {
     // todo: material list
     public materials: Material[];
 
+    public get boundingSphere(): BoundingSphere | null {
+        if (this.geometry === null) {
+            return null;
+        }
+        return this.geometry.boundingSphere;
+    }
 
     public provideRenderItem(renderList: RenderList) {
         if (this.geometry) {

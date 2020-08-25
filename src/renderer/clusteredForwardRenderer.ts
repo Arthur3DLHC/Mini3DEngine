@@ -1013,6 +1013,7 @@ export class ClusteredForwardRenderer {
                     }
 
                     // check frustum culling
+                    // todo: need to consider skinned mesh and instanced mesh
                     item.geometry.boundingSphere.transform(item.object.worldTransform, sphere);
                     // iterate all frustums
 
