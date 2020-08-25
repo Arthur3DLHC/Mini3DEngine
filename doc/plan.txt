@@ -496,6 +496,8 @@ TODO:       主要类结构
                 动态的 instancing 物体怎么处理
                     更新矩阵；包围盒？occlusion query?
             
+            物体是否做包围球检测的控制标志？
+            
             测试 Occlusion query?
                 调试绘制：Occlusion test 失败的，画一个不会被遮挡的线框 box？或者用不同颜色线框区分被遮挡/无遮挡的物体
                 Occlusion query object 分组；
