@@ -76,7 +76,7 @@ window.onload = () => {
     for (let i = 0; i < boxMesh.maxInstanceCount; i++) {
         // rotation
         const matRot: mat4 = mat4.identity.copy();
-        matRot.fromYRotation(i * 0.01);
+        matRot.fromYRotation(i * 0.03);
 
         // translation: 10 x 10
         const matTran: mat4 = mat4.identity.copy();
@@ -109,7 +109,7 @@ window.onload = () => {
     for (let i = 0; i < cylinderMesh.maxInstanceCount; i++) {
         // rotation
         const matRot: mat4 = mat4.identity.copy();
-        matRot.fromYRotation(i * 0.01);
+        matRot.fromZRotation(i * 0.03);
 
         // translation: 10 x 10
         const matTran: mat4 = mat4.identity.copy();
