@@ -15,11 +15,17 @@ export class Mesh extends Object3D {
     // todo: material list
     public materials: Material[];
 
-    public get boundingSphere(): BoundingSphere | null {
+    protected _boundingSphere: BoundingSphere = new BoundingSphere();
+
+    /**
+     * the entire bounding sphere, in world space
+     */
+    public get boundingSphere(): BoundingSphere {
         if (this.geometry === null) {
-            return null;
+            return this._boundingSphere;
         }
-        return this.geometry.boundingSphere;
+        this.geometry.boundingSphere.transform(this.worldTransform, this._boundingSphere);
+        return this._boundingSphere;
     }
 
     public provideRenderItem(renderList: RenderList) {

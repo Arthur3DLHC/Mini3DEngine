@@ -12,6 +12,7 @@ export class InstancedMesh extends Mesh {
         super();
         this.curInstanceCount = 0;
         this._maxInstanceCount = maxInstanceCount;
+        this._tmpMatrix = new mat4();
         this._hasColor = hasColor;
         this._extraFloats = extraFloats;
         this._instFloatSize = 16;
@@ -36,12 +37,11 @@ export class InstancedMesh extends Mesh {
         }
 
         this._dirty = false;
-
-        this._boundingSphere = new BoundingSphere();
     }
     private _instanceData: Float32Array;
     private _instFloatSize: number;
     private _maxInstanceCount: number;
+    private _tmpMatrix: mat4;
 
     private _vertexBuffer: VertexBuffer;
     private _attributes: VertexBufferAttribute[];
@@ -49,8 +49,6 @@ export class InstancedMesh extends Mesh {
     private _hasColor: boolean;
     private _extraFloats: number;
     private _dirty: boolean;
-
-    private _boundingSphere: BoundingSphere;
 
     public curInstanceCount: number;
     public get maxInstanceCount(): number {
@@ -96,13 +94,31 @@ export class InstancedMesh extends Mesh {
             } else {
                 this._vertexBuffer.update();
             }
+
+            // enlarge bounding sphere to contain all instances
+            if (this.geometry && this.curInstanceCount > 0) {
+                this.getInstanceMatrix(0, this._tmpMatrix);
+                this.geometry.boundingSphere.transform(this._tmpMatrix, this._boundingSphere);
+
+                const worldSphere = new BoundingSphere();
+                for (let i = 1; i < this.curInstanceCount; i++) {
+                    this.getInstanceMatrix(i, this._tmpMatrix);
+                    this.geometry.boundingSphere.transform(this._tmpMatrix, worldSphere);
+                    this._boundingSphere.enlarge(worldSphere);
+                }
+            }
+
             this._dirty = false;
         }
     }
 
-    public updateBoundingSphere() {
-        // todo: calculate an entire bounding sphere containing all instances
-        
+    /**
+     * the entire bounding sphere, in world space
+     * will be updated when updating joint matrices
+     */
+    public get boundingSphere(): BoundingSphere {
+        // contains all instances, in world space
+        return this._boundingSphere;
     }
 
     public destroy(destroyChildren: boolean) {
@@ -128,5 +144,10 @@ export class InstancedMesh extends Mesh {
         for (const child of obj.children) {
             InstancedMesh.updateInstancedMeshes(child);
         }
+    }
+
+    private getInstanceMatrix(index: number, dest: mat4) {
+        const start = index * this._instFloatSize;
+        for(let i = 0; i < 16; i++) dest.values[i] = this._instanceData[start + i];
     }
 }

@@ -927,6 +927,20 @@ export class ClusteredForwardRenderer {
                 }
 
                 // frustum culling
+                if (item.object instanceof Mesh) {
+                    // different meshes has different bounding spheres
+                    const mesh = item.object as Mesh;
+                    if (!frustum.intersectsSphere(mesh.boundingSphere)) {
+                        continue;
+                    }
+                } else {
+                    item.geometry.boundingSphere.transform(item.object.worldTransform, sphere);
+                    if (!frustum.intersectsSphere(sphere)) {
+                        continue;
+                    }
+                }
+
+                /*
                 if (item.object instanceof InstancedMesh) {
                     // fix me: how to cull instances?
                     // use a whole bounding sphere? or axis aligned bounding box?
@@ -936,6 +950,7 @@ export class ClusteredForwardRenderer {
                         continue;
                     }
                 }
+                */
 
                 const isSkin = item.object instanceof SkinMesh;
 
@@ -1014,49 +1029,59 @@ export class ClusteredForwardRenderer {
 
                     // check frustum culling
                     // todo: need to consider skinned mesh and instanced mesh
-                    item.geometry.boundingSphere.transform(item.object.worldTransform, sphere);
+                    if (item.object instanceof Mesh) {
+                        // different meshes has different bounding spheres
+                        const mesh = item.object as Mesh;
+                        if (!frustum.intersectsSphere(mesh.boundingSphere)) {
+                            continue;
+                        }
+                    } else {
+                        item.geometry.boundingSphere.transform(item.object.worldTransform, sphere);
+                        if (!frustum.intersectsSphere(sphere)) {
+                            continue;
+                        }
+                    }
+
                     // iterate all frustums
 
-                    if (frustum.intersectsSphere(sphere)) {
-                        if (!inited) {
-                            GLDevice.renderTarget = target;
+                    if (!inited) {
+                        GLDevice.renderTarget = target;
 
-                            gl.viewport(rect.x, rect.y, rect.z, rect.w);
-                            gl.scissor(rect.x, rect.y, rect.z, rect.w);
-                            this.setRenderStateSet(this._renderStatesShadow);
+                        gl.viewport(rect.x, rect.y, rect.z, rect.w);
+                        gl.scissor(rect.x, rect.y, rect.z, rect.w);
+                        this.setRenderStateSet(this._renderStatesShadow);
 
-                            if (copyCache && (target !== this._shadowmapCacheFBO)) {
-                                this.copyShadowFromCache(light.shadow, iFrustum);
-                            }
-
-                            // todo: support light view idx for point light
-                            this._renderContext.fillUniformBuffersPerLightView(light, iFrustum);
-                            // disable color output
-
-                            if (!copyCache) {
-                                GLDevice.clearColor = new vec4([1, 0, 0, 1]);
-                                GLDevice.clearDepth = 1.0;
-                                GLDevice.clear(true, true, true);
-                            }
-
-                            // render opaque objects which can drop shadow
-                            GLPrograms.useProgram(this._shadowProgram);
-                            inited = true;
+                        if (copyCache && (target !== this._shadowmapCacheFBO)) {
+                            this.copyShadowFromCache(light.shadow, iFrustum);
                         }
 
-                        this._renderContext.fillUniformBuffersPerObject(item);
+                        // todo: support light view idx for point light
+                        this._renderContext.fillUniformBuffersPerLightView(light, iFrustum);
+                        // disable color output
 
-                        // draw item geometry
-                        if (GLPrograms.currProgram) {
-                            if (item.object instanceof InstancedMesh) {
-                                const instMesh = item.object as InstancedMesh;
-                                item.geometry.drawInstaces(item.startIndex, item.count, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
-                            } else {
-                                item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
-                            }
+                        if (!copyCache) {
+                            GLDevice.clearColor = new vec4([1, 0, 0, 1]);
+                            GLDevice.clearDepth = 1.0;
+                            GLDevice.clear(true, true, true);
                         }
-                        this._currentObject = item.object;
+
+                        // render opaque objects which can drop shadow
+                        GLPrograms.useProgram(this._shadowProgram);
+                        inited = true;
                     }
+
+                    this._renderContext.fillUniformBuffersPerObject(item);
+
+                    // draw item geometry
+                    if (GLPrograms.currProgram) {
+                        if (item.object instanceof InstancedMesh) {
+                            const instMesh = item.object as InstancedMesh;
+                            item.geometry.drawInstaces(item.startIndex, item.count, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
+                        } else {
+                            item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
+                        }
+                    }
+                    this._currentObject = item.object;
                 }
             }
         }

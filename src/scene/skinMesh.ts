@@ -10,12 +10,12 @@ export class SkinMesh extends Mesh {
     // todo: bind pose matrices, should be cached?
     public inverseBindMatrices: mat4[] = [];
 
-    private _boundingSphere: BoundingSphere = new BoundingSphere();
-
     /**
-     * the entire bounding sphere
+     * the entire bounding sphere, in world space
+     * will be updated when updating joint matrices
      */
-    public get boundingSphere(): BoundingSphere | null {
+    public get boundingSphere(): BoundingSphere {
+        // contains all joints, in world space
         return this._boundingSphere;
     }
 
