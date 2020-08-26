@@ -80,6 +80,7 @@ import { BoxGeometry } from "../geometry/common/boxGeometry.js";
 import { SkinMesh } from "../scene/skinMesh.js";
 import mat3 from "../../lib/tsm/mat3.js";
 import { InstancedMesh } from "../mini3DEngine.js";
+import { RenderItem } from "./renderItem.js";
 
 export class ClusteredForwardRenderer {
 
@@ -446,7 +447,9 @@ export class ClusteredForwardRenderer {
     private _postprocessor: PostProcessor;
     private _subsurfProcessor: SubsurfaceProcessor;
 
-    public get postprocessor(): PostProcessor { return this._postprocessor; }    
+    public get postprocessor(): PostProcessor { return this._postprocessor; }
+
+    public sortTransparents: boolean = true;
 
     private createRenderStates() {
         const gl = GLDevice.gl;
@@ -796,6 +799,9 @@ export class ClusteredForwardRenderer {
 
             // todo: sort the renderlists first?
             // sort transparent items only? from far to near; and renderItem.renderOrder;
+            if (this.sortTransparents) {
+                this._renderListTransparent.sortFarToNear(camera.position);
+            }
 
            // gl.colorMask(false, false, false, false);
             //gl.depthFunc(gl.LEQUAL);

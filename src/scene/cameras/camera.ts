@@ -1,6 +1,7 @@
 import { Object3D } from "../object3D.js";
 import vec4 from "../../../lib/tsm/vec4.js";
 import mat4 from "../../../lib/tsm/mat4.js";
+import vec3 from "../../../lib/tsm/vec3.js";
 
 export class Camera extends Object3D {
     // todo: skybox? or put skybox in scene?
@@ -29,6 +30,12 @@ export class Camera extends Object3D {
 
     public viewTransformPrev: mat4 = mat4.identity.copy();
     public projTransformPrev: mat4 = mat4.identity.copy();
+    
+    public get position(): vec3{
+        return this.worldTransform.getTranslation(this._tmpPosition);
+    }
+
+    private _tmpPosition: vec3 = new vec3();
 
     /**
      * make sure only call this once per frame
