@@ -22,7 +22,7 @@ export class SphereGeometry extends BufferGeometry {
 
         vertexBuffer.stride = floatCount * 4;
         vertexBuffer.data = new Float32Array(floatCount * (this._heightSegments + 1) * (this._widthSegments + 1));
-        // todo: fill vertex data
+        // fill vertex data
         for (let j = 0; j < this._heightSegments + 1; j++) {
             const t = (j / this._heightSegments);
             const lat = t * Math.PI - Math.PI * 0.5;
