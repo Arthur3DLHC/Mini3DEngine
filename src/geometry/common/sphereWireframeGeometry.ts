@@ -57,6 +57,8 @@ export class SphereWireframeGeometry extends BufferGeometry {
         this.primitives.push(grp);
         
         this.drawMode = GLDevice.gl.LINES;
+
+        this.boundingSphere.radius = this._radius;
     }
 
     private _radius: number;
