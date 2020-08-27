@@ -127,7 +127,7 @@ export class ClusteredForwardRenderer {
         this._skyboxGeom = new BoxGeometry(2, 2, 2);
         this._skyboxTransform = mat4.identity.copy();
 
-        this._boundingBoxGeom = new BoxGeometry(1, 1, 1);
+        this._occlusionBoxGeom = new BoxGeometry(1, 1, 1);
         this._boundingBoxTransform = mat4.identity.copy();
 
         this._boundingBoxWireframeGeom = new BoxWireframeGeometry(1, 1, 1);
@@ -386,7 +386,7 @@ export class ClusteredForwardRenderer {
     private _skyboxTransform: mat4;
 
     // todo: a unit box geometry for draw bounding boxes; used by occlusion query pass
-    private _boundingBoxGeom: BoxGeometry;
+    private _occlusionBoxGeom: BoxGeometry;
     private _boundingBoxTransform: mat4;
 
     // box and sphere wireframe geometry, for debug showing bounding boxes and spheres.
@@ -897,7 +897,7 @@ export class ClusteredForwardRenderer {
         if (this._renderListOpaqueOcclusionQuery.ItemCount > 0) {
             this.setRenderStateSet(this._renderStatesOpaqueOcclusion);
             GLPrograms.useProgram(this._occlusionQueryProgram);
-            this.renderItemBoundingBoxes(this._renderListOpaqueOcclusionQuery, true);
+            this.renderOcclusionBoundingBoxes(this._renderListOpaqueOcclusionQuery);
 
             // occlusion query objects, render according to last frame query result
             this.setRenderStateSet(this._renderStatesOpaque);
@@ -916,7 +916,7 @@ export class ClusteredForwardRenderer {
         if (this._renderListTransparentOcclusionQuery.ItemCount > 0) {
             this.setRenderStateSet(this._renderStatesTransparentOcclusion);
             GLPrograms.useProgram(this._occlusionQueryProgram);
-            this.renderItemBoundingBoxes(this._renderListTransparentOcclusionQuery, true);
+            this.renderOcclusionBoundingBoxes(this._renderListTransparentOcclusionQuery);
 
             // occlusion query objects, render according to last frame query result
             this.setRenderStateSet(this._renderStatesTransparent);
@@ -1116,7 +1116,7 @@ export class ClusteredForwardRenderer {
         GLDevice.sourceFBO = null;
     }
 
-    private renderItemBoundingBoxes(renderList: RenderList, occlusionQuery: boolean = false) {
+    private renderOcclusionBoundingBoxes(renderList: RenderList) {
         // render bounding boxes only, ignore all materials
         // 是每个 object 一个 boundingbox，还是每个 renderitem 一个？
         // 如果 occlusionQuery === true，需要检查对象是否有 queryID，如果没有就创建一个。
@@ -1132,13 +1132,11 @@ export class ClusteredForwardRenderer {
         for (let i = 0; i < renderList.ItemCount; i++) {
             const item = renderList.getItemAt(i);
             if (item) {
-                if (occlusionQuery) {
-                    if (item.object.occlusionQueryID === null) {
-                        item.object.occlusionQueryID = gl.createQuery();
-                    }
-                    if (item.object.occlusionQueryID !== null) {
-                        gl.beginQuery(gl.ANY_SAMPLES_PASSED, item.object.occlusionQueryID);
-                    }
+                if (item.object.occlusionQueryID === null) {
+                    item.object.occlusionQueryID = gl.createQuery();
+                }
+                if (item.object.occlusionQueryID !== null) {
+                    gl.beginQuery(gl.ANY_SAMPLES_PASSED, item.object.occlusionQueryID);
                 }
                 // todo: draw bounding box
                 // get local bouding box of object, then calculate the transform, fill it to the object world transform uniform.
@@ -1163,29 +1161,23 @@ export class ClusteredForwardRenderer {
                     // let this._boundingBoxTransform only contains local transform of bounding box
                     this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one);
                 
-                    this._boundingBoxGeom.drawInstaces(0, Infinity, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
+                    this._occlusionBoxGeom.drawInstaces(0, Infinity, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
 
                 } else {
                     mat4.product(item.object.worldTransform, this._boundingBoxTransform, this._boundingBoxTransform);
 
                     this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one);
                 
-                    this._boundingBoxGeom.draw(0, Infinity, GLPrograms.currProgram.attributes);
+                    this._occlusionBoxGeom.draw(0, Infinity, GLPrograms.currProgram.attributes);
                 }
 
                 // 是否应该在 object 上记录一个 occlusion query 帧号，如果本帧已经 query 过，就不用再 query 了
                 // 因为一个 object 可能会提供多个 renderItem
-                if (occlusionQuery) {
-                    if (item.object.occlusionQueryID !== null) {
-                        gl.endQuery(gl.ANY_SAMPLES_PASSED);
-                    }
+                if (item.object.occlusionQueryID !== null) {
+                    gl.endQuery(gl.ANY_SAMPLES_PASSED);
                 }
             }
         }
-    }
-
-    private renderItemBoundingBoxesDebug() {
-        
     }
 
     /**
