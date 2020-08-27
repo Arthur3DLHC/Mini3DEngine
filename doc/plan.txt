@@ -479,7 +479,7 @@ TODO:       主要类结构
                 先测试不排序的绘制；
                 是否使用OIT？
                 测试半透明物体的 Demo
-
+                Fix me: 半透明放在 postprocess 之后画，深度缓冲失效；
 
             GameScene 管理
                 参考 Phaser 和 PIXI.js？
