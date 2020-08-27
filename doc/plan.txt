@@ -461,9 +461,16 @@ TODO:       主要类结构
             优化 tsm 库？
 
             解析 Draco 压缩过的模型？
+            
+            绘制调试用的包围盒和包围球
+                单位盒和单位球，边线模式图元
+                在 RenderItems 时绘制？还是单独设立一个 pass？
 
             支持材质自定义 Shader？
                 非物理材质
+                Shader Cache 机制
+                    Cache key: shader code key, features;
+                    程序的最开始，需要把 shader code 注册到全局列表
 
             骨骼皮肤动画：包围球不准确问题（坐姿人物眉毛消失）
 
@@ -472,6 +479,7 @@ TODO:       主要类结构
                 先测试不排序的绘制；
                 是否使用OIT？
                 测试半透明物体的 Demo
+
 
             GameScene 管理
                 参考 Phaser 和 PIXI.js？

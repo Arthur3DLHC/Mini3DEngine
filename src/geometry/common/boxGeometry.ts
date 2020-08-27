@@ -8,13 +8,14 @@ import { VertexBufferAttribute } from "../../WebGLResources/vertexBufferAttribut
 export class BoxGeometry extends BufferGeometry {
     /**
      * constructor
+     * no segments support yet.
      * @param width length in x dimension
      * @param height length in y dimension
      * @param depth lengh in z dimension
      */
     public constructor(width: number, height: number, depth: number) {
         super();
-        // todo: create vertex and index buffer
+        // create vertex and index buffer
         // create vertex attributes
         // position, normal, texcoord?
         // fix me: tangent, binormal?

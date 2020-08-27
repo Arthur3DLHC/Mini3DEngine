@@ -102,7 +102,7 @@ export class AnimationSampler {
     }
 
     private cubicSplineInterpolation(prevKey: number, nextKey: number, t: number, isQuaternion: boolean) {
-
+        throw new Error("Not implemented.");
     }
 
     private _interpolate: (prevKey: number, nextKey: number, t: number, isQuaternion: boolean) => void = this.linearInterpolation;
