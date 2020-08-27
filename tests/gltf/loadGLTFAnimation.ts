@@ -88,14 +88,19 @@ window.onload = () => {
     let lastUpdateFPSTime = 0;
     let curFPS = 0;
 
-    const actions: AnimationAction[] = [];
-    let curAction: AnimationAction | undefined = undefined;
+    const actionsFemale: AnimationAction[] = [];
+    const actionsMale: AnimationAction[] = [];
+    let curActionFemale: AnimationAction | undefined = undefined;
+    let curActionMale: AnimationAction | undefined = undefined;
 
     function gameLoop(now: number) {
         Clock.instance.update(now);
         scene.updateBehavior();
-        if (curAction !== undefined) {
-            curAction.update(Clock.instance.curTime, Clock.instance.elapsedTime);
+        if (curActionFemale !== undefined) {
+            curActionFemale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
+        }
+        if (curActionMale !== undefined) {
+            curActionMale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
         }
         scene.updateWorldTransform(false, true);
         SkinMesh.updateSkinMeshes(scene);
@@ -119,7 +124,8 @@ window.onload = () => {
     // const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/BoxInterleaved/glTF/BoxInterleaved.gltf");
     // const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/BoxTextured/glTF/BoxTextured.gltf");
     // const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/DamagedHelmet/glTF/DamagedHelmet.gltf");
-    const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/std_female/std_female_anim.gltf");
+    const gltfPromiseFemale: Promise<GltfAsset> = gltfLoader.load("./models/std_female/std_female_animation.gltf");
+    const gltfPromiseMale: Promise<GltfAsset> = gltfLoader.load("./models/std_male/std_male_animation.gltf");
 
     console.log("loading skybox...");
 
@@ -140,11 +146,11 @@ window.onload = () => {
     const imagesPromise = Promise.all(imagePromises);
 
     // fix me: type error
-    Promise.all([gltfPromise, imagesPromise]).then((loaded) => {
+    Promise.all([gltfPromiseFemale, gltfPromiseMale, imagesPromise]).then((loaded) => {
         const skyboxTexture: TextureCube = new TextureCube();
 
         for(let i = 0; i < 6; i++) {
-            skyboxTexture.images[i] = loaded[1][i];
+            skyboxTexture.images[i] = loaded[2][i];
         }
 
         skyboxTexture.componentType = GLDevice.gl.UNSIGNED_BYTE;
@@ -162,41 +168,79 @@ window.onload = () => {
 
 
         const builder = new GLTFSceneBuilder();
-        const gltfScene = builder.build(loaded[0], 0, actions);
-        gltfScene.rotation = quat.fromAxisAngle(new vec3([0, 1, 0]), Math.PI);
-        gltfScene.autoUpdateTransform = true;
-        scene.attachChild(gltfScene);
+        
+        const gltfSceneFemale = builder.build(loaded[0], 0, actionsFemale);
+        // gltfSceneFemale.rotation = quat.fromAxisAngle(new vec3([0, 1, 0]), Math.PI);
+        gltfSceneFemale.autoUpdateTransform = true;
+        scene.attachChild(gltfSceneFemale);
 
-        prepareGLTFScene(gltfScene);
+        prepareGLTFScene(gltfSceneFemale);
+
+        const gltfSceneMale = builder.build(loaded[1], 0, actionsMale);
+        // gltfSceneMale.rotation = quat.fromAxisAngle(new vec3([0, 1, 0]), Math.PI);
+        gltfSceneMale.autoUpdateTransform = true;
+        scene.attachChild(gltfSceneMale);
+
+        prepareGLTFScene(gltfSceneMale);
 
         // todo: add all action names to action list UI
-        const actionList: HTMLDivElement = document.getElementById("actionList") as HTMLDivElement;
-        actionList.innerHTML = "";
+        const actionListFemale: HTMLDivElement = document.getElementById("actionList_female") as HTMLDivElement;
+        const actionListMale: HTMLDivElement = document.getElementById("actionList_male") as HTMLDivElement;
+        actionListFemale.innerHTML = "";
+        actionListMale.innerHTML = "";
 
-        if (actions.length > 0) {
-            curAction = actions[0];
-            curAction.LoopMode = AnimationLoopMode.Repeat;
-            curAction.play();
+        if (actionsFemale.length > 0) {
+            curActionFemale = actionsFemale[0];
+            curActionFemale.LoopMode = AnimationLoopMode.Repeat;
+            curActionFemale.play();
 
             let actidx = 0;
-            for (const act of actions) {
+            for (const act of actionsFemale) {
                 // click callback
                 // NOTE: can not all constructor of HTMLElements in TypeScript.
                 // Can only call document.createElement()
                 const actionItem: HTMLDivElement = document.createElement("div");
-                actionItem.id = "action_" + actidx;
+                actionItem.id = "action_female_" + actidx;
                 actionItem.innerHTML = act.name;
                 actionItem.className = "actionItem";
                 actionItem.onclick = (ev: MouseEvent) => {
-                    if (curAction !== undefined) {
-                        curAction.stop();
-                        curAction.reset();
+                    if (curActionFemale !== undefined) {
+                        curActionFemale.stop();
+                        curActionFemale.reset();
                     }
-                    curAction = act;
-                    curAction.LoopMode = AnimationLoopMode.Repeat;
-                    curAction.play();
+                    curActionFemale = act;
+                    curActionFemale.LoopMode = AnimationLoopMode.Repeat;
+                    curActionFemale.play();
                 }
-                actionList.appendChild(actionItem);
+                actionListFemale.appendChild(actionItem);
+                actidx++;
+            }
+        }
+
+        if (actionsMale.length > 0) {
+            curActionMale = actionsMale[0];
+            curActionMale.LoopMode = AnimationLoopMode.Repeat;
+            curActionMale.play();
+
+            let actidx = 0;
+            for (const act of actionsMale) {
+                // click callback
+                // NOTE: can not all constructor of HTMLElements in TypeScript.
+                // Can only call document.createElement()
+                const actionItem: HTMLDivElement = document.createElement("div");
+                actionItem.id = "action_male_" + actidx;
+                actionItem.innerHTML = act.name;
+                actionItem.className = "actionItem";
+                actionItem.onclick = (ev: MouseEvent) => {
+                    if (curActionMale !== undefined) {
+                        curActionMale.stop();
+                        curActionMale.reset();
+                    }
+                    curActionMale = act;
+                    curActionMale.LoopMode = AnimationLoopMode.Repeat;
+                    curActionMale.play();
+                }
+                actionListMale.appendChild(actionItem);
                 actidx++;
             }
         }
