@@ -81,6 +81,8 @@ import { SkinMesh } from "../scene/skinMesh.js";
 import mat3 from "../../lib/tsm/mat3.js";
 import { InstancedMesh } from "../mini3DEngine.js";
 import { RenderItem } from "./renderItem.js";
+import { BoxWireframeGeometry } from "../geometry/common/boxWireframeGeometry.js";
+import { SphereWireframeGeometry } from "../geometry/common/sphereWireframeGeometry.js";
 
 export class ClusteredForwardRenderer {
 
@@ -127,6 +129,9 @@ export class ClusteredForwardRenderer {
 
         this._boundingBoxGeom = new BoxGeometry(1, 1, 1);
         this._boundingBoxTransform = mat4.identity.copy();
+
+        this._boundingBoxWireframeGeom = new BoxWireframeGeometry(1, 1, 1);
+        this._boundingSphereWireframeGeom = new SphereWireframeGeometry(1, 64);
 
         // main output
         // todo: handle size change
@@ -383,6 +388,10 @@ export class ClusteredForwardRenderer {
     // todo: a unit box geometry for draw bounding boxes; used by occlusion query pass
     private _boundingBoxGeom: BoxGeometry;
     private _boundingBoxTransform: mat4;
+
+    // box and sphere wireframe geometry, for debug showing bounding boxes and spheres.
+    private _boundingBoxWireframeGeom: BoxWireframeGeometry;
+    private _boundingSphereWireframeGeom: SphereWireframeGeometry;
 
     // todo: system textures: shadowmap atlas, decal atlas, envMap array, irradiance volumes
     // todo: system texture unit numbers
@@ -817,12 +826,15 @@ export class ClusteredForwardRenderer {
             }
 
             this.renderOpaque(this._frustum);
+
+            this._postprocessor.processOpaque(this.numReservedTextures, this._postprocessFBO[this._currFrameFBOIdx], this._sceneColorTexture[1 - this._currFrameFBOIdx]);
+            
             this.renderTransparent(this._frustum);
 
             // todo: render sprites
 
-            // todo: do post process
-            this._postprocessor.processOpaque(this.numReservedTextures, this._postprocessFBO[this._currFrameFBOIdx], this._sceneColorTexture[1 - this._currFrameFBOIdx]);
+            // todo: draw debug bounding boxes and spheres
+            // according to the flags on object or renderitem?
 
             // Test code: apply render target texture to a screen space rectangle
             // test drawing a screen space rectangle
@@ -1171,6 +1183,11 @@ export class ClusteredForwardRenderer {
             }
         }
     }
+
+    private renderItemBoundingBoxesDebug() {
+        
+    }
+
     /**
      * render a rectangle in screen space
      * @param left left corner in [0,1] space
