@@ -261,6 +261,8 @@ export class PostProcessor {
 
         GLDevice.renderTarget = target;
 
+        // this._renderStates.apply();
+
         // set these textures for all effects
         GLTextures.setTextureAt(this._sceneDepthTexUnit, this._sceneDepthTexture);
         GLTextures.setTextureAt(this._sceneNormalTexUnit, this._sceneNormalTexture);
@@ -469,6 +471,8 @@ export class PostProcessor {
 
         gl.viewport(0, 0, this._sceneDepthTexture.width, this._sceneDepthTexture.height);
         gl.scissor(0, 0, this._sceneDepthTexture.width, this._sceneDepthTexture.height);
+
+        this._renderStates.apply();
 
         GLRenderStates.setBlendState(this._compositeBlendState);
 

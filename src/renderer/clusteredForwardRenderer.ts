@@ -828,7 +828,10 @@ export class ClusteredForwardRenderer {
             this.renderOpaque(this._frustum);
 
             this._postprocessor.processOpaque(this.numReservedTextures, this._postprocessFBO[this._currFrameFBOIdx], this._sceneColorTexture[1 - this._currFrameFBOIdx]);
-            
+
+            // don't forget to restore render target
+            GLDevice.renderTarget = this._mainFBO[this._currFrameFBOIdx];
+
             this.renderTransparent(this._frustum);
 
             // todo: render sprites
