@@ -30,6 +30,8 @@ export class Object3D {
         this.occlusionQuery = false;
         this.occlusionQueryID = null;
         this.occlusionQueryResult = true;
+        this.showBoundingBox = false;
+        this.showBoundingSphere = false;
         // this._curFrameNumber = -1;
     }
 
@@ -83,6 +85,9 @@ export class Object3D {
     public occlusionQuery: boolean;
     public occlusionQueryID: WebGLQuery|null;
     public occlusionQueryResult: boolean;
+
+    public showBoundingBox: boolean;
+    public showBoundingSphere: boolean;
 
     public behaviors: Behavior[];
 

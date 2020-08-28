@@ -96,6 +96,8 @@ export class ClusteredForwardRenderer {
         this._renderListOpaqueOcclusionQuery = new RenderList();
         this._renderListTransparent = new RenderList();
         this._renderListTransparentOcclusionQuery = new RenderList();
+        this._renderListBoundingBox = new RenderList();
+        this._renderListBoundingSphere = new RenderList();
         this._renderListSprites = new RenderList();
         this._tmpRenderList = new RenderList();
         this._renderContext = new ClusteredForwardRenderContext();
@@ -348,6 +350,8 @@ export class ClusteredForwardRenderer {
     private _renderListOpaqueOcclusionQuery: RenderList;
     private _renderListTransparent: RenderList;
     private _renderListTransparentOcclusionQuery: RenderList;
+    private _renderListBoundingBox: RenderList; // objects showing their bouding boxes
+    private _renderListBoundingSphere: RenderList; // objects showing their bouding spheres
     private _renderListSprites: RenderList;
     private _tmpRenderList: RenderList; // object will provide its items to this list first, then dispath to other lists.
 
@@ -554,6 +558,8 @@ export class ClusteredForwardRenderer {
         this._renderListOpaqueOcclusionQuery.clear();
         this._renderListTransparent.clear();
         this._renderListTransparentOcclusionQuery.clear();
+        this._renderListBoundingBox.clear();
+        this._renderListBoundingSphere.clear();
         this._renderListSprites.clear();
         this._renderContext.clear(statics, true);
         this._curNumMovedObjects = 0;
@@ -641,6 +647,14 @@ export class ClusteredForwardRenderer {
                                 }
                             }
                         }
+                    }
+
+                    // todo: add bouding boxes and spheres here?
+                    if (item.object.showBoundingBox) {
+                        this._renderListBoundingBox.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
+                    }
+                    if (item.object.showBoundingSphere) {
+                        this._renderListBoundingSphere.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
                     }
                 }
             }
@@ -1178,6 +1192,119 @@ export class ClusteredForwardRenderer {
                 // 因为一个 object 可能会提供多个 renderItem
                 if (item.object.occlusionQueryID !== null) {
                     gl.endQuery(gl.ANY_SAMPLES_PASSED);
+                }
+            }
+        }
+    }
+
+    private renderBoundingBoxes() {
+        const renderList = this._renderListBoundingBox;
+
+        if (renderList.ItemCount <= 0) {
+            return;
+        }
+        
+        // TODO: Shader and renderstates? set here or outside?
+        if (GLPrograms.currProgram === null) {
+            return;
+        }
+
+        const gl = GLDevice.gl;
+
+        let boxScale = new vec3();
+        const boxLocalTranMat = new mat4();
+        const boxLocalScaleMat = new mat4();
+
+        for (let i = 0; i < renderList.ItemCount; i++) {
+            const item = renderList.getItemAt(i);
+            if (item) {
+                // todo: draw bounding box
+                // get local bouding box of object, then calculate the transform, fill it to the object world transform uniform.
+
+                // fix me: instanced mesh bounding box? 
+                // draw instanced also?
+                // how to apply local scale and translation matrix ? use u_object.matWorld ?
+
+                const boundingBox = item.geometry.boundingBox;
+                boxLocalTranMat.fromTranslation(boundingBox.center);
+
+                boundingBox.maxPoint.copy(boxScale);
+                boxScale.subtract(boundingBox.minPoint);
+
+                boxLocalScaleMat.fromScaling(boxScale);
+
+                mat4.product(boxLocalTranMat, boxLocalScaleMat, this._boundingBoxTransform);
+
+                if (item.object instanceof InstancedMesh) {
+                    const instMesh = item.object as InstancedMesh;
+
+                    // let this._boundingBoxTransform only contains local transform of bounding box
+                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one);
+                
+                    this._boundingBoxWireframeGeom.drawInstaces(0, Infinity, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
+
+                } else {
+                    mat4.product(item.object.worldTransform, this._boundingBoxTransform, this._boundingBoxTransform);
+
+                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one);
+                
+                    this._boundingBoxWireframeGeom.draw(0, Infinity, GLPrograms.currProgram.attributes);
+                }
+            }
+        }
+    }
+
+    private renderBoundingSpheres() {
+        const renderList = this._renderListBoundingSphere;
+        if (renderList.ItemCount <= 0) {
+            return;
+        }
+
+        if (GLPrograms.currProgram === null) {
+            return;
+        }
+
+        const gl = GLDevice.gl;
+
+        let sphereScale = new vec3();
+        const sphereLocalTranMat = new mat4();
+        const sphereLocalScaleMat = new mat4();
+
+        for (let i = 0; i < renderList.ItemCount; i++) {
+            const item = renderList.getItemAt(i);
+            if (item) {
+                // todo: draw bounding box
+                // get local bouding box of object, then calculate the transform, fill it to the object world transform uniform.
+
+                // fix me: instanced mesh bounding box? 
+                // draw instanced also?
+                // how to apply local scale and translation matrix ? use u_object.matWorld ?
+
+                const boundingSphere = item.geometry.boundingSphere;
+                sphereLocalTranMat.fromTranslation(boundingSphere.center);
+
+                sphereScale.x = boundingSphere.radius;
+                sphereScale.y = boundingSphere.radius;
+                sphereScale.z = boundingSphere.radius;
+
+                sphereLocalScaleMat.fromScaling(sphereScale);
+
+                mat4.product(sphereLocalTranMat, sphereLocalScaleMat, this._boundingBoxTransform);
+
+                if (item.object instanceof InstancedMesh) {
+                    const instMesh = item.object as InstancedMesh;
+
+                    // let this._boundingBoxTransform only contains local transform of bounding sphere
+                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one);
+                
+                    this._boundingSphereWireframeGeom.drawInstaces(0, Infinity, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
+
+                } else {
+                    mat4.product(item.object.worldTransform, this._boundingBoxTransform, this._boundingBoxTransform);
+
+                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one);
+                
+                    this._boundingSphereWireframeGeom.draw(0, Infinity, GLPrograms.currProgram.attributes);
                 }
             }
         }
