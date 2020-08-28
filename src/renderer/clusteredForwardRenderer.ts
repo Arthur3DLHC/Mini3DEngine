@@ -850,8 +850,9 @@ export class ClusteredForwardRenderer {
 
             // todo: render sprites
 
-            // todo: draw debug bounding boxes and spheres
-            // according to the flags on object or renderitem?
+            // todo: draw debug bounding boxes and spheres after all has been rendered?
+            this.renderBoundingBoxes();
+            this.renderBoundingSpheres();
 
             // Test code: apply render target texture to a screen space rectangle
             // test drawing a screen space rectangle
@@ -1205,11 +1206,17 @@ export class ClusteredForwardRenderer {
         }
         
         // TODO: Shader and renderstates? set here or outside?
+        const gl = GLDevice.gl;
+
+        // use the opaque render state, draw opaque wireframes
+        this._renderStatesOpaque.apply();
+
+        // single color
+        GLPrograms.useProgram(this._colorProgram);
+
         if (GLPrograms.currProgram === null) {
             return;
         }
-
-        const gl = GLDevice.gl;
 
         let boxScale = new vec3();
         const boxLocalTranMat = new mat4();
@@ -1260,11 +1267,17 @@ export class ClusteredForwardRenderer {
             return;
         }
 
+        const gl = GLDevice.gl;
+
+        // use the opaque render state, draw opaque wireframes
+        this._renderStatesOpaque.apply();
+
+        // single color
+        GLPrograms.useProgram(this._colorProgram);
+
         if (GLPrograms.currProgram === null) {
             return;
         }
-
-        const gl = GLDevice.gl;
 
         let sphereScale = new vec3();
         const sphereLocalTranMat = new mat4();
