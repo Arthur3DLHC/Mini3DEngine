@@ -182,6 +182,7 @@ window.onload = () => {
         if (gltfNode instanceof Mesh) {
             gltfNode.castShadow = true;
             gltfNode.receiveShadow = true;
+            gltfNode.showBoundingSphere = true;
         }
 
         for (const child of gltfNode.children) {

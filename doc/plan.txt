@@ -463,14 +463,13 @@ TODO:       主要类结构
             绘制调试用的包围盒和包围球
                 单位盒和单位球，边线模式图元
                 在 RenderItems 时绘制？还是单独设立一个 pass？
+                调试骨骼皮肤模型的包围球
 
             支持材质自定义 Shader？
                 非物理材质
                 Shader Cache 机制
                     Cache key: shader code key, features;
                     程序的最开始，需要把 shader code 注册到全局列表
-
-            骨骼皮肤动画：包围球不准确问题（坐姿人物眉毛消失）
 
             半透明物体的绘制？
                 需要由远到近排序？按照物体中心点；
