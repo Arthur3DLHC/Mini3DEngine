@@ -11,6 +11,12 @@ export class BoundingSphere {
         this.radius = radius;
     }
 
+    public copyFrom(other: BoundingSphere): BoundingSphere {
+        other.center.copy(this.center);
+        this.radius = other.radius;
+        return this;
+    }
+
     public center: vec3;
     public radius: number;
 

@@ -66,6 +66,7 @@ window.onload = () => {
     boxMesh.isStatic = true;
     boxMesh.autoUpdateTransform = false;    // let the behavior work
     // boxMesh.localTransform.fromTranslation(new vec3([0, 0, -5]));
+    boxMesh.showBoundingSphere = true;
     const boxMtl = new StandardPBRMaterial();
     boxMtl.color = new vec4([1.0, 1.0, 0.0, 1.0]);
     boxMtl.metallic = 0.8;
@@ -99,6 +100,7 @@ window.onload = () => {
     cylinderMesh.castShadow = true;
     cylinderMesh.isStatic = true;
     cylinderMesh.autoUpdateTransform = false;
+    cylinderMesh.showBoundingSphere = true;
     const cylinderMtl = new StandardPBRMaterial();
     cylinderMtl.color = new vec4([0.0, 1.0, 0.0, 1.0]);
     cylinderMtl.emissive = new vec4([0.5, 0.5, 0.5, 1]);

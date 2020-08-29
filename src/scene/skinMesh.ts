@@ -23,8 +23,8 @@ export class SkinMesh extends Mesh {
         // todo: apply joint transform to geometry bounding sphere then enlarge total bounding sphere?
         if (this.geometry) {
             const geomSphere = this.geometry.boundingSphere
-            this._boundingSphere.center = geomSphere.center;
-            this._boundingSphere.radius = geomSphere.radius;
+            // this._boundingSphere.center = geomSphere.center;
+            // this._boundingSphere.radius = geomSphere.radius;
 
             const geomWorldSphere = new BoundingSphere();
 
@@ -38,7 +38,11 @@ export class SkinMesh extends Mesh {
 
                 // enlarge boundingsphere
                 geomSphere.transform(joint.worldTransform, geomWorldSphere);
-                this._boundingSphere.enlarge(geomWorldSphere);
+                if (i === 0) {
+                    this._boundingSphere.copyFrom(geomWorldSphere);
+                } else {
+                    this._boundingSphere.enlarge(geomWorldSphere);
+                }
             }
         }
     }
