@@ -11,6 +11,10 @@ export class ActionSelector {
     public actions: AnimationAction[] = [];
 
     private _curAction: AnimationAction | null = null;
+
+    public get curAction(): AnimationAction | null {
+        return this._curAction;
+    }
     
     public playAction(actionName: string) {
         // find action by name
