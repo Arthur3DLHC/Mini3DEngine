@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, InstancedMesh } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, InstancedMesh, BoundingRenderModes } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "../common/behaviors/autoRotateBehavior.js";
 import vec4 from "../../lib/tsm/vec4.js";
@@ -66,7 +66,7 @@ window.onload = () => {
     boxMesh.isStatic = true;
     boxMesh.autoUpdateTransform = false;    // let the behavior work
     // boxMesh.localTransform.fromTranslation(new vec3([0, 0, -5]));
-    boxMesh.showBoundingSphere = true;
+    boxMesh.boundingSphereRenderMode = BoundingRenderModes.normal;
     const boxMtl = new StandardPBRMaterial();
     boxMtl.color = new vec4([1.0, 1.0, 0.0, 1.0]);
     boxMtl.metallic = 0.8;
@@ -100,7 +100,7 @@ window.onload = () => {
     cylinderMesh.castShadow = true;
     cylinderMesh.isStatic = true;
     cylinderMesh.autoUpdateTransform = false;
-    cylinderMesh.showBoundingSphere = true;
+    cylinderMesh.boundingSphereRenderMode = BoundingRenderModes.normal;
     const cylinderMtl = new StandardPBRMaterial();
     cylinderMtl.color = new vec4([0.0, 1.0, 0.0, 1.0]);
     cylinderMtl.emissive = new vec4([0.5, 0.5, 0.5, 1]);

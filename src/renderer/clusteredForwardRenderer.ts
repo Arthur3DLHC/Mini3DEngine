@@ -83,6 +83,7 @@ import { InstancedMesh } from "../mini3DEngine.js";
 import { RenderItem } from "./renderItem.js";
 import { BoxWireframeGeometry } from "../geometry/common/boxWireframeGeometry.js";
 import { SphereWireframeGeometry } from "../geometry/common/sphereWireframeGeometry.js";
+import { BoundingRenderModes } from "./boundingRenderModes.js";
 
 export class ClusteredForwardRenderer {
 
@@ -650,10 +651,10 @@ export class ClusteredForwardRenderer {
                     }
 
                     // todo: add bouding boxes and spheres here?
-                    if (item.object.showBoundingBox) {
+                    if (item.object.boundingBoxRenderMode !== BoundingRenderModes.none) {
                         this._renderListBoundingBox.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
                     }
-                    if (item.object.showBoundingSphere) {
+                    if (item.object.boundingSphereRenderMode !== BoundingRenderModes.none) {
                         this._renderListBoundingSphere.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
                     }
                 }
@@ -1221,6 +1222,7 @@ export class ClusteredForwardRenderer {
         let boxScale = new vec3();
         const boxLocalTranMat = new mat4();
         const boxLocalScaleMat = new mat4();
+        const boxColor = vec4.one.copy();
 
         for (let i = 0; i < renderList.ItemCount; i++) {
             const item = renderList.getItemAt(i);
@@ -1242,22 +1244,43 @@ export class ClusteredForwardRenderer {
 
                 mat4.product(boxLocalTranMat, boxLocalScaleMat, this._boundingBoxTransform);
 
+                // todo: set the color according to object's bounding render mode
+                this.getBoundingColorFor(item.object, item.object.boundingBoxRenderMode, boxColor);
+
                 if (item.object instanceof InstancedMesh) {
                     const instMesh = item.object as InstancedMesh;
 
                     // let this._boundingBoxTransform only contains local transform of bounding box
-                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, 0, true);
+                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, boxColor, 0, true);
                 
                     this._boundingBoxWireframeGeom.drawInstaces(0, Infinity, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
 
                 } else {
                     mat4.product(item.object.worldTransform, this._boundingBoxTransform, this._boundingBoxTransform);
 
-                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, 0, false);
+                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, boxColor, 0, false);
                 
                     this._boundingBoxWireframeGeom.draw(0, Infinity, GLPrograms.currProgram.attributes);
                 }
             }
+        }
+    }
+
+    getBoundingColorFor(object: Object3D, mode: BoundingRenderModes, outColor: vec4) {
+        switch(mode) {
+            case BoundingRenderModes.normal:
+                vec4.one.copy(outColor);
+                break;
+            case BoundingRenderModes.occlusionResult:
+                if (object.occlusionQueryResult) {
+                    outColor.rgba = [0, 1, 0, 1];
+                } else {
+                    outColor.rgba = [1, 0, 0, 1];
+                }
+                break;
+            case BoundingRenderModes.collisionResult:
+                vec4.one.copy(outColor);
+                break;
         }
     }
 

@@ -5,6 +5,7 @@ import mat4 from "../../lib/tsm/mat4.js";
 import { Behavior } from "./behavior.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import quat from "../../lib/tsm/quat.js";
+import { BoundingRenderModes } from "../renderer/boundingRenderModes.js";
 
 export class Object3D {
     // base class of all render objects
@@ -30,8 +31,8 @@ export class Object3D {
         this.occlusionQuery = false;
         this.occlusionQueryID = null;
         this.occlusionQueryResult = true;
-        this.showBoundingBox = false;
-        this.showBoundingSphere = false;
+        this.boundingBoxRenderMode = BoundingRenderModes.none;
+        this.boundingSphereRenderMode = BoundingRenderModes.none;
         // this._curFrameNumber = -1;
     }
 
@@ -86,8 +87,10 @@ export class Object3D {
     public occlusionQueryID: WebGLQuery|null;
     public occlusionQueryResult: boolean;
 
-    public showBoundingBox: boolean;
-    public showBoundingSphere: boolean;
+    // public showBoundingBox: boolean;
+    // public showBoundingSphere: boolean;
+    public boundingBoxRenderMode: BoundingRenderModes;
+    public boundingSphereRenderMode: BoundingRenderModes;
 
     public behaviors: Behavior[];
 
