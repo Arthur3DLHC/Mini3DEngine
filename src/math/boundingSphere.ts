@@ -20,15 +20,16 @@ export class BoundingSphere {
     public center: vec3;
     public radius: number;
 
+    private static _tmpScaling: vec3 = new vec3();
+
     public transform(matrix: mat4, result?: BoundingSphere): BoundingSphere {
         if (!result) {
             result = new BoundingSphere();
         }
 
-        result.center = matrix.multiplyVec3(this.center);
-        const scaling = new vec3();
-        matrix.getScaling(scaling);
-        const maxScaling = Math.max(scaling.x, Math.max(scaling.y, scaling.z));
+        matrix.multiplyVec3(this.center, result.center);
+        matrix.getScaling(BoundingSphere._tmpScaling);
+        const maxScaling = Math.max(BoundingSphere._tmpScaling.x, Math.max(BoundingSphere._tmpScaling.y, BoundingSphere._tmpScaling.z));
         result.radius = this.radius * maxScaling;
 
         return result;

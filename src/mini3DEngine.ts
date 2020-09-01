@@ -1,4 +1,6 @@
 // TODO: export all public classes of engine
+export * from "./animation/actionSelector.js";
+export * from "./animation/animationAction.js";
 export * from "./contentLoaders/baseLoader.js";
 export * from "./contentLoaders/cache.js";
 export * from "./contentLoaders/gltfAsset.js";

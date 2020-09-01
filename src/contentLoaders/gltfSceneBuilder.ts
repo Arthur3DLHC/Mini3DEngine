@@ -202,6 +202,8 @@ export class GLTFSceneBuilder {
             node = new Object3D();
         }
 
+        node.name = nodeDef.name !== undefined ? nodeDef.name : "";
+
         // parentObject.attachChild(node);
 
         // todo: node transform

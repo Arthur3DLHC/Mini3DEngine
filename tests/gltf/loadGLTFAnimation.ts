@@ -1,10 +1,9 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset, Object3D, BoundingRenderModes } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset, Object3D, BoundingRenderModes, ActionSelector } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
 import { FirstPersonViewBehavior } from "../common/behaviors/firstPersonViewBehavior.js";
 import { SkinMesh } from "../../src/scene/skinMesh.js";
-import { AnimationAction, AnimationLoopMode } from "../../src/animation/animationAction.js";
 import quat from "../../lib/tsm/quat.js";
 
 /**
@@ -88,20 +87,28 @@ window.onload = () => {
     let lastUpdateFPSTime = 0;
     let curFPS = 0;
 
-    const actionsFemale: AnimationAction[] = [];
-    const actionsMale: AnimationAction[] = [];
-    let curActionFemale: AnimationAction | undefined = undefined;
-    let curActionMale: AnimationAction | undefined = undefined;
+    // const actionsFemale: AnimationAction[] = [];
+    // const actionsMale: AnimationAction[] = [];
+    // let curActionFemale: AnimationAction | undefined = undefined;
+    // let curActionMale: AnimationAction | undefined = undefined;
+
+    const actionSelectorFemale: ActionSelector = new ActionSelector();
+    const actionSelectorMale: ActionSelector = new ActionSelector();
 
     function gameLoop(now: number) {
         Clock.instance.update(now);
         scene.updateBehavior();
-        if (curActionFemale !== undefined) {
-            curActionFemale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
-        }
-        if (curActionMale !== undefined) {
-            curActionMale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
-        }
+
+        actionSelectorFemale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
+        actionSelectorMale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
+
+        // if (curActionFemale !== undefined) {
+        //     curActionFemale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
+        // }
+        // if (curActionMale !== undefined) {
+        //     curActionMale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
+        // }
+
         scene.updateWorldTransform(false, true);
         SkinMesh.updateSkinMeshes(scene);
         renderer.render(scene);
@@ -169,15 +176,17 @@ window.onload = () => {
 
         const builder = new GLTFSceneBuilder();
         
-        const gltfSceneFemale = builder.build(loaded[0], 0, actionsFemale);
+        const gltfSceneFemale = builder.build(loaded[0], 0, actionSelectorFemale.actions);
         // gltfSceneFemale.rotation = quat.fromAxisAngle(new vec3([0, 1, 0]), Math.PI);
+        gltfSceneFemale.name = "Female";
         gltfSceneFemale.autoUpdateTransform = true;
         scene.attachChild(gltfSceneFemale);
 
         prepareGLTFScene(gltfSceneFemale);
 
-        const gltfSceneMale = builder.build(loaded[1], 0, actionsMale);
+        const gltfSceneMale = builder.build(loaded[1], 0, actionSelectorMale.actions);
         // gltfSceneMale.rotation = quat.fromAxisAngle(new vec3([0, 1, 0]), Math.PI);
+        gltfSceneMale.name = "Male";
         gltfSceneMale.autoUpdateTransform = true;
         scene.attachChild(gltfSceneMale);
 
@@ -189,13 +198,11 @@ window.onload = () => {
         actionListFemale.innerHTML = "";
         actionListMale.innerHTML = "";
 
-        if (actionsFemale.length > 0) {
-            curActionFemale = actionsFemale[0];
-            curActionFemale.LoopMode = AnimationLoopMode.Repeat;
-            curActionFemale.play();
+        if (actionSelectorFemale.actions.length > 0) {
+            actionSelectorFemale.playAction(actionSelectorFemale.actions[0].name);
 
             let actidx = 0;
-            for (const act of actionsFemale) {
+            for (const act of actionSelectorFemale.actions) {
                 // click callback
                 // NOTE: can not all constructor of HTMLElements in TypeScript.
                 // Can only call document.createElement()
@@ -204,26 +211,28 @@ window.onload = () => {
                 actionItem.innerHTML = act.name;
                 actionItem.className = "actionItem";
                 actionItem.onclick = (ev: MouseEvent) => {
-                    if (curActionFemale !== undefined) {
-                        curActionFemale.stop();
-                        curActionFemale.reset();
-                    }
-                    curActionFemale = act;
-                    curActionFemale.LoopMode = AnimationLoopMode.Repeat;
-                    curActionFemale.play();
+                    actionSelectorFemale.playAction(act.name);
+                    // if (curActionFemale !== undefined) {
+                    //     curActionFemale.stop();
+                    //     curActionFemale.reset();
+                    // }
+                    // curActionFemale = act;
+                    // curActionFemale.LoopMode = AnimationLoopMode.Repeat;
+                    // curActionFemale.play();
                 }
                 actionListFemale.appendChild(actionItem);
                 actidx++;
             }
         }
 
-        if (actionsMale.length > 0) {
-            curActionMale = actionsMale[0];
-            curActionMale.LoopMode = AnimationLoopMode.Repeat;
-            curActionMale.play();
+        if (actionSelectorMale.actions.length > 0) {
+            actionSelectorMale.playAction(actionSelectorMale.actions[0].name);
+            // curActionMale = actionsMale[0];
+            // curActionMale.LoopMode = AnimationLoopMode.Repeat;
+            // curActionMale.play();
 
             let actidx = 0;
-            for (const act of actionsMale) {
+            for (const act of actionSelectorMale.actions) {
                 // click callback
                 // NOTE: can not all constructor of HTMLElements in TypeScript.
                 // Can only call document.createElement()
@@ -232,13 +241,15 @@ window.onload = () => {
                 actionItem.innerHTML = act.name;
                 actionItem.className = "actionItem";
                 actionItem.onclick = (ev: MouseEvent) => {
-                    if (curActionMale !== undefined) {
-                        curActionMale.stop();
-                        curActionMale.reset();
-                    }
-                    curActionMale = act;
-                    curActionMale.LoopMode = AnimationLoopMode.Repeat;
-                    curActionMale.play();
+                    actionSelectorMale.playAction(act.name);
+
+                    // if (curActionMale !== undefined) {
+                    //     curActionMale.stop();
+                    //     curActionMale.reset();
+                    // }
+                    // curActionMale = act;
+                    // curActionMale.LoopMode = AnimationLoopMode.Repeat;
+                    // curActionMale.play();
                 }
                 actionListMale.appendChild(actionItem);
                 actidx++;

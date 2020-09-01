@@ -35,4 +35,10 @@ export class ActionSelector {
         this._curAction.reset();
         this._curAction.play();
     }
+
+    public update(time: number, deltaTime: number) {
+        if (this._curAction !== null) {
+            this._curAction.update(time, deltaTime);
+        }
+    }
 }
