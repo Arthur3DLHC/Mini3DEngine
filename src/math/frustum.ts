@@ -114,6 +114,7 @@ export class Frustum {
     public setFromProjectionMatrix(matProj: mat4, ignoreNearPlane: boolean = false): Frustum {
         // from three.js
         // theory is at https://www.gamedevs.org/uploads/fast-extraction-viewing-frustum-planes-from-world-view-projection-matrix.pdf
+        // also http://www.cs.otago.ac.nz/postgrads/alexis/planeExtraction.pdf
 
 		const me = matProj.values;
 		var me0 = me[ 0 ], me1 = me[ 1 ], me2 = me[ 2 ], me3 = me[ 3 ];

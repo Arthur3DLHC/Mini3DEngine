@@ -2,7 +2,15 @@ import { Frustum } from "../math/frustum.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { BoundingBox } from "../math/boundingBox.js";
 import { Cluster } from "./cluster.js";
+import { BaseLight } from "../scene/lights/baseLight.js";
+import { Decal } from "../scene/decal.js";
+import { EnvironmentProbe } from "../scene/environmentProbe.js";
+import mat4 from "../../lib/tsm/mat4.js";
+import vec3 from "../../lib/tsm/vec3.js";
 
+/**
+ * See http://www.aortiz.me/2018/12/21/CG.html
+ */
 export class ClusterGrid {
     public near: number = 0.1;
     public far: number = 100;
@@ -15,8 +23,10 @@ export class ClusterGrid {
     // todo: save clusters hierarchical?
     public clusters: Cluster[][][] = [];
 
+    private frustum: Frustum = new Frustum();
+
     /**
-     * call this once the resolusion or frustum changed.
+     * call this only when the resolusion or frustum changed.
      */
     public updateClusters() {
         this.resolusion.x = Math.max(1, this.resolusion.x);
@@ -31,14 +41,18 @@ export class ClusterGrid {
             for (let j = 0; j < this.resolusion.y; j++) {
                 const row: Cluster[] = [];
                 for (let i = 0; i < this.resolusion.x; i++) {
-                    const cluster: Cluster = new Cluster();
-                    // todo: calc aabb
+                    const cluster: Cluster = new Cluster(i, j, k);
+                    this.getClusterAABB(i, j, k, cluster.boudingBox);
                     row.push(cluster);
                 }
                 layer.push(row);
             }
             this.clusters.push(layer);
         }
+
+        // update frustum
+        const matProj: mat4 = mat4.frustum(this.left, this.right, this.bottom, this.top, this.near, this.far);
+        this.frustum.setFromProjectionMatrix(matProj, false);
     }
 
     /**
@@ -53,16 +67,6 @@ export class ClusterGrid {
                 }
             }
         }
-    }
-
-    /**
-     * get the cluster aabb in view space
-     * @param i 
-     * @param j 
-     * @param k 
-     * @param result 
-     */
-    public getClusterBounding(i: number, j: number, k: number, result: BoundingBox) {
     }
 
     // todo: check items
@@ -80,4 +84,51 @@ export class ClusterGrid {
     //                          check item against it's aabb
     //                              if intersect
     //                                  fill item to cluster's list
+
+    public fillLight(light: BaseLight) {
+        // need to transform to view space
+
+        // point light: bounding sphere
+
+        // spot light: bounding frustum? 6 planes
+
+        // directional light: bounding box? 6 planes
+    }
+
+    public fillDecal(decal: Decal) {
+        // need to transform to view space
+        // bounding box
+    }
+
+    public fillEnvironmentProbe(envProbe: EnvironmentProbe) {
+        // need to transform to view space
+        // bounding box
+    }
+
+    /**
+     * get the cluster aabb in view space
+     * @param i 
+     * @param j 
+     * @param k 
+     * @param result 
+     */
+    protected getClusterAABB(i: number, j: number, k: number, result: BoundingBox) {
+
+    }
+
+    protected getSlickAABB(k: number, result: BoundingBox) {
+
+    }
+
+    protected getRowAABB(j: number, k: number, result: BoundingBox) {
+
+    }
+
+    protected getGridPoint(i: number, j: number, k: number, result: vec3) {
+        // from DOOM 2016 presentation
+        // See http://www.aortiz.me/2018/12/21/CG.html for the formula to get the cluster slice from pixel depth in shader
+        // github repo: https://github.com/Angelo1211/HybridRenderingEngine/
+        const e = k / this.resolusion.z;
+        result.z = this.near * Math.pow((this.far / this.near), e);
+    }
 }
