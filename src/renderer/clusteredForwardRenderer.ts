@@ -1315,32 +1315,49 @@ export class ClusteredForwardRenderer {
                 // fix me: instanced mesh bounding box? 
                 // draw instanced also?
                 // how to apply local scale and translation matrix ? use u_object.matWorld ?
+                if (item.object instanceof SkinMesh) {
+                    const skinMesh = item.object as SkinMesh;
+                    const boundingSphere = skinMesh.boundingSphere;
+                    sphereLocalTranMat.fromTranslation(boundingSphere.center);
 
-                const boundingSphere = item.geometry.boundingSphere;
-                sphereLocalTranMat.fromTranslation(boundingSphere.center);
+                    sphereScale.x = boundingSphere.radius;
+                    sphereScale.y = boundingSphere.radius;
+                    sphereScale.z = boundingSphere.radius;
 
-                sphereScale.x = boundingSphere.radius;
-                sphereScale.y = boundingSphere.radius;
-                sphereScale.z = boundingSphere.radius;
+                    sphereLocalScaleMat.fromScaling(sphereScale);
 
-                sphereLocalScaleMat.fromScaling(sphereScale);
-
-                mat4.product(sphereLocalTranMat, sphereLocalScaleMat, this._boundingBoxTransform);
-
-                if (item.object instanceof InstancedMesh) {
-                    const instMesh = item.object as InstancedMesh;
-
-                    // let this._boundingBoxTransform only contains local transform of bounding sphere
-                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, 0, true);
-                
-                    this._boundingSphereWireframeGeom.drawInstaces(0, Infinity, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
-
-                } else {
-                    mat4.product(item.object.worldTransform, this._boundingBoxTransform, this._boundingBoxTransform);
+                    mat4.product(sphereLocalTranMat, sphereLocalScaleMat, this._boundingBoxTransform);
 
                     this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, 0, false);
-                
                     this._boundingSphereWireframeGeom.draw(0, Infinity, GLPrograms.currProgram.attributes);
+                } else {
+                    const boundingSphere = item.geometry.boundingSphere;
+                    sphereLocalTranMat.fromTranslation(boundingSphere.center);
+
+                    sphereScale.x = boundingSphere.radius;
+                    sphereScale.y = boundingSphere.radius;
+                    sphereScale.z = boundingSphere.radius;
+
+                    sphereLocalScaleMat.fromScaling(sphereScale);
+
+                    mat4.product(sphereLocalTranMat, sphereLocalScaleMat, this._boundingBoxTransform);
+
+                    if (item.object instanceof InstancedMesh) {
+                        const instMesh = item.object as InstancedMesh;
+
+                        // let this._boundingBoxTransform only contains local transform of bounding sphere
+                        this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, 0, true);
+
+                        this._boundingSphereWireframeGeom.drawInstaces(0, Infinity, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
+
+                    } else {
+
+                        mat4.product(item.object.worldTransform, this._boundingBoxTransform, this._boundingBoxTransform);
+
+                        this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, 0, false);
+
+                        this._boundingSphereWireframeGeom.draw(0, Infinity, GLPrograms.currProgram.attributes);
+                    }
                 }
             }
         }
