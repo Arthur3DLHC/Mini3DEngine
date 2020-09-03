@@ -16,6 +16,7 @@ export class Cluster {
     public boudingBox: BoundingBox = new BoundingBox();
 
     // item idx list
+    // todo: use Uint32Array to faster?
     public lights: number[] = [];
     public decals: number[] = [];
     public envProbes: number[] = [];

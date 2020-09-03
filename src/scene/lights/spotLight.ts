@@ -3,6 +3,7 @@ import { SpotLightShadow } from "./spotLightShadow.js";
 import { BufferGeometry } from "../../geometry/bufferGeometry.js";
 import { RenderList } from "../../renderer/renderList.js";
 import { LightType } from "./lightType.js";
+import { BoundingSphere } from "../../math/boundingSphere.js";
 
 export class SpotLight extends BaseLight {
     public constructor() {
@@ -34,5 +35,11 @@ export class SpotLight extends BaseLight {
 
     public provideRenderItem(renderList: RenderList) {
         // todo: 如果开启了调试绘制模式，则输出调试图元；
+    }
+
+    public get boundingSphere(): BoundingSphere {
+        // 直接使用光源半径了，不太精确
+        this.boundingSphere.radius = (this.range == 0 ? Infinity : this.range);
+        return this._boundingSphere;
     }
 }

@@ -1,4 +1,5 @@
 import vec3 from "../../lib/tsm/vec3.js"
+import { BoundingSphere } from "./boundingSphere.js";
 
 /**
  * from three.js: box.js
@@ -31,5 +32,20 @@ export class BoundingBox {
         vec3.componentsMin(this.minPoint, point, this.minPoint);
         vec3.componentsMax(this.maxPoint, point, this.maxPoint);
         return this;
+    }
+
+    public intersectSphere(sphere: BoundingSphere): boolean {
+        let dmin = 0;
+        const c = sphere.center;
+        for (let i = 0; i < 3; i++) {
+            if(c.at(i) < this.minPoint.at(i)) {
+                const offset = c.at(i) - this.minPoint.at(i);
+                dmin += offset * offset;
+            } else if (c.at(i) > this.maxPoint.at(i)) {
+                const offset = c.at(i) - this.maxPoint.at(i);
+                dmin += offset * offset;
+            }
+        }
+        return dmin <= sphere.radius * sphere.radius;
     }
 }

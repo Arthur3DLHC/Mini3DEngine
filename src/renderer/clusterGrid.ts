@@ -7,6 +7,9 @@ import { Decal } from "../scene/decal.js";
 import { EnvironmentProbe } from "../scene/environmentProbe.js";
 import mat4 from "../../lib/tsm/mat4.js";
 import vec3 from "../../lib/tsm/vec3.js";
+import { BoundingSphere } from "../math/boundingSphere.js";
+import { PointLight } from "../scene/lights/pointLight.js";
+import { SpotLight } from "../scene/lights/spotLight.js";
 
 /**
  * See http://www.aortiz.me/2018/12/21/CG.html
@@ -19,6 +22,8 @@ export class ClusterGrid {
     public bottom: number = -0.1;
     public top: number = 0.1;
     public resolusion: vec4 = new vec4([1,1,1,1]);
+
+    public viewTransform: mat4 = new mat4();
 
     // todo: save clusters hierarchical?
     public clusters: Cluster[][][] = [];
@@ -77,10 +82,10 @@ export class ClusterGrid {
     // todo: check items
     // hierarchical:
     // for every item,
-    //  check agains the view frustm;
+    //  check item boundingSphere agains the view frustm;
     //  if intersect,
     //      for every depth slice,
-    //          check item against it's aabb
+    //          check item (boundingSphere or 6 planes) against it's aabb
     //          if intersect,
     //              for every row,
     //                  check item against it's aabb
@@ -90,10 +95,47 @@ export class ClusterGrid {
     //                              if intersect
     //                                  fill item to cluster's list
 
+
     public fillLight(light: BaseLight) {
         // need to transform to view space
+        const boundingSphere = new BoundingSphere(light.boundingSphere.center, light.boundingSphere.radius);
+        const matModelView = new mat4();
+        mat4.product(this.viewTransform, light.worldTransform, matModelView);
+        boundingSphere.transform(matModelView);
 
-        // point light: bounding sphere
+        if (!this._frustum.intersectsSphere(boundingSphere)) {
+            return;
+        }
+
+        const boundingBox: BoundingBox = new BoundingBox();
+
+        // iterate clusters hierarchically
+        if (light instanceof PointLight) {
+            // slices
+            for (let k = 0; k < this.resolusion.z; k++) {
+                this.getSliceAABB(k, boundingBox);
+    
+                if (boundingBox.intersectSphere(boundingSphere)) {
+                    // rows
+                    for (let j = 0; j < this.resolusion.y; j++) {
+                        this.getRowAABB(j, k, boundingBox);
+                        if (boundingBox.intersectSphere(boundingSphere)) {
+                            // clusters
+                            
+                        }
+                    }
+                }
+            }            
+        } else if (light instanceof SpotLight) {
+
+        } else {
+            // fix me: directional light range is infinite.
+        }
+
+        // point light: bounding sphere vs AABB
+
+        // planes and AABB culling:
+        // https://www.braynzarsoft.net/viewtutorial/q16390-34-aabb-cpu-side-frustum-culling
 
         // spot light: bounding frustum? 6 planes
 

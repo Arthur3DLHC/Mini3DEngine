@@ -3,6 +3,7 @@ import { DirectionalLightShadow } from "./directionalLightShadow.js";
 import { BufferGeometry } from "../../geometry/bufferGeometry.js";
 import { RenderList } from "../../renderer/renderList.js";
 import { LightType } from "./lightType.js";
+import { BoundingSphere } from "../../math/boundingSphere.js";
 
 export class DirectionalLight extends BaseLight {
     public constructor() {
@@ -26,5 +27,12 @@ export class DirectionalLight extends BaseLight {
 
     public provideRenderItem(renderList: RenderList) {
         // todo: 如果开启了调试绘制模式，则输出调试图元；
+    }
+
+    public get boundingSphere(): BoundingSphere {
+        // Fix me: 平行光没有纵向范围
+        // 在 shader 中也尚未实现 radius 的衰减和判断
+        this.boundingSphere.radius = Infinity;
+        return this._boundingSphere;
     }
 }

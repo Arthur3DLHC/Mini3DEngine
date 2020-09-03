@@ -1,5 +1,6 @@
 import vec3 from "../../lib/tsm/vec3.js";
 import mat4 from "../../lib/tsm/mat4.js";
+import { BoundingBox } from "./boundingBox.js";
 
 /**
  * from three.js: sphere.js
@@ -39,7 +40,7 @@ export class BoundingSphere {
      * enlarge this bounding sphere to contain another one
      * @param sphere bounding sphere to contain
      */
-    enlarge(sphere: BoundingSphere) {
+    public enlarge(sphere: BoundingSphere) {
         // center may change
         // from this center to new sphere center
         const offset: vec3 = sphere.center.copy()
@@ -63,5 +64,9 @@ export class BoundingSphere {
         const s: number = distToNewCenter / dist;
         this.center.add(offset.scale(s));
         this.radius = newRadius;
+    }
+
+    public intersectBox(box: BoundingBox): boolean {
+        return box.intersectSphere(this);
     }
 }

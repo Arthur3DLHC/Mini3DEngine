@@ -1,6 +1,7 @@
 import { LightShadow } from "./lightShadow.js";
 import { LightType } from "./lightType.js";
 import { Object3D } from "../object3D.js";
+import { BoundingSphere } from "../../math/boundingSphere.js";
 
 export class BaseLight extends Object3D {
     public constructor() {
@@ -36,6 +37,15 @@ export class BaseLight extends Object3D {
     public get type() : LightType {
         return LightType.Unknow;
     }
+
+    /**
+     * the bounding sphere of this light, in local space
+     */
+    public get boundingSphere(): BoundingSphere{
+        return this._boundingSphere;
+    }
+
+    protected _boundingSphere: BoundingSphere = new BoundingSphere();
 
     public destroy(destroyChildren: boolean) {
         // release alloced shadowmap atlas
