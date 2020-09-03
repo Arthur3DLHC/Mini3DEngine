@@ -23,7 +23,12 @@ export class ClusterGrid {
     // todo: save clusters hierarchical?
     public clusters: Cluster[][][] = [];
 
-    private frustum: Frustum = new Frustum();
+    private _frustum: Frustum = new Frustum();
+
+    private _tmpMinPointNear: vec3 = new vec3();
+    private _tmpMaxPointNear: vec3 = new vec3();
+    private _tmpMinPointFar: vec3 = new vec3();
+    private _tmpMaxPointFar: vec3 = new vec3();
 
     /**
      * call this only when the resolusion or frustum changed.
@@ -52,7 +57,7 @@ export class ClusterGrid {
 
         // update frustum
         const matProj: mat4 = mat4.frustum(this.left, this.right, this.bottom, this.top, this.near, this.far);
-        this.frustum.setFromProjectionMatrix(matProj, false);
+        this._frustum.setFromProjectionMatrix(matProj, false);
     }
 
     /**
@@ -113,22 +118,64 @@ export class ClusterGrid {
      * @param result 
      */
     protected getClusterAABB(i: number, j: number, k: number, result: BoundingBox) {
-
+        this.getGridPoint(i, j, k + 1, this._tmpMinPointFar);
+        this.getGridPoint(i + 1, j + 1, k + 1, this._tmpMaxPointFar);
+        this.calcAABBByFarCorners(k, this._tmpMinPointFar, this._tmpMaxPointFar, result);
     }
 
-    protected getSlickAABB(k: number, result: BoundingBox) {
-
+    protected getSliceAABB(k: number, result: BoundingBox) {
+        // min point: left bottom grid
+        this.getGridPoint(0, 0, k + 1, this._tmpMinPointFar);
+        this.getGridPoint(this.resolusion.x, this.resolusion.y, k + 1, this._tmpMaxPointFar);
+        this.calcAABBByFarCorners(k, this._tmpMinPointFar, this._tmpMaxPointFar, result);
     }
 
     protected getRowAABB(j: number, k: number, result: BoundingBox) {
+        this.getGridPoint(0, j, k + 1, this._tmpMinPointFar);
+        this.getGridPoint(this.resolusion.x, j + 1, k + 1, this._tmpMaxPointFar);
+        this.calcAABBByFarCorners(k, this._tmpMinPointFar, this._tmpMaxPointFar, result);
+    }
+    
+    private calcAABBByFarCorners(k: number, minPtFar: vec3, maxPtFar: vec3, result: BoundingBox) {
+        const sliceNearZ = this.getSliceZ(k);
+        const scale = sliceNearZ / minPtFar.z;
 
+        this._tmpMinPointNear.z = sliceNearZ;
+        this._tmpMinPointNear.x = minPtFar.x * scale;
+        this._tmpMinPointNear.y = minPtFar.y * scale;
+
+        this._tmpMaxPointNear.z = sliceNearZ;
+        this._tmpMaxPointNear.x = maxPtFar.x * scale;
+        this._tmpMaxPointNear.y = maxPtFar.y * scale;
+
+        // note the z is negative, so the far the smaller, the near the bigger
+        result.minPoint.z = minPtFar.z;
+        result.minPoint.x = Math.min(minPtFar.x, this._tmpMinPointNear.x);
+        result.minPoint.y = Math.min(minPtFar.y, this._tmpMinPointNear.y);
+
+        result.maxPoint.z = this._tmpMinPointNear.z;
+        result.maxPoint.x = Math.max(maxPtFar.x, this._tmpMaxPointNear.x);
+        result.maxPoint.y = Math.max(maxPtFar.y, this._tmpMaxPointNear.y);
+    }
+
+    protected getSliceZ(slice: number): number {
+       // from DOOM 2016 presentation
+        // See http://www.aortiz.me/2018/12/21/CG.html for the formula to get the cluster slice from pixel depth in shader
+        // github repo: https://github.com/Angelo1211/HybridRenderingEngine/
+        const e = slice / this.resolusion.z;
+        return -this.near * Math.pow((this.far / this.near), e);    // negative z in view space
     }
 
     protected getGridPoint(i: number, j: number, k: number, result: vec3) {
-        // from DOOM 2016 presentation
-        // See http://www.aortiz.me/2018/12/21/CG.html for the formula to get the cluster slice from pixel depth in shader
-        // github repo: https://github.com/Angelo1211/HybridRenderingEngine/
-        const e = k / this.resolusion.z;
-        result.z = this.near * Math.pow((this.far / this.near), e);
+        result.z = this.getSliceZ(k);
+
+        const scale = result.z / this.near;
+        // x
+        const xNear = this.left + (i / this.resolusion.x) * (this.right - this.left);
+        result.x = scale * xNear;
+
+        // y
+        const yNear = this.bottom + (j / this.resolusion.y) * (this.top - this.bottom);
+        result.y = scale * yNear;
     }
 }
