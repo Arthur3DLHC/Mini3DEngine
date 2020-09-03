@@ -111,6 +111,7 @@ export class ClusterGrid {
 
         // iterate clusters hierarchically
         if (light instanceof PointLight) {
+            // point light: bounding sphere vs AABB
             // slices
             for (let k = 0; k < this.resolusion.z; k++) {
                 this.getSliceAABB(k, boundingBox);
@@ -121,25 +122,22 @@ export class ClusterGrid {
                         this.getRowAABB(j, k, boundingBox);
                         if (boundingBox.intersectSphere(boundingSphere)) {
                             // clusters
-                            
+
                         }
                     }
                 }
             }            
         } else if (light instanceof SpotLight) {
-
+            // spot light: bounding frustum? 6 planes vs AABB
+            // planes and AABB culling:
+            // https://www.braynzarsoft.net/viewtutorial/q16390-34-aabb-cpu-side-frustum-culling
         } else {
             // fix me: directional light range is infinite.
         }
 
-        // point light: bounding sphere vs AABB
 
-        // planes and AABB culling:
-        // https://www.braynzarsoft.net/viewtutorial/q16390-34-aabb-cpu-side-frustum-culling
 
-        // spot light: bounding frustum? 6 planes
 
-        // directional light: bounding box? 6 planes
     }
 
     public fillDecal(decal: Decal) {
