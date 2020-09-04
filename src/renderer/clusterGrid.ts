@@ -152,24 +152,24 @@ export class ClusterGrid {
             const matFrustum = new mat4();
             mat4.product(matLightViewProj, matInvView, matFrustum);
 
-            // frustum
+            // light frustum in view space
             // fix me: can the frustum be cached on light object?
-            const frustum = new Frustum();
-            frustum.setFromProjectionMatrix(matFrustum);
+            const lightFrustum = new Frustum();
+            lightFrustum.setFromProjectionMatrix(matFrustum);
             // test frustum and aabb
             // slices
             for (let k = 0; k < this.resolusion.z; k++) {
                 this.getSliceAABB(k, boundingBox);
     
-                if (frustum.intersectsBox(boundingBox)) {
+                if (lightFrustum.intersectsBox(boundingBox)) {
                     // rows
                     for (let j = 0; j < this.resolusion.y; j++) {
                         this.getRowAABB(j, k, boundingBox);
-                        if (frustum.intersectsBox(boundingBox)) {
+                        if (lightFrustum.intersectsBox(boundingBox)) {
                             // clusters
                             for (let i = 0; i < this.resolusion.x; i++) {
                                 this.getClusterAABB(i, j, k, boundingBox);
-                                if (frustum.intersectsBox(boundingBox)) {
+                                if (lightFrustum.intersectsBox(boundingBox)) {
                                     this.clusters[k][j][i].lights.push(lightIdx);
                                 }
                             }
