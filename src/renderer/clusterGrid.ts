@@ -197,7 +197,7 @@ export class ClusterGrid {
 
     public fillDecal(decal: Decal) {
         // need to transform to view space
-        // bounding box
+        // bounding box? 6 planes?
     }
 
     public fillEnvironmentProbe(envProbe: EnvironmentProbe, idx: number) {
