@@ -112,6 +112,10 @@ export class ClusterGrid {
         // iterate clusters hierarchically
         if (light instanceof PointLight) {
             // point light: bounding sphere vs AABB
+            this.checkClustersWithBoundingSphere(boundingSphere, (cluster: Cluster)=>{
+                cluster.lights.push(lightIdx);
+            });
+            /*
             // slices
             for (let k = 0; k < this.resolusion.z; k++) {
                 this.getSliceAABB(k, boundingBox);
@@ -132,6 +136,7 @@ export class ClusterGrid {
                     }
                 }
             }
+            */
         } else if (light instanceof SpotLight) {
             // spot light: bounding frustum? 6 planes vs AABB
             // planes and AABB culling:
@@ -179,6 +184,7 @@ export class ClusterGrid {
             }
         } else {
             // fix me: directional light range is infinite.
+            // should let them support distance and radius ranges?
             for (let k = 0; k < this.resolusion.z; k++) {
                 for (let j = 0; j < this.resolusion.y; j++) {
                     for (let i = 0; i < this.resolusion.x; i++) {
@@ -194,9 +200,75 @@ export class ClusterGrid {
         // bounding box
     }
 
-    public fillEnvironmentProbe(envProbe: EnvironmentProbe) {
+    public fillEnvironmentProbe(envProbe: EnvironmentProbe, idx: number) {
         // need to transform to view space
-        // bounding box
+        // bounding sphere?
+        const boundingSphere = new BoundingSphere(vec3.zero, 1);
+        const matModelView = new mat4();
+        mat4.product(this.viewTransform, envProbe.worldTransform, matModelView);
+        boundingSphere.transform(matModelView);
+
+        if (!this._frustum.intersectsSphere(boundingSphere)) {
+            return;
+        }
+
+        this.checkClustersWithBoundingSphere(boundingSphere, (cluster: Cluster)=>{
+            cluster.envProbes.push(idx);
+        });
+    }
+
+    /**
+     * hierarchical test cluster aabbs with bounding sphere
+     * @param boundingSphere 
+     * @param onIntersect callback function when cluster aabb intersects bounding sphere
+     */
+    protected checkClustersWithBoundingSphere(boundingSphere: BoundingSphere, onIntersect:(cluster: Cluster)=>void) {
+        // for early quit loop
+        let intersectLastSlice: boolean = false;
+        let intersectLastRow: boolean = false;
+        let intersectLastCluster: boolean = false;
+        const boundingBox: BoundingBox = new BoundingBox();
+
+        // slices
+        for (let k = 0; k < this.resolusion.z; k++) {
+            this.getSliceAABB(k, boundingBox);
+            let intersectThisSlice = boundingBox.intersectSphere(boundingSphere);
+            if (intersectThisSlice) {
+                // rows
+                intersectLastRow = false;
+                for (let j = 0; j < this.resolusion.y; j++) {
+                    this.getRowAABB(j, k, boundingBox);
+                    let intersectThisRow = boundingBox.intersectSphere(boundingSphere);
+                    if (intersectThisRow) {
+                        // clusters
+                        intersectLastCluster = false;
+                        for (let i = 0; i < this.resolusion.x; i++) {
+                            this.getClusterAABB(i, j, k, boundingBox);
+                            let intersectThisCluster = boundingBox.intersectSphere(boundingSphere);
+                            if (intersectThisCluster) {
+                                // this.clusters[k][j][i].envProbes.push(idx);
+                                onIntersect(this.clusters[k][j][i]);
+                            } else {
+                                if (intersectLastCluster) {
+                                    break;
+                                }
+                            }
+                            intersectLastCluster = intersectThisCluster;
+                        }
+                    } else {
+                        if (intersectLastRow) {
+                            break;
+                        }
+                    }
+                    intersectLastRow = intersectThisRow;
+                }
+            } else {
+                if (intersectLastSlice) {
+                    break;
+                }
+            }
+            intersectLastSlice = intersectThisSlice;
+        }
     }
 
     /**

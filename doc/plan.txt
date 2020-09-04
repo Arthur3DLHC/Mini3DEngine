@@ -479,7 +479,7 @@ TODO:       主要类结构
 
             GameScene 管理
                 参考 Phaser 和 PIXI.js？
-                H-Game Demo 场景管理
+                H-Game Demo 场景管理和简单逻辑；
 
             优化 tsm 库？
 

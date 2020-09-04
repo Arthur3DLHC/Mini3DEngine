@@ -27,10 +27,10 @@ export class EnvironmentProbe extends Object3D {
     // 在blender中用sphere定义EnvironmentProbe的位置和影响范围？
     // 使用统一的cubemap size？
     public get radius(): number {
-        this.worldTransform.getScaling(this.scaling);
-        return Math.max(this.scaling.x, Math.max(this.scaling.y, this.scaling.z));
+        // this.worldTransform.getScaling(this.scaling);
+        return Math.max(this.scale.x, Math.max(this.scale.y, this.scale.z));
     }
-    private scaling: vec3 = new vec3([1,1,1]);
+    // private scaling: vec3 = new vec3([1,1,1]);
 
     /**
      * multiple cubemaps passed in shader by texture 2d array; cube texture array is not supported now by WebGL2.0
