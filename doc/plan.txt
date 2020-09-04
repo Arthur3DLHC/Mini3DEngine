@@ -529,4 +529,8 @@ TODO:       主要类结构
                 使用json定义object prefab对象；
                 区分哪些网格是 occluder，哪些网格需要 occlusion query；使用前缀？
                 Blender 中的光源属性是否齐全？怎样使用；导出光源场景测试
+                    需要根据光源亮度自动计算一个衰减距离；
                 Blender 中能否导出 instancing 的网格？导出有 linked duplicate 网格场景测试
+
+            Volume Rendering?
+                SDF

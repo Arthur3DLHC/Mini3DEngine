@@ -96,7 +96,7 @@ export class ClusterGrid {
     //                                  fill item to cluster's list
 
 
-    public fillLight(light: BaseLight) {
+    public fillLight(light: BaseLight, lightIdx: number) {
         // need to transform to view space
         const boundingSphere = new BoundingSphere(light.boundingSphere.center, light.boundingSphere.radius);
         const matModelView = new mat4();
@@ -122,22 +122,71 @@ export class ClusterGrid {
                         this.getRowAABB(j, k, boundingBox);
                         if (boundingBox.intersectSphere(boundingSphere)) {
                             // clusters
-
+                            for (let i = 0; i < this.resolusion.x; i++) {
+                                this.getClusterAABB(i, j, k, boundingBox);
+                                if (boundingBox.intersectSphere(boundingSphere)) {
+                                    this.clusters[k][j][i].lights.push(lightIdx);
+                                }
+                            }
                         }
                     }
                 }
-            }            
+            }
         } else if (light instanceof SpotLight) {
             // spot light: bounding frustum? 6 planes vs AABB
             // planes and AABB culling:
             // https://www.braynzarsoft.net/viewtutorial/q16390-34-aabb-cpu-side-frustum-culling
+            const spotLight = light as SpotLight;
+            // the viewproj transform of spotLight
+            const matLightView = spotLight.worldTransform.copy();
+            matLightView.inverse();
+            const matLightProj = mat4.perspective(Math.min(spotLight.outerConeAngle * 2, 3.10) * 180.0 / Math.PI, 1, 0.01, spotLight.range > 0 ? spotLight.range : 100);
+
+            const matLightViewProj = new mat4();
+            mat4.product(matLightProj, matLightView, matLightViewProj);
+
+            // from view space to light proj space
+            const matInvView = this.viewTransform.copy();
+            matInvView.inverse();
+
+            const matFrustum = new mat4();
+            mat4.product(matLightViewProj, matInvView, matFrustum);
+
+            // frustum
+            // fix me: can the frustum be cached on light object?
+            const frustum = new Frustum();
+            frustum.setFromProjectionMatrix(matFrustum);
+            // test frustum and aabb
+            // slices
+            for (let k = 0; k < this.resolusion.z; k++) {
+                this.getSliceAABB(k, boundingBox);
+    
+                if (frustum.intersectsBox(boundingBox)) {
+                    // rows
+                    for (let j = 0; j < this.resolusion.y; j++) {
+                        this.getRowAABB(j, k, boundingBox);
+                        if (frustum.intersectsBox(boundingBox)) {
+                            // clusters
+                            for (let i = 0; i < this.resolusion.x; i++) {
+                                this.getClusterAABB(i, j, k, boundingBox);
+                                if (frustum.intersectsBox(boundingBox)) {
+                                    this.clusters[k][j][i].lights.push(lightIdx);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         } else {
             // fix me: directional light range is infinite.
+            for (let k = 0; k < this.resolusion.z; k++) {
+                for (let j = 0; j < this.resolusion.y; j++) {
+                    for (let i = 0; i < this.resolusion.x; i++) {
+                        this.clusters[k][j][i].lights.push(lightIdx);
+                    }
+                }
+            }
         }
-
-
-
-
     }
 
     public fillDecal(decal: Decal) {
