@@ -162,6 +162,10 @@ export class ClusterGrid {
             const lightFrustum = new Frustum();
             lightFrustum.setFromProjectionMatrix(matFrustum);
             // test frustum and aabb
+            this.checkClustersWithFrustum(lightFrustum, (cluster: Cluster)=>{
+                cluster.lights.push(lightIdx);
+            });
+            /*
             // slices
             for (let k = 0; k < this.resolusion.z; k++) {
                 this.getSliceAABB(k, boundingBox);
@@ -182,6 +186,7 @@ export class ClusterGrid {
                     }
                 }
             }
+            */
         } else {
             // fix me: directional light range is infinite.
             // should let them support distance and radius ranges?
@@ -266,6 +271,49 @@ export class ClusterGrid {
                 if (intersectLastSlice) {
                     break;
                 }
+            }
+            intersectLastSlice = intersectThisSlice;
+        }
+    }
+
+    protected checkClustersWithFrustum(frustum: Frustum, onIntersect:(cluster: Cluster)=>void) {
+        
+        let intersectLastSlice: boolean = false;
+        let intersectLastRow: boolean = false;
+        let intersectLastCluster: boolean = false;
+        
+        const boundingBox: BoundingBox = new BoundingBox();
+        
+        // slices
+        for (let k = 0; k < this.resolusion.z; k++) {
+            this.getSliceAABB(k, boundingBox);
+            let intersectThisSlice = frustum.intersectsBox(boundingBox);
+            if (intersectThisSlice) {
+                // rows
+                intersectLastRow = false;
+                for (let j = 0; j < this.resolusion.y; j++) {
+                    this.getRowAABB(j, k, boundingBox);
+                    let intersectThisRow = frustum.intersectsBox(boundingBox);
+                    if (intersectThisRow) {
+                        // clusters
+                        intersectLastCluster = false;
+                        for (let i = 0; i < this.resolusion.x; i++) {
+                            this.getClusterAABB(i, j, k, boundingBox);
+                            let intersectThisCluster = frustum.intersectsBox(boundingBox);
+                            if (intersectThisCluster) {
+                                onIntersect(this.clusters[k][j][i]);
+                            } else {
+                                if (intersectLastCluster) break;
+                            }
+                            intersectLastCluster = intersectThisCluster;
+                        }
+                    } else {
+                        if (intersectLastRow) break;
+                    }
+                    intersectLastRow = intersectThisRow;
+                }
+            } else {
+                if (intersectLastSlice) break;
             }
             intersectLastSlice = intersectThisSlice;
         }

@@ -1,5 +1,6 @@
 import vec3 from "../../lib/tsm/vec3.js";
 import { BoundingSphere } from "./boundingSphere.js";
+import mat4 from "../../lib/tsm/mat4.js";
 
 export class Plane {
     public constructor(a: number = 0, b: number = 0, c: number = 0, d: number = 0) {
@@ -9,6 +10,8 @@ export class Plane {
 
     public normal: vec3;
     public constant: number;
+
+    private static _tmpMatrix: mat4 = new mat4();
 
     public copy(): Plane {
         return new Plane(this.normal.x, this.normal.y, this.normal.z, this.constant);
@@ -88,6 +91,29 @@ export class Plane {
         return this.distanceToPoint(sphere.center) - sphere.radius;
     }
 
+    public transform(transformation: mat4): Plane {
+        // multiply inverse transform matrix
+        // https://stackoverflow.com/questions/7685495/transforming-a-3d-plane-using-a-4x4-matrix
+        // https://github.com/BabylonJS/Babylon.js/blob/master/src/Maths/math.plane.ts
+        
+        // inverse
+        const inversedMatrix = Plane._tmpMatrix;
+        transformation.copy(inversedMatrix);
+        inversedMatrix.inverse();
+        const m = inversedMatrix.values;
+        const x = this.normal.x;
+        const y = this.normal.y;
+        const z = this.normal.z;
+        const d = this.constant;
+        // transpose
+        this.normal.x = x * m[0] + y * m[1] + z * m[2] + d * m[3];
+        this.normal.y = x * m[4] + y * m[5] + z * m[6] + d * m[7];
+        this.normal.z = x * m[8] + y * m[9] + z * m[10] + d * m[11];
+        this.constant = x * m[12] + y * m[13] + z * m[14] + d * m[15];
+
+        return this;
+    }
+
     public static fromPoints(p1: vec3, p2: vec3, p3: vec3): Plane {
         const result = new Plane(0, 0, 0, 0);
         result.setFromPoints(p1, p2, p3);
@@ -100,7 +126,4 @@ export class Plane {
         // return new Plane(normal.x, normal.y, normal.z, d);
         return new Plane().setFromNormalAndPoint(normal, point);
     }
-
-    // todo: position check methods
-
 }
