@@ -35,6 +35,8 @@ export class ClusterGrid {
     private _tmpMinPointFar: vec3 = new vec3();
     private _tmpMaxPointFar: vec3 = new vec3();
 
+    private _tmpInvViewTransform: mat4 = new mat4();
+
     /**
      * call this only when the resolusion or frustum changed.
      */
@@ -142,6 +144,8 @@ export class ClusterGrid {
             // planes and AABB culling:
             // https://www.braynzarsoft.net/viewtutorial/q16390-34-aabb-cpu-side-frustum-culling
             const spotLight = light as SpotLight;
+
+            // todo: optimize - too much temp newed matrices
             // the viewproj transform of spotLight
             const matLightView = spotLight.worldTransform.copy();
             matLightView.inverse();
@@ -151,7 +155,7 @@ export class ClusterGrid {
             mat4.product(matLightProj, matLightView, matLightViewProj);
 
             // from view space to light proj space
-            const matInvView = this.viewTransform.copy();
+            const matInvView = this.viewTransform.copy(this._tmpInvViewTransform);
             matInvView.inverse();
 
             const matFrustum = new mat4();
