@@ -21,7 +21,8 @@ export class ClusterGrid {
     public right: number = 0.1;
     public bottom: number = -0.1;
     public top: number = 0.1;
-    public resolusion: vec4 = new vec4([1,1,1,1]);
+    public orthographic: boolean = false;        // orthographic or perspective
+    public resolusion: vec3 = new vec3([1,1,1]);
 
     public viewTransform: mat4 = new mat4();
 
@@ -40,7 +41,7 @@ export class ClusterGrid {
     /**
      * call this only when the resolusion or frustum changed.
      */
-    public updateClusters() {
+    public initialize() {
         this.resolusion.x = Math.max(1, this.resolusion.x);
         this.resolusion.y = Math.max(1, this.resolusion.y);
         this.resolusion.z = Math.max(1, this.resolusion.z);
@@ -54,12 +55,23 @@ export class ClusterGrid {
                 const row: Cluster[] = [];
                 for (let i = 0; i < this.resolusion.x; i++) {
                     const cluster: Cluster = new Cluster(i, j, k);
-                    this.getClusterAABB(i, j, k, cluster.boudingBox);
+                    // this.getClusterAABB(i, j, k, cluster.boudingBox);
                     row.push(cluster);
                 }
                 layer.push(row);
             }
             this.clusters.push(layer);
+        }
+    }
+
+    public updateClusterAABBs() {
+        for (let k = 0; k < this.resolusion.z; k++) {
+            for (let j = 0; j < this.resolusion.y; j++) {
+                for (let i = 0; i < this.resolusion.x; i++) {
+                    const cluster: Cluster = this.clusters[k][j][i];
+                    this.getClusterAABB(i, j, k, cluster.boudingBox);
+                }
+            }
         }
 
         // update frustum

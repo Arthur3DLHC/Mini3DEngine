@@ -25,6 +25,7 @@ import { Hammersley } from "../math/Hammersley.js";
 import { SkinMesh } from "../scene/skinMesh.js";
 import { InstancedMesh } from "../scene/instancedMesh.js";
 import { ClusterGrid } from "./clusterGrid.js";
+import { PerspectiveCamera } from "../scene/cameras/perspectiveCamera.js";
 
 export class ClusteredForwardRenderContext extends RenderContext {
     public constructor() {
@@ -32,6 +33,10 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
         this._clusterGrid = new ClusterGrid();
         // todo: where to initialize cluster grids?
+        this._clusterGrid.resolusion.x = ClusteredForwardRenderContext.NUM_CLUSTERS_X;
+        this._clusterGrid.resolusion.y = ClusteredForwardRenderContext.NUM_CLUSTERS_Y;
+        this._clusterGrid.resolusion.z = ClusteredForwardRenderContext.NUM_CLUSTERS_Z;
+        this._clusterGrid.initialize();
 
         this._tmpData = new Float32Array(4096);
         this._buffer = new BufferHelper(this._tmpData);
@@ -524,6 +529,35 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
         if (useClusters) {
             // todo: use cluster grid to cull objects
+            // check if the frustum has changed?
+            // fix me: othographic cameras?
+            if (camera instanceof PerspectiveCamera) {
+                const perspCamera = camera as PerspectiveCamera;
+                const fovRad = perspCamera.fov * Math.PI / 180.0;
+                const tanHalfFov = Math.tan(fovRad * 0.5);
+                const right = perspCamera.near * tanHalfFov * perspCamera.aspect;
+                const left = -right;
+                const top = perspCamera.near * tanHalfFov;
+                const bottom = -top;
+                const clusterGrid = this._clusterGrid;
+                if (camera.near != clusterGrid.near ||
+                    camera.far != clusterGrid.far ||
+                    left != clusterGrid.left ||
+                    right != clusterGrid.right ||
+                    bottom != clusterGrid.bottom ||
+                    top != clusterGrid.top) {
+                    clusterGrid.near = camera.near;
+                    clusterGrid.far = camera.far;
+                    clusterGrid.left = left;
+                    clusterGrid.right = right;
+                    clusterGrid.top = top;
+                    clusterGrid.bottom = bottom;
+                    clusterGrid.updateClusterAABBs();
+                }
+
+                // todo: iterate lights, decals and envprobes, fill to cluster grid
+                // todo: use lists in clusters to update uniform buffers;
+            }
         }
         else {
             // todo: calculate clip space cluster AABB
