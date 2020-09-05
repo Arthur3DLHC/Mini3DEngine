@@ -206,6 +206,9 @@ export class ClusterGrid {
 
     public fillDecal(decal: Decal) {
         // need to transform to view space
+        // limit visible distance
+
+        // check against cluster aabbs
         // bounding box? 6 planes?
     }
 
@@ -220,6 +223,8 @@ export class ClusterGrid {
         if (!this._frustum.intersectsSphere(boundingSphere)) {
             return;
         }
+
+        // todo: environment probes visible distance limit
 
         this.checkClustersWithBoundingSphere(boundingSphere, (cluster: Cluster)=>{
             cluster.envProbes.push(idx);
