@@ -24,10 +24,14 @@ import { Halton } from "../math/halton.js";
 import { Hammersley } from "../math/Hammersley.js";
 import { SkinMesh } from "../scene/skinMesh.js";
 import { InstancedMesh } from "../scene/instancedMesh.js";
+import { ClusterGrid } from "./clusterGrid.js";
 
 export class ClusteredForwardRenderContext extends RenderContext {
     public constructor() {
         super();
+
+        this._clusterGrid = new ClusterGrid();
+        // todo: where to initialize cluster grids?
 
         this._tmpData = new Float32Array(4096);
         this._buffer = new BufferHelper(this._tmpData);
@@ -70,6 +74,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this.bindUniformBuffers();
     }
 
+    private _clusterGrid: ClusterGrid;
+
     private _tmpData: Float32Array;
     private _buffer: BufferHelper;
     private _tmpIdxData: Uint32Array;
@@ -90,6 +96,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
     private _ubClusters: UniformBuffer;
     private _ubObject: UniformBuffer;
     private _ubMaterialPBR: UniformBuffer;
+
 
     public get ubMaterialPBR(): UniformBuffer {
         return this._ubMaterialPBR;
