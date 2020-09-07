@@ -198,6 +198,8 @@ export class GLTFSceneBuilder {
             }
             this._meshReferences[nodeDef.mesh]++;
         }
+        // todo: light, environment probe, irradiance volume
+        
         else {
             node = new Object3D();
         }
