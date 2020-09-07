@@ -15,21 +15,32 @@ import { SpotLight } from "../scene/lights/spotLight.js";
  * See http://www.aortiz.me/2018/12/21/CG.html
  */
 export class ClusterGrid {
-    public near: number = 0.1;
-    public far: number = 100;
-    public left: number = -0.1;
-    public right: number = 0.1;
-    public bottom: number = -0.1;
-    public top: number = 0.1;
-    public orthographic: boolean = false;        // orthographic or perspective
-    public resolusion: vec3 = new vec3([1,1,1]);
+    public get near(): number {return this._near;}
+    public get far(): number {return this._far;}
+    public get left(): number {return this.left;}
+    public get right(): number {return this.right;}
+    public get bottom(): number {return this.bottom;}
+    public get top(): number {return this.top;}
+    public get orthographic(): boolean {return this.orthographic;}        // orthographic or perspective
+    public get resolusion(): vec3 {return this._resolusion;}
 
     public viewTransform: mat4 = new mat4();
 
     // todo: save clusters hierarchical?
     public clusters: Cluster[][][] = [];
 
+    // private _aabbDirty = false;
+    // private _clusterdDirty = false;
     private _frustum: Frustum = new Frustum();
+
+    private _near: number = 0.1;
+    private _far: number = 100;
+    private _left: number = -0.1;
+    private _right: number = 0.1;
+    private _bottom: number = -0.1;
+    private _top: number = 0.1;
+    private _orthographic: boolean = false;        // orthographic or perspective
+    private _resolusion: vec3 = new vec3([1,1,1]);
 
     private _tmpMinPointNear: vec3 = new vec3();
     private _tmpMaxPointNear: vec3 = new vec3();
@@ -61,6 +72,19 @@ export class ClusterGrid {
                 layer.push(row);
             }
             this.clusters.push(layer);
+        }
+    }
+
+    public setFrustumParams(l: number, r: number, b: number, t: number, n: number, f: number) {
+        let dirty = false;
+        if(this._left !== l) {this._left = l; dirty = true;}
+        if(this._right !== r) {this._right = r; dirty = true;}
+        if(this._bottom !== b) {this._bottom = b; dirty = true;}
+        if(this._top !== t) {this._top = t; dirty = true;}
+        if(this._near !== n) {this._near = n; dirty = true;}
+        if(this._far !== f) {this._far = f; dirty = true;}
+        if (dirty) {
+            this.updateClusterAABBs();
         }
     }
 

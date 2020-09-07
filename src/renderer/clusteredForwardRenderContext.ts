@@ -540,20 +540,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 const top = perspCamera.near * tanHalfFov;
                 const bottom = -top;
                 const clusterGrid = this._clusterGrid;
-                if (camera.near != clusterGrid.near ||
-                    camera.far != clusterGrid.far ||
-                    left != clusterGrid.left ||
-                    right != clusterGrid.right ||
-                    bottom != clusterGrid.bottom ||
-                    top != clusterGrid.top) {
-                    clusterGrid.near = camera.near;
-                    clusterGrid.far = camera.far;
-                    clusterGrid.left = left;
-                    clusterGrid.right = right;
-                    clusterGrid.top = top;
-                    clusterGrid.bottom = bottom;
-                    clusterGrid.updateClusterAABBs();
-                }
+                clusterGrid.setFrustumParams(left, right, bottom, top, camera.near, camera.far);
 
                 // todo: iterate lights, decals and envprobes, fill to cluster grid
                 // todo: use lists in clusters to update uniform buffers;
