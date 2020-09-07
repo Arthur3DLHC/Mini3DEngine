@@ -477,6 +477,10 @@ TODO:       主要类结构
                 是否使用OIT？
                 测试半透明物体的 Demo
 
+            从 gltf 中读取光源；
+
+            从 Blender 导出 Irradiance Volume 到 gltf；从 gltf 读取 Irradiance Volume，添加 probes 到场景；
+
             GameScene 管理
                 参考 Phaser 和 PIXI.js？
                 H-Game Demo 场景管理和简单逻辑；
