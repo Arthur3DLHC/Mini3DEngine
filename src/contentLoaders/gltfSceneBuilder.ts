@@ -27,6 +27,11 @@ import { AnimationAction } from "../animation/animationAction.js";
 import { AnimationSampler, Interpolation } from "../animation/animationSampler.js";
 import { InstancedMesh } from "../scene/instancedMesh.js";
 import { Instance } from "../scene/instance.js";
+import { BaseLight } from "../scene/lights/baseLight.js";
+import { KHR_Lights_Punctual } from "./gltfExtensions.js";
+import { DirectionalLight } from "../scene/lights/directionalLight.js";
+import { PointLight } from "../scene/lights/pointLight.js";
+import { SpotLight } from "../scene/lights/spotLight.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -198,10 +203,17 @@ export class GLTFSceneBuilder {
             }
             this._meshReferences[nodeDef.mesh]++;
         }
-        // todo: light, environment probe, irradiance volume
-        
         else {
-            node = new Object3D();
+            // todo: light, environment probe, irradiance volume
+            if (nodeDef.extensions !== undefined) {
+                if (nodeDef.extensions.KHR_lights_punctual !== undefined) {
+                    node = this.processLight(nodeDef, gltf);
+                } else {
+                    node = new Object3D();
+                }
+            } else {
+                node = new Object3D();
+            }
         }
 
         node.name = nodeDef.name !== undefined ? nodeDef.name : "";
@@ -219,6 +231,41 @@ export class GLTFSceneBuilder {
         //        this.processNode(childId, node, gltf);
         //    }
         //}
+    }
+    private processLight(nodeDef: Node, gltf: GltfAsset): BaseLight {
+        const extensions = gltf.gltf.extensions;
+        if (extensions === undefined) {
+            throw new Error("No extensions in gltf");
+        }
+        const punctualLights: KHR_Lights_Punctual = extensions.KHR_lights_punctual;
+        if (punctualLights === undefined) {
+            throw new Error("No lights found in extensions");
+        }
+        const lightDefs = punctualLights.lights;
+        if (nodeDef.extensions === undefined || nodeDef.extensions.KHR_lights_punctual === undefined) {
+            throw new Error("No light extension on node");
+        }
+        const lightIdx: number = nodeDef.extensions.KHR_lights_punctual.light;
+        const lightDef = lightDefs[lightIdx];
+        if (lightDef === undefined) {
+            throw new Error("Light not found in lights array");
+        }
+        switch(lightDef.type) {
+            case "directional":
+                const dirLight = new DirectionalLight();
+                return dirLight;
+                break;
+            case "point":
+                const pointLight = new PointLight();
+                return pointLight;
+                break;
+            case "spot":
+                const spotLight = new SpotLight();
+                return spotLight;
+                break;
+            default:
+                throw new Error("Unknown light type:" + lightDef.type);
+        }
     }
 
     private processNodeTransform(nodeDef: Node, node: Object3D) {
