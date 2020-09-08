@@ -9,6 +9,8 @@ export class EnvironmentProbe extends Object3D {
     public constructor() {
         super();
         this.visibleDistance = 20;
+        this.clippingStart = 0.01;
+        this.clippingEnd = 20;
         this.backgroundColor = new vec4([0, 0, 0, 1]);
         this.texture = null;
         this.textureIndex = 0;
@@ -23,6 +25,9 @@ export class EnvironmentProbe extends Object3D {
     public visibleDistance: number;
 
     public backgroundColor: vec4;
+
+    public clippingStart: number;
+    public clippingEnd: number;
 
     // 在blender中用sphere定义EnvironmentProbe的位置和影响范围？
     // 使用统一的cubemap size？

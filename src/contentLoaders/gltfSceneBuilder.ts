@@ -260,12 +260,14 @@ export class GLTFSceneBuilder {
         if (extras.resolutionY !== undefined) resY = extras.resolutionY;
         if (extras.resolutionZ !== undefined) resZ = extras.resolutionZ;
 
+
         let ret: Object3D;
 
         if(resX === 1 && resY === 1 && resZ === 1) {
             // if resolution is 1x1x1, return one envprobe object
             const envProbe = new EnvironmentProbe();
-            // todo: clip range
+            if (extras.clippingStart !== undefined) envProbe.clippingStart = extras.clippingStart;
+            if (extras.clippingEnd !== undefined) envProbe.clippingEnd = extras.clippingEnd;
             ret = envProbe;
         } else {
             // else add envprobes as children
@@ -274,8 +276,8 @@ export class GLTFSceneBuilder {
                 for (let j = 0; j < resY; j++) {
                     for (let i = 0; i < resX; i++) {
                         const envProbe = new EnvironmentProbe();
-                        // todo: clip range
-                        // todo: calculate local transform
+                        if (extras.clippingStart !== undefined) envProbe.clippingStart = extras.clippingStart;
+                        if (extras.clippingEnd !== undefined) envProbe.clippingEnd = extras.clippingEnd;
                         envProbe.translation.x = i / (resX - 1.0);
                         envProbe.translation.y = j / (resY - 1.0);
                         envProbe.translation.z = k / (resZ - 1.0);

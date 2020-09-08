@@ -1631,7 +1631,8 @@ export class ClusteredForwardRenderer {
         cubefaceCamera.autoUpdateTransform = false;
         // because objects will be transformed to envprobe local space,
         // and the envprobe's radius is represented by its scale transform,
-        // so we can use a unique projection frustum with far plane at 1
+        // so we can use a default unique projection frustum with far plane at 1
+        // later will be overwritten by clipping range of envprobe
         cubefaceCamera.projTransform = mat4.perspective(90, 1, 0.01, 1);
         cubefaceCamera.viewport = new vec4([0, 0, this._renderContext.envmapSize, this._renderContext.envmapSize]);
         
@@ -1693,6 +1694,9 @@ export class ClusteredForwardRenderer {
             // iterate all envprobes
             for (let ienvprobe = 0; ienvprobe < this._renderContext.envprobeCount; ienvprobe++) {
                 const envprobe = this._renderContext.envProbes[ienvprobe];
+
+                // use envprobe clipping properties to prevent light leaking.
+                cubefaceCamera.projTransform = mat4.perspective(90, 1, envprobe.clippingStart, envprobe.clippingEnd);
 
                 envprobe.worldTransform.copy(matWorldToProbe);
                 matWorldToProbe.inverse();
