@@ -478,8 +478,10 @@ TODO:       主要类结构
                 测试半透明物体的 Demo
 
             从 gltf 中读取光源；
+                Blender python script;
 
             从 Blender 导出 Irradiance Volume 到 gltf；从 gltf 读取 Irradiance Volume，添加 probes 到场景；
+                Blender python script;
 
             GameScene 管理
                 参考 Phaser 和 PIXI.js？

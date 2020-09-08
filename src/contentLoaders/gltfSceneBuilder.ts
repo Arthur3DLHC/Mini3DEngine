@@ -286,6 +286,7 @@ export class GLTFSceneBuilder {
         if (lightDef.intensity !== undefined) light.intensity = lightDef.intensity;
         light.isStatic = this.setLightsStatic;
         // todo: cast shadows ? set in custom properties extras?
+        // the shadow properties will be copied from light objects to their custom properties block in Blender by python script.
         if (nodeDef.extras !== undefined) {
             const extras = nodeDef.extras;
             light.castShadow = extras.shadow !== undefined ? extras.shadow : false;
