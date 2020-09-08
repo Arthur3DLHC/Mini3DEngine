@@ -360,7 +360,7 @@ export class GLTFSceneBuilder {
         // the shadow properties will be copied from light objects to their custom properties block in Blender by python script.
         if (nodeDef.extras !== undefined) {
             const extras = nodeDef.extras;
-            light.castShadow = extras.shadow !== undefined ? extras.shadow : false;
+            light.castShadow = extras.castShadow !== undefined ? extras.castShadow : false;
             if (light.shadow !== null && extras.shadowMapSize !== undefined) {
                 light.shadow.mapSize = extras.shadowMapSize;
             }
