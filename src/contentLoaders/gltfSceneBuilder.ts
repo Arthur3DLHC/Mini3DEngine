@@ -69,6 +69,11 @@ export class GLTFSceneBuilder {
     ]);
 
     /**
+     * set lights as static
+     */
+    public setLightsStatic: boolean = true;
+
+    /**
      * build scene hierarchy from gltf asset. NOTE: don't call this before all binary datas has been loaded.
      * @param gltf the GlTf asset data
      * @param sceneIdx index of scene in gltf
@@ -250,22 +255,45 @@ export class GLTFSceneBuilder {
         if (lightDef === undefined) {
             throw new Error("Light not found in lights array");
         }
+        let light: BaseLight;
         switch(lightDef.type) {
             case "directional":
                 const dirLight = new DirectionalLight();
-                return dirLight;
+                light = dirLight;
                 break;
             case "point":
                 const pointLight = new PointLight();
-                return pointLight;
+                light = pointLight;
+                // todo: range
+                if(lightDef.range !== undefined) pointLight.range = lightDef.range;
                 break;
             case "spot":
                 const spotLight = new SpotLight();
-                return spotLight;
+                light = spotLight;
+                // range
+                if(lightDef.range !== undefined) spotLight.range = lightDef.range;
+                // todo: cone angles
+                if(lightDef.spot !== undefined) {
+                    if(lightDef.spot.outerConeAngle !== undefined) spotLight.outerConeAngle = lightDef.spot.outerConeAngle;
+                    if(lightDef.spot.innerConeAngle !== undefined) spotLight.innerConeAngle = lightDef.spot.innerConeAngle; 
+                }
                 break;
             default:
                 throw new Error("Unknown light type:" + lightDef.type);
         }
+        if (lightDef.name !== undefined) light.name = lightDef.name;
+        if (lightDef.color !== undefined) light.color.xyzw = [lightDef.color[0], lightDef.color[1], lightDef.color[2], 1];
+        if (lightDef.intensity !== undefined) light.intensity = lightDef.intensity;
+        light.isStatic = this.setLightsStatic;
+        // todo: cast shadows ? set in custom properties extras?
+        if (nodeDef.extras !== undefined) {
+            const extras = nodeDef.extras;
+            light.castShadow = extras.shadow !== undefined ? extras.shadow : false;
+            if (light.shadow !== null && extras.shadowMapSize !== undefined) {
+                light.shadow.mapSize = extras.shadowMapSize;
+            }
+        }
+        return light;
     }
 
     private processNodeTransform(nodeDef: Node, node: Object3D) {
