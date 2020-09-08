@@ -115,6 +115,7 @@
     "nodes" : [
         {
             "extras" : {
+                "extType" : "irradianceVolume",
                 "resolutionX" : 2,
                 "resolutionY" : 2,
                 "resolutionZ" : 2,

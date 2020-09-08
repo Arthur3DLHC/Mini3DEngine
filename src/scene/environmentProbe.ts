@@ -27,6 +27,7 @@ export class EnvironmentProbe extends Object3D {
     // 在blender中用sphere定义EnvironmentProbe的位置和影响范围？
     // 使用统一的cubemap size？
     public get radius(): number {
+        // todo: use world transform scaling
         // this.worldTransform.getScaling(this.scaling);
         return Math.max(this.scale.x, Math.max(this.scale.y, this.scale.z));
     }

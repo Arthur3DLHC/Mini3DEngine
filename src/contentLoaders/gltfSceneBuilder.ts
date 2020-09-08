@@ -32,6 +32,7 @@ import { KHR_Lights_Punctual } from "./gltfExtensions.js";
 import { DirectionalLight } from "../scene/lights/directionalLight.js";
 import { PointLight } from "../scene/lights/pointLight.js";
 import { SpotLight } from "../scene/lights/spotLight.js";
+import { EnvironmentProbe } from "../scene/environmentProbe.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -216,7 +217,16 @@ export class GLTFSceneBuilder {
                 } else {
                     node = new Object3D();
                 }
-            } else {
+            } else if (nodeDef.extras !== undefined) {
+                // if not light but has extra custum properties
+                if (nodeDef.extras.extType === "irradianceVolume") {
+                    node = this.processIrradianceVolume(nodeDef, gltf);
+                } else {
+                    // todo: other extra object types
+                    node = new Object3D();
+                }
+            }
+            else {
                 node = new Object3D();
             }
         }
@@ -237,6 +247,48 @@ export class GLTFSceneBuilder {
         //    }
         //}
     }
+
+    private processIrradianceVolume(nodeDef: Node, gltf: GltfAsset): Object3D {
+        // todo: calc environtment probe locations, 
+        if (nodeDef.extras === undefined) {
+            throw new Error("No extras on node.");
+        }
+
+        const extras = nodeDef.extras;
+        let resX = 1, resY = 1, resZ = 1;
+        if (extras.resolutionX !== undefined) resX = extras.resolutionX;
+        if (extras.resolutionY !== undefined) resY = extras.resolutionY;
+        if (extras.resolutionZ !== undefined) resZ = extras.resolutionZ;
+
+        let ret: Object3D;
+
+        if(resX === 1 && resY === 1 && resZ === 1) {
+            // if resolution is 1x1x1, return one envprobe object
+            const envProbe = new EnvironmentProbe();
+            // todo: clip range
+            ret = envProbe;
+        } else {
+            // else add envprobes as children
+            ret = new Object3D();
+            for (let k = 0; k < resZ; k++) {
+                for (let j = 0; j < resY; j++) {
+                    for (let i = 0; i < resX; i++) {
+                        const envProbe = new EnvironmentProbe();
+                        // todo: clip range
+                        // todo: calculate local transform
+                        envProbe.translation.x = i / (resX - 1.0);
+                        envProbe.translation.y = j / (resY - 1.0);
+                        envProbe.translation.z = k / (resZ - 1.0);
+                        // fix me: how to set the affect radius of envprobe?
+                        ret.attachChild(envProbe);
+                    }
+                }
+            }
+        }
+
+        return ret;
+    }
+
     private processLight(nodeDef: Node, gltf: GltfAsset): BaseLight {
         const extensions = gltf.gltf.extensions;
         if (extensions === undefined) {
@@ -272,7 +324,7 @@ export class GLTFSceneBuilder {
                 light = spotLight;
                 // range
                 if(lightDef.range !== undefined) spotLight.range = lightDef.range;
-                // todo: cone angles
+                // cone angles
                 if(lightDef.spot !== undefined) {
                     if(lightDef.spot.outerConeAngle !== undefined) spotLight.outerConeAngle = lightDef.spot.outerConeAngle;
                     if(lightDef.spot.innerConeAngle !== undefined) spotLight.innerConeAngle = lightDef.spot.innerConeAngle; 
