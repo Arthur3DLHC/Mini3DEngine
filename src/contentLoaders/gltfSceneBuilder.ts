@@ -221,6 +221,8 @@ export class GLTFSceneBuilder {
                 // if not light but has extra custum properties
                 if (nodeDef.extras.extType === "irradianceVolume") {
                     node = this.processIrradianceVolume(nodeDef, gltf);
+                } else if (nodeDef.extras.extType === "environmentProbe") {
+                    node = this.processEnvironmentProbe(nodeDef, gltf);
                 } else {
                     // todo: other extra object types
                     node = new Object3D();
@@ -246,6 +248,21 @@ export class GLTFSceneBuilder {
         //        this.processNode(childId, node, gltf);
         //    }
         //}
+    }
+
+    private processEnvironmentProbe(nodeDef: Node, gltf: GltfAsset): Object3D {
+        // return single envprobe
+        if (nodeDef.extras === undefined) {
+            throw new Error("No extras on node.");
+        }
+
+        const extras = nodeDef.extras;
+
+        const envProbe = new EnvironmentProbe();
+        if (extras.clippingStart !== undefined) envProbe.clippingStart = extras.clippingStart;
+        if (extras.clippingEnd !== undefined) envProbe.clippingEnd = extras.clippingEnd;
+        
+        return envProbe;
     }
 
     private processIrradianceVolume(nodeDef: Node, gltf: GltfAsset): Object3D {
