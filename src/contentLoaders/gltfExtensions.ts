@@ -12,6 +12,7 @@ export interface KHR_Light_Punctual {
     "type": "directional" | "point" | "spot" | string;
     "range"?: number;
     "spot"?: Spot;
+    "extras"?: any;
 }
 
 export interface KHR_Lights_Punctual {

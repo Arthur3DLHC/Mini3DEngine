@@ -4,6 +4,7 @@ import bpy
 # only some data types can hold custom properties, such as lights
 
 for light in bpy.data.lights:
+    print("processing light: " + light.name)
     light["castShadow"] = light.use_shadow
     light["shadowMapSize"] = light.shadow_buffer_size
     
@@ -14,7 +15,8 @@ for obj in bpy.data.objects:
     if obj.type == "LIGHT_PROBE":
         probe = obj.data
         if probe.type == "GRID":
-            print("is grid")
+            print("processing irradiance volume: " + obj.name)
+            obj["extType"] = "irradianceVolume"
             obj["resolutionX"] = probe.grid_resolution_x
             obj["resolutionY"] = probe.grid_resolution_y
             obj["resolutionZ"] = probe.grid_resolution_z

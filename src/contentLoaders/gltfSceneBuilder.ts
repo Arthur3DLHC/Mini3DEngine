@@ -346,9 +346,9 @@ export class GLTFSceneBuilder {
             case "directional":
                 const dirLight = new DirectionalLight();
                 light = dirLight;
-                if (nodeDef.extras !== undefined) {
-                    if (nodeDef.extras.radius !== undefined) {
-                        dirLight.radius = nodeDef.extras.radius;
+                if (lightDef.extras !== undefined) {
+                    if (lightDef.extras.radius !== undefined) {
+                        dirLight.radius = lightDef.extras.radius;
                     } else {
                         dirLight.radius = 1;
                     }
@@ -380,12 +380,12 @@ export class GLTFSceneBuilder {
         light.isStatic = this.setLightsStatic;
         // todo: cast shadows ? set in custom properties extras?
         // the shadow properties will be copied from light objects to their custom properties block in Blender by python script.
-        if (nodeDef.extras !== undefined) {
-            const extras = nodeDef.extras;
+        if (lightDef.extras !== undefined) {
+            const extras = lightDef.extras;
             // light.castShadow = extras.castShadow !== undefined ? extras.castShadow : false;
-            light.castShadow = extras.castShadow === 1;
+            light.castShadow = (extras.castShadow === 1);
             if (light.shadow !== null && extras.shadowMapSize !== undefined) {
-                light.shadow.mapSize = extras.shadowMapSize;
+                // light.shadow.mapSize = extras.shadowMapSize;
             }
         }
         return light;
