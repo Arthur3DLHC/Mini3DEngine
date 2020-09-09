@@ -80,7 +80,7 @@ window.onload = () => {
 
     // test environment probes
     // envprobes will be loaded from the gltf scene
-    addEnvProbe("envProbe01", 20, new vec3([ 0, 2, 0]), scene);
+    // addEnvProbe("envProbe01", 20, new vec3([ 0, 2, 0]), scene);
 
     const infoPanel: HTMLDivElement = document.getElementById("infoPanel") as HTMLDivElement;
 

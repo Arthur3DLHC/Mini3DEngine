@@ -306,6 +306,12 @@ export class GLTFSceneBuilder {
                         envProbe.translation.x = i / (resX) + halfCellSize.x;
                         envProbe.translation.y = j / (resY) + halfCellSize.y;
                         envProbe.translation.z = k / (resZ) + halfCellSize.z;
+
+                        // in blender, the irradiance volume unit range is [-1, 1]
+                        envProbe.translation.x = envProbe.translation.x * 2.0 - 1.0;
+                        envProbe.translation.y = envProbe.translation.y * 2.0 - 1.0;
+                        envProbe.translation.z = envProbe.translation.z * 2.0 - 1.0;
+
                         // fix me: how to set the affect radius of envprobe?
                         envProbe.updateLocalTransform();
                         ret.attachChild(envProbe);
