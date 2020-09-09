@@ -331,6 +331,7 @@ export class GLTFSceneBuilder {
             case "directional":
                 const dirLight = new DirectionalLight();
                 light = dirLight;
+                dirLight.radius = 20;
                 break;
             case "point":
                 const pointLight = new PointLight();
@@ -360,7 +361,8 @@ export class GLTFSceneBuilder {
         // the shadow properties will be copied from light objects to their custom properties block in Blender by python script.
         if (nodeDef.extras !== undefined) {
             const extras = nodeDef.extras;
-            light.castShadow = extras.castShadow !== undefined ? extras.castShadow : false;
+            // light.castShadow = extras.castShadow !== undefined ? extras.castShadow : false;
+            light.castShadow = extras.castShadow === 1;
             if (light.shadow !== null && extras.shadowMapSize !== undefined) {
                 light.shadow.mapSize = extras.shadowMapSize;
             }

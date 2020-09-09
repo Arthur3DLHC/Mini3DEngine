@@ -167,6 +167,9 @@
                     "light" : 0
                 }
             },
+            "extras" : {
+                "castShadow" : 1
+            },
             "name" : "Sun_Orientation",
             "rotation" : [
                 -0.7071067690849304,
