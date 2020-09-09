@@ -1,13 +1,22 @@
 import bpy
+
+# in blender, there are 'objects' and their 'datas'
+# only some data types can hold custom properties, such as lights
+
 for light in bpy.data.lights:
     light["castShadow"] = light.use_shadow
     light["shadowMapSize"] = light.shadow_buffer_size
-for probe in bpy.data.lightprobes:
-    print(probe.name)
-    if probe.type == "GRID":
-        print("is grid")
-        probe["resolutionX"] = probe.grid_resolution_x
-        probe["resolutionY"] = probe.grid_resolution_y
-        probe["resolutionZ"] = probe.grid_resolution_z
-        probe["clippingStart"] = probe.clip_start
-        probe["clippingEnd"] = probe.clip_end
+    
+# for lightprobes, the data object can not hold custom properties
+# so you need to hold them on the object using the data object
+
+for obj in bpy.data.objects:
+    if obj.type == "LIGHT_PROBE":
+        probe = obj.data
+        if probe.type == "GRID":
+            print("is grid")
+            obj["resolutionX"] = probe.grid_resolution_x
+            obj["resolutionY"] = probe.grid_resolution_y
+            obj["resolutionZ"] = probe.grid_resolution_z
+            obj["clippingStart"] = probe.clip_start
+            obj["clippingEnd"] = probe.clip_end

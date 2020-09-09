@@ -18,7 +18,7 @@
                         1,
                         1
                     ],
-                    "intensity" : 2,
+                    "intensity" : 200,
                     "type" : "directional",
                     "name" : "Sun"
                 }
@@ -168,7 +168,8 @@
                 }
             },
             "extras" : {
-                "castShadow" : 1
+                "castShadow" : 1,
+                "radius" : 6
             },
             "name" : "Sun_Orientation",
             "rotation" : [

@@ -346,7 +346,13 @@ export class GLTFSceneBuilder {
             case "directional":
                 const dirLight = new DirectionalLight();
                 light = dirLight;
-                dirLight.radius = 20;
+                if (nodeDef.extras !== undefined) {
+                    if (nodeDef.extras.radius !== undefined) {
+                        dirLight.radius = nodeDef.extras.radius;
+                    } else {
+                        dirLight.radius = 1;
+                    }
+                }
                 break;
             case "point":
                 const pointLight = new PointLight();

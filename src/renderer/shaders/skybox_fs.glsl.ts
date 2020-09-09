@@ -4,6 +4,8 @@
 export default /** glsl */`
 precision lowp samplerCube;
 
+#include <uniforms_object>
+
 uniform samplerCube s_skybox;
 
 in vec3 ex_worldDir;
@@ -18,7 +20,7 @@ void main(void) {
     FinalOutput o = defaultFinalOutput();
 
     //o.color = vec4(1.0, 0.0, 0.0, 1.0);
-    o.color = texColor;
+    o.color = texColor * u_object.color;
     o.normal = vec3(0.0, 0.0, 1.0);
     o.specular = vec3(0.0);
     o.roughness = 1.0;

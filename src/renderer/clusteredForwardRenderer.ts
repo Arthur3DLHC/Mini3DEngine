@@ -836,7 +836,7 @@ export class ClusteredForwardRenderer {
             // sky box
             if (scene.background !== null) {
                 if (scene.background instanceof TextureCube) {
-                    this.renderSkyBox(scene.background, camera.worldTransform.getTranslation());
+                    this.renderSkyBox(scene.background, scene.backgroundIntensity, camera.worldTransform.getTranslation());
                 }
             }
 
@@ -880,8 +880,8 @@ export class ClusteredForwardRenderer {
             // debug output diffuse Riemann sum result
 
             for(let i = 0; i < 6; i++) {
-                this.renderScreenRect(128.0 * i / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, i, 0, false);
-                // this.renderScreenRect(128.0 * i / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, i, CubemapProcessor.diffuseMipLevel, false);
+                // this.renderScreenRect(128.0 * i / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, i, 0, false);
+                this.renderScreenRect(128.0 * i / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, i, CubemapProcessor.diffuseMipLevel, false);
             }
             
             // this.renderScreenRect(0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, CubemapProcessor.diffuseMipLevel, false);
@@ -1469,13 +1469,13 @@ export class ClusteredForwardRenderer {
         }
     }
 
-    private renderSkyBox(cubemap: TextureCube, camPos: vec3) {
+    private renderSkyBox(cubemap: TextureCube, intensity: number, camPos: vec3) {
         // do not do depth test, culling; (same as screen space rect)
         this.setRenderStateSet(this._renderStatesScrRectOpaque);
         GLPrograms.useProgram(this._skyboxProgram);
         // transform matrix - follow camera
         this._skyboxTransform.setTranslation(camPos);
-        this._renderContext.fillUniformBuffersPerObjectByValues(this._skyboxTransform, this._skyboxTransform, new vec4([1,1,1,1]), 0, false);
+        this._renderContext.fillUniformBuffersPerObjectByValues(this._skyboxTransform, this._skyboxTransform, new vec4([intensity,intensity,intensity,intensity]), 0, false);
 
         GLTextures.setTextureAt(this._numReservedTextures, cubemap, GLDevice.gl.TEXTURE_CUBE_MAP);
         let location = this._skyboxProgram.getUniformLocation("s_skybox");
@@ -1744,7 +1744,7 @@ export class ClusteredForwardRenderer {
 
                     if (scene.background !== undefined) {
                         if (scene.background instanceof TextureCube) {
-                            this.renderSkyBox(scene.background, envprobe.worldTransform.getTranslation());
+                            this.renderSkyBox(scene.background, scene.backgroundIntensity, envprobe.worldTransform.getTranslation());
                         }
                     }
 
