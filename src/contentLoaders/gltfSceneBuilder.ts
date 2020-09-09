@@ -283,22 +283,31 @@ export class GLTFSceneBuilder {
         if(resX === 1 && resY === 1 && resZ === 1) {
             // if resolution is 1x1x1, return one envprobe object
             const envProbe = new EnvironmentProbe();
+            envProbe.isStatic = true;
+            envProbe.autoUpdateTransform = false;
             if (extras.clippingStart !== undefined) envProbe.clippingStart = extras.clippingStart;
             if (extras.clippingEnd !== undefined) envProbe.clippingEnd = extras.clippingEnd;
             ret = envProbe;
         } else {
             // else add envprobes as children
             ret = new Object3D();
+            // put the envprobe on the center of every cell
+            const cellSize = new vec3([1.0 / resX, 1.0 / resY, 1.0 / resZ]);
+            const halfCellSize = cellSize.copy();
+            halfCellSize.scale(0.5);
             for (let k = 0; k < resZ; k++) {
                 for (let j = 0; j < resY; j++) {
                     for (let i = 0; i < resX; i++) {
                         const envProbe = new EnvironmentProbe();
+                        envProbe.isStatic = true;
+                        envProbe.autoUpdateTransform = false;
                         if (extras.clippingStart !== undefined) envProbe.clippingStart = extras.clippingStart;
                         if (extras.clippingEnd !== undefined) envProbe.clippingEnd = extras.clippingEnd;
-                        envProbe.translation.x = i / (resX - 1.0);
-                        envProbe.translation.y = j / (resY - 1.0);
-                        envProbe.translation.z = k / (resZ - 1.0);
+                        envProbe.translation.x = i / (resX) + halfCellSize.x;
+                        envProbe.translation.y = j / (resY) + halfCellSize.y;
+                        envProbe.translation.z = k / (resZ) + halfCellSize.z;
                         // fix me: how to set the affect radius of envprobe?
+                        envProbe.updateLocalTransform();
                         ret.attachChild(envProbe);
                     }
                 }

@@ -80,7 +80,7 @@ window.onload = () => {
 
     // test environment probes
     // envprobes will be loaded from the gltf scene
-    // addEnvProbe("envProbe01", 6, new vec3([ 0, 0, 0]), scene);
+    addEnvProbe("envProbe01", 20, new vec3([ 0, 2, 0]), scene);
 
     const infoPanel: HTMLDivElement = document.getElementById("infoPanel") as HTMLDivElement;
 
@@ -183,7 +183,7 @@ window.onload = () => {
         if (gltfNode instanceof Mesh) {
             gltfNode.castShadow = true;
             gltfNode.receiveShadow = true;
-            gltfNode.boundingSphereRenderMode = BoundingRenderModes.normal;
+            gltfNode.boundingSphereRenderMode = BoundingRenderModes.none;
         }
 
         for (const child of gltfNode.children) {
