@@ -4,6 +4,9 @@ import { BufferGeometry } from "../geometry/bufferGeometry.js";
 import { RenderList } from "../renderer/renderList.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
+import { BoxWireframeGeometry } from "../geometry/common/boxWireframeGeometry.js";
+import { Material } from "./materials/material.js";
+import { StandardPBRMaterial } from "./materials/standardPBRMaterial.js";
 
 export class EnvironmentProbe extends Object3D {
     public constructor() {
@@ -16,7 +19,6 @@ export class EnvironmentProbe extends Object3D {
         this.textureIndex = 0;
 
         this.debugDraw = false;
-        this._debugGeometry = null;
     }
     // the pose and location is defined by transform matrix.
     /**
@@ -48,9 +50,23 @@ export class EnvironmentProbe extends Object3D {
     public textureIndex: number;
 
     public debugDraw: boolean;
-    private _debugGeometry: BufferGeometry | null;
+    private static _debugGeometry: BufferGeometry | null = null;
+    private static _debugMaterial: Material | null = null;
 
     public provideRenderItem(renderList: RenderList) {
         // todo: 如果开启了调试绘制模式，则输出调试图元；
+        if(this.debugDraw) {
+            if (EnvironmentProbe._debugGeometry === null) {
+                EnvironmentProbe._debugGeometry = new BoxWireframeGeometry(0.1, 0.1, 0.1);
+            }
+            if (EnvironmentProbe._debugMaterial === null) {
+                const stdMtl = new StandardPBRMaterial();
+                stdMtl.color.rgba = [0, 0, 0, 1];
+                stdMtl.emissive.rgba = [0, 1, 0, 1];
+
+                EnvironmentProbe._debugMaterial = stdMtl;
+            }
+            renderList.addRenderItem(this, EnvironmentProbe._debugGeometry, 0, Infinity, EnvironmentProbe._debugMaterial);
+        }
     }
 }
