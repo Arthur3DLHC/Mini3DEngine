@@ -17,11 +17,6 @@ layout(location = 0) out vec4 o_color;
 
 void main(void)
 {
-    //o_color = textureLod(s_source, ex_texcoord, u_level);
-    //o_color = texture(s_source, ex_texcoord);
-    //o_color = vec4(1.0, 0.0, 0.0, 1.0);
-    //return;
-
     // get face index from UV
     // vec2 uv = ex_texcoord * vec2(6.0, 1.0);
     // float u = floor(uv.x);
@@ -29,6 +24,10 @@ void main(void)
     // uv.x -= u;
     vec2 uv = ex_texcoord;
     int faceIdx = u_faceIdx;
+
+    // debug
+    // o_color = textureLod(s_source, vec3(uv, float(faceIdx)), u_level);
+    // return;
 
     // todo: if uv is on edge, average the pixel color
     float edgeWidth = 1.0 / u_texSize;

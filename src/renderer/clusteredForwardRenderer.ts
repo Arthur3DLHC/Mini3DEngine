@@ -880,8 +880,8 @@ export class ClusteredForwardRenderer {
             // debug output diffuse Riemann sum result
 
             for(let i = 0; i < 6; i++) {
-                this.renderScreenRect(128.0 * i / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, i, 0, false);
-                // this.renderScreenRect(128.0 * i / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, i, CubemapProcessor.diffuseMipLevel, false);
+                // this.renderScreenRect(128.0 * i / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, i, 0, false);
+                this.renderScreenRect(128.0 * i / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, i, CubemapProcessor.diffuseMipLevel, false);
             }
             
             // this.renderScreenRect(0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, CubemapProcessor.diffuseMipLevel, false);
