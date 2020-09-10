@@ -1686,7 +1686,7 @@ export class ClusteredForwardRenderer {
         const cubeProc = new CubemapProcessor();
 
         // todo: repeat several times to simulate multiple bounces
-        const numBounces = 4;
+        const numBounces = 3;
         for (let ibounce = 0; ibounce < numBounces; ibounce++) {
             // if first bounce, do not use envprobes;
             // other times, use envprobes generate by last time

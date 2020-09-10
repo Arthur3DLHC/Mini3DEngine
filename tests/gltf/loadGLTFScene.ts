@@ -186,10 +186,10 @@ window.onload = () => {
             gltfNode.receiveShadow = true;
             gltfNode.boundingSphereRenderMode = BoundingRenderModes.none;
         }
-        // else if (gltfNode instanceof EnvironmentProbe) {
-        //     const envProbe = gltfNode as EnvironmentProbe;
-        //     envProbe.debugDraw = true;
-        // }
+        else if (gltfNode instanceof EnvironmentProbe) {
+            const envProbe = gltfNode as EnvironmentProbe;
+            envProbe.debugDraw = true;
+        }
 
         for (const child of gltfNode.children) {
             prepareGLTFScene(child);

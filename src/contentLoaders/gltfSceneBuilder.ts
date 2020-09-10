@@ -341,6 +341,8 @@ export class GLTFSceneBuilder {
         if (lightDef === undefined) {
             throw new Error("Light not found in lights array");
         }
+        let intensity = 1;
+        if (lightDef.intensity !== undefined) intensity = lightDef.intensity;
         let light: BaseLight;
         switch(lightDef.type) {
             case "directional":
@@ -358,13 +360,21 @@ export class GLTFSceneBuilder {
                 const pointLight = new PointLight();
                 light = pointLight;
                 // todo: range
-                if(lightDef.range !== undefined) pointLight.range = lightDef.range;
+                if(lightDef.range !== undefined) {
+                    pointLight.range = lightDef.range;
+                } else {
+                    pointLight.range = intensity * 0.2;
+                }
                 break;
             case "spot":
                 const spotLight = new SpotLight();
                 light = spotLight;
                 // range
-                if(lightDef.range !== undefined) spotLight.range = lightDef.range;
+                if(lightDef.range !== undefined) {
+                    spotLight.range = lightDef.range;
+                } else {
+                    spotLight.range = intensity * 0.2;
+                }
                 // cone angles
                 if(lightDef.spot !== undefined) {
                     if(lightDef.spot.outerConeAngle !== undefined) spotLight.outerConeAngle = lightDef.spot.outerConeAngle;
@@ -376,7 +386,7 @@ export class GLTFSceneBuilder {
         }
         if (lightDef.name !== undefined) light.name = lightDef.name;
         if (lightDef.color !== undefined) light.color.xyzw = [lightDef.color[0], lightDef.color[1], lightDef.color[2], 1];
-        if (lightDef.intensity !== undefined) light.intensity = lightDef.intensity;
+        if (lightDef.intensity !== undefined) light.intensity = intensity;
         light.isStatic = this.setLightsStatic;
         // todo: cast shadows ? set in custom properties extras?
         // the shadow properties will be copied from light objects to their custom properties block in Blender by python script.
