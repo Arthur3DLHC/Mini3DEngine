@@ -36,7 +36,7 @@ export default /** glsl */`
 
     struct EnvProbe {
         vec3 position;      // always xyz axis aligned
-        float radius;  // radius
+        float radius;       // radius
     };
     uniform EnvProbes
     {

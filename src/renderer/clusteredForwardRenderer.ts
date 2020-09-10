@@ -880,8 +880,8 @@ export class ClusteredForwardRenderer {
             // debug output diffuse Riemann sum result
 
             for(let i = 0; i < 6; i++) {
-                // this.renderScreenRect(128.0 * i / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, i, 0, false);
-                this.renderScreenRect(128.0 * i / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, i, CubemapProcessor.diffuseMipLevel, false);
+                this.renderScreenRect(128.0 * i / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, i, 0, false);
+                // this.renderScreenRect(128.0 * i / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, i, CubemapProcessor.diffuseMipLevel, false);
             }
             
             // this.renderScreenRect(0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, CubemapProcessor.diffuseMipLevel, false);
@@ -1641,6 +1641,7 @@ export class ClusteredForwardRenderer {
         cubefaceCamera.projTransform = mat4.perspective(90, 1, 0.01, 1);
         cubefaceCamera.viewport = new vec4([0, 0, this._renderContext.envmapSize, this._renderContext.envmapSize]);
         
+        const worldPosition = new vec3();
         const matWorldToProbe = new mat4();
         const matViewProj = new mat4();
 
@@ -1703,8 +1704,11 @@ export class ClusteredForwardRenderer {
                 // use envprobe clipping properties to prevent light leaking.
                 cubefaceCamera.projTransform = mat4.perspective(90, 1, envprobe.clippingStart, envprobe.clippingEnd);
 
-                envprobe.worldTransform.copy(matWorldToProbe);
-                matWorldToProbe.inverse();
+                // all envprobes must be axis aligned
+                envprobe.worldTransform.getTranslation(worldPosition);
+                // envprobe.worldTransform.copy(matWorldToProbe);
+                // matWorldToProbe.inverse();
+                matWorldToProbe.fromTranslation(worldPosition.negate());
 
                 for (let iface = 0; iface < 6; iface++) {
                     // todo: set the cubemap texture array layer as render target
