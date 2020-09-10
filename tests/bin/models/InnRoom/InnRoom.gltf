@@ -18,7 +18,7 @@
                         1,
                         1
                     ],
-                    "intensity" : 200,
+                    "intensity" : 100,
                     "type" : "directional",
                     "name" : "Sun",
                     "extras" : {
@@ -123,8 +123,8 @@
         {
             "extras" : {
                 "extType" : "irradianceVolume",
-                "resolutionZ" : 2,
-                "resolutionX" : 2,
+                "resolutionZ" : 3,
+                "resolutionX" : 3,
                 "resolutionY" : 2,
                 "clippingStart" : 0.009999999776482582,
                 "clippingEnd" : 40
