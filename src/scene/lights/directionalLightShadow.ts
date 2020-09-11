@@ -6,7 +6,7 @@ export class DirectionalLightShadow extends LightShadow {
     public constructor(light: DirectionalLight) {
         super(light);
         this.radius = 0;
-        this.distance = 100;
+        this.distance = 20;
     }
 
     /**
