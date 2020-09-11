@@ -11,7 +11,7 @@ import { Frustum } from "../../math/frustum.js";
 export class LightShadow {
     public constructor(light: BaseLight) {
         this._light = light;
-        this.bias = -0.001;
+        this.bias = -0.01;
         this.mapSize = new vec2([256, 256]);
         this.mapRects = [new vec4([0, 0, 256, 256])];
         this.shadowMap = null;
