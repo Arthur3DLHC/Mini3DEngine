@@ -33,6 +33,7 @@ import { DirectionalLight } from "../scene/lights/directionalLight.js";
 import { PointLight } from "../scene/lights/pointLight.js";
 import { SpotLight } from "../scene/lights/spotLight.js";
 import { EnvironmentProbe } from "../scene/environmentProbe.js";
+import { DirectionalLightShadow } from "../scene/lights/directionalLightShadow.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -348,11 +349,13 @@ export class GLTFSceneBuilder {
             case "directional":
                 const dirLight = new DirectionalLight();
                 light = dirLight;
+                // directional lights in blender do not have range
+                // so define it in extras
                 if (lightDef.extras !== undefined) {
-                    if (lightDef.extras.radius !== undefined) {
-                        dirLight.radius = lightDef.extras.radius;
-                    } else {
-                        dirLight.radius = 1;
+                    if (lightDef.extras.radius !== undefined) dirLight.radius = lightDef.extras.radius;
+                    if (lightDef.extras.shadowDistance !== undefined) {
+                        const dirShadow = dirLight.shadow as DirectionalLightShadow;
+                        dirShadow.distance = lightDef.extras.shadowDistance;
                     }
                 }
                 break;

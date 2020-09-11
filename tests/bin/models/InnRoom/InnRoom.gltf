@@ -24,7 +24,9 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 512,
-                        "radius" : 5
+                        "radius" : 5,
+                        "shadowBias" : 0.1,
+                        "shadowDistance" : 20
                     }
                 },
                 {
@@ -35,10 +37,12 @@
                     ],
                     "intensity" : 30,
                     "type" : "point",
+                    "range" : 6,
                     "name" : "Point",
                     "extras" : {
                         "castShadow" : 0,
-                        "shadowMapSize" : 512
+                        "shadowMapSize" : 512,
+                        "shadowBias" : 0.009999999776482582
                     }
                 },
                 {
@@ -49,10 +53,12 @@
                     ],
                     "intensity" : 30,
                     "type" : "point",
+                    "range" : 6,
                     "name" : "Point.002",
                     "extras" : {
                         "castShadow" : 0,
-                        "shadowMapSize" : 512
+                        "shadowMapSize" : 512,
+                        "shadowBias" : 0.009999999776482582
                     }
                 }
             ]
@@ -224,9 +230,9 @@
                 0.8481382131576538
             ],
             "translation" : [
-                16.48365592956543,
-                12.953481674194336,
-                13.432904243469238
+                6.485433101654053,
+                6.632112979888916,
+                5.222955703735352
             ]
         },
         {

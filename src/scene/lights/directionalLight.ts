@@ -8,7 +8,7 @@ import { BoundingSphere } from "../../math/boundingSphere.js";
 export class DirectionalLight extends BaseLight {
     public constructor() {
         super();
-        this.radius = 0;
+        this.radius = 10;
         this.shadow = new DirectionalLightShadow(this);
         this._debugGeometry = null;
     }
