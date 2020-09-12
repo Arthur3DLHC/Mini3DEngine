@@ -486,7 +486,9 @@ TODO:       主要类结构
             绘制光源和 envProbe 的调试图元
 
             InnRoom 场景加一些补光？解决室内过暗问题；
-                使用点光源？是否加阴影？
+                使用点光源，不加阴影
+                是否应该将点光源放到地面以下？
+                光源加一个镜面反射强度选项？去掉补光的镜面反射？只产生漫反射？
 
             阴影继续优化：柔化边缘
                 方差阴影？或者加入线性插值？
@@ -515,6 +517,11 @@ TODO:       主要类结构
                 call drawInstanced for instanced mesh;
                 InstanceMesh 怎样做 frustum culling?
                     Bounding box of instances?
+                    需要在 Blender 中手动对 Instancing 的物体分组，每个组使用一个统一的包围盒？
+                        每一组的 instancing 物体放到一个父物体下？
+                    或者在加载 gltf 后按照一定的 BVH 自动对 Instancing 的物体分块？
+                        四叉树或八叉树，或最简单的 Cell
+                        将生成 instancing 网格的操作放在这一步，而不是加载 gltf 时？
                 Occlusion query
                     用 instanced 方式绘制包围盒
                 测试程序
