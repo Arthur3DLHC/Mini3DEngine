@@ -549,7 +549,7 @@ TODO:       主要类结构
                     加一个参数：checkClusters
                         主画面渲染，设为true;
                         Cubemap 或 Shadowmap 渲染，设为 false；分辨率较低，而且是类似 bake 阶段，无需 Clustered
-
+                剔除平行光，如果它指定了 radius 和 distance。（目前没有剔除）
 
             particle system; sprite;
 
