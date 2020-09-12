@@ -442,6 +442,14 @@ TODO:       主要类结构
                 测试程序
                     加载带骨骼皮肤动画的模型
                     测试动画的播放
+                    同时控制多个模型的动画播放
+
+            绘制调试用的包围盒和包围球
+                单位盒和单位球，边线模式图元
+                在 RenderItems 时绘制？还是单独设立一个 pass？
+                调试骨骼皮肤模型的包围球
+
+-------------------------- 进行到这里了 ---------------------------
 
                 动画调度器？
                 动画 Mixer？不着急实现
@@ -454,19 +462,11 @@ TODO:       主要类结构
                     所有资源加载完后再开始逻辑循环？
                     切换场景时清空资源缓存，更新要加载的资源列表，调用 load 方法?
                 考虑统一使用 Promise.all 实现？
-                    需要将不同的资源分类；Promise.all 仅支持列表中元素为同一类型；
-
------------------------------------------------------
-
-            导出更多动画，测试多角色同时骨骼皮肤动画
-            
-            绘制调试用的包围盒和包围球
-                单位盒和单位球，边线模式图元
-                在 RenderItems 时绘制？还是单独设立一个 pass？
-                调试骨骼皮肤模型的包围球
+                    需要将不同的资源分类；Typescript Promise.all 仅支持列表中元素为同一类型；
 
             支持材质自定义 Shader？
-                非物理材质
+                不紧急
+                非物理材质比如卡通材质
                 Shader Cache 机制
                     Cache key: shader code key, features;
                     程序的最开始，需要把 shader code 注册到全局列表
@@ -477,13 +477,16 @@ TODO:       主要类结构
                 是否使用OIT？
                 测试半透明物体的 Demo
 
-            从 gltf 中读取光源；
-                Blender python script;
-
-            从 Blender 导出 Irradiance Volume 到 gltf；从 gltf 读取 Irradiance Volume，添加 probes 到场景；
-                Blender python script;
+            Blender python 脚本
+                补充光源属性到 gltf 的 extra 中
+                从 Blender 导出 Irradiance Volume 到 gltf；从 gltf 读取 Irradiance Volume，添加 probes 到场景；
+                补充材质属性到 gltf 的 extra 中
+                    次表面反射参数
 
             绘制光源和 envProbe 的调试图元
+
+            平行光的处理
+                如果平行光指定了半径和距离，则以外的部分不应产生光照？
 
             InnRoom 场景加一些补光？解决室内过暗问题；
                 使用点光源，不加阴影
@@ -549,14 +552,11 @@ TODO:       主要类结构
 
             particle system; sprite;
 
-            从GLTF加载组件信息？
-                读取object的自定义属性：组件列表和组件属性？或者prefab文件名？
-                或者使用命名规范、前缀来定义；
-                使用json定义object prefab对象；
-                区分哪些网格是 occluder，哪些网格需要 occlusion query；使用前缀？
-                Blender 中的光源属性是否齐全？怎样使用；导出光源场景测试
-                    需要根据光源亮度自动计算一个衰减距离；
-                Blender 中能否导出 instancing 的网格？导出有 linked duplicate 网格场景测试
+            ECS 架构
+                从 GLTF 加载组件信息？
+                    读取 object 的自定义属性：组件列表和组件属性？或者 prefab 名称？
+                    使用 json 定义 object prefab 对象；
+                    区分哪些网格是 occluder，哪些网格需要 occlusion query；使用 Custom Property 标志？
 
             Volume Rendering?
                 SDF
