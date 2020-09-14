@@ -237,6 +237,19 @@ window.onload = () => {
                     actionSelectorFemale.playAction(femaleActionNames[actidx]);
 
                     // todo: put characters on love pose location
+                    const lovePoseMale = maleActionPoses.get(maleActionNames[actidx]);
+                    if (lovePoseMale !== undefined) {
+                        // the rotation and translation should be relative to the room scene root node
+                        lovePoseMale.translation.copy(gltfSceneMale.translation);
+                        lovePoseMale.rotation.copy(gltfSceneMale.rotation);
+                        gltfSceneMale.updateLocalTransform();
+                    }
+                    const lovePoseFemale = femaleActionPoses.get(femaleActionNames[actidx]);
+                    if (lovePoseFemale !== undefined) {
+                        lovePoseFemale.translation.copy(gltfSceneFemale.translation);
+                        lovePoseFemale.rotation.copy(gltfSceneFemale.rotation);
+                        gltfSceneFemale.updateLocalTransform();
+                    }
                 }
                 actionList.appendChild(actionItem);
         }
