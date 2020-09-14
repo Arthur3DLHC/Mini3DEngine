@@ -157,6 +157,7 @@ void main(void)
 
         Light light = getLightInCluster(cluster, i);
         uint lightType = getLightType(light);
+        float lightRange = getLightRange(light);
 
         float rangeAttenuation = 1.0;
         float spotAttenuation = 1.0;
@@ -168,21 +169,29 @@ void main(void)
         vec3 pointToLight = -lightDir;
         
         // check light type
-        if (lightType != LightType_Directional) {
+        if (lightType == LightType_Directional) {
+            // if dir light radius > 0, block out parts outside the beam
+            if(lightRange > 0.0) {
+                vec3 ltop = ex_worldPosition - lightPosition;
+                vec3 perpend = ltop - dot(ltop, lightDir) * lightDir;
+                if(dot(perpend, perpend) > lightRange * lightRange) {
+                    continue;
+                }
+            }
+        } else {
             pointToLight = lightPosition - ex_worldPosition;
-            float lightRange = getLightRange(light);
             float lightDistSq = dot(pointToLight, pointToLight);
             // block out light early
             if (lightRange > 0.0 && lightDistSq > lightRange * lightRange) {
                 continue;
             }
             rangeAttenuation = getRangeAttenuation(lightRange, lightDistSq);
-        }
-        if (lightType == LightType_Spot) {
-            spotAttenuation = getSpotAttenuation(pointToLight, lightDir, getLightOuterConeCos(light), getLightInnerConeCos(light));
-            // block out light early
-            if (spotAttenuation < 0.001) {
-                continue;
+            if (lightType == LightType_Spot) {
+                spotAttenuation = getSpotAttenuation(pointToLight, lightDir, getLightOuterConeCos(light), getLightInnerConeCos(light));
+                // block out light early
+                if (spotAttenuation < 0.001) {
+                    continue;
+                }
             }
         }
 

@@ -336,7 +336,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
         }
         else if (light.type === LightType.Directional) {
             const dir: DirectionalLight = light as DirectionalLight;
-            radius = (dir.radius === 0 ? 1e7 : dir.radius);
+            //radius = (dir.radius === 0 ? 1e7 : dir.radius);
+            radius = dir.radius;
         }
 
         // shadow matrix
