@@ -87,11 +87,6 @@ window.onload = () => {
     let lastUpdateFPSTime = 0;
     let curFPS = 0;
 
-    // const actionsFemale: AnimationAction[] = [];
-    // const actionsMale: AnimationAction[] = [];
-    // let curActionFemale: AnimationAction | undefined = undefined;
-    // let curActionMale: AnimationAction | undefined = undefined;
-
     const actionSelectorFemale: ActionSelector = new ActionSelector();
     const actionSelectorMale: ActionSelector = new ActionSelector();
 
@@ -101,13 +96,6 @@ window.onload = () => {
 
         actionSelectorFemale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
         actionSelectorMale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
-
-        // if (curActionFemale !== undefined) {
-        //     curActionFemale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
-        // }
-        // if (curActionMale !== undefined) {
-        //     curActionMale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
-        // }
 
         scene.updateWorldTransform(false, true);
         SkinMesh.updateSkinMeshes(scene);
@@ -126,16 +114,14 @@ window.onload = () => {
 
     console.log("loading gltf model...");
 
-    // todo: adjust the way that promise and loadingManager cooperate
-    // const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/Box/glTF/Box.gltf");
-    // const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/BoxInterleaved/glTF/BoxInterleaved.gltf");
-    // const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/BoxTextured/glTF/BoxTextured.gltf");
-    // const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/DamagedHelmet/glTF/DamagedHelmet.gltf");
     const gltfPromiseFemale: Promise<GltfAsset> = gltfLoader.load("./models/std_female/std_female_animation.gltf");
     const gltfPromiseMale: Promise<GltfAsset> = gltfLoader.load("./models/std_male/std_male_animation.gltf");
 
+    // todo: load room scene
+
     console.log("loading skybox...");
 
+    // todo: use outdoor sky box
     const imagePromises: (Promise<HTMLImageElement>)[] = [];
     const envmapUrls: string[] = [
         "./textures/skyboxes/ballroom/px.png",
@@ -152,7 +138,6 @@ window.onload = () => {
 
     const imagesPromise = Promise.all(imagePromises);
 
-    // fix me: type error
     Promise.all([gltfPromiseFemale, gltfPromiseMale, imagesPromise]).then((loaded) => {
         const skyboxTexture: TextureCube = new TextureCube();
 
@@ -193,56 +178,58 @@ window.onload = () => {
         prepareGLTFScene(gltfSceneMale);
 
         // todo: add all action names to action list UI
-        const actionListFemale: HTMLDivElement = document.getElementById("actionList_female") as HTMLDivElement;
-        const actionListMale: HTMLDivElement = document.getElementById("actionList_male") as HTMLDivElement;
-        actionListFemale.innerHTML = "";
-        actionListMale.innerHTML = "";
+        const actionList: HTMLDivElement = document.getElementById("actionList") as HTMLDivElement;
+        actionList.innerHTML = "";
 
-        if (actionSelectorFemale.actions.length > 0) {
-            actionSelectorFemale.playAction(actionSelectorFemale.actions[0].name);
+        const actionNames = [
+            "Idle",
+            "Dancing",
+            "Masturbating",
+            "Breast",
+            "Oral",
+            "CowGirl",
+            "CowGirl Fast",
+            "CowGirl Cum",
+        ];
 
-            let actidx = 0;
-            for (const act of actionSelectorFemale.actions) {
-                // click callback
-                // NOTE: can not all constructor of HTMLElements in TypeScript.
-                // Can only call document.createElement()
-                const actionItem: HTMLDivElement = document.createElement("div");
-                actionItem.id = "action_female_" + actidx;
-                actionItem.innerHTML = act.name;
+        const femaleActionNames = [
+            "Female.Idle",
+            "Female.Dance001",
+            "Female.Masturbating",
+            "Female.Breast",
+            "Female.Oral",
+            "Female.CowGirl",
+            "Female.CowGirl.Fast",
+            "Female.CowGirl.Cum",
+        ];
+
+        const maleActionNames = [
+            "Male.Idle",
+            "Male.Idle",
+            "Male.Idle",
+            "Male.Breast",
+            "Male.Oral",
+            "Male.CowGirl",
+            "Male.CowGirl.Fast",
+            "Male.CowGirl.Cum",
+        ];
+
+        for (let actidx = 0; actidx < actionNames.length; actidx++) {
+            const actionItem: HTMLDivElement = document.createElement("div");
+                actionItem.id = "action_" + actidx;
+                actionItem.innerHTML = actionNames[actidx];
                 actionItem.className = "actionItem";
                 actionItem.onclick = (ev: MouseEvent) => {
-                    actionSelectorFemale.playAction(act.name);
+                    actionSelectorMale.playAction(maleActionNames[actidx]);
+                    actionSelectorFemale.playAction(femaleActionNames[actidx]);
                 }
-                actionListFemale.appendChild(actionItem);
-                actidx++;
-            }
-        }
-
-        if (actionSelectorMale.actions.length > 0) {
-            actionSelectorMale.playAction(actionSelectorMale.actions[0].name);
-
-            let actidx = 0;
-            for (const act of actionSelectorMale.actions) {
-                // click callback
-                // NOTE: can not all constructor of HTMLElements in TypeScript.
-                // Can only call document.createElement()
-                const actionItem: HTMLDivElement = document.createElement("div");
-                actionItem.id = "action_male_" + actidx;
-                actionItem.innerHTML = act.name;
-                actionItem.className = "actionItem";
-                actionItem.onclick = (ev: MouseEvent) => {
-                    actionSelectorMale.playAction(act.name);
-                }
-                actionListMale.appendChild(actionItem);
-                actidx++;
-            }
+                actionList.appendChild(actionItem);
         }
 
         console.log("start game loop...");
 
         Clock.instance.start();
         requestAnimationFrame(gameLoop);
-
 
     });
 
@@ -264,7 +251,7 @@ window.onload = () => {
         if (gltfNode instanceof Mesh) {
             gltfNode.castShadow = true;
             gltfNode.receiveShadow = true;
-            gltfNode.boundingSphereRenderMode = BoundingRenderModes.normal;
+            // gltfNode.boundingSphereRenderMode = BoundingRenderModes.normal;
         }
 
         for (const child of gltfNode.children) {
