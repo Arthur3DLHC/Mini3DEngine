@@ -10,6 +10,8 @@ import vec3 from "../../lib/tsm/vec3.js";
 import { BoundingSphere } from "../math/boundingSphere.js";
 import { PointLight } from "../scene/lights/pointLight.js";
 import { SpotLight } from "../scene/lights/spotLight.js";
+import { DirectionalLight } from "../scene/lights/directionalLight.js";
+import { DirectionalLightShadow } from "../scene/lights/directionalLightShadow.js";
 
 /**
  * See http://www.aortiz.me/2018/12/21/CG.html
@@ -228,14 +230,44 @@ export class ClusterGrid {
             }
             */
         } else {
-            // fix me: directional light range is infinite.
-            // should let them support distance and radius ranges?
-            for (let k = 0; k < this.resolusion.z; k++) {
-                for (let j = 0; j < this.resolusion.y; j++) {
-                    for (let i = 0; i < this.resolusion.x; i++) {
-                        this.clusters[k][j][i].lights.push(lightIdx);
+            const dirLight = light as DirectionalLight;
+            if (dirLight.radius === 0) {    // infinite radius
+                for (let k = 0; k < this.resolusion.z; k++) {
+                    for (let j = 0; j < this.resolusion.y; j++) {
+                        for (let i = 0; i < this.resolusion.x; i++) {
+                            this.clusters[k][j][i].lights.push(lightIdx);
+                        }
                     }
                 }
+            } else {
+                // todo: check light frustum
+                // todo: optimize - too much temp newed matrices
+                // the viewproj transform of spotLight
+                const shadow = dirLight.shadow as DirectionalLightShadow;
+
+                const matLightView = dirLight.worldTransform.copy();
+                matLightView.inverse();
+                //const matLightProj = mat4.perspective(Math.min(spotLight.outerConeAngle * 2, 3.10) * 180.0 / Math.PI, 1, 0.01, spotLight.range > 0 ? spotLight.range : 100);
+                const matLightProj = mat4.orthographic(-dirLight.radius, dirLight.radius, -dirLight.radius, dirLight.radius, 0.01, shadow.distance);
+
+                const matLightViewProj = new mat4();
+                mat4.product(matLightProj, matLightView, matLightViewProj);
+
+                // from view space to light proj space
+                const matInvView = this.viewTransform.copy(this._tmpInvViewTransform);
+                matInvView.inverse();
+
+                const matFrustum = new mat4();
+                mat4.product(matLightViewProj, matInvView, matFrustum);
+
+                // light frustum in view space
+                // fix me: can the frustum be cached on light object?
+                const lightFrustum = new Frustum();
+                lightFrustum.setFromProjectionMatrix(matFrustum);
+                // test frustum and aabb
+                this.checkClustersWithFrustum(lightFrustum, (cluster: Cluster) => {
+                    cluster.lights.push(lightIdx);
+                });
             }
         }
     }
