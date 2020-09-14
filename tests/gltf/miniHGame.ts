@@ -118,18 +118,19 @@ window.onload = () => {
     const gltfPromiseMale: Promise<GltfAsset> = gltfLoader.load("./models/std_male/std_male_animation.gltf");
 
     // todo: load room scene
+    const gltfPromiseRoom: Promise<GltfAsset> = gltfLoader.load("./models/InnRoom/InnRoom.gltf");
 
     console.log("loading skybox...");
 
     // todo: use outdoor sky box
     const imagePromises: (Promise<HTMLImageElement>)[] = [];
     const envmapUrls: string[] = [
-        "./textures/skyboxes/ballroom/px.png",
-        "./textures/skyboxes/ballroom/nx.png",
-        "./textures/skyboxes/ballroom/py.png",
-        "./textures/skyboxes/ballroom/ny.png",
-        "./textures/skyboxes/ballroom/pz.png",
-        "./textures/skyboxes/ballroom/nz.png",
+        "./textures/skyboxes/rooitou_park_2k/px.png",
+        "./textures/skyboxes/rooitou_park_2k/nx.png",
+        "./textures/skyboxes/rooitou_park_2k/py.png",
+        "./textures/skyboxes/rooitou_park_2k/ny.png",
+        "./textures/skyboxes/rooitou_park_2k/pz.png",
+        "./textures/skyboxes/rooitou_park_2k/nz.png",
     ];
     for (let i = 0; i < 6; i++) {
         const imgPromise: Promise<HTMLImageElement> = imageLoader.loadPromise(envmapUrls[i]);
@@ -138,11 +139,11 @@ window.onload = () => {
 
     const imagesPromise = Promise.all(imagePromises);
 
-    Promise.all([gltfPromiseFemale, gltfPromiseMale, imagesPromise]).then((loaded) => {
+    Promise.all([gltfPromiseFemale, gltfPromiseMale, gltfPromiseRoom, imagesPromise]).then((loaded) => {
         const skyboxTexture: TextureCube = new TextureCube();
 
         for(let i = 0; i < 6; i++) {
-            skyboxTexture.images[i] = loaded[2][i];
+            skyboxTexture.images[i] = loaded[3][i];
         }
 
         skyboxTexture.componentType = GLDevice.gl.UNSIGNED_BYTE;
@@ -167,7 +168,7 @@ window.onload = () => {
         gltfSceneFemale.autoUpdateTransform = true;
         scene.attachChild(gltfSceneFemale);
 
-        prepareGLTFScene(gltfSceneFemale);
+        prepareGLTFCharacter(gltfSceneFemale);
 
         const gltfSceneMale = builder.build(loaded[1], 0, actionSelectorMale.actions);
         // gltfSceneMale.rotation = quat.fromAxisAngle(new vec3([0, 1, 0]), Math.PI);
@@ -175,11 +176,9 @@ window.onload = () => {
         gltfSceneMale.autoUpdateTransform = true;
         scene.attachChild(gltfSceneMale);
 
-        prepareGLTFScene(gltfSceneMale);
+        prepareGLTFCharacter(gltfSceneMale);
 
-        // todo: add all action names to action list UI
-        const actionList: HTMLDivElement = document.getElementById("actionList") as HTMLDivElement;
-        actionList.innerHTML = "";
+
 
         const actionNames = [
             "Idle",
@@ -213,6 +212,20 @@ window.onload = () => {
             "Male.CowGirl.Fast",
             "Male.CowGirl.Cum",
         ];
+        
+        const maleActionPoses: Map<string, Object3D> = new Map<string, Object3D>();
+        const femaleActionPoses: Map<string, Object3D> = new Map<string, Object3D>();
+
+        const gltfSceneRoom = builder.build(loaded[2], 0);
+        gltfSceneRoom.name = "Room";
+        gltfSceneRoom.autoUpdateTransform = true;
+        scene.attachChild(gltfSceneRoom);
+
+        prepareGLTFScene(gltfSceneRoom, maleActionPoses, femaleActionPoses);
+
+        // todo: add all action names to action list UI
+        const actionList: HTMLDivElement = document.getElementById("actionList") as HTMLDivElement;
+        actionList.innerHTML = "";
 
         for (let actidx = 0; actidx < actionNames.length; actidx++) {
             const actionItem: HTMLDivElement = document.createElement("div");
@@ -222,6 +235,8 @@ window.onload = () => {
                 actionItem.onclick = (ev: MouseEvent) => {
                     actionSelectorMale.playAction(maleActionNames[actidx]);
                     actionSelectorFemale.playAction(femaleActionNames[actidx]);
+
+                    // todo: put characters on love pose location
                 }
                 actionList.appendChild(actionItem);
         }
@@ -245,7 +260,7 @@ window.onload = () => {
         scene.attachChild(probe);
     }
 
-    function prepareGLTFScene(gltfNode: Object3D) {
+    function prepareGLTFCharacter(gltfNode: Object3D) {
         // gltfNode.isStatic = true;
         
         if (gltfNode instanceof Mesh) {
@@ -255,7 +270,34 @@ window.onload = () => {
         }
 
         for (const child of gltfNode.children) {
-            prepareGLTFScene(child);
+            prepareGLTFCharacter(child);
+        }
+    }
+
+    function prepareGLTFScene(gltfNode: Object3D, maleActionPoses: Map<string, Object3D>, femaleActionPoses: Map<string, Object3D>) {
+        gltfNode.isStatic = true;
+        
+        if (gltfNode instanceof Mesh) {
+            gltfNode.castShadow = true;
+            gltfNode.receiveShadow = true;
+            gltfNode.boundingSphereRenderMode = BoundingRenderModes.none;
+        }
+        else if (gltfNode instanceof EnvironmentProbe) {
+            const envProbe = gltfNode as EnvironmentProbe;
+            // envProbe.debugDraw = true;
+        }
+
+        // todo: name prefix? if love position, put the translation and position to action position list
+        if (gltfNode.name.startsWith("LovePose.Male.")) {
+            const poseName = gltfNode.name.substr(9);
+            maleActionPoses.set(poseName, gltfNode);
+        } else if(gltfNode.name.startsWith("LovePose.Female.")) {
+            const poseName = gltfNode.name.substr(9);
+            femaleActionPoses.set(poseName, gltfNode);
+        }
+
+        for (const child of gltfNode.children) {
+            prepareGLTFScene(child, maleActionPoses, femaleActionPoses);
         }
     }
 }
