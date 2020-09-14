@@ -26,6 +26,7 @@ import { SkinMesh } from "../scene/skinMesh.js";
 import { InstancedMesh } from "../scene/instancedMesh.js";
 import { ClusterGrid } from "./clusterGrid.js";
 import { PerspectiveCamera } from "../scene/cameras/perspectiveCamera.js";
+import { DirectionalLight } from "../scene/lights/directionalLight.js";
 
 export class ClusteredForwardRenderContext extends RenderContext {
     public constructor() {
@@ -334,6 +335,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
             innerConeCos = Math.cos(spot.innerConeAngle);
         }
         else if (light.type === LightType.Directional) {
+            const dir: DirectionalLight = light as DirectionalLight;
+            radius = (dir.radius === 0 ? 1e7 : dir.radius);
         }
 
         // shadow matrix
