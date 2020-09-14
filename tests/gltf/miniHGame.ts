@@ -80,7 +80,7 @@ window.onload = () => {
     scene.attachChild(dirLight01);
     
     // test environment probes
-    addEnvProbe("envProbe01", 6, new vec3([ 0, 0, 0]), scene);
+    // addEnvProbe("envProbe01", 6, new vec3([ 0, 0, 0]), scene);
 
     const infoPanel: HTMLDivElement = document.getElementById("infoPanel") as HTMLDivElement;
 
@@ -218,7 +218,7 @@ window.onload = () => {
 
         const gltfSceneRoom = builder.build(loaded[2], 0);
         gltfSceneRoom.name = "Room";
-        gltfSceneRoom.autoUpdateTransform = true;
+        // gltfSceneRoom.autoUpdateTransform = true;
         scene.attachChild(gltfSceneRoom);
 
         prepareGLTFScene(gltfSceneRoom, maleActionPoses, femaleActionPoses);
@@ -275,6 +275,7 @@ window.onload = () => {
 
     function prepareGLTFCharacter(gltfNode: Object3D) {
         // gltfNode.isStatic = true;
+        gltfNode.autoUpdateTransform = true;
         
         if (gltfNode instanceof Mesh) {
             gltfNode.castShadow = true;
@@ -289,6 +290,8 @@ window.onload = () => {
 
     function prepareGLTFScene(gltfNode: Object3D, maleActionPoses: Map<string, Object3D>, femaleActionPoses: Map<string, Object3D>) {
         gltfNode.isStatic = true;
+        gltfNode.autoUpdateTransform = false;
+        gltfNode.updateLocalTransform();
         
         if (gltfNode instanceof Mesh) {
             gltfNode.castShadow = true;
