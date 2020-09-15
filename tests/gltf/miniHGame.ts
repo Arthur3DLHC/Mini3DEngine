@@ -92,27 +92,8 @@ window.onload = () => {
     const actionSelectorFemale: ActionSelector = new ActionSelector();
     const actionSelectorMale: ActionSelector = new ActionSelector();
 
-    function gameLoop(now: number) {
-        Clock.instance.update(now);
-        scene.updateBehavior();
-
-        actionSelectorFemale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
-        actionSelectorMale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
-
-        scene.updateWorldTransform(false, true);
-        SkinMesh.updateSkinMeshes(scene);
-        renderer.render(scene);
-
-        if (now - lastUpdateFPSTime > 1000) {
-            infoPanel.innerHTML = curFPS.toString();
-            lastUpdateFPSTime = now;
-            curFPS = 0;
-        }
-
-        curFPS++;
-
-        requestAnimationFrame(gameLoop);
-    }
+    const maleActionPoses: Map<string, Object3D> = new Map<string, Object3D>();
+    const femaleActionPoses: Map<string, Object3D> = new Map<string, Object3D>();
 
     console.log("loading gltf model...");
 
@@ -163,9 +144,9 @@ window.onload = () => {
         console.log("building gltf scene...");
 
 
-        const builder = new GLTFSceneBuilder();
+        const builderFemale = new GLTFSceneBuilder();
         
-        const gltfSceneFemale = builder.build(loaded[0], 0, actionSelectorFemale.actions);
+        const gltfSceneFemale = builderFemale.build(loaded[0], 0, actionSelectorFemale.actions);
         // gltfSceneFemale.rotation = quat.fromAxisAngle(new vec3([0, 1, 0]), Math.PI);
         gltfSceneFemale.name = "Female";
         gltfSceneFemale.autoUpdateTransform = true;
@@ -173,15 +154,15 @@ window.onload = () => {
 
         prepareGLTFCharacter(gltfSceneFemale);
 
-        const gltfSceneMale = builder.build(loaded[1], 0, actionSelectorMale.actions);
+        const builderMale = new GLTFSceneBuilder();
+
+        const gltfSceneMale = builderMale.build(loaded[1], 0, actionSelectorMale.actions);
         // gltfSceneMale.rotation = quat.fromAxisAngle(new vec3([0, 1, 0]), Math.PI);
         gltfSceneMale.name = "Male";
         gltfSceneMale.autoUpdateTransform = true;
         scene.attachChild(gltfSceneMale);
 
         prepareGLTFCharacter(gltfSceneMale);
-
-
 
         const actionNames = [
             "Idle",
@@ -215,11 +196,9 @@ window.onload = () => {
             "Male.CowGirl.Fast",
             "Male.CowGirl.Cum",
         ];
-        
-        const maleActionPoses: Map<string, Object3D> = new Map<string, Object3D>();
-        const femaleActionPoses: Map<string, Object3D> = new Map<string, Object3D>();
 
-        const gltfSceneRoom = builder.build(loaded[2], 0);
+        const builderRoom = new GLTFSceneBuilder()
+        const gltfSceneRoom = builderRoom.build(loaded[2], 0);
         gltfSceneRoom.name = "Room";
         // gltfSceneRoom.autoUpdateTransform = true;
         scene.attachChild(gltfSceneRoom);
@@ -240,6 +219,13 @@ window.onload = () => {
                     actionSelectorFemale.playAction(femaleActionNames[actidx]);
 
                     // todo: put characters on love pose location
+                    const lovePoseFemale = femaleActionPoses.get(femaleActionNames[actidx]);
+                    if (lovePoseFemale !== undefined) {
+                        lovePoseFemale.translation.copy(gltfSceneFemale.translation);
+                        lovePoseFemale.rotation.copy(gltfSceneFemale.rotation);
+                        gltfSceneFemale.updateLocalTransform();
+                    }
+
                     const lovePoseMale = maleActionPoses.get(maleActionNames[actidx]);
                     if (lovePoseMale !== undefined) {
                         // the rotation and translation should be relative to the room scene root node
@@ -247,12 +233,7 @@ window.onload = () => {
                         lovePoseMale.rotation.copy(gltfSceneMale.rotation);
                         gltfSceneMale.updateLocalTransform();
                     }
-                    const lovePoseFemale = femaleActionPoses.get(femaleActionNames[actidx]);
-                    if (lovePoseFemale !== undefined) {
-                        lovePoseFemale.translation.copy(gltfSceneFemale.translation);
-                        lovePoseFemale.rotation.copy(gltfSceneFemale.rotation);
-                        gltfSceneFemale.updateLocalTransform();
-                    }
+
                 }
                 actionList.appendChild(actionItem);
         }
@@ -263,6 +244,28 @@ window.onload = () => {
         requestAnimationFrame(gameLoop);
 
     });
+    
+    function gameLoop(now: number) {
+        Clock.instance.update(now);
+        scene.updateBehavior();
+
+        actionSelectorFemale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
+        actionSelectorMale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
+
+        scene.updateWorldTransform(false, true);
+        SkinMesh.updateSkinMeshes(scene);
+        renderer.render(scene);
+
+        if (now - lastUpdateFPSTime > 1000) {
+            infoPanel.innerHTML = curFPS.toString();
+            lastUpdateFPSTime = now;
+            curFPS = 0;
+        }
+
+        curFPS++;
+
+        requestAnimationFrame(gameLoop);
+    }
 
     function addEnvProbe(name: string, size: number, position: vec3, scene: Scene) {
         const probe = new EnvironmentProbe();
@@ -308,11 +311,11 @@ window.onload = () => {
 
         // todo: name prefix? if love position, put the translation and position to action position list
         if (gltfNode.name.startsWith("LovePose.Male.")) {
-            const poseName = gltfNode.name.substr(9);
-            maleActionPoses.set(poseName, gltfNode);
+            const malePoseName = gltfNode.name.substr(9);
+            maleActionPoses.set(malePoseName, gltfNode);
         } else if(gltfNode.name.startsWith("LovePose.Female.")) {
-            const poseName = gltfNode.name.substr(9);
-            femaleActionPoses.set(poseName, gltfNode);
+            const femalePoseName = gltfNode.name.substr(9);
+            femaleActionPoses.set(femalePoseName, gltfNode);
         }
 
         for (const child of gltfNode.children) {
