@@ -6,7 +6,7 @@ export class DirectionalLightShadow extends LightShadow {
     public constructor(light: DirectionalLight) {
         super(light);
         this.radius = 0;
-        this.distance = 20;
+        this.range = 20;
     }
 
     /**
@@ -14,7 +14,7 @@ export class DirectionalLightShadow extends LightShadow {
      * if zero, automatically use the light radius as shadow radius.
      */
     public radius: number;
-    public distance: number;
+    public range: number;
 
     public updateShadowMatrices() {
         // todo: check dirty
@@ -29,7 +29,11 @@ export class DirectionalLightShadow extends LightShadow {
         if (this.radius > 0) {
             r = this.radius;
         }
-        const matProj = mat4.orthographic(-r, r, -r, r, 0.01, this.distance > 0 ? this.distance : 20);
+        let d = dirLight.range;
+        if (this.range > 0) {
+            d = this.range;
+        }
+        const matProj = mat4.orthographic(-r, r, -r, r, 0.01, d);
         if (! matProj.equals(this._matProj)) {
             this.moved = true;
             matProj.copy(this._matProj);

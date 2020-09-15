@@ -354,8 +354,9 @@ export class GLTFSceneBuilder {
                 if (lightDef.extras !== undefined) {
                     if (lightDef.extras.radius !== undefined) dirLight.radius = lightDef.extras.radius;
                     if (lightDef.extras.shadowDistance !== undefined) {
+                        dirLight.range = lightDef.extras.shadowDistance;
                         const dirShadow = dirLight.shadow as DirectionalLightShadow;
-                        dirShadow.distance = lightDef.extras.shadowDistance;
+                        dirShadow.range = lightDef.extras.shadowDistance;
                     }
                 }
                 break;

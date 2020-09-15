@@ -1516,8 +1516,8 @@ export class ClusteredForwardRenderer {
             if (dirShadow.radius > 0) {
                 radius = dirShadow.radius;
             }
-            let distance = 20;
-            if(dirShadow.distance > 0) distance = dirShadow.distance;
+            let distance = dirLight.range;
+            if(dirShadow.range > 0) distance = dirShadow.range;
             const box = new BoundingBox(new vec3([-radius, -radius, -distance]),
                                         new vec3([radius, radius, 0]));
 

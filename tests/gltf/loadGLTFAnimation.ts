@@ -69,7 +69,7 @@ window.onload = () => {
     dirLight01.radius = 2;
     dirLight01.castShadow = true;
     const shadow = (dirLight01.shadow as DirectionalLightShadow);
-    shadow.distance = 10;
+    shadow.range = 10;
     shadow.radius = 2;
     const dirLightLookAt = new LookatBehavior(dirLight01);
     dirLight01.behaviors.push(dirLightLookAt);

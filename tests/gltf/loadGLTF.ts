@@ -61,7 +61,7 @@ window.onload = () => {
     dirLight01.color = new vec4([3,3,3,1]);
     dirLight01.radius = 5;
     dirLight01.castShadow = true;
-    (dirLight01.shadow as DirectionalLightShadow).distance = 15;
+    (dirLight01.shadow as DirectionalLightShadow).range = 15;
     const dirLightLookAt = new LookatBehavior(dirLight01);
     dirLight01.behaviors.push(dirLightLookAt);
     dirLightLookAt.position = new vec3([5, 5, 5]);

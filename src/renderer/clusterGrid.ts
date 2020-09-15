@@ -231,7 +231,8 @@ export class ClusterGrid {
             */
         } else {
             const dirLight = light as DirectionalLight;
-            if (dirLight.radius === 0) {    // infinite radius
+            const dirLightShadow = light.shadow as DirectionalLightShadow;
+            if (dirLight.radius === 0 || dirLight.range === 0) {    // infinite radius
                 for (let k = 0; k < this.resolusion.z; k++) {
                     for (let j = 0; j < this.resolusion.y; j++) {
                         for (let i = 0; i < this.resolusion.x; i++) {
@@ -243,12 +244,10 @@ export class ClusterGrid {
                 // todo: check light frustum
                 // todo: optimize - too much temp newed matrices
                 // the viewproj transform of spotLight
-                const shadow = dirLight.shadow as DirectionalLightShadow;
-
                 const matLightView = dirLight.worldTransform.copy();
                 matLightView.inverse();
                 //const matLightProj = mat4.perspective(Math.min(spotLight.outerConeAngle * 2, 3.10) * 180.0 / Math.PI, 1, 0.01, spotLight.range > 0 ? spotLight.range : 100);
-                const matLightProj = mat4.orthographic(-dirLight.radius, dirLight.radius, -dirLight.radius, dirLight.radius, 0.01, shadow.distance);
+                const matLightProj = mat4.orthographic(-dirLight.radius, dirLight.radius, -dirLight.radius, dirLight.radius, 0.01, dirLight.range);
 
                 const matLightViewProj = new mat4();
                 mat4.product(matLightProj, matLightView, matLightViewProj);

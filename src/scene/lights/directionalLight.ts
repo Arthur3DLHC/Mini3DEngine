@@ -9,6 +9,7 @@ export class DirectionalLight extends BaseLight {
     public constructor() {
         super();
         this.radius = 10;
+        this.range = 20;
         this.shadow = new DirectionalLightShadow(this);
         this._debugGeometry = null;
     }
@@ -22,6 +23,12 @@ export class DirectionalLight extends BaseLight {
      * if zero, use infinite radius; and this.shadow.radius will be used as shadow radius.
      */
     public radius: number;
+
+    /**
+     * range of the light. the height of the cylinder
+     * if zero, use infinite range; and this.shadow.distance will be used as shadow distance
+     */
+    public range: number;
 
     private _debugGeometry: BufferGeometry | null;
 

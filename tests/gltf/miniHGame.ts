@@ -61,6 +61,7 @@ window.onload = () => {
 
 
     // add some lights
+    /*
     const dirLight01 = new DirectionalLight();
     dirLight01.isStatic = true;
     dirLight01.autoUpdateTransform = false; // let the behaivor work
@@ -69,7 +70,7 @@ window.onload = () => {
     dirLight01.radius = 2;
     dirLight01.castShadow = true;
     const shadow = (dirLight01.shadow as DirectionalLightShadow);
-    shadow.distance = 10;
+    shadow.range = 10;
     shadow.radius = 2;
     const dirLightLookAt = new LookatBehavior(dirLight01);
     dirLight01.behaviors.push(dirLightLookAt);
@@ -78,7 +79,8 @@ window.onload = () => {
     dirLightLookAt.up = new vec3([0, 1, 0]);
 
     scene.attachChild(dirLight01);
-    
+    */
+   
     // test environment probes
     // addEnvProbe("envProbe01", 6, new vec3([ 0, 0, 0]), scene);
 
