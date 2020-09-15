@@ -39,7 +39,7 @@ export class SpotLight extends BaseLight {
 
     public get boundingSphere(): BoundingSphere {
         // 直接使用光源半径了，不太精确
-        this.boundingSphere.radius = (this.range == 0 ? Infinity : this.range);
+        this._boundingSphere.radius = (this.range == 0 ? Infinity : this.range);
         return this._boundingSphere;
     }
 }

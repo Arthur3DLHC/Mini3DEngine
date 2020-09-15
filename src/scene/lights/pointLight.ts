@@ -29,7 +29,7 @@ export class PointLight extends BaseLight {
     }
 
     public get boundingSphere(): BoundingSphere {
-        this.boundingSphere.radius = (this.range == 0 ? Infinity : this.range);
+        this._boundingSphere.radius = (this.range == 0 ? Infinity : this.range);
         return this._boundingSphere;
     }
 }

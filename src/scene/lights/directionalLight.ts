@@ -37,9 +37,19 @@ export class DirectionalLight extends BaseLight {
     }
 
     public get boundingSphere(): BoundingSphere {
-        // Fix me: 平行光没有纵向范围
-        // 在 shader 中也尚未实现 radius 的衰减和判断
-        this.boundingSphere.radius = Infinity;
+        if (this.radius <= 0 || this.range <= 0) {
+            this._boundingSphere.radius = Infinity;
+            this._boundingSphere.center.z = 0;
+        } else {
+            // radius
+            const halfRange = this.range * 0.5;
+            const r = this.radius;
+            this._boundingSphere.radius = Math.sqrt( halfRange * halfRange + r * r );
+
+            // center
+            // light look at -z direction
+            this._boundingSphere.center.z = -halfRange;
+        }
         return this._boundingSphere;
     }
 }
