@@ -455,6 +455,7 @@ TODO:       主要类结构
 
                 动画调度器？
                 动画 Mixer？不着急实现
+                动画状态机；
 
             资源加载器
                 资源列表和资源计数？
@@ -510,6 +511,9 @@ TODO:       主要类结构
             解析 Draco 压缩过的模型？
 
         大场景相关
+            制作模块化的大一点的场景；
+                模块化类 DOOM 场景
+
             Instancing
                 GLTF中共享网格的节点设为用 Instancing
                 什么时候更新 instance 矩阵数组？
@@ -561,6 +565,5 @@ TODO:       主要类结构
             Volume Rendering?
                 SDF
 
-            模块化类 DOOM 场景
 
         物理系统
