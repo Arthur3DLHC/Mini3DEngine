@@ -173,6 +173,7 @@ window.onload = () => {
             "CowGirl",
             "CowGirl Fast",
             "CowGirl Cum",
+            "CowGirl Rest"
         ];
 
         const femaleActionNames = [
@@ -184,6 +185,7 @@ window.onload = () => {
             "Female.CowGirl",
             "Female.CowGirl.Fast",
             "Female.CowGirl.Cum",
+            "Female.CowGirl.Rest",
         ];
 
         const maleActionNames = [
@@ -195,6 +197,7 @@ window.onload = () => {
             "Male.CowGirl",
             "Male.CowGirl.Fast",
             "Male.CowGirl.Cum",
+            "Male.CowGirl.Rest",
         ];
 
         const builderRoom = new GLTFSceneBuilder()

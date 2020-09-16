@@ -839,7 +839,11 @@ export class GLTFSceneBuilder {
                 mtl.normalMap = this.processTexture(mtlDef.normalTexture, gltf);
             }
 
-            // todo: subsurface? save in gltf extra?
+            // subsurface: save in gltf extra?
+            if (mtlDef.extras !== undefined) {
+                if(mtlDef.extras.subsurf !== undefined) mtl.subsurface = mtlDef.extras.subsurf;
+                if(mtlDef.extras.subsurfColor !== undefined) mtl.subsurfaceColor.xyz = mtlDef.extras.subsurfColor;
+            }
         }
         return mtl;
     }

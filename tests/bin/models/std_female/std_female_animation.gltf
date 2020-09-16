@@ -42949,7 +42949,8 @@
                 0
             ],
             "extras" : {
-                "subsurf" : 0.135
+                "subsurf" : 0.135,
+                "subsurfColor" : [0.8, 0.2, 0.15]
             },
             "name" : "Material.Skin.001",
             "pbrMetallicRoughness" : {
