@@ -840,10 +840,10 @@ export class GLTFSceneBuilder {
             }
 
             // subsurface: save in gltf extra?
-            if (mtlDef.extras !== undefined) {
-                if(mtlDef.extras.subsurf !== undefined) mtl.subsurface = mtlDef.extras.subsurf;
-                if(mtlDef.extras.subsurfColor !== undefined) mtl.subsurfaceColor.xyz = mtlDef.extras.subsurfColor;
-            }
+            // if (mtlDef.extras !== undefined) {
+            //     if(mtlDef.extras.subsurf !== undefined) mtl.subsurface = mtlDef.extras.subsurf;
+            //     if(mtlDef.extras.subsurfColor !== undefined) mtl.subsurfaceColor.xyz = mtlDef.extras.subsurfColor;
+            // }
         }
         return mtl;
     }

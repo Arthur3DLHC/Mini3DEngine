@@ -21,9 +21,10 @@ float calcCurvature(vec3 n, vec3 pos) {
 }
 
 // sample pre-integrated subsurface BRDF texture, calculate subsurface color?
-vec3 subsurfaceScattering(float ndotl, float curvature, vec3 subsurfaceColor, float subsurfaceAmount) {
+vec4 subsurfaceScattering(float ndotl, float curvature, vec3 subsurfaceColor, float subsurfaceAmount) {
     vec2 uv = vec2(ndotl * 0.5 + 0.5, curvature);
     float subsurf = texture(s_subsurfBRDF, uv).r;
-    return subsurf * subsurfaceColor * subsurfaceAmount;
+    // return subsurf * subsurfaceColor * subsurfaceAmount;
+    return vec4(subsurfaceColor * subsurfaceAmount, subsurf);
 }
 `;

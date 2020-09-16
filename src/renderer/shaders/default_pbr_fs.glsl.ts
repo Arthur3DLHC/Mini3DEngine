@@ -131,7 +131,9 @@ void main(void)
     // fix me: subsurface amount and texture use textures?
     float curvature = 0.0;
     if(u_material.subsurface > 0.0) {
-        curvature = calcCurvature(n, ex_worldPosition);
+        // fix me: using position and normal, the curvature is too blocky
+        curvature = 0.2;
+        // curvature = calcCurvature(n, ex_worldPosition);
     }
 
     // vec2 dither = getDither();
@@ -245,10 +247,14 @@ void main(void)
         vec3 intensity = rangeAttenuation * spotAttenuation * light.color.rgb;// * shadow;
 
         // todo: if subsurface > 0, sample subsurface strength from subsurface scattering BRDF texture
+        vec4 subsuf = vec4(0.0);
         if(u_material.subsurface > 0.0) {
             // TODO: 根据 ndotl 和 curvature 取样 subsurface BRDF texture
-            vec3 subsuf = subsurfaceScattering(NdotL, curvature, u_material.subsurfaceColor, u_material.subsurface);
-            f_diffuse += subsuf * intensity;
+            // vec3 subsuf = subsurfaceScattering(NdotL, curvature, u_material.subsurfaceColor, u_material.subsurface);
+            // f_diffuse += subsuf * intensity;
+
+            subsuf = subsurfaceScattering(NdotL, curvature, u_material.subsurfaceColor, u_material.subsurface);
+            f_diffuse += subsuf.rgb * subsuf.a * intensity;
         }
 
         // float NdotV = clampedDot(n, v);  // 前面已经算过了，与光源无关
@@ -267,7 +273,7 @@ void main(void)
             vec3 illuminance = intensity * NdotL;
             vec3 F = F_Schlick(f0, f90, VdotH);
 
-            f_diffuse += illuminance * BRDF_lambertian(F, albedoColor);
+            f_diffuse += illuminance * BRDF_lambertian(F, albedoColor) * (1.0 - subsuf.a);
             f_specular += illuminance * BRDF_specularGGX(F, alphaRoughness, NdotL, NdotV, NdotH);
         }
 
@@ -342,7 +348,6 @@ void main(void)
     // color = ACESToneMapping(color, 1.0);
 
     o.color = vec4(color, getOpacity());
-    // o.color = vec4(curvature, curvature, curvature, getOpacity());
     // o.color = vec4(curvature, curvature, curvature, getOpacity());
     o.normal = (u_view.matView * vec4(n, 0)).xyz;  // output world normal or view normal?
     o.roughness = roughness;
