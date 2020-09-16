@@ -13,10 +13,10 @@ export class ActionStateMachine {
         if (this._curState !== null) {
             this._curState.onExit();
         }
+        this._curState = state;
         if (state !== null) {
             state.onEnter();
         }
-        this._curState = state;
     }
 
     public addState(state: ActionState) {

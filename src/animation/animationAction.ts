@@ -31,6 +31,17 @@ export class AnimationAction {
         return this._clip.duration;
     }
 
+    public get finished(): boolean {
+        if (this.LoopMode === AnimationLoopMode.Repeat) {
+            return false;
+        }
+        if (this._speed >= 0) {
+            return this._curPlaybackTime >= this._clip.duration;
+        } else {
+            return this._curPlaybackTime <= 0;
+        }
+    }
+
     private _clip: AnimationClip;
     private _channels: AnimationChannel[];
 
