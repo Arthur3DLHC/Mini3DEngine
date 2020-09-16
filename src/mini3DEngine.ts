@@ -58,6 +58,7 @@ export * from "./scene/materials/subsurfacePBRMaterial.js";
 export * from "./scene/mesh.js";
 export * from "./scene/object3D.js";
 export * from "./scene/scene.js";
+export * from "./scene/skinMesh.js";
 export * from "./utils/bufferHelper.js";
 export * from "./WebGLResources/dataArray.js";
 export * from "./WebGLResources/frameBuffer.js";
