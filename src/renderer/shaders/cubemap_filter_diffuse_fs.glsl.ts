@@ -3,7 +3,7 @@
  * https://blog.csdn.net/i_dovelemon/article/details/79091105
  */
 export default /** glsl */`
-precision lowp sampler2DArray;
+precision mediump sampler2DArray;
 
 #include <function_cubemap>
 

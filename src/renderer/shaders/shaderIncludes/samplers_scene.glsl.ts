@@ -3,8 +3,8 @@
  */
 export default /** glsl */`
 precision mediump sampler2DShadow;
-precision lowp sampler2DArray;
-precision lowp sampler3D;
+precision mediump sampler2DArray;
+precision mediump sampler3D;
 // samplers
 // debug shadow texture
 // uniform sampler2D s_shadowAtlasStatic;

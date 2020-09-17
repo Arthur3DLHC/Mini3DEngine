@@ -2,7 +2,7 @@
  * scene sky box shader
  */
 export default /** glsl */`
-precision lowp samplerCube;
+precision mediump samplerCube;
 
 #include <uniforms_object>
 

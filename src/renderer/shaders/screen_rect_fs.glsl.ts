@@ -3,9 +3,9 @@
  */
 export default /** glsl */`
 precision mediump sampler2DShadow;
-precision lowp samplerCube;
-precision lowp sampler2DArray;
-precision lowp sampler3D;
+precision mediump samplerCube;
+precision mediump sampler2DArray;
+precision mediump sampler3D;
 
 // #include <uniforms_scene>
 #include <uniforms_view>
