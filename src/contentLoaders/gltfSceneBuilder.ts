@@ -839,12 +839,17 @@ export class GLTFSceneBuilder {
                 mtl.normalMap = this.processTexture(mtlDef.normalTexture, gltf);
             }
 
-            // subsurface: save in gltf extra?
-            // fix me: subsurface shader has problem now and the effect is weird 
+
             if (mtlDef.extras !== undefined) {
+                // export specular intensity from blender to extras now.
+                // maybe should use KHR_materials_specular in ther future, if blender-gltf-io exports it.
                 if (mtlDef.extras.specular !== undefined) mtl.specular = mtlDef.extras.specular;
-            //     if(mtlDef.extras.subsurf !== undefined) mtl.subsurface = mtlDef.extras.subsurf;
-            //     if(mtlDef.extras.subsurfColor !== undefined) mtl.subsurfaceColor.xyz = mtlDef.extras.subsurfColor;
+
+                // subsurface: save in gltf extra?
+                // fix me: subsurface shader has problem now and the effect is weird 
+
+                //     if(mtlDef.extras.subsurf !== undefined) mtl.subsurface = mtlDef.extras.subsurf;
+                //     if(mtlDef.extras.subsurfColor !== undefined) mtl.subsurfaceColor.xyz = mtlDef.extras.subsurfColor;
             }
         }
         return mtl;
