@@ -116,3 +116,11 @@ for mtl in bpy.data.materials:
     if isinstance(specular_socket, bpy.types.NodeSocket):
         fac = get_factor_from_socket(specular_socket, kind='VALUE')
         mtl["specular"] = fac
+    subsurf_socket = get_socket(mtl, "Subsurface")
+    if isinstance(subsurf_socket, bpy.types.NodeSocket):
+        subs = get_factor_from_socket(subsurf_socket, kind='VALUE')
+        mtl["subsurface"] = subs
+    subscolor_socket = get_socket(mtl, "Subsurface Color")
+    if isinstance(subscolor_socket, bpy.types.NodeSocket):
+        subsColor = get_factor_from_socket(subscolor_socket, kind='RGB')
+        mtl["subsurfaceColor"] = subsColor
