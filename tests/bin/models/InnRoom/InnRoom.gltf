@@ -32,38 +32,6 @@
                 {
                     "color" : [
                         1,
-                        0.33513516187667847,
-                        0.04921818524599075
-                    ],
-                    "intensity" : 15,
-                    "type" : "point",
-                    "range" : 6,
-                    "name" : "Point",
-                    "extras" : {
-                        "castShadow" : 0,
-                        "shadowMapSize" : 512,
-                        "shadowBias" : 0.009999999776482582
-                    }
-                },
-                {
-                    "color" : [
-                        1,
-                        0.29042741656303406,
-                        0.0476878397166729
-                    ],
-                    "intensity" : 15,
-                    "type" : "point",
-                    "range" : 6,
-                    "name" : "Point.002",
-                    "extras" : {
-                        "castShadow" : 0,
-                        "shadowMapSize" : 512,
-                        "shadowBias" : 0.009999999776482582
-                    }
-                },
-                {
-                    "color" : [
-                        1,
                         1,
                         1
                     ],
@@ -104,7 +72,9 @@
                 2,
                 4,
                 6,
+                7,
                 8,
+                9,
                 10,
                 11,
                 12,
@@ -117,10 +87,10 @@
                 19,
                 20,
                 21,
-                22,
                 23,
                 24,
                 25,
+                26,
                 27,
                 28,
                 29,
@@ -157,15 +127,15 @@
                 60,
                 61,
                 62,
-                63,
                 64,
                 65,
                 66,
+                67,
                 68,
-                69,
-                70,
-                71,
-                72,
+                99,
+                100,
+                101,
+                102,
                 103,
                 104,
                 105,
@@ -181,11 +151,7 @@
                 115,
                 116,
                 117,
-                118,
-                119,
-                120,
-                121,
-                122
+                118
             ]
         }
     ],
@@ -275,56 +241,6 @@
                     "light" : 1
                 }
             },
-            "name" : "Point_Orientation",
-            "rotation" : [
-                -0.7071067690849304,
-                0,
-                0,
-                0.7071067690849304
-            ]
-        },
-        {
-            "children" : [
-                5
-            ],
-            "name" : "Point",
-            "translation" : [
-                0.8541222810745239,
-                -0.20884037017822266,
-                -0.4789499044418335
-            ]
-        },
-        {
-            "extensions" : {
-                "KHR_lights_punctual" : {
-                    "light" : 2
-                }
-            },
-            "name" : "Point.002_Orientation",
-            "rotation" : [
-                -0.7071067690849304,
-                0,
-                0,
-                0.7071067690849304
-            ]
-        },
-        {
-            "children" : [
-                7
-            ],
-            "name" : "Point.002",
-            "translation" : [
-                -2.0945754051208496,
-                -0.10957181453704834,
-                2.3315536975860596
-            ]
-        },
-        {
-            "extensions" : {
-                "KHR_lights_punctual" : {
-                    "light" : 3
-                }
-            },
             "name" : "Sun.001_Orientation",
             "rotation" : [
                 -0.7071067690849304,
@@ -335,7 +251,7 @@
         },
         {
             "children" : [
-                9
+                5
             ],
             "name" : "Sun.001",
             "rotation" : [
@@ -567,7 +483,7 @@
         },
         {
             "children" : [
-                26
+                22
             ],
             "mesh" : 10,
             "name" : "Ceiling.Lamp.001",
@@ -1012,7 +928,7 @@
         },
         {
             "children" : [
-                67
+                63
             ],
             "mesh" : 34,
             "name" : "Window.Curtain.001",
@@ -1461,6 +1377,10 @@
         },
         {
             "children" : [
+                69,
+                70,
+                71,
+                72,
                 73,
                 74,
                 75,
@@ -1486,11 +1406,7 @@
                 95,
                 96,
                 97,
-                98,
-                99,
-                100,
-                101,
-                102
+                98
             ],
             "mesh" : 43,
             "name" : "Bowl.001",
@@ -1511,20 +1427,20 @@
         },
         {
             "mesh" : 44,
-            "name" : "Window.Frame.002",
-            "translation" : [
-                2.9941580295562744,
-                0.7922029495239258,
-                1.2607563734054565
-            ]
-        },
-        {
-            "mesh" : 45,
             "name" : "Window.Frame.012",
             "translation" : [
                 2.9941580295562744,
                 0.7922029495239258,
                 -0.24218250811100006
+            ]
+        },
+        {
+            "mesh" : 44,
+            "name" : "Window.Frame.002",
+            "translation" : [
+                2.9941580295562744,
+                0.7922029495239258,
+                1.2641749382019043
             ]
         },
         {
@@ -2844,27 +2760,13 @@
             ]
         },
         {
-            "name" : "Cube.009",
+            "name" : "Cube.034",
             "primitives" : [
                 {
                     "attributes" : {
                         "POSITION" : 188,
                         "NORMAL" : 189,
                         "TEXCOORD_0" : 190
-                    },
-                    "indices" : 191,
-                    "material" : 0
-                }
-            ]
-        },
-        {
-            "name" : "Cube.034",
-            "primitives" : [
-                {
-                    "attributes" : {
-                        "POSITION" : 192,
-                        "NORMAL" : 193,
-                        "TEXCOORD_0" : 194
                     },
                     "indices" : 191,
                     "material" : 0
@@ -4517,7 +4419,7 @@
             "count" : 816,
             "max" : [
                 0.1281460076570511,
-                1.453133225440979,
+                1.8406126499176025,
                 0.594201385974884
             ],
             "min" : [
@@ -4544,34 +4446,6 @@
             "componentType" : 5123,
             "count" : 1176,
             "type" : "SCALAR"
-        },
-        {
-            "bufferView" : 192,
-            "componentType" : 5126,
-            "count" : 816,
-            "max" : [
-                0.1281460076570511,
-                1.453133225440979,
-                0.594201385974884
-            ],
-            "min" : [
-                -0.12814612686634064,
-                -0.061083097010850906,
-                -0.5942016243934631
-            ],
-            "type" : "VEC3"
-        },
-        {
-            "bufferView" : 193,
-            "componentType" : 5126,
-            "count" : 816,
-            "type" : "VEC3"
-        },
-        {
-            "bufferView" : 194,
-            "componentType" : 5126,
-            "count" : 816,
-            "type" : "VEC2"
         }
     ],
     "bufferViews" : [
@@ -5534,26 +5408,11 @@
             "buffer" : 0,
             "byteLength" : 2352,
             "byteOffset" : 1919820
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 9792,
-            "byteOffset" : 1922172
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 9792,
-            "byteOffset" : 1931964
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 6528,
-            "byteOffset" : 1941756
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 1948284,
+            "byteLength" : 1922172,
             "uri" : "InnRoom.bin"
         }
     ]

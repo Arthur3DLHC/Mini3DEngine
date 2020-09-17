@@ -34183,7 +34183,7 @@
                     "index" : 1,
                     "texCoord" : 0
                 },
-                "metallicFactor" : 0.05356644093990326,
+                "metallicFactor" : 0,
                 "roughnessFactor" : 0.8062704205513
             }
         },
