@@ -135,7 +135,7 @@ window.onload = () => {
 
     console.log("loading skybox...");
 
-    const imagePromises: (Promise<HTMLImageElement>)[] = [];
+    const imagePromises: (Promise<HTMLImageElement|ImageData>)[] = [];
     const envmapUrls: string[] = [
         "./textures/skyboxes/ballroom/px.png",
         "./textures/skyboxes/ballroom/nx.png",
@@ -145,7 +145,7 @@ window.onload = () => {
         "./textures/skyboxes/ballroom/nz.png",
     ];
     for (let i = 0; i < 6; i++) {
-        const imgPromise: Promise<HTMLImageElement> = imageLoader.loadPromise(envmapUrls[i]);
+        const imgPromise: Promise<HTMLImageElement|ImageData> = imageLoader.loadPromise(envmapUrls[i]);
         imagePromises.push(imgPromise);
     }
 

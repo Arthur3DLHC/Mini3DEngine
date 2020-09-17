@@ -104,7 +104,7 @@ window.onload = () => {
     console.log("loading skybox...");
 
     // todo: use outdoor sky box
-    const imagePromises: (Promise<HTMLImageElement>)[] = [];
+    const imagePromises: (Promise<HTMLImageElement|ImageData>)[] = [];
     const envmapUrls: string[] = [
         "./textures/skyboxes/rooitou_park_2k/px.png",
         "./textures/skyboxes/rooitou_park_2k/nx.png",
@@ -114,7 +114,7 @@ window.onload = () => {
         "./textures/skyboxes/rooitou_park_2k/nz.png",
     ];
     for (let i = 0; i < 6; i++) {
-        const imgPromise: Promise<HTMLImageElement> = imageLoader.loadPromise(envmapUrls[i]);
+        const imgPromise: Promise<HTMLImageElement|ImageData> = imageLoader.loadPromise(envmapUrls[i]);
         imagePromises.push(imgPromise);
     }
 

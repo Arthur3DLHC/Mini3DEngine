@@ -29,7 +29,7 @@ export class TextureCube extends Texture {
     /**
      * cube texture 不使用基类的 image 属性
      */
-    public images: HTMLImageElement[];
+    public images: (HTMLImageElement|ImageData)[];
     public isShadowMap: boolean = false;
 
     public create() {
