@@ -34175,7 +34175,7 @@
                 0
             ],
             "extras" : {
-                "subsurf" : 0.08500000089406967,
+                "subsurface" : 0.08500000089406967,
                 "specular" : 0.35
             },
             "name" : "Material.Skin",

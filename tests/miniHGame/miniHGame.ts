@@ -15,6 +15,9 @@ window.onload = () => {
         return;
     }
 
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
     GLDevice.initialize(canvas);
 
     const loadingManager = new LoadingManager();
