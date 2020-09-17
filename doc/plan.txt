@@ -515,7 +515,8 @@ TODO:       主要类结构
 
         大场景相关
             制作模块化的大一点的场景；
-                模块化类 DOOM 场景
+                FPS：模块化类 DOOM 室内场景, 狭窄一些；Local point lights;
+                Action: 城堡，室外+室内，宽阔一些；夜间；无月光；雾；Local point lights：灯烛，火把；
 
             Instancing
                 GLTF中共享网格的节点设为用 Instancing
@@ -557,6 +558,10 @@ TODO:       主要类结构
                         Cubemap 或 Shadowmap 渲染，设为 false；分辨率较低，而且是类似 bake 阶段，无需 Clustered
                 剔除平行光，如果它指定了 radius 和 distance。（目前没有剔除）
 
+            户外阴影方案
+                Cascaded shadow map? 
+                或类似的简化方案：指定一个平行光作为日光，近景用跟随相机走的动态 shadowmap，远景过度到静态 shadowmap
+
             particle system; sprite;
 
             ECS 架构
@@ -567,6 +572,8 @@ TODO:       主要类结构
 
             Volume Rendering?
                 SDF
+                体积雾；全局雾；
+                雾带光照，并取样 shadowmap？
 
 
         物理系统
