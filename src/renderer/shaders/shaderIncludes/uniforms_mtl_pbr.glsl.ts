@@ -12,6 +12,7 @@ export default /** glsl */`
         float subsurface;
         float metallic;
         float roughness;
+        float specular;
         float colorMapAmount;
         float metallicMapAmount;
         float roughnessMapAmount;

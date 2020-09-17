@@ -11,6 +11,7 @@ export class StandardPBRMaterial extends Material {
         // this.reflectivity = 0.5;
         this.roughness = 0.5;
         this.metallic = 0.0;
+        this.specular = 0.5;
 
         this.subsurfaceColor = new vec3([1.0, 1.0, 1.0]);
         this.subsurface = 0.0;
@@ -40,6 +41,10 @@ export class StandardPBRMaterial extends Material {
 
     public roughness: number;
     public metallic: number;
+    /**
+     * specular intensity; f0 in PBR shader
+     */
+    public specular: number;
 
     public subsurfaceColor: vec3;
     public subsurface: number;

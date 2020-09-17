@@ -26,3 +26,6 @@ for obj in bpy.data.objects:
             obj["resolutionZ"] = probe.grid_resolution_y
             obj["clippingStart"] = probe.clip_start
             obj["clippingEnd"] = probe.clip_end
+
+for mtl in bpy.data.materials:
+    mtl["specular"] = mtl.specular_intensity

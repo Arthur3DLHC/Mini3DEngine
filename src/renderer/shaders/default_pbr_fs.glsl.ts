@@ -88,6 +88,10 @@ vec3 getEmissive() {
     return ret;
 }
 
+float getSpecular() {
+    return u_material.specular;
+}
+
 vec2 getMetallicRoughness() {
     // todo: roughness matallic map
     vec2 ret = vec2(u_material.metallic, u_material.roughness);
@@ -139,10 +143,10 @@ void main(void)
     // vec2 dither = getDither();
 
     // simple default f0
-    vec3 f0 = vec3(0.04);
+    vec3 f0 = vec3(0.08) * getSpecular();
     // use metallic factor to lerp between default 0.04 and baseColor
     vec3 albedoColor = mix(baseColor.rgb * (vec3(1.0) - f0),  vec3(0), metallic);
-    f0 = mix(vec3(0.04), baseColor.rgb, metallic);
+    f0 = mix(f0, baseColor.rgb, metallic);
     vec3 f90 = vec3(1.0);
     float alphaRoughness = roughness * roughness;
 

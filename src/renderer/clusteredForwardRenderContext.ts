@@ -182,6 +182,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubMaterialPBR.addFloat("subsurface", 0);
         this._ubMaterialPBR.addFloat("metallic", 0);
         this._ubMaterialPBR.addFloat("roughness", 0);
+        this._ubMaterialPBR.addFloat("specular", 0);
         this._ubMaterialPBR.addFloat("colorMapAmount", 0);
         this._ubMaterialPBR.addFloat("metallicMapAmount", 0);
         this._ubMaterialPBR.addFloat("roughnessMapAmount", 0);
@@ -711,6 +712,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 this._ubMaterialPBR.setFloat("subsurface", stdPBRMtl.subsurface);
                 this._ubMaterialPBR.setFloat("metallic", stdPBRMtl.metallic);
                 this._ubMaterialPBR.setFloat("roughness", stdPBRMtl.roughness);
+                this._ubMaterialPBR.setFloat("specular", stdPBRMtl.specular);
                 this._ubMaterialPBR.setFloat("colorMapAmount", stdPBRMtl.colorMapAmount);
                 this._ubMaterialPBR.setFloat("metallicMapAmount", stdPBRMtl.metallicMapAmount);
                 this._ubMaterialPBR.setFloat("roughnessMapAmount", stdPBRMtl.roughnessMapAmount);
