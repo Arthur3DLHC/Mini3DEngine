@@ -1475,7 +1475,11 @@ export class ClusteredForwardRenderer {
         GLPrograms.useProgram(this._skyboxProgram);
         // transform matrix - follow camera
         this._skyboxTransform.setTranslation(camPos);
-        this._renderContext.fillUniformBuffersPerObjectByValues(this._skyboxTransform, this._skyboxTransform, new vec4([intensity,intensity,intensity,intensity]), 0, false);
+
+        // todo: check skybox LDR / HDR
+
+        this._renderContext.fillUniformBuffersPerObjectByValues(this._skyboxTransform, this._skyboxTransform,
+            new vec4([intensity,intensity,intensity,intensity]), 0, false, cubemap.isHDR ? 1 : 0);
 
         GLTextures.setTextureAt(this._numReservedTextures, cubemap, GLDevice.gl.TEXTURE_CUBE_MAP);
         let location = this._skyboxProgram.getUniformLocation("s_skybox");

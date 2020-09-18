@@ -115,14 +115,29 @@ window.onload = () => {
     console.log("loading skybox...");
 
     const imagePromises: (Promise<HTMLImageElement|ImageData>)[] = [];
-    const envmapUrls: string[] = [
-        "./textures/skyboxes/rooitou_park_2k/px.png",
-        "./textures/skyboxes/rooitou_park_2k/nx.png",
-        "./textures/skyboxes/rooitou_park_2k/py.png",
-        "./textures/skyboxes/rooitou_park_2k/ny.png",
-        "./textures/skyboxes/rooitou_park_2k/pz.png",
-        "./textures/skyboxes/rooitou_park_2k/nz.png",
-    ];
+    const isHDR = true;
+    let envmapUrls: string[];
+
+    if (isHDR) {
+        envmapUrls = [
+            "./textures/skyboxes/rooitou_park_hdr/px.hdr",
+            "./textures/skyboxes/rooitou_park_hdr/nx.hdr",
+            "./textures/skyboxes/rooitou_park_hdr/py.hdr",
+            "./textures/skyboxes/rooitou_park_hdr/ny.hdr",
+            "./textures/skyboxes/rooitou_park_hdr/pz.hdr",
+            "./textures/skyboxes/rooitou_park_hdr/nz.hdr",
+        ]
+    } else {
+        envmapUrls = [
+            "./textures/skyboxes/rooitou_park_2k/px.png",
+            "./textures/skyboxes/rooitou_park_2k/nx.png",
+            "./textures/skyboxes/rooitou_park_2k/py.png",
+            "./textures/skyboxes/rooitou_park_2k/ny.png",
+            "./textures/skyboxes/rooitou_park_2k/pz.png",
+            "./textures/skyboxes/rooitou_park_2k/nz.png",
+        ];
+    }
+
     for (let i = 0; i < 6; i++) {
         const imgPromise: Promise<HTMLImageElement|ImageData> = imageLoader.loadPromise(envmapUrls[i]);
         imagePromises.push(imgPromise);
@@ -139,7 +154,8 @@ window.onload = () => {
         }
 
         skyboxTexture.componentType = GLDevice.gl.UNSIGNED_BYTE;
-        skyboxTexture.format = GLDevice.gl.RGB;
+        skyboxTexture.format = isHDR ? GLDevice.gl.RGBA : GLDevice.gl.RGB;
+        skyboxTexture.isHDR = isHDR;
         skyboxTexture.depth = 1;
         skyboxTexture.width = skyboxTexture.images[0].width;
         skyboxTexture.height = skyboxTexture.images[0].height;

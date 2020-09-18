@@ -16,6 +16,7 @@ export class Texture {
         this.mipLevels = mipLevels;
         this.format = format;
         this.componentType = compType;
+        this.isHDR = false;
         this.samplerState = null;
         this.cached = false;
     }
@@ -47,6 +48,8 @@ export class Texture {
 
     public format: GLenum;
     public componentType: GLenum;
+
+    public isHDR: boolean;
 
     /**
      * default sampler state? or put sampler state to material?

@@ -102,12 +102,18 @@ export class TextureLoader extends BaseLoader {
                 texture.height = image.height;
                 texture.depth = 1;
                 texture.mipLevels = 1024;
-                const isJPEG = url.search( /\.jpe?g($|\?)/i ) > 0 || url.search( /^data\:image\/jpeg/ ) === 0;
-                if (isJPEG) {
-                    texture.format = GLDevice.gl.RGB;
+                const isHDR = url.search(/\.hdr($|\?)/i) > 0;
+                if(isHDR) {
+
                 } else {
-                    texture.format = GLDevice.gl.RGBA;
+                    const isJPEG = url.search( /\.jpe?g($|\?)/i ) > 0 || url.search( /^data\:image\/jpeg/ ) === 0;
+                    if (isJPEG) {
+                        texture.format = GLDevice.gl.RGB;
+                    } else {
+                        texture.format = GLDevice.gl.RGBA;
+                    }
                 }
+                texture.isHDR = isHDR;
                 texture.componentType = GLDevice.gl.UNSIGNED_BYTE;
                 texture.samplerState = new SamplerState(GLDevice.gl.REPEAT, GLDevice.gl.REPEAT, GLDevice.gl.LINEAR_MIPMAP_LINEAR, GLDevice.gl.LINEAR_MIPMAP_LINEAR);
                 texture.cached = true;

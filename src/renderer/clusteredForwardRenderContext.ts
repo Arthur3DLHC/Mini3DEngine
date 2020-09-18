@@ -691,12 +691,13 @@ export class ClusteredForwardRenderContext extends RenderContext {
         // todo: object skin transforms, if skinmesh
     }
 
-    public fillUniformBuffersPerObjectByValues(matWorld: mat4, matWorldPrev: mat4, color: vec4, numSkinJoints:number, instancing: boolean) {
+    public fillUniformBuffersPerObjectByValues(matWorld: mat4, matWorldPrev: mat4, color: vec4, numSkinJoints:number, instancing: boolean, custom: number = 0) {
         this._ubObject.setMat4("matWorld", matWorld);
         this._ubObject.setMat4("matWorldPrev", matWorldPrev);
         this._ubObject.setVec4("color", color);
         this._tmpColor.y = numSkinJoints;
         this._tmpColor.z = instancing ? 1: 0;
+        this._tmpColor.w = custom;
         this._ubObject.setVec4("props", this._tmpColor);
         this._ubObject.update();
     }

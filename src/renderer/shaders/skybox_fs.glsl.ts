@@ -7,6 +7,7 @@ precision mediump samplerCube;
 #include <uniforms_object>
 
 uniform samplerCube s_skybox;
+uniform int u_isHDR;            // use RGBE format
 
 in vec3 ex_worldDir;
 in vec3 ex_normal;
@@ -16,6 +17,10 @@ in vec2 ex_texcoord;
 
 void main(void) {
     vec4 texColor = texture(s_skybox, ex_worldDir);
+    if (u_isHDR == 1) {
+        texColor.rgb *= pow(2.0, texColor.a * 255.0 - 128.0);
+        texColor.a = 1.0;
+    }
 
     FinalOutput o = defaultFinalOutput();
 

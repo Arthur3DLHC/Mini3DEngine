@@ -126,6 +126,8 @@ export class ImageLoader extends BaseLoader {
                     if (format != '32-bit_rle_rgbe') {
                         let errorInfo = 'unknown HDR format : ' + format;
                         console.warn(errorInfo);
+                        self.manager.itemError(url);
+                        self.manager.itemEnd(url);
                         reject(errorInfo);
                         return;
                     }
@@ -157,6 +159,8 @@ export class ImageLoader extends BaseLoader {
                             }
                         } else {
                             if ((rgbe[2] << 8) + rgbe[3] != width) {
+                                self.manager.itemError(url);
+                                self.manager.itemEnd(url);
                                 reject("HDR line mismatch ..");
                                 return;
                             }
