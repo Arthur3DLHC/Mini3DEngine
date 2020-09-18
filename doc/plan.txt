@@ -451,17 +451,18 @@ TODO:       主要类结构
                 在 RenderItems 时绘制？还是单独设立一个 pass？
                 调试骨骼皮肤模型的包围球
 
+
+            使用 HDR 环境贴图
+                加载 hdr 贴图文件
+                在 shader 中区分 HDR 纹理格式：RGBE 解析；
+                测试；
+
 -------------------------- 进行到这里了 ---------------------------
 
                 动画调度器？
                 动画 Mixer？不着急实现
                 动画状态机；
                 更多 make 动画？调整角色模型？仅增加胸部网格密度？
-
-            使用 HDR 环境贴图
-                加载 hdr 贴图文件
-                在 shader 中区分 HDR 纹理格式：RGBE 解析；
-                测试；
 
             资源加载器
                 资源列表和资源计数？
@@ -518,7 +519,7 @@ TODO:       主要类结构
 
         大场景相关
             制作模块化的大一点的场景；
-                FPS：模块化类 DOOM 室内场景, 狭窄一些；Local point lights;
+                FPS：模块化类 DOOM 室内场景, 狭窄一些；Local point lights; 导出，测试 clustered, instancing, occlusion culling 等
                 Action: 城堡，室外+室内，宽阔一些；夜间；无月光；雾；Local point lights：灯烛，火把；
 
             Instancing
