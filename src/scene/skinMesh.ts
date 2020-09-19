@@ -23,8 +23,6 @@ export class SkinMesh extends Mesh {
         // todo: apply joint transform to geometry bounding sphere then enlarge total bounding sphere?
         if (this.geometry) {
             const geomSphere = this.geometry.boundingSphere
-            // this._boundingSphere.center = geomSphere.center;
-            // this._boundingSphere.radius = geomSphere.radius;
 
             const geomWorldSphere = new BoundingSphere();
 
@@ -36,6 +34,11 @@ export class SkinMesh extends Mesh {
                 // as https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/master/src/skin.js do,
                 // because we do not multiply the world matrix of parent node in shader.
 
+                // if(i === 0) {
+                //     geomSphere.transform(joint.worldTransform, geomWorldSphere);
+                //     this._boundingSphere.copyFrom(geomWorldSphere);
+                // }
+
                 // enlarge boundingsphere
                 geomSphere.transform(joint.worldTransform, geomWorldSphere);
                 if (i === 0) {
@@ -44,6 +47,7 @@ export class SkinMesh extends Mesh {
                     this._boundingSphere.enlarge(geomWorldSphere);
                 }
             }
+
         }
     }
 

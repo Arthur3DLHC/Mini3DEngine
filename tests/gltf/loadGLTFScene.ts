@@ -16,6 +16,9 @@ window.onload = () => {
         return;
     }
 
+    canvas.width = Math.max(1280, window.innerWidth - 10);
+    canvas.height = Math.max(720, window.innerHeight - 10);
+
     GLDevice.initialize(canvas);
 
     const loadingManager = new LoadingManager();
@@ -163,7 +166,7 @@ window.onload = () => {
         skyboxTexture.samplerState = new SamplerState();
         skyboxTexture.upload();
         scene.background = skyboxTexture;
-        scene.backgroundIntensity = 30;
+        scene.backgroundIntensity = 10;
         
         // gltf asset should has been already loaded?
         console.log("building gltf scene...");
@@ -204,7 +207,7 @@ window.onload = () => {
         }
         else if (gltfNode instanceof EnvironmentProbe) {
             const envProbe = gltfNode as EnvironmentProbe;
-            envProbe.debugDraw = true;
+            // envProbe.debugDraw = true;
         }
 
         for (const child of gltfNode.children) {

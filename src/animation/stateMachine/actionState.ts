@@ -32,6 +32,10 @@ export class ActionState {
         if (this.animation !== null) {
             this.animation.update(Clock.instance.curTime, Clock.instance.elapsedTime);
         }
+
+        for (const trans of this.transitions) {
+            trans.checkTransit();
+        }
     }
 
     /**
