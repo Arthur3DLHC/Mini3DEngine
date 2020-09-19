@@ -174,7 +174,7 @@ export class ClusteredForwardRenderer {
         this._decalAtlasUnit = 2;
         this._envMapArrayUnit = 3;
         this._specularDFGUnit = 4;
-        this._irradianceVolumeAtlasUnit = 5;
+        this._irradianceProbeArrayUnit = 5;
 
         this._numReservedTextures = 6;
 
@@ -229,7 +229,8 @@ export class ClusteredForwardRenderer {
         this._specularDFG.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.LINEAR, gl.LINEAR);
         this._specularDFG.create();
 
-        this._irradianceVolumeAtlas = new TextureAtlas3D();
+        this._irradianceProbesArray = new Texture2DArray(1, 1, ClusteredForwardRenderContext.MAX_IRRPROBES * 6, 1, gl.RGBA, gl.HALF_FLOAT, false);
+        this._irradianceProbesArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.NEAREST, gl.NEAREST);
 
         this._debugDepthTexture = new Texture2D(4096, 4096, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, false);
         this._debugDepthTexture.create();
@@ -405,7 +406,7 @@ export class ClusteredForwardRenderer {
     private _decalAtlasUnit: GLenum;
     private _envMapArrayUnit: GLenum;
     private _specularDFGUnit: GLenum;
-    private _irradianceVolumeAtlasUnit: GLenum;
+    private _irradianceProbeArrayUnit: GLenum;
 
     private _sceneColorTexture: Texture2D[];      // main color output
     private _sceneNormalTexture: Texture2D;
@@ -418,7 +419,7 @@ export class ClusteredForwardRenderer {
     private _envMapArray: Texture2DArray;
     private _specularDFG: Texture2D;
     // private _envMapDepthTexture: Texture2D;
-    private _irradianceVolumeAtlas: TextureAtlas3D;
+    private _irradianceProbesArray: Texture2DArray;
 
     // FBOs
 
@@ -675,7 +676,7 @@ export class ClusteredForwardRenderer {
         GLTextures.setTextureAt(this._decalAtlasUnit, this._decalAtlas.texture);
         GLTextures.setTextureAt(this._envMapArrayUnit, this._envMapArray);
         GLTextures.setTextureAt(this._specularDFGUnit, this._specularDFG);
-        GLTextures.setTextureAt(this._irradianceVolumeAtlasUnit, this._irradianceVolumeAtlas.texture);
+        GLTextures.setTextureAt(this._irradianceProbeArrayUnit, this._irradianceProbesArray);
     }
 
     private bindTexturesPerMaterial(material: Material | null, useSkin: boolean) {
@@ -694,7 +695,7 @@ export class ClusteredForwardRenderer {
                 samplerUniforms.setTextureUnit("s_decalAtlas", this._decalAtlasUnit);
                 samplerUniforms.setTextureUnit("s_envMapArray", this._envMapArrayUnit);
                 samplerUniforms.setTextureUnit("s_specularDFG", this._specularDFGUnit);
-                samplerUniforms.setTextureUnit("s_irrVolAtlas", this._irradianceVolumeAtlasUnit);
+                samplerUniforms.setTextureUnit("s_irrProbeArray", this._irradianceProbeArrayUnit);
 
                 GLTextures.setStartUnit(this._numReservedTextures);
                 const pbrMtl = material as StandardPBRMaterial;
@@ -1689,7 +1690,8 @@ export class ClusteredForwardRenderer {
 
         const cubeProc = new CubemapProcessor();
 
-        // todo: repeat several times to simulate multiple bounces
+        // repeat several times to simulate multiple bounces
+        // todo: 分开 irradiance probes 之后，这里就不用做多次反弹了
         const numBounces = 3;
         for (let ibounce = 0; ibounce < numBounces; ibounce++) {
             // if first bounce, do not use envprobes;
@@ -1783,6 +1785,25 @@ export class ClusteredForwardRenderer {
         envMapFBO.release();
         tmpEnvMapArray.release();
         envMapDepthTexture.release();
+
+        console.log("done.");
+    }
+
+    /**
+     * 注意：先 update irrance probes, 再 update cubemaps；
+     * 
+     * @param scene 
+     */
+    private updateIrradianceProbes(scene: Scene) {
+        console.log("updating irradiance probes...");
+
+        if (this._irradianceProbesArray.glTexture) {
+            this._irradianceProbesArray.release();
+        }
+
+        const gl = GLDevice.gl;
+
+
 
         console.log("done.");
     }

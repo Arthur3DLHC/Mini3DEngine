@@ -523,9 +523,13 @@ TODO:       主要类结构
                 可以提高 irradiance probe 的数量，同时避免占用过多显存
                 使用 Ambient Cube，而不是 2x2 的环境贴图；可以降低 shader 复杂度；
                     单生成一个 1x1 的 texture array
+                    为每个 irradiance probe 渲染 cubemap
                     将渲染好的 envmap 做 diffuse filter 输出到此 texture array
                     Diffuse filter 中，可以直接用每个面的方向向量作为主卷积方向了；
                     在 default pbr shader 中，按照 half life 2 的方式混合 （需要做三次采样），而不是按 cubemap 采样一次；
+                注意：
+                    先 update irradiance probes, 再 update envmaps；
+                    irradiance probes 做多次反弹，envmaps 就不用了
 
             制作模块化的大一点的场景；
                 FPS：模块化类 DOOM 室内场景, 狭窄一些；Local point lights; 导出，测试 clustered, instancing, occlusion culling 等
