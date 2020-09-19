@@ -5,7 +5,7 @@ export default /** glsl */`
     #define MAX_LIGHTS_PERSCENE  256
     #define MAX_DECALS_PERSCENE  512
     #define MAX_ENVPROBES_PERSCENE  128
-    #define MAX_IRRADIANCE_VOLUMES_PERSCENE  512
+    #define MAX_IRRPROBES_PERSCENE  512
     
     layout (std140, column_major) uniform; 
 
@@ -43,15 +43,17 @@ export default /** glsl */`
         EnvProbe probes[MAX_ENVPROBES_PERSCENE];
     } u_envProbes;
 
-    struct IrradianceVolume {
-        mat4 transform;
-        vec4 boxMin;         // irradiance volume 三维图集中的盒子最小角
-        vec4 boxMax;         // irradiance volume 三维图集中的盒子最小角
+    struct IrradianceProbe {
+        vec3 position;          // alwayx xyz axis aligned
+        float radius;
+        // mat4 transform;
+        // vec4 boxMin;         // irradiance volume 三维图集中的盒子最小角
+        // vec4 boxMax;         // irradiance volume 三维图集中的盒子最小角
     };
-    uniform IrrVolumes
+    uniform IrrProbes
     {
-        IrradianceVolume volumes[MAX_IRRADIANCE_VOLUMES_PERSCENE];
-    } u_irrVolumes;
+        IrradianceProbe volumes[MAX_IRRPROBES_PERSCENE];
+    } u_irrProbes;
 
     // dithering pattern?
     uniform DitherPattern {

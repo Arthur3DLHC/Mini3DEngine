@@ -53,7 +53,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubLights = new UniformBuffer("lights");
         this._ubDecals = new UniformBuffer("decals");
         this._ubEnvProbes = new UniformBuffer("envprobes");
-        this._ubIrrVolumes = new UniformBuffer("irrVolumes");
+        this._ubIrrProbes = new UniformBuffer("irrVolumes");
         this._ubDitherPattern = new UniformBuffer("ditherPattern");
         //this._ubFrame = new UniformBuffer();
         this._ubView = new UniformBuffer("view");
@@ -67,7 +67,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubLights.build();
         this._ubDecals.build();
         this._ubEnvProbes.build();
-        this._ubIrrVolumes.build();
+        this._ubIrrProbes.build();
         this._ubDitherPattern.build();
         //this._ubFrame.build();
         this._ubView.build();
@@ -94,7 +94,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
     private _ubLights: UniformBuffer;
     private _ubDecals: UniformBuffer;
     private _ubEnvProbes: UniformBuffer;
-    private _ubIrrVolumes: UniformBuffer;
+    private _ubIrrProbes: UniformBuffer;
     private _ubDitherPattern: UniformBuffer;
     // private _ubFrame: UniformBuffer;
     private _ubView: UniformBuffer;
@@ -111,7 +111,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
     public static readonly LIGHT_SIZE_FLOAT = 40;
     public static readonly DECAL_SIZE_FLOAT = 20;
     public static readonly ENVPROBE_SIZE_FLOAT = 4;
-    public static readonly IRRVOL_SIZE_FLOAT = 24;
+    public static readonly IRRVOL_SIZE_FLOAT = 4;
 
     public static readonly NUM_CLUSTERS_X = 16;
     public static readonly NUM_CLUSTERS_Y = 8;
@@ -122,7 +122,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
     public static readonly MAX_LIGHTS = 256;
     public static readonly MAX_DECALS = 512;
     public static readonly MAX_ENVPROBES = 128;
-    public static readonly MAX_IRRVOLUMES = 512;
+    public static readonly MAX_IRRPROBES = 512;
     public static readonly MAX_ITEMS = 4096;
     public static readonly MAX_BONES = 256;
 
@@ -138,7 +138,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubLights.addUniform("lights", ClusteredForwardRenderContext.MAX_LIGHTS * ClusteredForwardRenderContext.LIGHT_SIZE_FLOAT);
         this._ubDecals.addUniform("decals", ClusteredForwardRenderContext.MAX_DECALS * ClusteredForwardRenderContext.DECAL_SIZE_FLOAT);
         this._ubEnvProbes.addUniform("probes", ClusteredForwardRenderContext.MAX_ENVPROBES * ClusteredForwardRenderContext.ENVPROBE_SIZE_FLOAT);
-        this._ubIrrVolumes.addUniform("volumes", ClusteredForwardRenderContext.MAX_IRRVOLUMES * ClusteredForwardRenderContext.IRRVOL_SIZE_FLOAT);
+        this._ubIrrProbes.addUniform("volumes", ClusteredForwardRenderContext.MAX_IRRPROBES * ClusteredForwardRenderContext.IRRVOL_SIZE_FLOAT);
         this._ubDitherPattern.addMat4("randX", matIdentity);
         this._ubDitherPattern.addMat4("randY", matIdentity);
 
@@ -195,7 +195,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         GLUniformBuffers.uniformBlockNames["Lights"] = 0;
         GLUniformBuffers.uniformBlockNames["Decals"] = 1;
         GLUniformBuffers.uniformBlockNames["EnvProbes"] = 2;
-        GLUniformBuffers.uniformBlockNames["IrrVolumes"] = 3;
+        GLUniformBuffers.uniformBlockNames["IrrProbes"] = 3;
         GLUniformBuffers.uniformBlockNames["View"] = 4;
         GLUniformBuffers.uniformBlockNames["DitherPattern"] = 5;
         GLUniformBuffers.uniformBlockNames["ItemIndices"] = 6;
@@ -209,7 +209,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         GLUniformBuffers.bindUniformBuffer(this._ubLights, "Lights");
         GLUniformBuffers.bindUniformBuffer(this._ubDecals, "Decals");
         GLUniformBuffers.bindUniformBuffer(this._ubEnvProbes, "EnvProbes");
-        GLUniformBuffers.bindUniformBuffer(this._ubIrrVolumes, "IrrVolumes");
+        GLUniformBuffers.bindUniformBuffer(this._ubIrrProbes, "IrrProbes");
         GLUniformBuffers.bindUniformBuffer(this._ubDitherPattern, "DitherPattern");
         //GLUniformBuffers.bindUniformBuffer(this._ubFrame, "Frame");
         GLUniformBuffers.bindUniformBuffer(this._ubView, "View");
@@ -223,7 +223,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         GLUniformBuffers.bindUniformBlock(program, "Lights");
         GLUniformBuffers.bindUniformBlock(program, "Decals");
         GLUniformBuffers.bindUniformBlock(program, "EnvProbes");
-        GLUniformBuffers.bindUniformBlock(program, "IrrVolumes");
+        GLUniformBuffers.bindUniformBlock(program, "IrrProbes");
         GLUniformBuffers.bindUniformBlock(program, "DitherPattern");
         //GLUniformBuffers.bindUniformBlock(program, "Frame");
         GLUniformBuffers.bindUniformBlock(program, "View");
@@ -278,8 +278,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
             this._buffer.addArray(boxMin.values);
             this._buffer.addArray(boxMax.values);
         }
-        this._ubIrrVolumes.setUniform("volumes", this._tmpData, this._buffer.length);
-        this._ubIrrVolumes.update();
+        this._ubIrrProbes.setUniform("volumes", this._tmpData, this._buffer.length);
+        this._ubIrrProbes.update();
 
         // dither pattern
         // todo: should use a texture ?
