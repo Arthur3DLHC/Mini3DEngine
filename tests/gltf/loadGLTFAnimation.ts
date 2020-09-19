@@ -36,6 +36,7 @@ window.onload = () => {
     const fpsBehavior = new FirstPersonViewBehavior(camera);
     camera.behaviors.push(fpsBehavior);
     fpsBehavior.position = new vec3([0, 1.7, 2]);
+    fpsBehavior.moveSpeed = 1.5;
     scene.attachChild(camera);
 
     window.onmousedown = (ev: MouseEvent) => {

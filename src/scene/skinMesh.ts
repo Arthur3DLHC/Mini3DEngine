@@ -19,12 +19,17 @@ export class SkinMesh extends Mesh {
         return this._boundingSphere;
     }
 
+    private static _tmpGeomWorldSphere: BoundingSphere = new BoundingSphere();
+
     public updateJointMatrices(){
         // todo: apply joint transform to geometry bounding sphere then enlarge total bounding sphere?
         if (this.geometry) {
             const geomSphere = this.geometry.boundingSphere
 
-            const geomWorldSphere = new BoundingSphere();
+            // const geomWorldSphere = new BoundingSphere();
+
+            // test
+            // this._boundingSphere.radius = 1000;
 
             for (let i = 0; i < this.joints.length; i++) {
                 const joint = this.joints[i];
@@ -40,11 +45,12 @@ export class SkinMesh extends Mesh {
                 // }
 
                 // enlarge boundingsphere
-                geomSphere.transform(joint.worldTransform, geomWorldSphere);
+
+                geomSphere.transform(joint.worldTransform, SkinMesh._tmpGeomWorldSphere);
                 if (i === 0) {
-                    this._boundingSphere.copyFrom(geomWorldSphere);
+                    this._boundingSphere.copyFrom(SkinMesh._tmpGeomWorldSphere);
                 } else {
-                    this._boundingSphere.enlarge(geomWorldSphere);
+                    this._boundingSphere.enlarge(SkinMesh._tmpGeomWorldSphere);
                 }
             }
 

@@ -19,6 +19,9 @@ export class GLDevice {
         const maxUBSize = GLDevice.gl.getParameter(GLDevice.gl.MAX_UNIFORM_BLOCK_SIZE);
         console.log("max uniform block size: " + maxUBSize);
 
+        const maxTexArrayLayers = GLDevice.gl.getParameter(GLDevice.gl.MAX_ARRAY_TEXTURE_LAYERS);
+        console.log("max texture array layers: " + maxTexArrayLayers);
+
         // extensions needed
         const extColorBufferFloat = gl2.getExtension("EXT_color_buffer_float");
         const extColorBufferHalfFloat = gl2.getExtension("EXT_color_buffer_half_float");

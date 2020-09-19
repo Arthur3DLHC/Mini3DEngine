@@ -464,17 +464,7 @@ TODO:       主要类结构
                 动画状态机；
                 更多 make 动画？
                 优化动画性能：不每帧更新包围球？预处理 SkinMesh 时计算一个最大包围球？
-
-            资源加载器
-                资源列表和资源计数？
-                参考类似 PIXI.js 的机制？
-                    输入一个要加载的资源 url 列表？在 onload 函数中回调一个加载完的资源数据 map？
-                    能否通过 promise 的方式返回？
-                    所有资源加载完后再开始逻辑循环？
-                    切换场景时清空资源缓存，更新要加载的资源列表，调用 load 方法?
-                考虑统一使用 Promise.all 实现？
-                    需要将不同的资源分类；Typescript Promise.all 仅支持列表中元素为同一类型；
-                    根据文件扩展名放到不同的 promise 列表里？
+                    经过实测，是否更新包围球对性能影响不大
 
             支持材质自定义 Shader？
                 不紧急
@@ -492,8 +482,9 @@ TODO:       主要类结构
             Blender python 脚本
                 补充光源属性到 gltf 的 extra 中
                 从 Blender 导出 Irradiance Volume 到 gltf；从 gltf 读取 Irradiance Volume，添加 probes 到场景；
+                区分 Irradiance probe 和 envmap probe？
                 补充材质属性到 gltf 的 extra 中
-                    次表面反射参数
+                    次表面反射参数；高光强度；
 
             绘制光源和 envProbe 的调试图元
                 差光源的；
@@ -513,10 +504,19 @@ TODO:       主要类结构
             GameScene 管理
                 参考 Phaser 和 PIXI.js？
                 H-Game Demo 场景管理和简单逻辑；
+            
+            资源加载器
+                资源列表和资源计数？
+                参考类似 PIXI.js 的机制？
+                    输入一个要加载的资源 url 列表？在 onload 函数中回调一个加载完的资源数据 map？
+                    能否通过 promise 的方式返回？
+                    所有资源加载完后再开始逻辑循环？
+                    切换场景时清空资源缓存，更新要加载的资源列表，调用 load 方法?
+                考虑统一使用 Promise.all 实现？
+                    需要将不同的资源分类；Typescript Promise.all 仅支持列表中元素为同一类型；
+                    根据文件扩展名放到不同的 promise 列表里？
 
             优化 tsm 库？
-
-            解析 Draco 压缩过的模型？
 
         大场景相关
             将环境反射 probe 和 irradiacne probe 分开
