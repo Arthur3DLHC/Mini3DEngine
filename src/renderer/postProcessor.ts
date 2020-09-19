@@ -526,6 +526,7 @@ export class PostProcessor {
         // 暂时先只做 tonemapping，将来再加 bloom
         GLPrograms.useProgram(this._toneMappingProgram);
         this.setTexture(this._toneMappingProgram.getUniformLocation("s_sceneColor"), this._customTexStartUnit, sourceImage);
+        gl.uniform1i(this._toneMappingProgram.getUniformLocation("u_Enable"), this.enableToneMapping ? 1 : 0);
         this._rectGeom.draw(0, Infinity, this._toneMappingProgram.attributes);
         GLTextures.setTextureAt(this._customTexStartUnit, null);
     }
