@@ -1780,9 +1780,8 @@ export class ClusteredForwardRenderer {
 
             cubeProc.processSpecularLD(tmpEnvMapArray, this._envMapArray, this._renderContext.envProbeCount, this._numReservedTextures);
             // cubeProc.processDiffuse(tmpEnvMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
-
-            cubeProc.processSpecularDFG(this._specularDFG);
         }
+        cubeProc.processSpecularDFG(this._specularDFG);
 
         cubeProc.release();
 
@@ -1831,7 +1830,7 @@ export class ClusteredForwardRenderer {
         this._irradianceProbesArray.mipLevels = 1;
         this._irradianceProbesArray.format = gl.RGBA;
         this._irradianceProbesArray.componentType = gl.HALF_FLOAT;
-        this._irradianceProbesArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.NEAREST, gl.NEAREST);
+        this._irradianceProbesArray.samplerState = new SamplerState(gl.REPEAT, gl.REPEAT, gl.NEAREST, gl.NEAREST);
 
         this._irradianceProbesArray.create();
 

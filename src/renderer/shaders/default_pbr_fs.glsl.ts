@@ -158,6 +158,72 @@ void main(void)
     vec4 ndc = ex_hPosition / ex_hPosition.w;
     uint cluster = clusterOfPixel(ndc);
 
+     // todo: irradiance probes
+
+    // todo: env maps: image based lighting
+    uint irrStart = 0u;
+    uint irrCount = 0u;
+    // float cubeUVScale = 1.0 / 6.0;
+
+    vec3 iblDiffuse = vec3(0.0);
+    // vec3 iblSpecular = vec3(0.0);
+    float totalWeight = 0.0;
+    // reflection vector, in world space
+    // vec3 reflV = reflect(-v, n);
+
+    // todo: use irradiance probes instead
+    // getEnvProbeIndicesInCluster(cluster, envmapStart, envmapCount);
+    getIrrProbeIndicesInCluster(cluster, irrStart, irrCount);
+    for (uint i = irrStart; i < irrStart + irrCount; i++) {
+        uint probeIdx = getItemIndexAt(i);
+        IrradianceProbe probe = u_irrProbes.probes[probeIdx];
+
+        // todo: blend by distance to envprobe center position
+        // todo: should also add radius weight: the smaller the probe, the stronger the weight.
+        // https://www.xmswiki.com/wiki/SMS:Inverse_Distance_Weighted_Interpolation
+        float dist = length(probe.position - ex_worldPosition) + 0.1;
+        float distxradius = dist * probe.radius;
+        float weight = 1.0 / (distxradius * distxradius);
+
+        // IBL diffuse part
+
+        // TODO: use ambient cube ?
+
+        int envmapIdx = int(i - irrStart);
+
+        int layer = envmapIdx * 6;
+
+        // ivec3 isNegative = ivec3(lessThan(n, vec3(0.0, 0.0, 0.0)));
+        ivec3 isNegative;
+        isNegative.x = (n.x < 0.0 ? 1 : 0);
+        isNegative.y = (n.y < 0.0 ? 1 : 0);
+        isNegative.z = (n.z < 0.0 ? 1 : 0);
+
+        vec3 nSquared = n * n;
+        // n = normalize(n);
+        // vec3 nSquared = vec3(n.x * n.x, n.y * n.y, n.z * n.z);
+
+        vec3 diffuseLight = nSquared.x * textureLod(s_irrProbeArray, vec3(0.5, 0.5, float(layer + isNegative.x)), 0.0).rgb
+            + nSquared.y * textureLod(s_irrProbeArray, vec3(0.5, 0.5, float(layer + isNegative.y + 2)), 0.0).rgb
+            + nSquared.z * textureLod(s_irrProbeArray, vec3(0.5, 0.5, float(layer + isNegative.z + 4)), 0.0).rgb;
+
+        iblDiffuse += diffuseLight * albedoColor * weight;
+
+        // iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, envmapIdx, n, albedoColor) * weight;
+        
+        totalWeight += weight;
+    }
+    if (totalWeight > 0.0) {
+        // debug output envmap
+        // o.color.rgb += reflection * 0.5 / totalWeight;
+        // f_specular += iblSpecular / totalWeight;
+        // f_diffuse += vec3(0.5);
+
+        f_diffuse += iblDiffuse / totalWeight;
+    }
+
+
+
     uint lightCount = getLightCountInCluster(cluster);
     for(uint i = 0u; i < lightCount; i++) {
 
@@ -297,50 +363,7 @@ void main(void)
     // test texcoord
     // o.color = vec4(ex_texcoord, 1, 1);
 
-    // todo: irradiance probes
-
-    // todo: env maps: image based lighting
-    uint irrStart = 0u;
-    uint irrCount = 0u;
-    // float cubeUVScale = 1.0 / 6.0;
-
-    vec3 iblDiffuse = vec3(0.0);
-    // vec3 iblSpecular = vec3(0.0);
-    float totalWeight = 0.0;
-    // reflection vector, in world space
-    // vec3 reflV = reflect(-v, n);
-
-    // todo: use irradiance probes instead
-    // getEnvProbeIndicesInCluster(cluster, envmapStart, envmapCount);
-    getIrrProbeIndicesInCluster(cluster, irrStart, irrCount);
-    for (uint i = irrStart; i < irrStart + irrCount; i++) {
-        uint probeIdx = getItemIndexAt(i);
-        IrradianceProbe probe = u_irrProbes.probes[probeIdx];
-
-        // todo: blend by distance to envprobe center position
-        // todo: should also add radius weight: the smaller the probe, the stronger the weight.
-        // https://www.xmswiki.com/wiki/SMS:Inverse_Distance_Weighted_Interpolation
-        float dist = length(probe.position - ex_worldPosition) + 0.1;
-        float distxradius = dist * probe.radius;
-        float weight = 1.0 / (distxradius * distxradius);
-
-        // IBL diffuse part
-
-        // TODO: use ambient cube ?
-
-        int envIdx = int(i - irrStart);
-        iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, envIdx, n, albedoColor) * weight;
-        
-        totalWeight += weight;
-    }
-    if (totalWeight > 0.0) {
-        // debug output envmap
-        // o.color.rgb += reflection * 0.5 / totalWeight;
-        // f_specular += iblSpecular / totalWeight;
-        // f_diffuse += vec3(0.5);
-
-        f_diffuse += iblDiffuse / totalWeight;
-    }
+   
     // todo: opacity for transparent surfaces;
     // todo: tone mapping? linear space to sRGB space?
     vec3 color = f_diffuse + f_specular + f_emissive;

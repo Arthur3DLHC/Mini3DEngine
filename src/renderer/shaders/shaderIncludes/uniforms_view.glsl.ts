@@ -36,11 +36,12 @@ export default /** glsl */`
 
         // fix me: 按照这个尺寸，会超过 OpenGL 保证的 16384 个 byte 的限制
         // 但是一般的DX11显卡应该都能保证 65536 个 byte
+        // 对齐是否有问题？
         uint start;
         uint lightCount;
         uint decalCount;
         uint envProbeCount;
-        uint irrProbeCount;
+        // uint irrProbeCount;
     };
     uniform Clusters
     {

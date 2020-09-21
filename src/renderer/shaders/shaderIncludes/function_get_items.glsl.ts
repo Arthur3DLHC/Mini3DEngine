@@ -27,15 +27,15 @@ export default /** glsl */`
 
     //---------- environment (reflection) probes -----------
 
+    uint getEnvProbeCountInCluster(uint cluster)
+    {
+        return u_clusters.clusters[cluster].envProbeCount / 65536u;
+    }
+
     void getEnvProbeIndicesInCluster(uint cluster, out uint offset, out uint count)
     {
         offset = u_clusters.clusters[cluster].start + u_clusters.clusters[cluster].lightCount + u_clusters.clusters[cluster].decalCount;
-        count = u_clusters.clusters[cluster].envProbeCount;
-    }
-
-    uint getEnvProbeCountInCluster(uint cluster)
-    {
-        return u_clusters.clusters[cluster].envProbeCount;
+        count = getEnvProbeCountInCluster(cluster);
     }
 
     EnvProbe getEnvProbeInCluster(uint cluster, uint iProbe)
@@ -49,14 +49,15 @@ export default /** glsl */`
     //---------- irradiance probes ----------
     void getIrrProbeIndicesInCluster(uint cluster, out uint offset, out uint count)
     {
+        uint reflProbeCount = getEnvProbeCountInCluster(cluster);
         offset = u_clusters.clusters[cluster].start + u_clusters.clusters[cluster].lightCount
-         + u_clusters.clusters[cluster].decalCount + u_clusters.clusters[cluster].envProbeCount;
-        count = u_clusters.clusters[cluster].irrProbeCount;
+         + u_clusters.clusters[cluster].decalCount + reflProbeCount;
+        count = u_clusters.clusters[cluster].envProbeCount - reflProbeCount * 65536u;
     }
 
     uint getIrrProbeCountInCluster(uint cluster)
     {
-        return u_clusters.clusters[cluster].irrProbeCount;
+        return u_clusters.clusters[cluster].envProbeCount - getEnvProbeCountInCluster(cluster) * 65536u;
     }
 
     IrradianceProbe getIrrProbeInCluster(uint cluster, uint iProbe)

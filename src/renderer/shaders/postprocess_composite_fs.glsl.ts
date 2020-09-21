@@ -152,6 +152,7 @@ void main(void) {
     sumColor.rgb *= F;
     // sumColor.a *= length(sumColor.rgb);
 
+    /*
     if(sumColor.a < 0.99) {
         // select cubemaps by pixel position
         uint envmapStart = 0u;
@@ -195,6 +196,7 @@ void main(void) {
         }
         // sumColor.rgb = n * 0.5 + vec3(0.5);
     }
+    */
     // fix me: test add blend?
     // sumColor.a = (f0.r + f0.g + f0.b) * 0.33333;
     o_color = vec4(sumColor.rgb * sumAO, 0.0);

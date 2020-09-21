@@ -13,12 +13,26 @@ vec3 getIBLRadianceLambertian(sampler2DArray s, int envmapIdx, vec3 n, vec3 diff
 {
     // todo: use HL2 ambient cube
     int layer = envmapIdx * 6;
-    vec3 nSquared = n * n;
-    ivec3 isNegative = ivec3(lessThan(n, vec3(0.0, 0.0, 0.0)));
-    vec3 diffuseLight = nSquared.x * textureLod(s, vec3(0.5, 0.5, float(layer + isNegative.x)), 0.0).rgb
-                        + nSquared.y * textureLod(s, vec3(0.5, 0.5, float(layer + isNegative.y + 2)), 0.0).rgb
-                        + nSquared.z * textureLod(s, vec3(0.5, 0.5, float(layer + isNegative.z + 4)), 0.0).rgb;
-    
+
+    // ivec3 isNegative = ivec3(lessThan(n, vec3(0.0, 0.0, 0.0)));
+    ivec3 isNegative;
+    isNegative.x = (n.x < 0.0 ? 1 : 0);
+    isNegative.y = (n.y < 0.0 ? 1 : 0);
+    isNegative.z = (n.z < 0.0 ? 1 : 0);
+
+    // vec3 nSquared = n * n;
+    // n = normalize(n);
+    vec3 nSquared = vec3(n.x * n.x, n.y * n.y, n.z * n.z);
+
+    float len = nSquared.x + nSquared.y + nSquared.z;
+
+    vec3 diffuseLight = vec3(len);
+
+    // vec3 diffuseLight = n.x * n.x * textureLod(s, vec3(0.5, 0.5, float(layer + isNegative.x)), 0.0).rgb
+    //     + n.y * n.y * textureLod(s, vec3(0.5, 0.5, float(layer + isNegative.y + 2)), 0.0).rgb
+    //     + n.z * n.z * textureLod(s, vec3(0.5, 0.5, float(layer + isNegative.z + 4)), 0.0).rgb;
+
+    // vec3 diffuseLight = textureCubeArrayLod(s, n, envmapIdx, 0.0).rgb;
 
     // old diffuse environtment map method
     // vec3 diffuseLight = textureCubeArrayLod(s, n, envmapIdx, DIFFUSE_MIP_LEVEL).rgb;

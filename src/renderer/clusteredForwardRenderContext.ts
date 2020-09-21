@@ -117,7 +117,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
     public static readonly NUM_CLUSTERS_Y = 8;
     public static readonly NUM_CLUSTERS_Z = 12;
     public static readonly NUM_CLUSTERS = 16 * 8 * 12;
-    public static readonly CLUSTER_SIZE_INT = 5;
+    public static readonly CLUSTER_SIZE_INT = 4;
 
     public static readonly MAX_LIGHTS = 256;
     public static readonly MAX_DECALS = 512;
@@ -166,7 +166,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
         this._ubItemIndices.addUniform("indices", ClusteredForwardRenderContext.MAX_ITEMS);
 
-        this._ubClusters.addUniform("clusters", ClusteredForwardRenderContext.NUM_CLUSTERS * 4);
+        this._ubClusters.addUniform("clusters", ClusteredForwardRenderContext.NUM_CLUSTERS * ClusteredForwardRenderContext.CLUSTER_SIZE_INT);
 
         // per obj
         this._ubObject.addMat4("matWorld", matIdentity);
@@ -630,9 +630,9 @@ export class ClusteredForwardRenderContext extends RenderContext {
             this._clusterBuffer.addNumber(start);       // the start index of this cluster
             this._clusterBuffer.addNumber(lightCount);       // light count
             this._clusterBuffer.addNumber(decalCount);       // decal count
-            // this._clusterBuffer.addNumber(envProbeCount * 65536 + irrVolCount);        // envprobe (high 2 bytes) and irradiance volume count (low 2 bytes)
-            this._clusterBuffer.addNumber(envProbeCount);
-            this._clusterBuffer.addNumber(irrProbeCount);
+            this._clusterBuffer.addNumber(envProbeCount * 65536 + irrProbeCount);        // envprobe (high 2 bytes) and irradiance volume count (low 2 bytes)
+            // this._clusterBuffer.addNumber(envProbeCount);
+            // this._clusterBuffer.addNumber(irrProbeCount);
             start += lightCount + decalCount + envProbeCount + irrProbeCount;
         }
 
