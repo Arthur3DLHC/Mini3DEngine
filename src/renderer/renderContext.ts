@@ -25,7 +25,7 @@ export class RenderContext {
         this._curDynamicLightIndex = 0;
         this._curDynamicDecalIndex = 0;
         this._curEnvMapIndex = 0;
-        this._curIrradianceVolumeIndex = 0;
+        this._curIrradianceProbeIndex = 0;
     }
     public cameras: Camera[];
     // public skybox: TextureCube | null;
@@ -41,7 +41,7 @@ export class RenderContext {
     public get staticDecalCount() { return this._curStaticDecalIndex; }
     public get dynamicDecalCount() { return this._curDynamicDecalIndex; }
     public get envprobeCount() { return this._curEnvMapIndex; }
-    public get irradianceVolumeCount() { return this._curIrradianceVolumeIndex; }
+    public get irradianceProbeCount() { return this._curIrradianceProbeIndex; }
     public get cameraCount() { return this._curCameraIndex; }
 
     public clear(statics: boolean, dynamics: boolean) {
@@ -51,7 +51,7 @@ export class RenderContext {
             this._curStaticLightIndex = 0;
             this._curStaticDecalIndex = 0;
             this._curEnvMapIndex = 0;
-            this._curIrradianceVolumeIndex = 0;
+            this._curIrradianceProbeIndex = 0;
         }
         if (dynamics) {
             this._curDynamicLightIndex = 0;
@@ -90,8 +90,8 @@ export class RenderContext {
     }
 
     public addIrradianceProbe(irrVol: EnvironmentProbe) {
-        this.irradianceProbes[this._curIrradianceVolumeIndex] = irrVol;
-        this._curIrradianceVolumeIndex++;
+        this.irradianceProbes[this._curIrradianceProbeIndex] = irrVol;
+        this._curIrradianceProbeIndex++;
     }
 
     private _curCameraIndex: number;
@@ -100,5 +100,5 @@ export class RenderContext {
     private _curDynamicLightIndex: number;
     private _curDynamicDecalIndex: number;
     private _curEnvMapIndex: number;
-    private _curIrradianceVolumeIndex: number;
+    private _curIrradianceProbeIndex: number;
 }

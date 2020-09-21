@@ -273,7 +273,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubEnvProbes.update();
 
         this._buffer.seek(0);
-        for (let i = 0; i < this.irradianceVolumeCount; i++) {
+        for (let i = 0; i < this.irradianceProbeCount; i++) {
             const probe = this.irradianceProbes[i];
             let position = new vec3();
             probe.worldTransform.getTranslation(position);
@@ -426,8 +426,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
     public fillUniformBuffersPerView(camera: Camera,
                                     lights: boolean = true,
                                     decals: boolean = true,
-                                    envprobes: boolean = true,
-                                    irrvols: boolean = true,
+                                    reflprobes: boolean = true,
+                                    irrprobes: boolean = true,
                                     useClusters: boolean = false) {
 
         let invView: mat4 = camera.viewTransform.copy();
@@ -500,7 +500,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
         // todo: fill dynamic lights and decals
         // check visibility?
-        this.fillItemsPerView(camera, camPosition, useClusters, lights, decals, envprobes, irrvols);
+        this.fillItemsPerView(camera, camPosition, useClusters, lights, decals, reflprobes, irrprobes);
     }
 
     private fillItemsPerView(camera: Camera, camPosition: vec3, useClusters: boolean, lights: boolean, decals: boolean, envprobes: boolean, irrvols: boolean) {
@@ -618,7 +618,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
             if (irrvols) {
                 // pack envprobe and irrvolume count together
-                for (let iIrr = 0; iIrr < this.irradianceVolumeCount; iIrr++) {
+                for (let iIrr = 0; iIrr < this.irradianceProbeCount; iIrr++) {
                     const irrVol = this.irradianceProbes[iIrr];
                     if (irrVol.visible) {
                         this._idxBuffer.addNumber(iIrr);
