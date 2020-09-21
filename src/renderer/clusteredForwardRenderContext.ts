@@ -260,7 +260,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubDecals.update();
 
         this._buffer.seek(0);
-        for( let i = 0; i < this.envprobeCount; i++) {
+        for( let i = 0; i < this.envProbeCount; i++) {
             const probe = this.envProbes[i];
             let position = new vec3();
             probe.worldTransform.getTranslation(position);
@@ -601,7 +601,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
             }
 
             if (envprobes) {
-                for (let iEnv = 0; iEnv < this.envprobeCount; iEnv++) {
+                for (let iEnv = 0; iEnv < this.envProbeCount; iEnv++) {
                     const envProbe = this.envProbes[iEnv];
                     if (envProbe.visible) {
                         // check visible distance

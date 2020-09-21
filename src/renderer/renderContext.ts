@@ -40,7 +40,7 @@ export class RenderContext {
     public get dynamicLightCount() { return this._curDynamicLightIndex; }
     public get staticDecalCount() { return this._curStaticDecalIndex; }
     public get dynamicDecalCount() { return this._curDynamicDecalIndex; }
-    public get envprobeCount() { return this._curEnvMapIndex; }
+    public get envProbeCount() { return this._curEnvMapIndex; }
     public get irradianceProbeCount() { return this._curIrradianceProbeIndex; }
     public get cameraCount() { return this._curCameraIndex; }
 

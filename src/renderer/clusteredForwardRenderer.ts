@@ -1622,6 +1622,10 @@ export class ClusteredForwardRenderer {
     }
 
     private updateReflectProbes(scene: Scene) {
+        if (this._renderContext.envProbeCount <= 0) {
+            return;
+        }
+
         console.log("updating cubemaps...");
 
         // use a temp envmap array first
@@ -1653,7 +1657,7 @@ export class ClusteredForwardRenderer {
         // resize envmap array
         this._envMapArray.width = this._renderContext.envmapSize;
         this._envMapArray.height = this._renderContext.envmapSize;
-        this._envMapArray.depth = this._renderContext.envprobeCount * 6;
+        this._envMapArray.depth = this._renderContext.envProbeCount * 6;
         this._envMapArray.mipLevels = 6;
         this._envMapArray.format = gl.RGBA;
         this._envMapArray.componentType = gl.HALF_FLOAT;
@@ -1667,7 +1671,7 @@ export class ClusteredForwardRenderer {
 
         tmpEnvMapArray.width = this._renderContext.envmapSize;// * 6;
         tmpEnvMapArray.height = this._renderContext.envmapSize;
-        tmpEnvMapArray.depth = this._renderContext.envprobeCount * 6;
+        tmpEnvMapArray.depth = this._renderContext.envProbeCount * 6;
         tmpEnvMapArray.mipLevels = 1;
         tmpEnvMapArray.format = gl.RGBA;
         tmpEnvMapArray.componentType = gl.HALF_FLOAT;
@@ -1704,7 +1708,7 @@ export class ClusteredForwardRenderer {
             }
 
             // iterate all envprobes
-            for (let ienvprobe = 0; ienvprobe < this._renderContext.envprobeCount; ienvprobe++) {
+            for (let ienvprobe = 0; ienvprobe < this._renderContext.envProbeCount; ienvprobe++) {
                 const envprobe = this._renderContext.envProbes[ienvprobe];
 
                 // use envprobe clipping properties to prevent light leaking.
@@ -1774,7 +1778,7 @@ export class ClusteredForwardRenderer {
 
             GLTextures.setTextureAt(this._envMapArrayUnit, null, gl.TEXTURE_2D_ARRAY);
 
-            cubeProc.processSpecularLD(tmpEnvMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
+            cubeProc.processSpecularLD(tmpEnvMapArray, this._envMapArray, this._renderContext.envProbeCount, this._numReservedTextures);
             // cubeProc.processDiffuse(tmpEnvMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
 
             cubeProc.processSpecularDFG(this._specularDFG);
@@ -1795,6 +1799,10 @@ export class ClusteredForwardRenderer {
      * @param scene 
      */
     private updateIrradianceProbes(scene: Scene) {
+        if (this._renderContext.irradianceProbeCount <= 0) {
+            return;
+        }
+
         console.log("updating irradiance probes...");
 
         if (this._irradianceProbesArray.glTexture) {
@@ -1819,7 +1827,7 @@ export class ClusteredForwardRenderer {
         // resize irradiance probe array
         this._irradianceProbesArray.width = 1;
         this._irradianceProbesArray.height = 1;
-        this._irradianceProbesArray.depth = this._renderContext.irradianceProbeCount;
+        this._irradianceProbesArray.depth = this._renderContext.irradianceProbeCount * 6;
         this._irradianceProbesArray.mipLevels = 1;
         this._irradianceProbesArray.format = gl.RGBA;
         this._irradianceProbesArray.componentType = gl.HALF_FLOAT;
@@ -1832,7 +1840,7 @@ export class ClusteredForwardRenderer {
 
         tmpEnvMapArray.width = this._renderContext.envmapSize;// * 6;
         tmpEnvMapArray.height = this._renderContext.envmapSize;
-        tmpEnvMapArray.depth = this._renderContext.envprobeCount * 6;
+        tmpEnvMapArray.depth = this._renderContext.irradianceProbeCount * 6;
         tmpEnvMapArray.mipLevels = 1;
         tmpEnvMapArray.format = gl.RGBA;
         tmpEnvMapArray.componentType = gl.HALF_FLOAT;
@@ -1938,6 +1946,7 @@ export class ClusteredForwardRenderer {
             // use cubemaps to generate irradiance
             GLTextures.setTextureAt(this._irradianceProbeArrayUnit, null, gl.TEXTURE_2D_ARRAY);
             cubeProc.processIrradiance(tmpEnvMapArray, this._irradianceProbesArray, this._renderContext.irradianceProbeCount, this._numReservedTextures)
+            GLDevice.renderTarget = null;
         }
 
         cubeProc.release();
