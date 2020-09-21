@@ -753,7 +753,8 @@ export class ClusteredForwardRenderer {
             this._renderContext.fillUniformBuffersPerScene();
 
             // todo: bind shaddowmaps only, and render cubemaps
-            this.updateCubemaps(scene);
+            this.updateIrradianceProbes(scene);
+            this.updateReflectProbes(scene);
 
             GLDevice.renderTarget = this._mainFBO[this._currFrameFBOIdx];
 
@@ -1620,7 +1621,7 @@ export class ClusteredForwardRenderer {
         }
     }
 
-    private updateCubemaps(scene: Scene) {
+    private updateReflectProbes(scene: Scene) {
         console.log("updating cubemaps...");
 
         // use a temp envmap array first
@@ -1691,7 +1692,7 @@ export class ClusteredForwardRenderer {
 
         // repeat several times to simulate multiple bounces
         // todo: 分开 irradiance probes 之后，这里就不用做多次反弹了
-        const numBounces = 3;
+        const numBounces = 1;
         for (let ibounce = 0; ibounce < numBounces; ibounce++) {
             // if first bounce, do not use envprobes;
             // other times, use envprobes generate by last time
@@ -1749,7 +1750,8 @@ export class ClusteredForwardRenderer {
                     // will fill all visible lights, decals, envprobes;
                     // is that necessary to render decals ? maybe not;
                     // if not first time, fill envprobes, and set env texture
-                    this._renderContext.fillUniformBuffersPerView(cubefaceCamera, true, false, ibounce !== 0, false, false);
+                    // NOTE: need to apply irradiance probes !
+                    this._renderContext.fillUniformBuffersPerView(cubefaceCamera, true, false, ibounce !== 0, true, false);
 
                     if (scene.background !== undefined) {
                         if (scene.background instanceof TextureCube) {
@@ -1773,7 +1775,7 @@ export class ClusteredForwardRenderer {
             GLTextures.setTextureAt(this._envMapArrayUnit, null, gl.TEXTURE_2D_ARRAY);
 
             cubeProc.processSpecularLD(tmpEnvMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
-            cubeProc.processDiffuse(tmpEnvMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
+            // cubeProc.processDiffuse(tmpEnvMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
 
             cubeProc.processSpecularDFG(this._specularDFG);
         }
@@ -1933,10 +1935,9 @@ export class ClusteredForwardRenderer {
                 }
             }
 
-            // todo: cubemaps to generate irradiance
+            // use cubemaps to generate irradiance
             GLTextures.setTextureAt(this._irradianceProbeArrayUnit, null, gl.TEXTURE_2D_ARRAY);
-
-            cubeProc.processDiffuse(tmpEnvMapArray, this._irradianceProbesArray, this._renderContext.irradianceProbeCount, this._numReservedTextures)
+            cubeProc.processIrradiance(tmpEnvMapArray, this._irradianceProbesArray, this._renderContext.irradianceProbeCount, this._numReservedTextures)
         }
 
         cubeProc.release();

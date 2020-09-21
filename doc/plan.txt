@@ -528,11 +528,14 @@ TODO:       主要类结构
                     为每个 irradiance probe 渲染 cubemap
                     将渲染好的 envmap 做 diffuse filter 输出到此 texture array
 
-                    *** Diffuse filter 中，可以直接用每个面的方向向量作为主卷积方向了；
+                    *** 添加一个 irradiance filter shader，可以直接用每个面的方向向量作为主卷积方向了；
                     *** 在 default pbr shader 中，按照 half life 2 的方式混合 （需要做三次采样），而不是按 cubemap 采样一次；
+                    将渲染 cubemap 里相同的代码合并一下；
+
                 注意：
                     先 update irradiance probes, 再 update envmaps；
                     irradiance probes 做多次反弹，envmaps 就不用了
+                    生成 reflect map 时需要应用 irradiance probes
 
             制作模块化的大一点的场景；
                 FPS：模块化类 DOOM 室内场景, 狭窄一些；Local point lights; 导出，测试 clustered, instancing, occlusion culling 等

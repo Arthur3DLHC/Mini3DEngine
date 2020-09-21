@@ -3,6 +3,7 @@ import function_ibl from "./shaders/shaderIncludes/function_ibl.glsl.js";
 import cubemap_filter_vs from "./shaders/cubemap_filter_vs.glsl.js";
 import cubemap_filter_diffuse_fs from "./shaders/cubemap_filter_diffuse_fs.glsl.js";
 import cubemap_filter_fix_edge from "./shaders/cubemap_filter_fix_edge_fs.glsl.js";
+import cubemap_filter_irradiance_fs from "./shaders/cubemap_filter_irradiance_fs.glsl.js";
 import cubemap_filter_specular_LD_fs from "./shaders/cubemap_filter_specular_LD_fs.glsl.js";
 import cubemap_filter_specular_DFG_fs from "./shaders/cubemap_filter_specular_DFG_fs.glsl.js";
 
@@ -36,8 +37,12 @@ export class CubemapProcessor {
         }
 
         // fragment shader
-        if (GLPrograms.shaderCodes["cubemap_filter_diffuse_fs"] === undefined) {
-            GLPrograms.shaderCodes["cubemap_filter_diffuse_fs"] = cubemap_filter_diffuse_fs;
+        // if (GLPrograms.shaderCodes["cubemap_filter_diffuse_fs"] === undefined) {
+        //     GLPrograms.shaderCodes["cubemap_filter_diffuse_fs"] = cubemap_filter_diffuse_fs;
+        // }
+
+        if (GLPrograms.shaderCodes["cubemap_filter_irradiance_fs"] === undefined) {
+            GLPrograms.shaderCodes["cubemap_filter_irradiance_fs"] = cubemap_filter_irradiance_fs;
         }
 
         if (GLPrograms.shaderCodes["cubemap_filter_specular_LD_fs"] === undefined) {
@@ -224,6 +229,7 @@ export class CubemapProcessor {
         program.release();
     }
 
+    /*
     public processDiffuse(source: Texture2DArray, dest: Texture2DArray, cubemapCount: number, textureUnit: number) {
         // create a temp shader program?
         const diffuseProgram = new ShaderProgram();
@@ -337,5 +343,62 @@ export class CubemapProcessor {
         // delete shader program
         diffuseProgram.release();
         fixEdgeProgram.release();
+    }
+    */
+
+    public processIrradiance(source: Texture2DArray, dest: Texture2DArray, cubemapCount: number, textureUnit: number) {
+        // create a temp shader program?
+        const irradianceProgram = new ShaderProgram();
+        irradianceProgram.name = "cubemap_filter_irradiance";
+        irradianceProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_vs"]);
+        irradianceProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["cubemap_filter_irradiance_fs"]);
+        irradianceProgram.build();
+
+        // envcube 不用 fix edge
+
+        const destFBO = new FrameBuffer();
+
+        // iterate all cubemaps
+        for (let ienvmap = 0; ienvmap < cubemapCount; ienvmap++) {
+            GLPrograms.useProgram(irradianceProgram);
+
+            for (let iface = 0; iface < 6; iface++) {
+                // tmp texture only has 1 mip level; 6 faces
+                destFBO.attachTexture(0, dest, 0, ienvmap * 6 + iface);
+                destFBO.prepare();
+
+                GLDevice.renderTarget = destFBO;
+                // set viewport
+                GLDevice.gl.viewport(0, 0, 1, 1);
+                GLDevice.gl.scissor(0, 0, 1, 1);
+
+                // set render state
+                this._renderStates.apply();
+
+                // set textures
+                GLTextures.setTextureAt(textureUnit, source, GLDevice.gl.TEXTURE_2D_ARRAY);
+
+                // set uniform params and samplers
+                let sourceTexLocation = irradianceProgram.getUniformLocation("s_source");
+                GLDevice.gl.uniform1i(sourceTexLocation, textureUnit);
+
+                // source texture cubemap index
+                const ienvLocation = irradianceProgram.getUniformLocation("u_envmapIdx");
+                GLDevice.gl.uniform1i(ienvLocation, ienvmap);
+
+                const ifaceLocation = irradianceProgram.getUniformLocation("u_faceIdx");
+                GLDevice.gl.uniform1i(ifaceLocation, iface);
+
+                // draw a full screen quad
+                this._rectGeom.draw(0, Infinity, irradianceProgram.attributes);
+            }
+
+            GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D);
+            GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D_ARRAY);
+        }
+        
+        destFBO.release();
+        // delete shader program
+        irradianceProgram.release();
     }
 }
