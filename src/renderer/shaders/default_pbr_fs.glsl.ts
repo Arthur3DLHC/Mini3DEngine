@@ -199,7 +199,7 @@ void main(void)
         isNegative.y = (n.y < 0.0 ? 1 : 0);
         isNegative.z = (n.z < 0.0 ? 1 : 0);
 
-        vec3 nSquared = n * n;
+        vec3 nSquared = clamp(n * n, vec3(0.0), vec3(1.0));
         // n = normalize(n);
         // vec3 nSquared = vec3(n.x * n.x, n.y * n.y, n.z * n.z);
 
@@ -221,8 +221,6 @@ void main(void)
 
         f_diffuse += iblDiffuse / totalWeight;
     }
-
-
 
     uint lightCount = getLightCountInCluster(cluster);
     for(uint i = 0u; i < lightCount; i++) {
@@ -352,8 +350,6 @@ void main(void)
     }
 
     f_emissive = getEmissive();
-
-
 
     // test normal
     // vec3 normal = normalize(ex_worldNormal);
