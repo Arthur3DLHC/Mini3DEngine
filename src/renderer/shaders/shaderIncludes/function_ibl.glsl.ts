@@ -12,10 +12,18 @@ const float PI = 3.1415926536898;
 vec3 getIBLRadianceLambertian(sampler2DArray s, int envmapIdx, vec3 n, vec3 diffuseColor)
 {
     // todo: use HL2 ambient cube
-    vec3 diffuseLight = textureCubeArrayLod(s, n, envmapIdx, DIFFUSE_MIP_LEVEL).rgb;
-
+    int layer = envmapIdx * 6;
+    vec3 nSquared = n * n;
+    ivec3 isNegative = ivec3(lessThan(n, vec3(0.0, 0.0, 0.0)));
+    vec3 diffuseLight = nSquared.x * textureLod(s, vec3(0.5, 0.5, layer + isNegative.x), 0)
+                        + nSquared.y * textureLod(s, vec3(0.5, 0.5, layer + isNegative.y + 2), 0)
+                        + nSquared.z * textureLod(s, vec3(0.5, 0.5, layer + isNegative.z + 4), 0);
     
 
+    // old diffuse environtment map method
+    // vec3 diffuseLight = textureCubeArrayLod(s, n, envmapIdx, DIFFUSE_MIP_LEVEL).rgb;
+
+    // debugging
     // vec3 diffuseLight = textureCubeArrayLod(s, n, envmapIdx, 1.0).rgb;
 
     //#ifndef USE_HDR
