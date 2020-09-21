@@ -310,10 +310,12 @@ void main(void)
     // reflection vector, in world space
     // vec3 reflV = reflect(-v, n);
 
-    getEnvProbeIndicesInCluster(cluster, envmapStart, envmapCount);
-    for (uint i = envmapStart; i < envmapStart + envmapCount; i++) {
+    // todo: use irradiance probes instead
+    // getEnvProbeIndicesInCluster(cluster, envmapStart, envmapCount);
+    getIrrProbeIndicesInCluster(cluster, irrStart, irrCount);
+    for (uint i = irrStart; i < irrStart + irrCount; i++) {
         uint probeIdx = getItemIndexAt(i);
-        EnvProbe probe = u_envProbes.probes[probeIdx];
+        IrradianceProbe probe = u_irrProbes.probes[probeIdx];
 
         // todo: blend by distance to envprobe center position
         // todo: should also add radius weight: the smaller the probe, the stronger the weight.
@@ -326,14 +328,8 @@ void main(void)
 
         // TODO: use ambient cube ?
 
-        int envIdx = int(i - envmapStart);
-        iblDiffuse += getIBLRadianceLambertian(s_envMapArray, envIdx, n, albedoColor) * weight;
-        
-        // IBL specular part
-        // modified: sample specular part in ssr composition pass, not here
-        // vec3 ld = textureCubeArrayLod(s_envMapArray, reflV, layer, roughness * MAX_SPECULAR_MIP_LEVEL).rgb;
-        // vec2 dfg = texture(s_specularDFG, vec2(NdotV, roughness)).rg;
-        // iblSpecular += ld * (f0 * dfg.x + dfg.y) * weight;
+        int envIdx = int(i - irrStart);
+        iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, envIdx, n, albedoColor) * weight;
         
         totalWeight += weight;
     }

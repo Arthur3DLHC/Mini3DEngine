@@ -115,9 +115,9 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
     public static readonly NUM_CLUSTERS_X = 16;
     public static readonly NUM_CLUSTERS_Y = 8;
-    public static readonly NUM_CLUSTERS_Z = 24;
-    public static readonly NUM_CLUSTERS = 16 * 8 * 24;
-    public static readonly CLUSTER_SIZE_INT = 4;
+    public static readonly NUM_CLUSTERS_Z = 12;
+    public static readonly NUM_CLUSTERS = 16 * 8 * 12;
+    public static readonly CLUSTER_SIZE_INT = 5;
 
     public static readonly MAX_LIGHTS = 256;
     public static readonly MAX_DECALS = 512;
@@ -503,7 +503,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this.fillItemsPerView(camera, camPosition, useClusters, lights, decals, reflprobes, irrprobes);
     }
 
-    private fillItemsPerView(camera: Camera, camPosition: vec3, useClusters: boolean, lights: boolean, decals: boolean, envprobes: boolean, irrvols: boolean) {
+    private fillItemsPerView(camera: Camera, camPosition: vec3, useClusters: boolean, lights: boolean, decals: boolean, envprobes: boolean, irrprobes: boolean) {
         // dynamic lights and decals
         if (lights) {
             if (this.dynamicLightCount > 0) {
@@ -562,7 +562,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
             let lightCount = 0;
             let decalCount = 0;
             let envProbeCount = 0;
-            let irrVolCount = 0;
+            let irrProbeCount = 0;
             if (lights) {
                 for (let iLight = 0; iLight < this.staticLightCount; iLight++) {
                     const light = this.staticLights[iLight];
@@ -616,13 +616,13 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 }
             }
 
-            if (irrvols) {
+            if (irrprobes) {
                 // pack envprobe and irrvolume count together
                 for (let iIrr = 0; iIrr < this.irradianceProbeCount; iIrr++) {
-                    const irrVol = this.irradianceProbes[iIrr];
-                    if (irrVol.visible) {
+                    const irrProbe = this.irradianceProbes[iIrr];
+                    if (irrProbe.visible) {
                         this._idxBuffer.addNumber(iIrr);
-                        irrVolCount++;
+                        irrProbeCount++;
                     }
                 }
             }
@@ -632,7 +632,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
             this._clusterBuffer.addNumber(decalCount);       // decal count
             // this._clusterBuffer.addNumber(envProbeCount * 65536 + irrVolCount);        // envprobe (high 2 bytes) and irradiance volume count (low 2 bytes)
             this._clusterBuffer.addNumber(envProbeCount);
-            start += lightCount + decalCount + envProbeCount + irrVolCount;
+            this._clusterBuffer.addNumber(irrProbeCount);
+            start += lightCount + decalCount + envProbeCount + irrProbeCount;
         }
 
         this._ubItemIndices.updateByData(this._tmpIdxData, 0, 0, this._idxBuffer.length);

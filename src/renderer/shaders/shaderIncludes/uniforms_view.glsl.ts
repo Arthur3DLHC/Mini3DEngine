@@ -3,7 +3,7 @@
  */
 export default /** glsl */`
     #define MAX_ITEM_VEC4S_PERVIEW  1024 // (4096 / 4) ivec4s
-    #define NUM_CLUSTERS_PERVIEW    3072 //(16*8*24)
+    #define NUM_CLUSTERS_PERVIEW    1536 //(16 * 8 * 12)
 
     layout (std140, column_major) uniform; 
 
@@ -39,7 +39,8 @@ export default /** glsl */`
         uint start;
         uint lightCount;
         uint decalCount;
-        uint envProbeIrrVolCount;        // 目前是只有 envProbe 数量; 以后可能会 packed, 高16位是 envProbe 数量，低 16 位是 irrvol 数量
+        uint envProbeCount;
+        uint irrProbeCount;
     };
     uniform Clusters
     {

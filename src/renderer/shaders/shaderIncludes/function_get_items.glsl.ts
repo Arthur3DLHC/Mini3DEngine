@@ -25,17 +25,17 @@ export default /** glsl */`
         return u_lights.lights[lightIdx];
     }
 
-    //---------- environment probes -----------
+    //---------- environment (reflection) probes -----------
 
     void getEnvProbeIndicesInCluster(uint cluster, out uint offset, out uint count)
     {
         offset = u_clusters.clusters[cluster].start + u_clusters.clusters[cluster].lightCount + u_clusters.clusters[cluster].decalCount;
-        count = u_clusters.clusters[cluster].envProbeIrrVolCount;
+        count = u_clusters.clusters[cluster].envProbeCount;
     }
 
     uint getEnvProbeCountInCluster(uint cluster)
     {
-        return u_clusters.clusters[cluster].envProbeIrrVolCount;
+        return u_clusters.clusters[cluster].envProbeCount;
     }
 
     EnvProbe getEnvProbeInCluster(uint cluster, uint iProbe)
@@ -44,5 +44,27 @@ export default /** glsl */`
         uint offset = u_clusters.clusters[cluster].start + u_clusters.clusters[cluster].lightCount + u_clusters.clusters[cluster].decalCount + iProbe;
         uint probeIdx = getItemIndexAt(offset);
         return u_envProbes.probes[probeIdx];
+    }
+
+    //---------- irradiance probes ----------
+    void getIrrProbeIndicesInCluster(uint cluster, out uint offset, out uint count)
+    {
+        offset = u_clusters.clusters[cluster].start + u_clusters.clusters[cluster].lightCount
+         + u_clusters.clusters[cluster].decalCount + u_clusters.clusters[cluster].envProbeCount;
+        count = u_clusters.clusters[cluster].irrProbeCount;
+    }
+
+    uint getIrrProbeCountInCluster(uint cluster)
+    {
+        return u_clusters.clusters[cluster].irrProbeCount;
+    }
+
+    EnvProbe getIrrProbeInCluster(uint cluster, uint iProbe)
+    {
+        // 每次都算有点浪费性能
+        uint offset = u_clusters.clusters[cluster].start + u_clusters.clusters[cluster].lightCount + u_clusters.clusters[cluster].decalCount
+         + getEnvProbeCountInCluster(cluster) + iProbe;
+        uint probeIdx = getItemIndexAt(offset);
+        return u_irrProbes.probes[probeIdx];
     }
 `;
