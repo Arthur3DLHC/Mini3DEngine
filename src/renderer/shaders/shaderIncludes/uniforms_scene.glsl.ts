@@ -52,7 +52,7 @@ export default /** glsl */`
     };
     uniform IrrProbes
     {
-        IrradianceProbe volumes[MAX_IRRPROBES_PERSCENE];
+        IrradianceProbe probes[MAX_IRRPROBES_PERSCENE];
     } u_irrProbes;
 
     // dithering pattern?

@@ -38,8 +38,7 @@ import { Camera } from "../scene/cameras/camera.js";
 import { BaseLight } from "../scene/lights/baseLight.js";
 import { Mesh } from "../scene/mesh.js";
 import { Decal } from "../scene/decal.js";
-import { IrradianceVolume } from "../scene/irradianceVolume.js";
-import { EnvironmentProbe } from "../scene/environmentProbe.js";
+import { EnvironmentProbe, EnvironmentProbeType } from "../scene/environmentProbe.js";
 import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
 import { GLPrograms } from "../WebGLResources/glPrograms.js";
 import { RenderStateSet } from "./renderStateSet.js";
@@ -399,7 +398,7 @@ export class ClusteredForwardRenderer {
     private _boundingBoxWireframeGeom: BoxWireframeGeometry;
     private _boundingSphereWireframeGeom: SphereWireframeGeometry;
 
-    // todo: system textures: shadowmap atlas, decal atlas, envMap array, irradiance volumes
+    // todo: system textures: shadowmap atlas, decal atlas, envMap array, irradiance probes
     // todo: system texture unit numbers
     // private _shadowmapAtlasStaticUnit: GLenum;
     private _shadowmapAtlasUnit: GLenum;
@@ -607,15 +606,15 @@ export class ClusteredForwardRenderer {
                 if (decal.isStatic === statics) {
                     this._renderContext.addDecal(decal);
                 }
-            } else if (object instanceof IrradianceVolume) {
-                if (statics) {
-                    // irradiance volumes are always static
-                    this._renderContext.addIrradianceVolume(object as IrradianceVolume);
-                }
             } else if (object instanceof EnvironmentProbe) {
                 if (statics) {
                     // environment probes are always static
-                    this._renderContext.addEnvironmentProbe(object as EnvironmentProbe);
+                    const envProbe = object as EnvironmentProbe;
+                    if (envProbe.probeType === EnvironmentProbeType.Reflection) {
+                        this._renderContext.addEnvironmentProbe(envProbe);
+                    } else {
+                        this._renderContext.addIrradianceProbe(envProbe);
+                    }
                 }
             }
             this._tmpRenderList.clear();
@@ -764,7 +763,7 @@ export class ClusteredForwardRenderer {
             // shadowmap atlas (static);
             // decal atlas;
             // envProbes;
-            // irradiance volumes;
+            // irradiance probes;
             // GLTextures.setTextureAt(0, )
             this._currentScene = scene;
         }
@@ -1803,7 +1802,80 @@ export class ClusteredForwardRenderer {
 
         const gl = GLDevice.gl;
 
+        GLTextures.setTextureAt(this._shadowmapAtlasUnit, this._shadowmapAtlas.texture);
+        GLTextures.setTextureAt(this._irradianceProbeArrayUnit, null, gl.TEXTURE_2D_ARRAY);
 
+        const cubefaceCamera = new Camera();
+        cubefaceCamera.autoUpdateTransform = false;
+
+        cubefaceCamera.projTransform = mat4.perspective(90, 1, 0.01, 1);
+        cubefaceCamera.viewport = new vec4([0, 0, this._renderContext.envmapSize, this._renderContext.envmapSize]);
+
+        const worldPosition = new vec3();
+        const matWorldToProbe = new mat4();
+        const matViewProj = new mat4();
+
+        // resize irradiance probe array
+        this._irradianceProbesArray.width = 1;
+        this._irradianceProbesArray.height = 1;
+        this._irradianceProbesArray.depth = this._renderContext.irradianceVolumeCount;
+        this._irradianceProbesArray.mipLevels = 1;
+        this._irradianceProbesArray.format = gl.RGBA;
+        this._irradianceProbesArray.componentType = gl.HALF_FLOAT;
+        this._irradianceProbesArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.NEAREST, gl.NEAREST);
+
+        this._irradianceProbesArray.create();
+
+        // use a temp texturearray and fbo to render cubemaps
+        const tmpEnvMapArray = new Texture2DArray();
+
+        tmpEnvMapArray.width = this._renderContext.envmapSize;// * 6;
+        tmpEnvMapArray.height = this._renderContext.envmapSize;
+        tmpEnvMapArray.depth = this._renderContext.envprobeCount * 6;
+        tmpEnvMapArray.mipLevels = 1;
+        tmpEnvMapArray.format = gl.RGBA;
+        tmpEnvMapArray.componentType = gl.HALF_FLOAT;
+        tmpEnvMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
+        tmpEnvMapArray.create();
+
+        const envMapDepthTexture = new Texture2D();
+
+        envMapDepthTexture.width = this._renderContext.envmapSize;// * 6;
+        envMapDepthTexture.height = this._renderContext.envmapSize;
+        envMapDepthTexture.depth = 1;
+        envMapDepthTexture.isShadowMap = true;
+        envMapDepthTexture.format = gl.DEPTH_COMPONENT;               // NOTE: not DEPTH but DEPTH_COMPONENT !!!!
+        envMapDepthTexture.componentType = gl.UNSIGNED_SHORT;         // use a 16 bit depth buffer for env cube
+
+        envMapDepthTexture.create();
+
+        const envMapFBO = new FrameBuffer();
+        envMapFBO.depthStencilTexture = envMapDepthTexture;
+
+        const cubeProc = new CubemapProcessor();
+
+        // repeat several times to simulate multiple bounces
+        // todo: 分开 irradiance probes 之后，这里就不用做多次反弹了
+        const numBounces = 3;
+
+        for (let ibounce = 0; ibounce < numBounces; ibounce++) {
+            // if first bounce, do not use irradiance probes;
+            // other times, use irradiance probes generate by last time
+            if (ibounce === 0) {
+                GLTextures.setTextureAt(this._irradianceProbeArrayUnit, null, gl.TEXTURE_2D_ARRAY);
+            } else {
+                GLTextures.setTextureAt(this._irradianceProbeArrayUnit, this._irradianceProbesArray, gl.TEXTURE_2D_ARRAY);
+            }
+
+            // todo: iterate all irradiance probes
+
+        }
+
+        cubeProc.release();
+
+        envMapFBO.release();
+        tmpEnvMapArray.release();
+        envMapDepthTexture.release();
 
         console.log("done.");
     }

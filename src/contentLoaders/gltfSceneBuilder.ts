@@ -32,7 +32,7 @@ import { KHR_Lights_Punctual } from "./gltfExtensions.js";
 import { DirectionalLight } from "../scene/lights/directionalLight.js";
 import { PointLight } from "../scene/lights/pointLight.js";
 import { SpotLight } from "../scene/lights/spotLight.js";
-import { EnvironmentProbe } from "../scene/environmentProbe.js";
+import { EnvironmentProbe, EnvironmentProbeType } from "../scene/environmentProbe.js";
 import { DirectionalLightShadow } from "../scene/lights/directionalLightShadow.js";
 
 export class GLTFSceneBuilder {
@@ -260,6 +260,7 @@ export class GLTFSceneBuilder {
         const extras = nodeDef.extras;
 
         const envProbe = new EnvironmentProbe();
+        envProbe.probeType = EnvironmentProbeType.Reflection;
         if (extras.clippingStart !== undefined) envProbe.clippingStart = extras.clippingStart;
         if (extras.clippingEnd !== undefined) envProbe.clippingEnd = extras.clippingEnd;
         
@@ -285,6 +286,7 @@ export class GLTFSceneBuilder {
             // if resolution is 1x1x1, return one envprobe object
             const envProbe = new EnvironmentProbe();
             envProbe.isStatic = true;
+            envProbe.probeType = EnvironmentProbeType.Irradiance;
             envProbe.autoUpdateTransform = false;
             if (extras.clippingStart !== undefined) envProbe.clippingStart = extras.clippingStart;
             if (extras.clippingEnd !== undefined) envProbe.clippingEnd = extras.clippingEnd;
@@ -301,6 +303,7 @@ export class GLTFSceneBuilder {
                     for (let i = 0; i < resX; i++) {
                         const envProbe = new EnvironmentProbe();
                         envProbe.isStatic = true;
+                        envProbe.probeType = EnvironmentProbeType.Irradiance;
                         envProbe.autoUpdateTransform = false;
                         if (extras.clippingStart !== undefined) envProbe.clippingStart = extras.clippingStart;
                         if (extras.clippingEnd !== undefined) envProbe.clippingEnd = extras.clippingEnd;

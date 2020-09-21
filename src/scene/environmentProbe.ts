@@ -8,9 +8,15 @@ import { BoxWireframeGeometry } from "../geometry/common/boxWireframeGeometry.js
 import { Material } from "./materials/material.js";
 import { StandardPBRMaterial } from "./materials/standardPBRMaterial.js";
 
+export enum EnvironmentProbeType {
+    Reflection,
+    Irradiance,
+}
+
 export class EnvironmentProbe extends Object3D {
     public constructor() {
         super();
+        this.probeType = EnvironmentProbeType.Reflection;
         this.visibleDistance = 20;
         this.clippingStart = 0.01;
         this.clippingEnd = 20;
@@ -20,6 +26,9 @@ export class EnvironmentProbe extends Object3D {
 
         this.debugDraw = false;
     }
+
+    public probeType: EnvironmentProbeType;
+
     // the pose and location is defined by transform matrix.
     /**
      * the max visible distance of decal

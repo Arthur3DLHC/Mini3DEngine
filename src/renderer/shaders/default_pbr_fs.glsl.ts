@@ -297,7 +297,7 @@ void main(void)
     // test texcoord
     // o.color = vec4(ex_texcoord, 1, 1);
 
-    // todo: irradiance volumes
+    // todo: irradiance probes
 
     // todo: env maps: image based lighting
     uint envmapStart = 0u;

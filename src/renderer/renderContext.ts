@@ -1,7 +1,6 @@
 import { Camera } from "../scene/cameras/camera.js";
 import { BaseLight } from "../scene/lights/baseLight.js";
 import { Decal } from "../scene/decal.js";
-import { IrradianceVolume } from "../scene/irradianceVolume.js";
 import { EnvironmentProbe } from "../scene/environmentProbe.js";
 import { TextureCube } from "../WebGLResources/textures/textureCube.js";
 
@@ -18,7 +17,7 @@ export class RenderContext {
         this.dynamicLights = [];
         this.dynamicDecals = [];
         this.envProbes = [];
-        this.irradianceVolumes = [];
+        this.irradianceProbes = [];
 
         this._curCameraIndex = 0;
         this._curStaticLightIndex = 0;
@@ -35,7 +34,7 @@ export class RenderContext {
     public dynamicLights: BaseLight[];
     public dynamicDecals: Decal[];
     public envProbes: EnvironmentProbe[];
-    public irradianceVolumes: IrradianceVolume[];
+    public irradianceProbes: EnvironmentProbe[];
 
     public get staticLightCount() { return this._curStaticLightIndex; }
     public get dynamicLightCount() { return this._curDynamicLightIndex; }
@@ -90,8 +89,8 @@ export class RenderContext {
         this._curEnvMapIndex++;
     }
 
-    public addIrradianceVolume(irrVol: IrradianceVolume) {
-        this.irradianceVolumes[this._curIrradianceVolumeIndex] = irrVol;
+    public addIrradianceProbe(irrVol: EnvironmentProbe) {
+        this.irradianceProbes[this._curIrradianceVolumeIndex] = irrVol;
         this._curIrradianceVolumeIndex++;
     }
 

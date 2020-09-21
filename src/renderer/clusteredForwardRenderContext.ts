@@ -126,6 +126,9 @@ export class ClusteredForwardRenderContext extends RenderContext {
     public static readonly MAX_ITEMS = 4096;
     public static readonly MAX_BONES = 256;
 
+    /**
+     * cube texture face size for reflection and irradiance probes
+     */
     public envmapSize: number = 64;
 
     private setUniformBufferLayouts() {
@@ -138,7 +141,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubLights.addUniform("lights", ClusteredForwardRenderContext.MAX_LIGHTS * ClusteredForwardRenderContext.LIGHT_SIZE_FLOAT);
         this._ubDecals.addUniform("decals", ClusteredForwardRenderContext.MAX_DECALS * ClusteredForwardRenderContext.DECAL_SIZE_FLOAT);
         this._ubEnvProbes.addUniform("probes", ClusteredForwardRenderContext.MAX_ENVPROBES * ClusteredForwardRenderContext.ENVPROBE_SIZE_FLOAT);
-        this._ubIrrProbes.addUniform("volumes", ClusteredForwardRenderContext.MAX_IRRPROBES * ClusteredForwardRenderContext.IRRVOL_SIZE_FLOAT);
+        this._ubIrrProbes.addUniform("probes", ClusteredForwardRenderContext.MAX_IRRPROBES * ClusteredForwardRenderContext.IRRVOL_SIZE_FLOAT);
         this._ubDitherPattern.addMat4("randX", matIdentity);
         this._ubDitherPattern.addMat4("randY", matIdentity);
 
@@ -237,7 +240,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         // todo: fill all static lights in scene
         // all static decals
         // all envprobes
-        // all irradiance volumes
+        // all irradiance probes
         // pay attention to uniform alignment;
 
         this._buffer.seek(0);
@@ -271,14 +274,15 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
         this._buffer.seek(0);
         for (let i = 0; i < this.irradianceVolumeCount; i++) {
-            const vol = this.irradianceVolumes[i];
-            this._buffer.addArray(vol.worldTransform.values);
-            const boxMin = vol.atlasLocation.minPoint.copy();
-            const boxMax = vol.atlasLocation.maxPoint.copy();
-            this._buffer.addArray(boxMin.values);
-            this._buffer.addArray(boxMax.values);
+            const probe = this.irradianceProbes[i];
+            let position = new vec3();
+            probe.worldTransform.getTranslation(position);
+            this._buffer.addArray(position.values);
+            // todo: pass in size? no need for texture index, because it == probe index
+            // the envprobe has unique scaling.
+            this._buffer.addNumber(probe.radius);
         }
-        this._ubIrrProbes.setUniform("volumes", this._tmpData, this._buffer.length);
+        this._ubIrrProbes.setUniform("probes", this._tmpData, this._buffer.length);
         this._ubIrrProbes.update();
 
         // dither pattern
@@ -526,7 +530,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
             }
         }
 
-        // envprobes and irradiance volumes are always static
+        // envprobes and irradiance probes are always static
         // test: add all item indices, and assume only one cluster
         let start = 0;
         this._clusterBuffer.seek(0);
@@ -615,7 +619,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
             if (irrvols) {
                 // pack envprobe and irrvolume count together
                 for (let iIrr = 0; iIrr < this.irradianceVolumeCount; iIrr++) {
-                    const irrVol = this.irradianceVolumes[iIrr];
+                    const irrVol = this.irradianceProbes[iIrr];
                     if (irrVol.visible) {
                         this._idxBuffer.addNumber(iIrr);
                         irrVolCount++;
