@@ -59,7 +59,7 @@ export default /** glsl */`
         return u_clusters.clusters[cluster].irrProbeCount;
     }
 
-    EnvProbe getIrrProbeInCluster(uint cluster, uint iProbe)
+    IrradianceProbe getIrrProbeInCluster(uint cluster, uint iProbe)
     {
         // 每次都算有点浪费性能
         uint offset = u_clusters.clusters[cluster].start + u_clusters.clusters[cluster].lightCount + u_clusters.clusters[cluster].decalCount

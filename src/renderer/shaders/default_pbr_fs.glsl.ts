@@ -300,8 +300,8 @@ void main(void)
     // todo: irradiance probes
 
     // todo: env maps: image based lighting
-    uint envmapStart = 0u;
-    uint envmapCount = 0u;
+    uint irrStart = 0u;
+    uint irrCount = 0u;
     // float cubeUVScale = 1.0 / 6.0;
 
     vec3 iblDiffuse = vec3(0.0);

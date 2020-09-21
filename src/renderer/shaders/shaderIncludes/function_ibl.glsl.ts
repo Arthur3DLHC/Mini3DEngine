@@ -15,9 +15,9 @@ vec3 getIBLRadianceLambertian(sampler2DArray s, int envmapIdx, vec3 n, vec3 diff
     int layer = envmapIdx * 6;
     vec3 nSquared = n * n;
     ivec3 isNegative = ivec3(lessThan(n, vec3(0.0, 0.0, 0.0)));
-    vec3 diffuseLight = nSquared.x * textureLod(s, vec3(0.5, 0.5, layer + isNegative.x), 0)
-                        + nSquared.y * textureLod(s, vec3(0.5, 0.5, layer + isNegative.y + 2), 0)
-                        + nSquared.z * textureLod(s, vec3(0.5, 0.5, layer + isNegative.z + 4), 0);
+    vec3 diffuseLight = nSquared.x * textureLod(s, vec3(0.5, 0.5, float(layer + isNegative.x)), 0.0).rgb
+                        + nSquared.y * textureLod(s, vec3(0.5, 0.5, float(layer + isNegative.y + 2)), 0.0).rgb
+                        + nSquared.z * textureLod(s, vec3(0.5, 0.5, float(layer + isNegative.z + 4)), 0.0).rgb;
     
 
     // old diffuse environtment map method
