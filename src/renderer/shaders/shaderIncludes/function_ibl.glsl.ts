@@ -4,8 +4,8 @@
  * https://blog.csdn.net/i_dovelemon/article/details/79251920
  */
 export default /** glsl */`
-const float MAX_SPECULAR_MIP_LEVEL = 4.0;       // specular mip level: 0 ~ 4 include 4
-const float DIFFUSE_MIP_LEVEL = 5.0;
+const float MAX_SPECULAR_MIP_LEVEL = 5.0;       // specular mip level: 0 ~ 5 include 5
+const float DIFFUSE_MIP_LEVEL = 5.0;            // not used
 const float PI = 3.1415926536898;
 
 // diffuseColor is (1 - F) * (1 - metalic)

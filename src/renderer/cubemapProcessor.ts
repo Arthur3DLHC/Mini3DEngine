@@ -75,8 +75,8 @@ export class CubemapProcessor {
     private _rectGeom: PlaneGeometry;
     // private _rectTransform: mat4;
 
-    public static readonly maxSpecularMipLevel = 4;
-    public static readonly diffuseMipLevel = 5;
+    public static readonly maxSpecularMipLevel = 5;
+    public static readonly diffuseMipLevel = 5;         // not used
 
     public processSpecularLD(source: Texture2DArray, dest: Texture2DArray, cubemapCount: number, textureUnit: number) {
         // create a temp shader program
@@ -107,7 +107,7 @@ export class CubemapProcessor {
             GLPrograms.useProgram(specLDProgram);
             for (let iface = 0; iface < 6; iface++) {
 
-                // use 0 ~ 4 level as specular (64x64 to 8x8)
+                // use 0 ~ 5 level as specular
                 // with different roughness
                 for (let ilevel = 0; ilevel <= CubemapProcessor.maxSpecularMipLevel; ilevel++) {
                     // bind texture layer to fbo
@@ -154,6 +154,8 @@ export class CubemapProcessor {
             GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D);
             GLTextures.setTextureAt(textureUnit, null, GLDevice.gl.TEXTURE_2D_ARRAY);
     
+            // fix the edges
+
             GLPrograms.useProgram(fixEdgeProgram);
             for (let iface = 0; iface < 6; iface++) {
     
