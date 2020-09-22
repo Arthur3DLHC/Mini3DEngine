@@ -1669,29 +1669,19 @@ export class ClusteredForwardRenderer {
 
         // repeat several times to simulate multiple bounces
         // todo: 分开 irradiance probes 之后，这里就不用做多次反弹了
-        const numBounces = 1;
-        for (let ibounce = 0; ibounce < numBounces; ibounce++) {
-            // if first bounce, do not use envprobes;
-            // other times, use envprobes generate by last time
+        GLTextures.setTextureAt(this._irradianceProbeArrayUnit, this._irradianceProbesArray, gl.TEXTURE_2D_ARRAY);
+        GLTextures.setTextureAt(this._envMapArrayUnit, null, gl.TEXTURE_2D_ARRAY);
 
-            if  (ibounce === 0) {
-                GLTextures.setTextureAt(this._envMapArrayUnit, null, gl.TEXTURE_2D_ARRAY);
-            } else {
-                GLTextures.setTextureAt(this._envMapArrayUnit, this._envMapArray, gl.TEXTURE_2D_ARRAY);
-            }
+        const probeCount = this._renderContext.envProbeCount;
+        const probes = this._renderContext.envProbes;
 
-            const probeCount = this._renderContext.envProbeCount;
-            const probes = this._renderContext.envProbes;
+        // iterate all envprobes
+        this.renderSceneToProbe(probeCount, probes, tmpEnvMapArray, false, true, scene);
 
-            // iterate all envprobes
-            this.renderSceneToProbe(probeCount, probes, tmpEnvMapArray, ibounce, scene);
-            // todo: downsample all cubemaps and generate mipmaps
+        GLTextures.setTextureAt(this._envMapArrayUnit, null, gl.TEXTURE_2D_ARRAY);
 
-            GLTextures.setTextureAt(this._envMapArrayUnit, null, gl.TEXTURE_2D_ARRAY);
-
-            cubeProc.processSpecularLD(tmpEnvMapArray, this._envMapArray, this._renderContext.envProbeCount, this._numReservedTextures);
-            // cubeProc.processDiffuse(tmpEnvMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
-        }
+        cubeProc.processSpecularLD(tmpEnvMapArray, this._envMapArray, this._renderContext.envProbeCount, this._numReservedTextures);
+        // cubeProc.processDiffuse(tmpEnvMapArray, this._envMapArray, this._renderContext.envprobeCount, this._numReservedTextures);
         cubeProc.processSpecularDFG(this._specularDFG);
 
         cubeProc.release();
@@ -1701,7 +1691,7 @@ export class ClusteredForwardRenderer {
         console.log("done.");
     }
 
-    private renderSceneToProbe(probeCount: number, probes: EnvironmentProbe[], tmpEnvMapArray: Texture2DArray, ibounce: number, scene: Scene) {
+    private renderSceneToProbe(probeCount: number, probes: EnvironmentProbe[], tmpEnvMapArray: Texture2DArray, useEnvmaps: boolean, useIrrmaps: boolean, scene: Scene) {
         const gl: WebGL2RenderingContext = GLDevice.gl; 
         
         const cubefaceCamera = new Camera();
@@ -1777,7 +1767,7 @@ export class ClusteredForwardRenderer {
                 // is that necessary to render decals ? maybe not;
                 // if not first time, fill envprobes, and set env texture
                 // NOTE: need to apply irradiance probes !
-                this._renderContext.fillUniformBuffersPerView(cubefaceCamera, true, false, ibounce !== 0, true, false);
+                this._renderContext.fillUniformBuffersPerView(cubefaceCamera, true, false, useEnvmaps, useIrrmaps, false);
 
                 if (scene.background !== undefined) {
                     if (scene.background instanceof TextureCube) {
@@ -1860,7 +1850,7 @@ export class ClusteredForwardRenderer {
                 GLTextures.setTextureAt(this._irradianceProbeArrayUnit, this._irradianceProbesArray, gl.TEXTURE_2D_ARRAY);
             }
 
-            this.renderSceneToProbe(this._renderContext.irradianceProbeCount, this._renderContext.irradianceProbes, tmpEnvMapArray, ibounce, scene);
+            this.renderSceneToProbe(this._renderContext.irradianceProbeCount, this._renderContext.irradianceProbes, tmpEnvMapArray, false, ibounce != 0, scene);
 
             // todo: iterate all irradiance probes
             
