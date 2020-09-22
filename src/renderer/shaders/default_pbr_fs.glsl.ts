@@ -166,13 +166,9 @@ void main(void)
     // float cubeUVScale = 1.0 / 6.0;
 
     vec3 iblDiffuse = vec3(0.0);
-    // vec3 iblSpecular = vec3(0.0);
     float totalWeight = 0.0;
-    // reflection vector, in world space
-    // vec3 reflV = reflect(-v, n);
 
-    // todo: use irradiance probes instead
-    // getEnvProbeIndicesInCluster(cluster, envmapStart, envmapCount);
+    // ambient light: irradiance probes
     getIrrProbeIndicesInCluster(cluster, irrStart, irrCount);
     for (uint i = irrStart; i < irrStart + irrCount; i++) {
         uint probeIdx = getItemIndexAt(i);
@@ -190,26 +186,8 @@ void main(void)
         // TODO: use ambient cube ?
 
         int envmapIdx = int(i - irrStart);
-
-        int layer = envmapIdx * 6;
-
-        // ivec3 isNegative = ivec3(lessThan(n, vec3(0.0, 0.0, 0.0)));
-        ivec3 isNegative;
-        isNegative.x = (n.x < 0.0 ? 1 : 0);
-        isNegative.y = (n.y < 0.0 ? 1 : 0);
-        isNegative.z = (n.z < 0.0 ? 1 : 0);
-
-        vec3 nSquared = clamp(n * n, vec3(0.0), vec3(1.0));
-        // n = normalize(n);
-        // vec3 nSquared = vec3(n.x * n.x, n.y * n.y, n.z * n.z);
-
-        vec3 diffuseLight = nSquared.x * textureLod(s_irrProbeArray, vec3(0.5, 0.5, float(layer + isNegative.x)), 0.0).rgb
-            + nSquared.y * textureLod(s_irrProbeArray, vec3(0.5, 0.5, float(layer + isNegative.y + 2)), 0.0).rgb
-            + nSquared.z * textureLod(s_irrProbeArray, vec3(0.5, 0.5, float(layer + isNegative.z + 4)), 0.0).rgb;
-
-        iblDiffuse += diffuseLight * albedoColor * weight;
-
-        // iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, envmapIdx, n, albedoColor) * weight;
+        
+        iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, envmapIdx, n, albedoColor) * weight;
         
         totalWeight += weight;
     }
