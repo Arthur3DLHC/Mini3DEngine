@@ -18,12 +18,17 @@ for light in bpy.data.lights:
 for obj in bpy.data.objects:
     if obj.type == "LIGHT_PROBE":
         probe = obj.data
-        if probe.type == "GRID":
+        obj["clippingStart"] = probe.clip_start
+        obj["clippingEnd"] = probe.clip_end
+        obj["radius"] = probe.influence_distance
+        if probe.type == "CUBEMAP":
+            print("processing cubemap probe: " + obj.name)
+            obj["extType"] = "environmentProbe"
+        elif probe.type == "GRID":
             print("processing irradiance volume: " + obj.name)
             obj["extType"] = "irradianceVolume"
             obj["resolutionX"] = probe.grid_resolution_x
             obj["resolutionY"] = probe.grid_resolution_z    # swap y and z ?
             obj["resolutionZ"] = probe.grid_resolution_y
-            obj["clippingStart"] = probe.clip_start
-            obj["clippingEnd"] = probe.clip_end
+
 
