@@ -30,7 +30,7 @@ window.onload = () => {
     const scene = new Scene();
     const camera = new PerspectiveCamera();
     camera.aspect = canvas.width / canvas.height;
-    camera.far = 20;
+    camera.far = 40;
     camera.localTransform.fromTranslation(new vec3([0, 0, 2]));
     camera.autoUpdateTransform = false;
 
@@ -167,7 +167,7 @@ window.onload = () => {
         skyboxTexture.samplerState = new SamplerState();
         skyboxTexture.upload();
         scene.background = skyboxTexture;
-        scene.backgroundIntensity = 10;
+        scene.backgroundIntensity = 1;
         
         // gltf asset should has been already loaded?
         console.log("building gltf scene...");
