@@ -186,18 +186,6 @@ window.onload = () => {
 
     });
 
-    function addEnvProbe(name: string, size: number, position: vec3, scene: Scene) {
-        const probe = new EnvironmentProbe();
-        probe.name = name;
-        const probesrt = new SRTTransform();
-        probesrt.scaling.x = size; probesrt.scaling.y = size; probesrt.scaling.z = size;
-        position.copy(probesrt.translation);
-        probesrt.update();
-        probesrt.transform.copy(probe.localTransform);
-    
-        scene.attachChild(probe);
-    }
-
     function prepareGLTFScene(gltfNode: Object3D) {
         gltfNode.isStatic = true;
         
@@ -208,7 +196,7 @@ window.onload = () => {
         }
         else if (gltfNode instanceof EnvironmentProbe) {
             const envProbe = gltfNode as EnvironmentProbe;
-            envProbe.debugDraw = true;
+            // envProbe.debugDraw = true;
         }
 
         for (const child of gltfNode.children) {

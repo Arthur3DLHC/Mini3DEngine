@@ -1,9 +1,10 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset, Object3D, BoundingRenderModes } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset, Object3D, BoundingRenderModes, EnvironmentProbeType } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
 import { FirstPersonViewBehavior } from "../common/behaviors/firstPersonViewBehavior.js";
 import { SkinMesh } from "../../src/scene/skinMesh.js";
+import { SceneHelper } from "../common/sceneHelper.js";
 
 /**
  * Load gltf files using promise
@@ -76,7 +77,8 @@ window.onload = () => {
     scene.attachChild(dirLight01);
     
     // test environment probes
-    addEnvProbe("envProbe01", 6, new vec3([ 0, 0, 0]), scene);
+    SceneHelper.addEnvProbe("envProbe01", 6, new vec3([ 0, 0, 0]), scene, EnvironmentProbeType.Reflection);
+    SceneHelper.addEnvProbe("irrProbe01", 6, new vec3([ 0, 0, 0]), scene, EnvironmentProbeType.Irradiance);
 
     const infoPanel: HTMLDivElement = document.getElementById("infoPanel") as HTMLDivElement;
 
@@ -163,18 +165,6 @@ window.onload = () => {
 
 
     });
-
-    function addEnvProbe(name: string, size: number, position: vec3, scene: Scene) {
-        const probe = new EnvironmentProbe();
-        probe.name = name;
-        const probesrt = new SRTTransform();
-        probesrt.scaling.x = size; probesrt.scaling.y = size; probesrt.scaling.z = size;
-        position.copy(probesrt.translation);
-        probesrt.update();
-        probesrt.transform.copy(probe.localTransform);
-    
-        scene.attachChild(probe);
-    }
 
     function prepareGLTFScene(gltfNode: Object3D) {
         // gltfNode.isStatic = true;
