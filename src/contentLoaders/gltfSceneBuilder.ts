@@ -111,34 +111,7 @@ export class GLTFSceneBuilder {
         if (instancing) {
             // todo: sum mesh reference count; split by instancing groups?
             // if is skinned mesh, do not use instancing;
-            for (const nodeDef of gltf.gltf.nodes) {
-                if (nodeDef.mesh !== undefined) {
-                    if (this._meshReferences[nodeDef.mesh] > 0) {   // is an instanced mesh
-                        // get or add the instance groups of this mesh
-                        let instGroupCount = this._instancedMeshGroupCounts[nodeDef.mesh];
-                        if (instGroupCount === undefined) {
-                            instGroupCount = new Map<number, number>();
-                            this._instancedMeshGroupCounts[nodeDef.mesh] = instGroupCount;
-                        }
-
-                        // fetch instance group id from gltf, or use default
-                        let instGroupId: number = 0;
-                        if (nodeDef.extras.instanceGroup !== undefined) {
-                            instGroupId = nodeDef.extras.instanceGroup;
-                        }
-
-                        // get or increase the instance count of the node's group
-                        let instCount = instGroupCount.get(instGroupId);
-                        if (instCount === undefined) {
-                            instCount = 1;
-                            instGroupCount.set(instGroupId, instCount);
-                        } else {
-                            instGroupCount.set(instGroupId, instCount + 1);
-                        }
-                    }
-                    this._meshReferences[nodeDef.mesh]++;
-                }
-            }
+            this.gatherInstances(gltf.gltf.nodes);
         }
 
         // set a temp node array first? for joints?
@@ -175,6 +148,44 @@ export class GLTFSceneBuilder {
         return scene;
     }
 
+    private gatherInstances(nodes: Node[]) {
+        
+        for (const nodeDef of nodes) {
+            if (nodeDef.mesh !== undefined) {
+                if (this._meshReferences[nodeDef.mesh] > 0) { // is an instanced mesh
+                    if (this._instancedMeshGroups[nodeDef.mesh] === undefined) {
+                        this._instancedMeshGroups[nodeDef.mesh] = new Map<number, Object3D>();
+                    }
+
+                    // get or add the instance groups of this mesh
+                    let instGroupCount = this._instancedMeshGroupCounts[nodeDef.mesh];
+                    if (instGroupCount === undefined) {
+                        instGroupCount = new Map<number, number>();
+                        this._instancedMeshGroupCounts[nodeDef.mesh] = instGroupCount;
+                    }
+
+                    // fetch instance group id from gltf, or use default
+                    let instGroupId: number = 0;
+                    if (nodeDef.extras !== undefined) {
+                        if (nodeDef.extras.instanceGroup !== undefined) {
+                            instGroupId = nodeDef.extras.instanceGroup;
+                        }
+                    }
+
+                    // get or increase the instance count of the node's group
+                    let instCount = instGroupCount.get(instGroupId);
+                    if (instCount === undefined) {
+                        instCount = 2;
+                        instGroupCount.set(instGroupId, instCount);
+                    } else {
+                        instGroupCount.set(instGroupId, instCount + 1);
+                    }
+                }
+                this._meshReferences[nodeDef.mesh]++;
+            }
+        }
+    }
+
     private createNodeHierarchy(nodeId: GlTfId, parentObject: Object3D, nodes: Object3D[], gltf: GltfAsset) {
         if (gltf.gltf.nodes === undefined) {
             throw new Error("Nodes not found");
@@ -195,7 +206,7 @@ export class GLTFSceneBuilder {
 
         let node: Object3D;
         if (nodeDef.mesh !== undefined) {
-            if (this._meshReferences[nodeDef.mesh] > 0) {
+            if (this._meshReferences[nodeDef.mesh] > 1) {
                 // todo: handle instancing; create a new instance referencing same geometry;
                 // and render mesh using instancing mode
                 if (instancing && nodeDef.skin === undefined) {
@@ -208,7 +219,7 @@ export class GLTFSceneBuilder {
             } else {
                 node = this.processMesh(nodeDef.mesh, nodeDef.skin !== undefined, gltf);
             }
-            this._meshReferences[nodeDef.mesh]++;
+            // this._meshReferences[nodeDef.mesh]++;
         }
         else {
             // todo: light, environment probe, irradiance volume
@@ -451,8 +462,10 @@ export class GLTFSceneBuilder {
 
         // retrive the group id of node
         let instGroupId: number = 0;
-        if (nodeDef.extras.instanceGroup !== undefined) {
-            instGroupId = nodeDef.extras.instanceGroup;
+        if (nodeDef.extras !== undefined) {
+            if (nodeDef.extras.instanceGroup !== undefined) {
+                instGroupId = nodeDef.extras.instanceGroup;
+            }
         }
 
         let count = instCounts.get(instGroupId);
@@ -463,9 +476,12 @@ export class GLTFSceneBuilder {
         if (instMesh === undefined) {
             instMesh = this.processMesh(nodeDef.mesh, nodeDef.skin !== undefined, gltf, count);
             instGroup.set(instGroupId, instMesh);
+
+            console.info("Instanced mesh: " + nodeDef.mesh);
+            return instMesh;
         }
 
-        // todo: add this node to instance matrix of instanced mesh
+        // add this node to instance matrix of instanced mesh
         if (instMesh instanceof InstancedMesh) {
             const m = instMesh as InstancedMesh;
             // create an instance node? is that necessary?
@@ -476,7 +492,7 @@ export class GLTFSceneBuilder {
         else {
             node = new Object3D();
             this.processNodeTransform(nodeDef, node);
-            // todo: iterate all child meshes, add correspounding child instance nodes
+            // iterate all child meshes, add correspounding child instance nodes
             for (const child of instMesh.children) {
                 if (child instanceof InstancedMesh) {
                     const m = child as InstancedMesh;
@@ -487,6 +503,7 @@ export class GLTFSceneBuilder {
                 }
             }
         }
+        console.info("Instance of instanced mesh: " + nodeDef.mesh);
         return node;
     }
 
