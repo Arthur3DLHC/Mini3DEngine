@@ -38,6 +38,8 @@ export default /** glsl */`
         count = getEnvProbeCountInCluster(cluster);
     }
 
+    /*
+    // 目前没有用到
     EnvProbe getEnvProbeInCluster(uint cluster, uint iProbe)
     {
         // 每次都算有点浪费性能
@@ -45,6 +47,7 @@ export default /** glsl */`
         uint probeIdx = getItemIndexAt(offset);
         return u_envProbes.probes[probeIdx];
     }
+    */
 
     //---------- irradiance probes ----------
     void getIrrProbeIndicesInCluster(uint cluster, out uint offset, out uint count)
@@ -55,6 +58,8 @@ export default /** glsl */`
         count = u_clusters.clusters[cluster].envProbeCount - reflProbeCount * 65536u;
     }
 
+    /*
+    // 这两个函数没有用到
     uint getIrrProbeCountInCluster(uint cluster)
     {
         return u_clusters.clusters[cluster].envProbeCount - getEnvProbeCountInCluster(cluster) * 65536u;
@@ -68,4 +73,5 @@ export default /** glsl */`
         uint probeIdx = getItemIndexAt(offset);
         return u_irrProbes.probes[probeIdx];
     }
+    */
 `;
