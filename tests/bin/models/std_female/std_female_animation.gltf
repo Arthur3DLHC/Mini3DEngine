@@ -43021,7 +43021,7 @@
                 0
             ],
             "extras" : {
-                "specular" : 0.3499999940395355,
+                "specular" : 0.2,
                 "subsurface" : 0.13500000536441803,
                 "subsurfaceColor" : [
                     0.8000000715255737,
@@ -43035,8 +43035,8 @@
                     "index" : 2,
                     "texCoord" : 0
                 },
-                "metallicFactor" : 0.044871799647808075,
-                "roughnessFactor" : 0.7628204822540283
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.8
             }
         }
     ],
