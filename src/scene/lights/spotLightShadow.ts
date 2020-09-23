@@ -5,6 +5,7 @@ import mat4 from "../../../lib/tsm/mat4.js";
 export class SpotLightShadow extends LightShadow {
     public constructor(light: SpotLight) {
         super(light);
+        this.bias = -0.0005;
     }
 
     public updateShadowMatrices() {

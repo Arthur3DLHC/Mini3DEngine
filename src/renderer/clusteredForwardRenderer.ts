@@ -874,16 +874,16 @@ export class ClusteredForwardRenderer {
 
         if (this._drawDebugTexture) {
             // shadowmap:
-            // this.renderScreenRect(0, 0, 256.0 / 1280.0, 256.0 / 720.0, new vec4([1,1,1,1]), this._debugDepthTexture, 1, 0, false);
+            // this.renderScreenRect(0, 0, 512.0 / 1280.0, 512.0 / 720.0, new vec4([1,1,1,1]), this._debugDepthTexture, 1, 0, 0, false);
             
             // envmap:
             // this.renderScreenRect(0, 0, 768.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, false);
             // debug output diffuse Riemann sum result
 
-            for(let i = 0; i < 6; i++) {
-                this.renderScreenRect(128.0 * i / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, i, 2, false);
+            //for(let i = 0; i < 6; i++) {
+            //    this.renderScreenRect(128.0 * i / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, i, 2, false);
                 // this.renderScreenRect(128.0 * i / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, i, CubemapProcessor.maxSpecularMipLevel, false);
-            }
+            //}
             
             // this.renderScreenRect(0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 1, CubemapProcessor.diffuseMipLevel, false);
             // this.renderScreenRect(128.0 / 1280.0, 0, 128.0 / 1280.0, 128.0 / 720.0, new vec4([1,1,1,1]), this._envMapArray, 1, 2, CubemapProcessor.diffuseMipLevel, false);

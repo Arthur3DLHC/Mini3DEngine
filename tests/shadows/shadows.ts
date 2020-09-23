@@ -26,6 +26,7 @@ window.onload = () => {
     const fpsBehavior = new FirstPersonViewBehavior(camera);
     camera.behaviors.push(fpsBehavior);
     fpsBehavior.position = new vec3([0, 0, 8]);
+    fpsBehavior.moveSpeed = 2;
     scene.attachChild(camera);
 
     window.onmousedown = (ev: MouseEvent) => {
@@ -55,7 +56,7 @@ window.onload = () => {
     boxMesh.name = "box01";
     boxMesh.geometry = new BoxGeometry(1, 1, 1);
     boxMesh.castShadow = true;
-    boxMesh.isStatic = false;
+    boxMesh.isStatic = true;
     boxMesh.autoUpdateTransform = false; // let the AutoRotateBehavior work.
     // boxMesh.localTransform.fromTranslation(new vec3([0, 0, -5]));
     const boxMtl = new StandardPBRMaterial();
@@ -65,8 +66,8 @@ window.onload = () => {
     boxMesh.materials.push(boxMtl);
 
     // auto rotate
-    const boxAutoRot = new AutoRotateBehavior(boxMesh);
-    boxMesh.behaviors.push(boxAutoRot);
+    // const boxAutoRot = new AutoRotateBehavior(boxMesh);
+    // boxMesh.behaviors.push(boxAutoRot);
 
     scene.attachChild(boxMesh);
 
@@ -75,7 +76,7 @@ window.onload = () => {
     sphereMesh.localTransform.fromTranslation(new vec3([0, 0, 3]));
     sphereMesh.geometry = new SphereGeometry(1, 16, 8);
     sphereMesh.castShadow = true;
-    sphereMesh.isStatic = false;
+    sphereMesh.isStatic = true;
     sphereMesh.autoUpdateTransform = false;
     const sphereMtl = new StandardPBRMaterial();
     sphereMtl.color = new vec4([1.0, 0.0, 0.0, 1.0]);
@@ -157,17 +158,18 @@ window.onload = () => {
     spotLight01.autoUpdateTransform = false;    // let the behavior work
     spotLight01.on = true;
     spotLight01.color = new vec4([100, 100, 100, 1]);
-    spotLight01.range = 10;
+    spotLight01.range = 20;
     spotLight01.castShadow = true;
     // spotLight01.localTransform.fromTranslation(new vec3([0, 1, 3]));
     const spotLightLookAt = new LookatBehavior(spotLight01);
     spotLight01.behaviors.push(spotLightLookAt);
-    spotLightLookAt.position = new vec3([-3, 3, 3]);
+    spotLightLookAt.position = new vec3([-5, 5, 5]);
     spotLightLookAt.target = new vec3([0, 0, 0]);
     spotLightLookAt.up = new vec3([0, 1, 0]);
 
     scene.attachChild(spotLight01);
 
+    /*
     const dirLight01 = new DirectionalLight();
     dirLight01.isStatic = true;
     dirLight01.autoUpdateTransform = false; // let the behavior work
@@ -183,6 +185,7 @@ window.onload = () => {
     dirLightLookAt.up = new vec3([0, 1, 0]);
 
     scene.attachChild(dirLight01);
+    */
 
     Clock.instance.start();
 

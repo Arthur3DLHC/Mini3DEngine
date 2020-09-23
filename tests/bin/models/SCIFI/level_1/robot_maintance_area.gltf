@@ -29,7 +29,7 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 512,
-                        "shadowBias" : 1
+                        "shadowBias" : 0.009999999776482582
                     }
                 },
                 {
@@ -89,7 +89,7 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 512,
-                        "shadowBias" : 1
+                        "shadowBias" : 0.009999999776482582
                     }
                 },
                 {
@@ -109,7 +109,7 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 512,
-                        "shadowBias" : 1
+                        "shadowBias" : 0.009999999776482582
                     }
                 },
                 {
@@ -149,7 +149,7 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 512,
-                        "shadowBias" : 1
+                        "shadowBias" : 0.009999999776482582
                     }
                 },
                 {
@@ -169,7 +169,7 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 512,
-                        "shadowBias" : 1
+                        "shadowBias" : 0.009999999776482582
                     }
                 },
                 {
@@ -201,7 +201,6 @@
             "extras" : {
                 "glTF2ExportSettings" : {
                     "export_apply" : 1,
-                    "export_colors" : 0,
                     "export_extras" : 1,
                     "export_format" : "GLTF_SEPARATE",
                     "export_lights" : 1,
@@ -6866,7 +6865,7 @@
     ],
     "materials" : [
         {
-            "doubleSided" : false,
+            "doubleSided" : true,
             "emissiveFactor" : [
                 0,
                 0,
@@ -6885,7 +6884,7 @@
             }
         },
         {
-            "doubleSided" : false,
+            "doubleSided" : true,
             "emissiveFactor" : [
                 0,
                 0,
@@ -6904,7 +6903,7 @@
             }
         },
         {
-            "doubleSided" : false,
+            "doubleSided" : true,
             "emissiveFactor" : [
                 0.9169134497642517,
                 0.9169134497642517,
@@ -6923,7 +6922,7 @@
             }
         },
         {
-            "doubleSided" : false,
+            "doubleSided" : true,
             "emissiveFactor" : [
                 0,
                 0,
@@ -6942,7 +6941,7 @@
             }
         },
         {
-            "doubleSided" : false,
+            "doubleSided" : true,
             "emissiveFactor" : [
                 0,
                 0,
@@ -6961,7 +6960,7 @@
             }
         },
         {
-            "doubleSided" : false,
+            "doubleSided" : true,
             "emissiveFactor" : [
                 0,
                 0,
@@ -6980,7 +6979,7 @@
             }
         },
         {
-            "doubleSided" : false,
+            "doubleSided" : true,
             "emissiveFactor" : [
                 0,
                 0,
@@ -6999,7 +6998,7 @@
             }
         },
         {
-            "doubleSided" : false,
+            "doubleSided" : true,
             "emissiveFactor" : [
                 0,
                 0,
@@ -7477,7 +7476,8 @@
                         "NORMAL" : 122,
                         "TEXCOORD_0" : 123
                     },
-                    "indices" : 3
+                    "indices" : 3,
+                    "material" : 0
                 }
             ]
         },
