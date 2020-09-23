@@ -6866,7 +6866,7 @@
     ],
     "materials" : [
         {
-            "doubleSided" : true,
+            "doubleSided" : false,
             "emissiveFactor" : [
                 0,
                 0,
@@ -6885,7 +6885,7 @@
             }
         },
         {
-            "doubleSided" : true,
+            "doubleSided" : false,
             "emissiveFactor" : [
                 0,
                 0,
@@ -6904,7 +6904,7 @@
             }
         },
         {
-            "doubleSided" : true,
+            "doubleSided" : false,
             "emissiveFactor" : [
                 0.9169134497642517,
                 0.9169134497642517,
@@ -6923,7 +6923,7 @@
             }
         },
         {
-            "doubleSided" : true,
+            "doubleSided" : false,
             "emissiveFactor" : [
                 0,
                 0,
@@ -6942,7 +6942,7 @@
             }
         },
         {
-            "doubleSided" : true,
+            "doubleSided" : false,
             "emissiveFactor" : [
                 0,
                 0,
@@ -6961,7 +6961,7 @@
             }
         },
         {
-            "doubleSided" : true,
+            "doubleSided" : false,
             "emissiveFactor" : [
                 0,
                 0,
@@ -6980,7 +6980,7 @@
             }
         },
         {
-            "doubleSided" : true,
+            "doubleSided" : false,
             "emissiveFactor" : [
                 0,
                 0,
@@ -6999,7 +6999,7 @@
             }
         },
         {
-            "doubleSided" : true,
+            "doubleSided" : false,
             "emissiveFactor" : [
                 0,
                 0,

@@ -15,6 +15,7 @@ export default /** glsl */`
 in vec3 a_position;
 in vec3 a_normal;
 in vec2 a_texcoord0;
+// 注意不要添加无用的 vertex 输入，否则 instancing 会出问题
 
 // #ifdef USE_SKINNING
 

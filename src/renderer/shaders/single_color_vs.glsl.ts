@@ -12,6 +12,7 @@ export default /** glsl */`
 // vertex attribute
 // 使用<attribs>规定的vertex attribute
 in vec3 a_position;
+// 注意不要添加无用的 vertex 输入，否则 instancing 会出问题
 // in vec3 a_normal;
 // in vec2 a_texcoord0;
 

@@ -547,6 +547,8 @@ TODO:       主要类结构
 
             Instancing
                 GLTF中共享网格的节点设为用 Instancing
+                注意 vertex shader 中不要添加无用的 vertex 输入，否则 instancing 会出问题
+
                 什么时候更新 instance 矩阵数组？
                     如果是gltf静态instance，应该只需要更新一次；
                 Instancing shader
