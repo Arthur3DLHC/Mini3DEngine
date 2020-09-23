@@ -44,6 +44,7 @@ export class GLGeometryBuffers {
         // clear newattribs
         for (let i = 0; i < this._newAttributes.length; i++) {
             this._newAttributes[i] = 0;
+            this._attribDivisors[i] = 0;
         }
     }
 
@@ -63,6 +64,7 @@ export class GLGeometryBuffers {
             }
 
             GLDevice.gl.vertexAttribPointer(index, attrib.size, attrib.componentType, false, attrib.buffer.stride, attrib.offset);
+            
             if(this._attribDivisors[index] !== attrib.divisor) {
                 GLDevice.gl.vertexAttribDivisor(index, attrib.divisor);
                 this._attribDivisors[index] = attrib.divisor;

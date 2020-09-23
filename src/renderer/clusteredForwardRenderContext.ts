@@ -669,6 +669,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         // this._tmpColor.x = item.object.tag;
         this._tmpColor.y = 0;           // num skin joints
         this._tmpColor.z = 0;           // use instancing
+        this._tmpColor.w = 0;
 
         if (item.object instanceof SkinMesh) {
             // fix me: need to copy all matrices to a float32array?

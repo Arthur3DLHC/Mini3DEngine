@@ -11,8 +11,8 @@ export default /** glsl */`
 // vertex attribute
 // 使用<attribs>规定的vertex attribute
 in vec3 a_position;
-in vec3 a_normal;
-in vec2 a_texcoord0;
+// in vec3 a_normal;
+// in vec2 a_texcoord0;
 
 in vec4 a_joints0;              // joint indices
 in vec4 a_weights0;             // joint weights

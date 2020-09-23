@@ -191,6 +191,7 @@ window.onload = () => {
 
     function prepareGLTFScene(gltfNode: Object3D) {
         gltfNode.isStatic = true;
+        gltfNode.autoUpdateTransform = false;
         
         if (gltfNode instanceof Mesh) {
             gltfNode.castShadow = true;

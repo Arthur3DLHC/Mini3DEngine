@@ -127,6 +127,17 @@ export class GLTFSceneBuilder {
             this.createNodeHierarchy(nodeID, scene, nodes, gltf);
         }
 
+        if (instancing) {
+            for (const grp of this._instancedMeshGroups) {
+                if(grp !== undefined) {
+                    grp.forEach((instMesh, key, map)=>{
+                        scene.attachChild(instMesh);
+                        console.log("add instance mesh to scene: " + instMesh.name);
+                    })
+                }
+            }
+        }
+
         // todo: process skin meshes; findout skelecton joints
         let iNode = 0;
         for (const nodeDef of gltf.gltf.nodes) {
@@ -476,9 +487,11 @@ export class GLTFSceneBuilder {
         if (instMesh === undefined) {
             instMesh = this.processMesh(nodeDef.mesh, nodeDef.skin !== undefined, gltf, count);
             instGroup.set(instGroupId, instMesh);
+            if (nodeDef.name !== undefined) {
+                instMesh.name = "instmesh_" + nodeDef.name;
+            }
 
             console.info("Instanced mesh: " + nodeDef.mesh);
-            return instMesh;
         }
 
         // add this node to instance matrix of instanced mesh

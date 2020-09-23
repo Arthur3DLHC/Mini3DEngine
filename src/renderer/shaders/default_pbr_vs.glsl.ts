@@ -47,14 +47,15 @@ void main(void)
     vec4 localPosition = vec4(a_position, 1.0);
     if (useInstancing()) {
         worldPosition = localToWorldInst(localPosition);
+        ex_worldNormal = localToWorldInst(vec4(a_normal, 0.0)).xyz;
     } else {
         worldPosition = localToWorldCheckSkin(localPosition);
+        ex_worldNormal = localToWorldCheckSkin(vec4(a_normal, 0.0)).xyz;
     }
     ex_worldPosition = worldPosition.xyz;
     ex_hPosition = viewToProj(worldToView(worldPosition));
     gl_Position = ex_hPosition;
     ex_color = u_object.color;
-    ex_worldNormal = localToWorldCheckSkin(vec4(a_normal, 0.0)).xyz;
     ex_texcoord = a_texcoord0;
 }
 

@@ -21,6 +21,9 @@ export class InstancedMesh extends Mesh {
         }
         this._instFloatSize += extraFloats;
         this._instanceData = new Float32Array(maxInstanceCount * this._instFloatSize);
+        for (let i = 0; i < maxInstanceCount; i++) {
+            this.setMatrixOf(i, mat4.identity);
+        }
         this._vertexBuffer = new VertexBuffer(isStatic? GLDevice.gl.STATIC_DRAW : GLDevice.gl.DYNAMIC_DRAW);
         this._attributes = [];
 
@@ -36,7 +39,7 @@ export class InstancedMesh extends Mesh {
             this._attributes.push(new VertexBufferAttribute("a_instanceColor", this._vertexBuffer, 4, GLDevice.gl.FLOAT, 64, 0, 1));
         }
 
-        this._dirty = false;
+        this._dirty = true;
     }
     private _instanceData: Float32Array;
     private _instFloatSize: number;
