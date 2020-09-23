@@ -542,8 +542,12 @@ TODO:       主要类结构
             制作模块化的大一点的场景；
                 FPS：模块化类 DOOM 室内场景, 狭窄一些；Local point lights; 
                     导出，测试 clustered, instancing, occlusion culling 等
-                        经测试，需要注意：blender 中的细节物体必须 apply 所有修改器后再复制，否则无法共享网格数据，导致无法 instancing
+
                 Action: 城堡，室外+室内，宽阔一些 或横板？夜间；无月光；雾；Local point lights：灯烛，火把；
+
+            经测试，需要注意：
+                1、blender 中的细节物体必须 apply 所有修改器后再复制，否则无法共享网格数据，导致无法 instancing
+                2、锥形光的阴影bias需要取很小的值（目前取默认值-0.0005），否则阴影画不出来
 
             Instancing
                 GLTF中共享网格的节点设为用 Instancing
