@@ -552,13 +552,13 @@ TODO:       主要类结构
             Instancing
                 GLTF中共享网格的节点设为用 Instancing
                 注意 vertex shader 中不要添加无用的 vertex 输入，否则 instancing 会出问题
+                是否应该再整理一下从 gltf 读取 instanced mesh 的代码；目前有点乱；
 
                 什么时候更新 instance 矩阵数组？
                     如果是gltf静态instance，应该只需要更新一次；
                 Instancing shader
                     can use in mat4 in vertex shader for attribute input;
                     Cache shaders by key: shader file pathes and macros or features?
-                call drawInstanced for instanced mesh;
                 InstanceMesh 怎样做 frustum culling?
                     Bounding box of instances?
                     需要在 Blender 中手动对 Instancing 的物体分组，每个组使用一个统一的包围盒？
@@ -568,9 +568,6 @@ TODO:       主要类结构
                         将生成 instancing 网格的操作放在这一步，而不是加载 gltf 时？
                 Occlusion query
                     用 instanced 方式绘制包围盒
-                测试程序
-                    测试手动创建的 InstancedMesh
-                    测试从 gltf 加载
                 动态的 instancing 物体怎么处理
                     更新矩阵；包围盒？occlusion query?
             
