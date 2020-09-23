@@ -178,6 +178,7 @@ window.onload = () => {
 
         prepareGLTFScene(gltfScene);
 
+        scene.updateWorldTransform(false, true);
         InstancedMesh.updateInstancedMeshes(gltfScene);
 
         console.log("start game loop...");
