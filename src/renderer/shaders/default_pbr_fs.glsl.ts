@@ -185,9 +185,9 @@ void main(void)
 
         // TODO: use ambient cube ?
 
-        int envmapIdx = int(i - irrStart);
+        // int envmapIdx = int(i - irrStart);
         
-        iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, envmapIdx, n, albedoColor) * weight;
+        iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, int(probeIdx), n, albedoColor) * weight;
         
         totalWeight += weight;
     }

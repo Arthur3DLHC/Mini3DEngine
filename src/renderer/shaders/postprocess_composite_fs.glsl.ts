@@ -179,10 +179,10 @@ void main(void) {
             
             float weight = (1.0 / (distxradius * distxradius)) * fade;
 
-            int ienvmap = int(i - envmapStart);
+            // int ienvmap = int(i - envmapStart);
             
             // IBL specular part
-            vec3 ld = textureCubeArrayLod(s_envMapArray, reflV, ienvmap, roughness * MAX_SPECULAR_MIP_LEVEL).rgb;
+            vec3 ld = textureCubeArrayLod(s_envMapArray, reflV, int(probeIdx), roughness * MAX_SPECULAR_MIP_LEVEL).rgb;
             vec2 dfg = texture(s_specularDFG, vec2(NdotV, roughness)).rg;
             iblSpecular += ld * (f0 * dfg.x + dfg.y) * weight;
             // vec4 envmap = textureCubeArray(s_envMapArray, reflV, int(i - envmapStart));
