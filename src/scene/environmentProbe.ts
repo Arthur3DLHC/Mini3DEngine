@@ -17,7 +17,7 @@ export class EnvironmentProbe extends Object3D {
     public constructor() {
         super();
         this.probeType = EnvironmentProbeType.Reflection;
-        this.visibleDistance = 20;
+        this.visibleDistance = 10;
         this.clippingStart = 0.01;
         this.clippingEnd = 20;
         this.backgroundColor = new vec4([0, 0, 0, 1]);
@@ -31,7 +31,8 @@ export class EnvironmentProbe extends Object3D {
 
     // the pose and location is defined by transform matrix.
     /**
-     * the max visible distance of decal
+     * the max visible distance of probe.
+     * only work for reflection probes. (not for irradiace probes)
      */
     public visibleDistance: number;
 
