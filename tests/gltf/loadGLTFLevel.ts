@@ -119,7 +119,7 @@ window.onload = () => {
     console.log("loading skybox...");
 
     const imagePromises: (Promise<HTMLImageElement|ImageData>)[] = [];
-    const isHDR = true;
+    const isHDR = false;
     let envmapUrls: string[];
 
     if (isHDR) {
@@ -133,12 +133,12 @@ window.onload = () => {
         ]
     } else {
         envmapUrls = [
-            "./textures/skyboxes/rooitou_park_2k/px.png",
-            "./textures/skyboxes/rooitou_park_2k/nx.png",
-            "./textures/skyboxes/rooitou_park_2k/py.png",
-            "./textures/skyboxes/rooitou_park_2k/ny.png",
-            "./textures/skyboxes/rooitou_park_2k/pz.png",
-            "./textures/skyboxes/rooitou_park_2k/nz.png",
+            "./textures/skyboxes/space/px.jpg",
+            "./textures/skyboxes/space/nx.jpg",
+            "./textures/skyboxes/space/py.jpg",
+            "./textures/skyboxes/space/ny.jpg",
+            "./textures/skyboxes/space/pz.jpg",
+            "./textures/skyboxes/space/nz.jpg",
         ];
     }
 
