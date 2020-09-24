@@ -36,7 +36,9 @@ export default /** glsl */`
 
     struct EnvProbe {
         vec3 position;      // always xyz axis aligned
-        float radius;       // radius
+        float radius;       // probes with smaller radius has higher priority than larger ones
+        vec4 visibleRange;  // the visibility is affected by the distance from camera and the visible range of the probe
+                            // use vec2 to fit the UBO alignment 
     };
     uniform EnvProbes
     {

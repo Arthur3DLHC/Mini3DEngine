@@ -110,8 +110,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
     
     public static readonly LIGHT_SIZE_FLOAT = 40;
     public static readonly DECAL_SIZE_FLOAT = 20;
-    public static readonly ENVPROBE_SIZE_FLOAT = 4;
-    public static readonly IRRVOL_SIZE_FLOAT = 4;
+    public static readonly ENVPROBE_SIZE_FLOAT = 8;
+    public static readonly IRRPROBE_SIZE_FLOAT = 4;
 
     public static readonly NUM_CLUSTERS_X = 16;
     public static readonly NUM_CLUSTERS_Y = 8;
@@ -141,7 +141,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubLights.addUniform("lights", ClusteredForwardRenderContext.MAX_LIGHTS * ClusteredForwardRenderContext.LIGHT_SIZE_FLOAT);
         this._ubDecals.addUniform("decals", ClusteredForwardRenderContext.MAX_DECALS * ClusteredForwardRenderContext.DECAL_SIZE_FLOAT);
         this._ubEnvProbes.addUniform("probes", ClusteredForwardRenderContext.MAX_ENVPROBES * ClusteredForwardRenderContext.ENVPROBE_SIZE_FLOAT);
-        this._ubIrrProbes.addUniform("probes", ClusteredForwardRenderContext.MAX_IRRPROBES * ClusteredForwardRenderContext.IRRVOL_SIZE_FLOAT);
+        this._ubIrrProbes.addUniform("probes", ClusteredForwardRenderContext.MAX_IRRPROBES * ClusteredForwardRenderContext.IRRPROBE_SIZE_FLOAT);
         this._ubDitherPattern.addMat4("randX", matIdentity);
         this._ubDitherPattern.addMat4("randY", matIdentity);
 
@@ -268,6 +268,10 @@ export class ClusteredForwardRenderContext extends RenderContext {
             // todo: pass in size? no need for texture index, because it == probe index
             // the envprobe has unique scaling.
             this._buffer.addNumber(probe.radius);
+            this._buffer.addNumber(probe.visibleDistance);
+            this._buffer.addNumber(probe.visibleDistance);      // UBO alignment
+            this._buffer.addNumber(probe.visibleDistance);      // UBO alignment
+            this._buffer.addNumber(probe.visibleDistance);      // UBO alignment
         }
         this._ubEnvProbes.setUniform("probes", this._tmpData, this._buffer.length);
         this._ubEnvProbes.update();

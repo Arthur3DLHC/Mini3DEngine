@@ -172,7 +172,12 @@ void main(void) {
             // https://www.xmswiki.com/wiki/SMS:Inverse_Distance_Weighted_Interpolation
             float dist = length(probe.position - worldPos);
             float distxradius = dist * probe.radius + 0.01;
-            float weight = 1.0 / (distxradius * distxradius);
+
+            // envprobes has visible distance limit, so fade out to prevent popup artifact
+            float distToCam = length(probe.position - u_view.position);
+            float fade = 1.0 - smoothstep(0.7, 1.0, distToCam / probe.visibleRange.x);
+            
+            float weight = (1.0 / (distxradius * distxradius)) * fade;
 
             int ienvmap = int(i - envmapStart);
             

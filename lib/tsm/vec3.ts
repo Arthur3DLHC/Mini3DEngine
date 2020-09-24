@@ -269,9 +269,9 @@ export default class vec3 {
     }
 
     static distance(vector: vec3, vector2: vec3): number {
-        const x = vector2.x - vector.x
-        const y = vector2.y - vector.y
-        const z = vector2.z - vector.z
+        // const x = vector2.x - vector.x
+        // const y = vector2.y - vector.y
+        // const z = vector2.z - vector.z
 
         return Math.sqrt(this.squaredDistance(vector, vector2))
     }
