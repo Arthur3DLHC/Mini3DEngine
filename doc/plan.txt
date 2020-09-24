@@ -572,7 +572,7 @@ TODO:       主要类结构
                 动态的 instancing 物体怎么处理
                     更新矩阵；包围盒？occlusion query?
             
-            物体是否做包围球检测的控制标志？
+            物体是否做包围球检测的控制标志？ 
             
             测试 Occlusion query?
                 在 blender 中给物体加一个自定义属性，区分是 occluder 还是 occludee
