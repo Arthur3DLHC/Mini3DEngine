@@ -285,6 +285,7 @@ export class GLTFSceneBuilder {
         envProbe.probeType = EnvironmentProbeType.Reflection;
         if (extras.clippingStart !== undefined) envProbe.clippingStart = extras.clippingStart;
         if (extras.clippingEnd !== undefined) envProbe.clippingEnd = extras.clippingEnd;
+        if (extras.visibleRange !== undefined) envProbe.visibleDistance = extras.visibleRange;
         
         return envProbe;
     }

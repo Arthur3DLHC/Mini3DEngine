@@ -485,6 +485,10 @@ TODO:       主要类结构
 
             后期特效开启、关闭的控制；
 
+            尝试一下简版次表面效果
+                gltf-Model-Viewer中的方法
+                https://www.alanzucconi.com/2017/08/30/fast-subsurface-scattering-2/
+
             支持材质自定义 Shader？
                 不紧急
                 非物理材质比如卡通材质
@@ -501,7 +505,8 @@ TODO:       主要类结构
             Blender python 脚本
                 补充光源属性到 gltf 的 extra 中
                 从 Blender 导出 Irradiance Volume 到 gltf；从 gltf 读取 Irradiance Volume，添加 probes 到场景；
-                区分 Irradiance probe 和 envmap probe？
+                    ** 导出 Irradiance voluem 和 reflection probe 的更多属性：影响半径等；
+                    渲染时，通过节点缩放乘以影响半径得到最终的影响半径；
                 补充材质属性到 gltf 的 extra 中
                     次表面反射参数；高光强度；
 
