@@ -27,4 +27,15 @@ vec4 subsurfaceScattering(float ndotl, float curvature, vec3 subsurfaceColor, fl
     // return subsurf * subsurfaceColor * subsurfaceAmount;
     return vec4(subsurfaceColor * subsurfaceAmount, subsurf);
 }
+
+// https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/master/src/shaders/punctual.glsl, fixed some errors
+// https://www.alanzucconi.com/2017/08/30/fast-subsurface-scattering-2/
+// https://colinbarrebrisebois.com/2011/03/07/gdc-2011-approximating-translucency-for-a-fast-cheap-and-convincing-subsurface-scattering-look/
+vec3 subsurfaceRadiance(vec3 n, vec3 v, vec3 l, float scale, float distortion, float power, vec3 color, float thickness) {
+    vec3 distortedHalfway = l + n * distortion;
+    float backIntensity = max(0.0, dot(v, -distortedHalfway));
+    float reverseDiffuse = pow(clamp(backIntensity, 0.0, 1.0), power) * scale; // original code clamp funciton is wrong
+    return (reverseDiffuse + color) * (1.0 - thickness);
+}
+
 `;
