@@ -507,6 +507,7 @@ TODO:       主要类结构
                 从 Blender 导出 Irradiance Volume 到 gltf；从 gltf 读取 Irradiance Volume，添加 probes 到场景；
                     ** 导出 Irradiance voluem 和 reflection probe 的更多属性：影响半径等；
                     渲染时，通过节点缩放乘以影响半径得到最终的影响半径；
+                        Reflect probe 的矫正体？实现 Parallax corrected cubemap?
                 补充材质属性到 gltf 的 extra 中
                     次表面反射参数；高光强度；
 
