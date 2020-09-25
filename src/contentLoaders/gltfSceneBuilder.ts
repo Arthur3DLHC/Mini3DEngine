@@ -286,7 +286,7 @@ export class GLTFSceneBuilder {
         if (extras.clippingStart !== undefined) envProbe.clippingStart = extras.clippingStart;
         if (extras.clippingEnd !== undefined) envProbe.clippingEnd = extras.clippingEnd;
         if (extras.visibleRange !== undefined) envProbe.visibleDistance = extras.visibleRange;
-        
+        if (extras.influenceDist !== undefined) envProbe.range = extras.influenceDist;
         return envProbe;
     }
 
@@ -313,6 +313,7 @@ export class GLTFSceneBuilder {
             envProbe.autoUpdateTransform = false;
             if (extras.clippingStart !== undefined) envProbe.clippingStart = extras.clippingStart;
             if (extras.clippingEnd !== undefined) envProbe.clippingEnd = extras.clippingEnd;
+            if (extras.influenceDist !== undefined) envProbe.range = extras.influenceDist;
             ret = envProbe;
         } else {
             // else add envprobes as children
@@ -330,6 +331,8 @@ export class GLTFSceneBuilder {
                         envProbe.autoUpdateTransform = false;
                         if (extras.clippingStart !== undefined) envProbe.clippingStart = extras.clippingStart;
                         if (extras.clippingEnd !== undefined) envProbe.clippingEnd = extras.clippingEnd;
+                        if (extras.influenceDist !== undefined) envProbe.range = extras.influenceDist;
+
                         envProbe.translation.x = i / (resX) + halfCellSize.x;
                         envProbe.translation.y = j / (resY) + halfCellSize.y;
                         envProbe.translation.z = k / (resZ) + halfCellSize.z;

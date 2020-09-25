@@ -20,7 +20,7 @@ for obj in bpy.data.objects:
         probe = obj.data
         obj["clippingStart"] = probe.clip_start
         obj["clippingEnd"] = probe.clip_end
-        obj["radius"] = probe.influence_distance
+        obj["influenceDist"] = probe.influence_distance
         if probe.type == "CUBEMAP":
             print("processing cubemap probe: " + obj.name)
             obj["extType"] = "environmentProbe"
