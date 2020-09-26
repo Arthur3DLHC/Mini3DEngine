@@ -38,4 +38,9 @@ vec3 subsurfaceRadiance(vec3 n, vec3 v, vec3 l, float scale, float distortion, f
     return (reverseDiffuse + color) * (1.0 - thickness);
 }
 
+// note: the result value need to multiply with IBL diffuse color
+vec3 subsurfaceRadianceIBL(vec3 n, vec3 v, float scale, float distortion, float power, vec3 color, float thickness) {
+    return subsurfaceRadiance(n, v, -v, scale, distortion, power, color, thickness);
+}
+
 `;
