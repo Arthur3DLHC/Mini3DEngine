@@ -15,6 +15,8 @@ for light in bpy.data.lights:
 # for lightprobes, the data object can not hold custom properties
 # so you need to hold them on the object using the data object
 
+# todo: parallax correction
+
 for obj in bpy.data.objects:
     if obj.type == "LIGHT_PROBE":
         probe = obj.data

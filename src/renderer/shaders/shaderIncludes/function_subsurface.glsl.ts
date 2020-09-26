@@ -31,6 +31,7 @@ vec4 subsurfaceScattering(float ndotl, float curvature, vec3 subsurfaceColor, fl
 // https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/master/src/shaders/punctual.glsl, fixed some errors
 // https://www.alanzucconi.com/2017/08/30/fast-subsurface-scattering-2/
 // https://colinbarrebrisebois.com/2011/03/07/gdc-2011-approximating-translucency-for-a-fast-cheap-and-convincing-subsurface-scattering-look/
+// note: the result value should be multiplied with diffuse lighting color
 vec3 subsurfaceRadiance(vec3 n, vec3 v, vec3 l, float scale, float distortion, float power, vec3 color, float thickness) {
     vec3 distortedHalfway = l + n * distortion;
     float backIntensity = max(0.0, dot(v, -distortedHalfway));
@@ -38,7 +39,7 @@ vec3 subsurfaceRadiance(vec3 n, vec3 v, vec3 l, float scale, float distortion, f
     return (reverseDiffuse + color) * (1.0 - thickness);
 }
 
-// note: the result value need to multiply with IBL diffuse color
+// note: the result value need to multiply with diffuse IBL color
 vec3 subsurfaceRadianceIBL(vec3 n, vec3 v, float scale, float distortion, float power, vec3 color, float thickness) {
     return subsurfaceRadiance(n, v, -v, scale, distortion, power, color, thickness);
 }

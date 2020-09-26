@@ -182,11 +182,7 @@ void main(void)
         float weight = 1.0 / (distxradius * distxradius);
 
         // IBL diffuse part
-
-        // TODO: use ambient cube ?
-
-        // int envmapIdx = int(i - irrStart);
-        
+        // todo: simple subsurface?
         iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, int(probeIdx), n, albedoColor) * weight;
         
         totalWeight += weight;
@@ -244,6 +240,7 @@ void main(void)
         }
 
         // todo: check n dot l early? but if is subsurface material...
+        // todo: if use subsurface scattering, give the shadow a bigger bias?
 
         if (getLightCastShadow(light)) {
             mat4 matShadow = mat4(0.0);
@@ -268,8 +265,6 @@ void main(void)
                 shadowCoord = shadowCoord * vec3(rect.z * 0.5, rect.w * 0.5, 0.5)
                                          + vec3(rect.z * 0.5 + rect.x, rect.w * 0.5 + rect.y, 0.5);
             }
-            // dither the shadowcoord uv?
-            // effect is not very good; consider use linear pcf?
             shadow = shadowPCF3(s_shadowAtlas, shadowCoord);
 
             // vec2 offset = (dither - vec2(0.5)) / 1024.0; // shadow atlas texture size / 4
@@ -288,11 +283,11 @@ void main(void)
         // float NdotL = clampedDot(n, l);
         float NdotL = dot(n, l);
 
-        // don't apply shadow while subsurface scattering?
-        // fix me: 在阴影中的物体的明暗交界线上会出现一条光环
         vec3 intensity = rangeAttenuation * spotAttenuation * light.color.rgb;// * shadow;
 
         // todo: if subsurface > 0, sample subsurface strength from subsurface scattering BRDF texture
+        // todo: test the new simple subsurface scattering function
+        // 
         vec4 subsuf = vec4(0.0);
         if(u_material.subsurface > 0.0) {
             // TODO: 根据 ndotl 和 curvature 取样 subsurface BRDF texture

@@ -501,6 +501,8 @@ TODO:       主要类结构
                 先测试不排序的绘制；
                 是否使用OIT？
                 测试半透明物体的 Demo
+                半透明shader中应该应用 reflection probe, 而不是 diffuse probe?
+                    复习一下 DOOM 中是怎么做的
 
             Blender python 脚本
                 补充光源属性到 gltf 的 extra 中
