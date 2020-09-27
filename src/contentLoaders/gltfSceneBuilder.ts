@@ -893,6 +893,9 @@ export class GLTFSceneBuilder {
 
                 //     if(mtlDef.extras.subsurface !== undefined) mtl.subsurface = mtlDef.extras.subsurface;
                 //     if(mtlDef.extras.subsurfColor !== undefined) mtl.subsurfaceColor.xyz = mtlDef.extras.subsurfColor;
+                //     if (mtlDef.extras.subsurfaceRadius !== undefined) mtl.subsurfaceRadius = mtlDef.extras.subsurfaceRadius;
+                // todo: subsurface thickness == subsurface radius?
+                // todo: subsurface thickness texture?
             }
         }
         return mtl;

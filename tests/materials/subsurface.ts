@@ -70,7 +70,7 @@
             sphereMtl.metallic = 0.0;
             sphereMtl.roughness = 0.75;
             sphereMtl.specular = 0.25;
-            sphereMtl.subsurface = 1;
+            sphereMtl.subsurface = 0.1;
             sphereMtl.subsurfaceColor = new vec3([1.0, 0.2, 0.0]);
             sphereMtl.subsurfaceRadius = 1;
             sphereMtl.subsurfaceThickness = 0.5;
@@ -93,7 +93,7 @@
         cylinderMtl.emissive = new vec4([0.0, 0.0, 0.0, 1]);
         cylinderMtl.metallic = 0.01;
         cylinderMtl.roughness = 0.6;
-        cylinderMtl.subsurface = 1;
+        cylinderMtl.subsurface = 0.1;
         cylinderMtl.subsurfaceColor = new vec3([0.0, 1.0, 0.0]);
         cylinderMtl.subsurfaceRadius = 1;
         cylinderMtl.subsurfaceThickness = 0.5;

@@ -97,3 +97,7 @@ for mtl in bpy.data.materials:
     if isinstance(subscolor_socket, bpy.types.NodeSocket):
         subsColor = get_factor_from_socket(subscolor_socket, kind='RGB')
         mtl["subsurfaceColor"] = subsColor
+    subsRadius_socket = get_socket(mtl, "Subsurface Radius")
+    if isinstance(subsRadius_socket, bpy.types.NodeSocket):
+        subsR = get_factor_from_socket(subsRadius_socket, kind='VALUE')
+        mtl["subsurfaceRadius"] = subsR
