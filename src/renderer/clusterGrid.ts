@@ -4,7 +4,7 @@ import { BoundingBox } from "../math/boundingBox.js";
 import { Cluster } from "./cluster.js";
 import { BaseLight } from "../scene/lights/baseLight.js";
 import { Decal } from "../scene/decal.js";
-import { EnvironmentProbe } from "../scene/environmentProbe.js";
+import { EnvironmentProbe, EnvironmentProbeType } from "../scene/environmentProbe.js";
 import mat4 from "../../lib/tsm/mat4.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { BoundingSphere } from "../math/boundingSphere.js";
@@ -280,21 +280,33 @@ export class ClusterGrid {
     }
 
     public fillEnvironmentProbe(envProbe: EnvironmentProbe, idx: number) {
+        
         // need to transform to view space
         // bounding sphere?
-        const boundingSphere = new BoundingSphere(vec3.zero, 1);
+        const boundingSphere = new BoundingSphere(vec3.zero, envProbe.range);
         const matModelView = new mat4();
         mat4.product(this.viewTransform, envProbe.worldTransform, matModelView);
         boundingSphere.transform(matModelView);
+        
+        // check environment probes visible distance limit
+        // because envprobes are static, it will be dispatched to rendercontext only when the current scene changed.
+        // so we need to check the visible distance here.
+        if (envProbe.probeType === EnvironmentProbeType.Reflection) {
+            if(boundingSphere.center.squaredLength() > envProbe.visibleDistance * envProbe.visibleDistance) {
+                return;
+            }
+        }
 
         if (!this._frustum.intersectsSphere(boundingSphere)) {
             return;
         }
 
-        // todo: environment probes visible distance limit
-
         this.checkClustersWithBoundingSphere(boundingSphere, (cluster: Cluster)=>{
-            cluster.envProbes.push(idx);
+            if (envProbe.probeType === EnvironmentProbeType.Reflection) {
+                cluster.reflProbes.push(idx);
+            } else {
+                cluster.irrProbes.push(idx);
+            }
         });
     }
 

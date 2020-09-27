@@ -616,6 +616,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
                     const envProbe = this.envProbes[iEnv];
                     if (envProbe.visible) {
                         // check visible distance
+                        // because envprobes are static, it will be dispatched to rendercontext only when the current scene changed.
+                        // so we need to check the visible distance here.
                         const position = new vec3();
                         envProbe.worldTransform.getTranslation(position);
                         const dist = vec3.distance(position, camPosition);
@@ -628,7 +630,6 @@ export class ClusteredForwardRenderContext extends RenderContext {
             }
 
             if (irrprobes) {
-                // pack envprobe and irrvolume count together
                 for (let iIrr = 0; iIrr < this.irradianceProbeCount; iIrr++) {
                     const irrProbe = this.irradianceProbes[iIrr];
                     if (irrProbe.visible) {

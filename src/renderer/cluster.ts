@@ -19,11 +19,13 @@ export class Cluster {
     // todo: use Uint32Array to faster?
     public lights: number[] = [];
     public decals: number[] = [];
-    public envProbes: number[] = [];
+    public reflProbes: number[] = [];
+    public irrProbes: number[] = [];
 
     public clear() {
         this.lights.length = 0;
         this.decals.length = 0;
-        this.envProbes.length = 0;
+        this.reflProbes.length = 0;
+        this.irrProbes.length = 0;
     }
 }
