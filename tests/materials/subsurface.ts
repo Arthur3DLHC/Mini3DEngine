@@ -55,73 +55,32 @@
             fpsBehavior.onKeyUp(ev);
         }
     
-        // todo: test multiple objects in scene at same time
-    
-        // test box geometry
-        const boxMesh = new Mesh();
-        boxMesh.name = "box01";
-        boxMesh.geometry = new BoxGeometry(0.25, 0.25, 0.25);
-        boxMesh.castShadow = true;
-        boxMesh.isStatic = false;
-        boxMesh.autoUpdateTransform = false;    // let the behavior work
-        // boxMesh.localTransform.fromTranslation(new vec3([0, 0, -5]));
-        const boxMtl = new StandardPBRMaterial();
-        boxMtl.color = new vec4([1.0, 1.0, 0.0, 1.0]);
-        boxMtl.metallic = 0.8;
-        boxMtl.roughness = 0.4;
-        boxMesh.materials.push(boxMtl);
-    
-        // auto rotate
-        const boxAutoRot = new AutoRotateBehavior(boxMesh);
-        boxMesh.behaviors.push(boxAutoRot);
-    
-        scene.attachChild(boxMesh);
-    
-        // moving sphere
-        {
-            const sphereMesh = new Mesh();
-            sphereMesh.name = "sphere.Dynamic";
-            sphereMesh.localTransform.fromTranslation(new vec3([0, 0, 0.75]));
-            sphereMesh.geometry = new SphereGeometry(0.2, 16, 8);
-            sphereMesh.castShadow = true;
-            sphereMesh.isStatic = false;
-            sphereMesh.autoUpdateTransform = false;
-            const sphereMtl = new StandardPBRMaterial();
-            sphereMtl.color = new vec4([1.0, 1.0, 1.0, 1.0]);
-            sphereMtl.metallic = 0.9;
-            sphereMtl.roughness = 0.5;
-            sphereMtl.subsurface = 0.15;
-            sphereMtl.subsurfaceColor = new vec3([0.4, 0.06, 0.0]);
-            sphereMesh.materials.push(sphereMtl);
-        
-            boxMesh.attachChild(sphereMesh);
-        }
-    
-        // static sphere
+        // add a static sphere with subsurface material
+        // use control pannel to control the subsurface parameters
         {
             const sphereMesh = new Mesh();
             sphereMesh.name = "sphere.Static";
-            sphereMesh.localTransform.fromTranslation(new vec3([-0.75, -1.2, 0]));
-            sphereMesh.geometry = new SphereGeometry(0.4, 16, 8);
+            sphereMesh.localTransform.fromTranslation(new vec3([-0.75, 0, 0]));
+            sphereMesh.geometry = new SphereGeometry(0.5, 16, 8);
             sphereMesh.castShadow = true;
             sphereMesh.isStatic = true;
             sphereMesh.autoUpdateTransform = false;
             const sphereMtl = new StandardPBRMaterial();
             sphereMtl.color = new vec4([1.0, 1.0, 1.0, 1.0]);
-            sphereMtl.metallic = 0.05;
-            sphereMtl.roughness = 0.95;
+            sphereMtl.metallic = 0.0;
+            sphereMtl.roughness = 0.75;
+            sphereMtl.specular = 0.25;
+            sphereMtl.subsurface = 1;
+            sphereMtl.subsurfaceColor = new vec3([1.0, 0.2, 0.0]);
+            sphereMtl.subsurfaceRadius = 1;
+            sphereMtl.subsurfaceThickness = 0.5;
+            sphereMtl.subsurfacePower = 1;
             sphereMesh.materials.push(sphereMtl);
         
             scene.attachChild(sphereMesh);
         }
-    
-        /*
-        const sphereAutoRot = new AutoRotateBehavior(sphereMesh);
-        sphereMesh.behaviors.push(sphereAutoRot);
-    
-        scene.attachChild(sphereMesh);
-        */
-    
+
+        // add a static cylinder sphere with subsurface material
         const cylinderMesh = new Mesh();
         cylinderMesh.name = "cylinder01";
         cylinderMesh.localTransform.fromTranslation(new vec3([0.75, 0, 0]));
@@ -131,9 +90,14 @@
         cylinderMesh.autoUpdateTransform = false;
         const cylinderMtl = new StandardPBRMaterial();
         cylinderMtl.color = new vec4([0.0, 1.0, 0.0, 1.0]);
-        cylinderMtl.emissive = new vec4([0.5, 0.5, 0.5, 1]);
-        cylinderMtl.metallic = 0.2;
+        cylinderMtl.emissive = new vec4([0.0, 0.0, 0.0, 1]);
+        cylinderMtl.metallic = 0.01;
         cylinderMtl.roughness = 0.6;
+        cylinderMtl.subsurface = 1;
+        cylinderMtl.subsurfaceColor = new vec3([0.0, 1.0, 0.0]);
+        cylinderMtl.subsurfaceRadius = 1;
+        cylinderMtl.subsurfaceThickness = 0.5;
+        cylinderMtl.subsurfacePower = 1;
         cylinderMesh.materials.push(cylinderMtl);
     
         /*
@@ -147,7 +111,7 @@
         const matPlaneTran = new mat4();
     
         matPlaneRot.setIdentity();
-        matPlaneTran.fromTranslation(new vec3([0, -2, 0]));
+        matPlaneTran.fromTranslation(new vec3([0, -0.5, 0]));
         
         addPlane("floor", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), 0.5, 0.5, scene);
     
@@ -223,6 +187,7 @@
             skyboxTexture.samplerState = new SamplerState();
             skyboxTexture.upload();
             scene.background = skyboxTexture;
+            scene.backgroundIntensity = 0.1;
     
             Clock.instance.start();
             requestAnimationFrame(gameLoop);

@@ -33,10 +33,10 @@ vec4 subsurfaceScattering(float ndotl, float curvature, vec3 subsurfaceColor, fl
 // https://colinbarrebrisebois.com/2011/03/07/gdc-2011-approximating-translucency-for-a-fast-cheap-and-convincing-subsurface-scattering-look/
 // note: the result value should be multiplied with diffuse lighting color
 vec3 subsurfaceRadiance(vec3 n, vec3 v, vec3 l, float scale, float distortion, float power, vec3 color, float thickness) {
-    vec3 distortedHalfway = l + n * distortion;
-    float backIntensity = max(0.0, dot(v, -distortedHalfway));
+    vec3 distortedHalfway = normalize(l + n * distortion);
+    float backIntensity = dot(v, -distortedHalfway);
     float reverseDiffuse = pow(clamp(backIntensity, 0.0, 1.0), power) * scale; // original code clamp funciton is wrong
-    return (reverseDiffuse + color) * (1.0 - thickness);
+    return reverseDiffuse * color * thickness;
 }
 
 // note: the result value need to multiply with diffuse IBL color
