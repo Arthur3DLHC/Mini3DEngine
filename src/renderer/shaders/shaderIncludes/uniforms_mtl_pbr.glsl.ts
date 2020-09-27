@@ -10,18 +10,21 @@ export default /** glsl */`
         vec4 emissive;
 
         vec3 subsurfaceColor;
-        float subsurface;
+        float subsurface;           // subsurface amount
+
+        float subsurfaceRadius;
+        float subsurfacePower;
+        float subsurfaceThickness;
+        float specular;
 
         float metallic;
         float roughness;
-        float specular;
         float colorMapAmount;
-
         float metallicMapAmount;
+
         float roughnessMapAmount;
         float normalMapAmount;
         float occlusionMapAmount;
-        
         float emissiveMapAmount;
         // 注意: sampler 不能放在uniform block里
 

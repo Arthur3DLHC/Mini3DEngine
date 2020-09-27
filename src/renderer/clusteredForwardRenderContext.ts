@@ -181,13 +181,20 @@ export class ClusteredForwardRenderContext extends RenderContext {
         // default pbr material
         this._ubMaterialPBR.addVec4("baseColor", new vec4());
         this._ubMaterialPBR.addVec4("emissive", new vec4());
+
         this._ubMaterialPBR.addVec3("subsurfaceColor", new vec3());
         this._ubMaterialPBR.addFloat("subsurface", 0);
+
+        this._ubMaterialPBR.addFloat("subsurfaceRadius", 0);
+        this._ubMaterialPBR.addFloat("subsurfacePower", 0);
+        this._ubMaterialPBR.addFloat("subsurfaceThickness", 0);
+        this._ubMaterialPBR.addFloat("specular", 0);
+
         this._ubMaterialPBR.addFloat("metallic", 0);
         this._ubMaterialPBR.addFloat("roughness", 0);
-        this._ubMaterialPBR.addFloat("specular", 0);
         this._ubMaterialPBR.addFloat("colorMapAmount", 0);
         this._ubMaterialPBR.addFloat("metallicMapAmount", 0);
+
         this._ubMaterialPBR.addFloat("roughnessMapAmount", 0);
         this._ubMaterialPBR.addFloat("normalMapAmount", 0);
         this._ubMaterialPBR.addFloat("occlusionMapAmount", 0);
@@ -719,13 +726,20 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 const stdPBRMtl = material as StandardPBRMaterial;
                 this._ubMaterialPBR.setVec4("baseColor", stdPBRMtl.color);
                 this._ubMaterialPBR.setVec4("emissive", stdPBRMtl.emissive);
+
                 this._ubMaterialPBR.setVec3("subsurfaceColor", stdPBRMtl.subsurfaceColor);
                 this._ubMaterialPBR.setFloat("subsurface", stdPBRMtl.subsurface);
+
+                this._ubMaterialPBR.setFloat("subsurfaceRadius", stdPBRMtl.subsurface);
+                this._ubMaterialPBR.setFloat("subsurfacePower", stdPBRMtl.subsurface);
+                this._ubMaterialPBR.setFloat("subsurfaceThickness", stdPBRMtl.subsurface);
+                this._ubMaterialPBR.setFloat("specular", stdPBRMtl.specular);
+
                 this._ubMaterialPBR.setFloat("metallic", stdPBRMtl.metallic);
                 this._ubMaterialPBR.setFloat("roughness", stdPBRMtl.roughness);
-                this._ubMaterialPBR.setFloat("specular", stdPBRMtl.specular);
                 this._ubMaterialPBR.setFloat("colorMapAmount", stdPBRMtl.colorMapAmount);
                 this._ubMaterialPBR.setFloat("metallicMapAmount", stdPBRMtl.metallicMapAmount);
+                
                 this._ubMaterialPBR.setFloat("roughnessMapAmount", stdPBRMtl.roughnessMapAmount);
                 this._ubMaterialPBR.setFloat("normalMapAmount", stdPBRMtl.normalMapAmount);
                 this._ubMaterialPBR.setFloat("occlusionMapAmount", stdPBRMtl.occlusionMapAmount);

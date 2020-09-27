@@ -15,6 +15,9 @@ export class StandardPBRMaterial extends Material {
 
         this.subsurfaceColor = new vec3([1.0, 1.0, 1.0]);
         this.subsurface = 0.0;
+        this.subsurfaceRadius = 0.01;
+        this.subsurfacePower = 16;
+        this.subsurfaceThickness = 0.01;
 
         this.colorMap = null;
         this.metallicRoughnessMap = null;
@@ -48,6 +51,10 @@ export class StandardPBRMaterial extends Material {
 
     public subsurfaceColor: vec3;
     public subsurface: number;
+
+    public subsurfaceRadius: number;
+    public subsurfacePower: number;
+    public subsurfaceThickness: number;
 
     public colorMap: Texture | null;
     // public reflectivityMap: Texture | null;

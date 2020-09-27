@@ -132,7 +132,7 @@ void main(void)
     float metallic = metallicRoughness.x;
     float roughness = metallicRoughness.y;
 
-    // fix me: subsurface amount and texture use textures?
+    // fix me: subsurface amount and color use textures?
     float curvature = 0.0;
     if(u_material.subsurface > 0.0) {
         // fix me: using position and normal, the curvature is too blocky
@@ -151,6 +151,7 @@ void main(void)
     float alphaRoughness = roughness * roughness;
 
     vec3 f_diffuse = vec3(0.0);
+    vec3 f_subsurface = vec3(0.0);
     vec3 f_specular = vec3(0.0);
     vec3 f_emissive = vec3(0.0);
 
@@ -288,14 +289,15 @@ void main(void)
         // todo: if subsurface > 0, sample subsurface strength from subsurface scattering BRDF texture
         // todo: test the new simple subsurface scattering function
         // 
-        vec4 subsuf = vec4(0.0);
+        // vec4 subsuf = vec4(0.0);
         if(u_material.subsurface > 0.0) {
             // TODO: 根据 ndotl 和 curvature 取样 subsurface BRDF texture
             // vec3 subsuf = subsurfaceScattering(NdotL, curvature, u_material.subsurfaceColor, u_material.subsurface);
             // f_diffuse += subsuf * intensity;
 
-            subsuf = subsurfaceScattering(NdotL, curvature, u_material.subsurfaceColor, u_material.subsurface);
-            f_diffuse += subsuf.rgb * subsuf.a * intensity;
+            // subsuf = subsurfaceScattering(NdotL, curvature, u_material.subsurfaceColor, u_material.subsurface);
+            // f_diffuse += subsuf.rgb * subsuf.a * intensity;
+            f_subsurface += intensity * subsurfaceRadiance(n, v, l, u_material.subsurface, u_material.subsurfaceRadius, u_material.subsurfacePower, u_material.subsurfaceColor, u_material.subsurfaceThickness);
         }
 
         // float NdotV = clampedDot(n, v);  // 前面已经算过了，与光源无关
@@ -314,7 +316,7 @@ void main(void)
             vec3 illuminance = intensity * NdotL;
             vec3 F = F_Schlick(f0, f90, VdotH);
 
-            f_diffuse += illuminance * BRDF_lambertian(F, albedoColor) * (1.0 - subsuf.a);
+            f_diffuse += illuminance * BRDF_lambertian(F, albedoColor);
             f_specular += illuminance * BRDF_specularGGX(F, alphaRoughness, NdotL, NdotV, NdotH);
         }
 
@@ -335,7 +337,7 @@ void main(void)
    
     // todo: opacity for transparent surfaces;
     // todo: tone mapping? linear space to sRGB space?
-    vec3 color = f_diffuse + f_specular + f_emissive;
+    vec3 color = f_diffuse + f_subsurface + f_specular + f_emissive;
     // put tone mapping in post process
     // color = ACESToneMapping(color, 1.0);
 
