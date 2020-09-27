@@ -70,11 +70,11 @@
             sphereMtl.metallic = 0.0;
             sphereMtl.roughness = 0.75;
             sphereMtl.specular = 0.25;
-            sphereMtl.subsurface = 0.1;
+            sphereMtl.subsurface = 1;
             sphereMtl.subsurfaceColor = new vec3([1.0, 0.2, 0.0]);
-            sphereMtl.subsurfaceRadius = 1;
+            sphereMtl.subsurfaceRadius = 0.2;
             sphereMtl.subsurfaceThickness = 0.5;
-            sphereMtl.subsurfacePower = 1;
+            sphereMtl.subsurfacePower = 12;
             sphereMesh.materials.push(sphereMtl);
         
             scene.attachChild(sphereMesh);
