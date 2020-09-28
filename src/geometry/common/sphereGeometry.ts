@@ -4,6 +4,7 @@ import { IndexBuffer } from "../../WebGLResources/indexBuffer.js";
 import { GLDevice } from "../../WebGLResources/glDevice.js";
 import { Primitive } from "../primitive.js";
 import { VertexBufferAttribute } from "../../WebGLResources/vertexBufferAttribute.js";
+import vec3 from "../../../lib/tsm/vec3.js";
 
 export class SphereGeometry extends BufferGeometry {
     public constructor(radius: number, widthSegments: number, heightSegments: number) {
@@ -79,6 +80,8 @@ export class SphereGeometry extends BufferGeometry {
         this.primitives.push(grp);
 
         this.boundingSphere.radius = this._radius;
+        this.boundingBox.minPoint = new vec3([-this._radius, -this._radius, -this._radius]);
+        this.boundingBox.maxPoint = new vec3([this._radius, this._radius, this._radius]);
     }
 
     private _radius: number;

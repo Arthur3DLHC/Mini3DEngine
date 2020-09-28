@@ -1597,6 +1597,7 @@ export class ClusteredForwardRenderer {
             if (light.shadow.moved) {
                 // 如果光源移动或属性变化了，直接向 shadowmapAtlas 中绘制全部静态和动态物体
                 this.renderShadowItems(this._renderListOpaque, light, true, true, this._shadowmapFBO, false);
+                this.renderShadowItems(this._renderListOpaqueOcclusionQuery, light, true, true, this._shadowmapFBO, false);
                 light.shadow.cached = false;
                 light.shadow.moved = false;
             } else {
@@ -1605,6 +1606,7 @@ export class ClusteredForwardRenderer {
                 if (!light.shadow.cached) {
                     // todo: render all static meshes to cache
                     this.renderShadowItems(this._renderListOpaque, light, true, false, this._shadowmapCacheFBO, false);
+                    this.renderShadowItems(this._renderListOpaqueOcclusionQuery, light, true, false, this._shadowmapCacheFBO, false);
                     light.shadow.cached = true;
 
                     // copy from cache to shadowmap
@@ -1617,6 +1619,7 @@ export class ClusteredForwardRenderer {
 
                 // check moved meshes, if there is one can cast shadow moving in light view, update dynamic shadowmap
                 this.renderShadowItems(this._renderListOpaque, light, false, true, this._shadowmapFBO, !cacheCopied);
+                this.renderShadowItems(this._renderListOpaqueOcclusionQuery, light, false, true, this._shadowmapFBO, !cacheCopied);
             }
         }
     }
@@ -1782,6 +1785,7 @@ export class ClusteredForwardRenderer {
                 // fix me: is that necessary to use depth prepass and occlusion query?
                 // no after effects?
                 this.renderItems(this._renderListOpaque, this._frustum, false, false, false, true);
+                this.renderItems(this._renderListOpaqueOcclusionQuery, this._frustum, false, false, false, true);
                 // is that necessary to render transparent objects? yes, it is...
             }
 
