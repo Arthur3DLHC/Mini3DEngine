@@ -7321,7 +7321,6 @@
     ],
     "materials" : [
         {
-            "doubleSided" : true,
             "emissiveFactor" : [
                 0,
                 0,
@@ -7335,8 +7334,8 @@
                     0.3493264615535736,
                     1
                 ],
-                "metallicFactor" : 0.7437499761581421,
-                "roughnessFactor" : 0.29374998807907104
+                "metallicFactor" : 0.6968085169792175,
+                "roughnessFactor" : 0.421409547328949
             }
         },
         {
@@ -7377,7 +7376,6 @@
             }
         },
         {
-            "doubleSided" : true,
             "emissiveFactor" : [
                 0,
                 0,
