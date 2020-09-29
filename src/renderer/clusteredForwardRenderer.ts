@@ -640,7 +640,7 @@ export class ClusteredForwardRenderer {
                                 }
                             } else {
                                 if (item.object.occlusionQuery) {
-                                    // 如果开了 occlusion query，就不绘制 depth prepass 了？
+                                    // 如果开了 occlusion query，就不绘制 depth prepass 了
                                     this._renderListOpaqueOcclusionQuery.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
                                 } else {
                                     this._renderListOpaque.addRenderItem(item.object, item.geometry, item.startIndex, item.count, item.material);
@@ -918,13 +918,14 @@ export class ClusteredForwardRenderer {
             this.renderItems(this._renderListOpaque, frustum, false);
         }
 
-        // occlusion query objects, query for next frame;
+        // occlusion query objects
         if (this._renderListOpaqueOcclusionQuery.ItemCount > 0) {
+            // query for next frame;
             this.setRenderStateSet(this._renderStatesOpaqueOcclusion);
             GLPrograms.useProgram(this._occlusionQueryProgram);
             this.renderOcclusionBoundingBoxes(this._renderListOpaqueOcclusionQuery);
 
-            // occlusion query objects, render according to last frame query result
+            // render according to last frame query result
             this.setRenderStateSet(this._renderStatesOpaque);
             this.renderItems(this._renderListOpaqueOcclusionQuery, frustum, false, true);
         }
