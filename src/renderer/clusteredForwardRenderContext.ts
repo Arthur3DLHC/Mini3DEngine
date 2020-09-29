@@ -162,7 +162,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubView.addVec2("zRange", new vec2());
         this._ubView.addVec2("rtSize", new vec2());
         this._ubView.addVec4("farRect", new vec4());
-        this._ubView.addVec4("clusterRes", new vec4());
+        this._ubView.addVec4("clusterParams", new vec4());
 
         this._ubItemIndices.addUniform("indices", ClusteredForwardRenderContext.MAX_ITEMS);
 
@@ -499,13 +499,19 @@ export class ClusteredForwardRenderContext extends RenderContext {
         const farRect = new vec4([farLeftBottom.x / farLeftBottom.w, farLeftBottom.y / farLeftBottom.w, farRightTop.x / farRightTop.w, farRightTop.y / farRightTop.w]);
         this._ubView.setVec4("farRect", farRect);
 
-        const clusterRes = new vec4([1,1,1,1]);
+        const clusterParams = new vec4([1,1,0,0]);  // use 0 for z and w can force slice = 0
         if (useClusters) {
-            clusterRes.x = ClusteredForwardRenderContext.NUM_CLUSTERS_X;
-            clusterRes.y = ClusteredForwardRenderContext.NUM_CLUSTERS_Y;
-            clusterRes.z = ClusteredForwardRenderContext.NUM_CLUSTERS_Z;
+            clusterParams.x = ClusteredForwardRenderContext.NUM_CLUSTERS_X;
+            clusterParams.y = ClusteredForwardRenderContext.NUM_CLUSTERS_Y;
+            // clusterParams.z = ClusteredForwardRenderContext.NUM_CLUSTERS_Z;
+
+            // http://www.aortiz.me/2018/12/21/CG.html, solving slice from DOOM like equation
+            const numSlices = ClusteredForwardRenderContext.NUM_CLUSTERS_Z;
+            const logFarOverNear = Math.log(camera.far/camera.near)
+            clusterParams.z = numSlices / logFarOverNear;
+            clusterParams.w = -numSlices * Math.log(camera.near) / logFarOverNear;
         }
-        this._ubView.setVec4("clusterRes", clusterRes);
+        this._ubView.setVec4("clusterParams", clusterParams);
 
         this._ubView.update();
 

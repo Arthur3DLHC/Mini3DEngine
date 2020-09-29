@@ -156,8 +156,8 @@ void main(void)
     vec3 f_emissive = vec3(0.0);
 
     // todo: decals
-    vec4 ndc = ex_hPosition / ex_hPosition.w;
-    uint cluster = clusterOfPixel(ndc);
+    // vec4 ndc = ex_hPosition / ex_hPosition.w;
+    uint cluster = clusterOfPixel(ex_hPosition);
 
      // todo: irradiance probes
 

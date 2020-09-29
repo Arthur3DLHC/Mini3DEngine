@@ -117,15 +117,19 @@ void main(void) {
     // return;
 
     vec4 projectedPos = vec4(ex_texcoord * 2.0 - 1.0, texture(s_sceneDepth, ex_texcoord).r * 2.0 - 1.0, 1.0);
-    uint cluster = clusterOfPixel(projectedPos);
+
     // Position in view
     vec4 viewPos = u_view.matInvProj * projectedPos;
     // todo: handle orthographic
     viewPos /= viewPos.w;
-
     vec3 worldPos = (u_view.matInvView * viewPos).xyz;
 
-
+    // get the cluster index of this pixel
+    // todo: use hPosition, not projected position
+    // according to opengl projection matrix
+    float w = -viewPos.z;
+    vec4 hPosition = projectedPos * w;
+    uint cluster = clusterOfPixel(hPosition);
 
     // calculate world space reflection vector
     // vec3 v = normalize((u_view.matInvView * vec4(viewPos.xyz, 0.0)).xyz);    // world space

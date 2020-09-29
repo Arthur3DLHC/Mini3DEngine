@@ -20,7 +20,7 @@ export default /** glsl */`
         vec2 zRange;            // near, far
         vec2 rtSize;            // render target full size, in pixels
         vec4 farRect;           // far plane left, bottom, right, top
-        vec4 clusterRes;        // x, y, z resolusion of clusters.
+        vec4 clusterParams;     // x, y: x y resolusion of clusters. z, w: bias and offset for calculate cluster slice from NDC depth
         // fix me: 是否加一个亮度系数？
     } u_view;
 
