@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, InstancedMesh } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "../common/behaviors/autoRotateBehavior.js";
 import vec4 from "../../lib/tsm/vec4.js";
@@ -58,7 +58,7 @@ window.onload = () => {
 
     // occluder box geometry
     const boxMesh = new Mesh();
-    boxMesh.name = "box01";
+    boxMesh.name = "wall";
     boxMesh.geometry = new BoxGeometry(2, 1, 0.25);
     boxMesh.castShadow = true;
     boxMesh.isStatic = false;
@@ -75,30 +75,24 @@ window.onload = () => {
 
     let sphereOcclusionResult = true;
     let cylinderOcclusionResult = true;
+    let instOcclustionResult = true;
 
     // occludee sphere
-        const sphereMesh = new Mesh();
-        sphereMesh.name = "sphere.Static";
-        sphereMesh.localTransform.fromTranslation(new vec3([-0.75, 0, 0]));
-        sphereMesh.geometry = new SphereGeometry(0.4, 16, 8);
-        sphereMesh.castShadow = true;
-        sphereMesh.isStatic = true;
-        sphereMesh.occlusionQuery = true;
-        sphereMesh.autoUpdateTransform = false;
-        const sphereMtl = new StandardPBRMaterial();
-        sphereMtl.color = new vec4([1.0, 1.0, 1.0, 1.0]);
-        sphereMtl.metallic = 0.05;
-        sphereMtl.roughness = 0.95;
-        sphereMesh.materials.push(sphereMtl);
-    
-        scene.attachChild(sphereMesh);
-
-    /*
-    const sphereAutoRot = new AutoRotateBehavior(sphereMesh);
-    sphereMesh.behaviors.push(sphereAutoRot);
+    const sphereMesh = new Mesh();
+    sphereMesh.name = "sphere.Static";
+    sphereMesh.localTransform.fromTranslation(new vec3([-0.75, 0, 0]));
+    sphereMesh.geometry = new SphereGeometry(0.4, 16, 8);
+    sphereMesh.castShadow = true;
+    sphereMesh.isStatic = true;
+    sphereMesh.occlusionQuery = true;
+    sphereMesh.autoUpdateTransform = false;
+    const sphereMtl = new StandardPBRMaterial();
+    sphereMtl.color = new vec4([1.0, 1.0, 1.0, 1.0]);
+    sphereMtl.metallic = 0.05;
+    sphereMtl.roughness = 0.95;
+    sphereMesh.materials.push(sphereMtl);
 
     scene.attachChild(sphereMesh);
-    */
 
     // occludee cylinder
 
@@ -117,12 +111,39 @@ window.onload = () => {
     cylinderMtl.roughness = 0.6;
     cylinderMesh.materials.push(cylinderMtl);
 
-    /*
-    const cylinderAutoRot = new AutoRotateBehavior(cylinderMesh);
-    cylinderMesh.behaviors.push(cylinderAutoRot);
-    */
-
     scene.attachChild(cylinderMesh);
+
+    // todo: occludee instanced mesh
+    const instMesh = new InstancedMesh(100, false, 0, true);
+    instMesh.name = "instances";
+    instMesh.geometry = new CylinderGeometry(0.2, 0.8, 24);
+    instMesh.castShadow = true;
+    instMesh.isStatic = true;
+    instMesh.occlusionQuery = true;
+    instMesh.autoUpdateTransform = true;
+    const instMtl = new StandardPBRMaterial();
+    instMtl.color = new vec4([0, 0, 1, 1]);
+    instMtl.metallic = 0.0;
+    instMtl.roughness = 0.8;
+    instMesh.materials.push(instMtl);
+
+    for (let i = 0; i < instMesh.maxInstanceCount; i++) {
+        const matRot: mat4 = mat4.identity.copy();
+        matRot.fromZRotation(i * 0.03);
+
+        const matTran: mat4 = mat4.identity.copy();
+        const r = Math.floor(i / 10);
+        const c = i % 10;
+        matTran.fromTranslation(new vec3([r * 0.5, 0.5, c * 0.5 - 5]));
+
+        const matInst: mat4 = new mat4();
+        mat4.product(matTran, matRot, matInst);
+
+        instMesh.setMatrixOf(i, matInst);
+    }
+    instMesh.curInstanceCount = instMesh.maxInstanceCount;
+    instMesh.updateInstanceVertexBuffer();
+    scene.attachChild(instMesh);
 
     const matPlaneRot = new mat4();
     const matPlaneTran = new mat4();
@@ -157,6 +178,7 @@ window.onload = () => {
     const fpsLabel: HTMLDivElement = document.getElementById("fpsLabel") as HTMLDivElement;
     const sphereLabel: HTMLDivElement = document.getElementById("sphereLabel") as HTMLDivElement;
     const cylinderLabel: HTMLDivElement = document.getElementById("cylinderLabel") as HTMLDivElement;
+    const instLabel: HTMLDivElement = document.getElementById("instanceLabel") as HTMLDivElement;
 
     let lastUpdateFPSTime = 0;
     let curFPS = 0;
@@ -175,13 +197,18 @@ window.onload = () => {
         }
 
         if (sphereMesh.occlusionQueryResult !== sphereOcclusionResult) {
-            sphereLabel.innerHTML = sphereMesh.occlusionQueryResult ? "true" : "false";
+            sphereLabel.innerHTML = sphereMesh.occlusionQueryResult ? "sphere:true" : "sphere:false";
             sphereOcclusionResult = sphereMesh.occlusionQueryResult;
         }
 
         if (cylinderMesh.occlusionQueryResult !== cylinderOcclusionResult) {
-            cylinderLabel.innerHTML = cylinderMesh.occlusionQueryResult ? "true" : "false";
+            cylinderLabel.innerHTML = cylinderMesh.occlusionQueryResult ? "cylinder:true" : "cylinder:false";
             cylinderOcclusionResult = cylinderMesh.occlusionQueryResult;
+        }
+
+        if (instMesh.occlusionQueryResult !== instOcclustionResult) {
+            instLabel.innerHTML = instMesh.occlusionQueryResult ? "inst:true" : "inst:false";
+            instOcclustionResult = instMesh.occlusionQueryResult;
         }
 
         curFPS++;
