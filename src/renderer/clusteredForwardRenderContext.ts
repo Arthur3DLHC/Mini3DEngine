@@ -509,7 +509,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
             const numSlices = ClusteredForwardRenderContext.NUM_CLUSTERS_Z;
             const logFarOverNear = Math.log(camera.far/camera.near)
             clusterParams.z = numSlices / logFarOverNear;
-            clusterParams.w = -numSlices * Math.log(camera.near) / logFarOverNear;
+            clusterParams.w = - numSlices * Math.log(camera.near) / logFarOverNear;
         }
         this._ubView.setVec4("clusterParams", clusterParams);
 

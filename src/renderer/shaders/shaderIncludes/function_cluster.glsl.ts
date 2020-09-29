@@ -2,9 +2,18 @@
  * cluster relative functions
  */
 export default /** glsl */`
-    // todo: get cluster index from pixel NDC position (already divide by w? range [-1,1])
     uint clusterOfPixel(vec4 hPosition) {
-        // todo: use u_view.clusterParams
+        // http://www.aortiz.me/2018/12/21/CG.html, solving slice from DOOM like equation
+
+        // clusterParams are calculated as:
+            // const numSlices = ClusteredForwardRenderContext.NUM_CLUSTERS_Z;
+            // const logFarOverNear = Math.log(camera.far/camera.near)
+            // clusterParams.z = numSlices / logFarOverNear;
+            // clusterParams.w = - numSlices * Math.log(camera.near) / logFarOverNear;
+
+        float viewZ = abs(hPosition.w);
+        uint slice = uint(floor(log(viewZ) * u_view.clusterParams.z + u_view.clusterParams.w));
+        
         return 0u;
     }
 
