@@ -946,6 +946,9 @@ export class GLTFSceneBuilder {
             }
             // todo: create sampler state ?
             texture.samplerState = new SamplerState(sampDef.wrapS, sampDef.wrapT, sampDef.minFilter, sampDef.magFilter);
+        } else {
+            // use a default repeat state
+            texture.samplerState = new SamplerState(GLDevice.gl.REPEAT, GLDevice.gl.REPEAT, GLDevice.gl.LINEAR_MIPMAP_LINEAR, GLDevice.gl.LINEAR_MIPMAP_LINEAR);
         }
 
         if (texDef.source !== undefined) {
