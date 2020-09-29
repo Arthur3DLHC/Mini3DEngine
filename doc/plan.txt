@@ -581,15 +581,15 @@ TODO:       主要类结构
                     用 instanced 方式绘制包围盒
                 动态的 instancing 物体怎么处理
                     更新矩阵；包围盒？occlusion query?
+                    暂时不支持动态 instancing
             
             物体是否做包围球检测的控制标志？ 
             
             测试 Occlusion query?
-                在 blender 中给物体加一个自定义属性，区分是 occluder 还是 occludee
-                调试绘制：Occlusion test 失败的，画一个不会被遮挡的线框 box？或者用不同颜色线框区分被遮挡/无遮挡的物体
-                Occlusion query object 分组；
-                    用 instancing 方式绘制组内每个 box？还是绘制组的总 AABB？
-                        绘制每个 box 是否精确一些；
+                在 blender 中给物体加一个自定义属性，occlustionQuery
+                测试Demo，调试
+                    普通mesh的occlusion query
+                    instancedMesh的occlusion query
 
             Decals
 
@@ -598,9 +598,11 @@ TODO:       主要类结构
                     加一个参数：checkClusters
                         主画面渲染，设为true;
                         Cubemap 或 Shadowmap 渲染，设为 false；分辨率较低，而且是类似 bake 阶段，无需 Clustered
+                shader 实现从像素位置获得 cluster id 的函数
                 如何绘制调试信息：
                     Cluster划分
                     Cluster内对象的数量
+                    使用一个统一的全屏后期特效？不会影响 defaultPBR shader，便于开启和关闭；
 
             户外阴影方案
                 Cascaded shadow map? 
