@@ -231,6 +231,11 @@ export class GLTFSceneBuilder {
                 node = this.processMesh(nodeDef.mesh, nodeDef.skin !== undefined, gltf);
             }
             // this._meshReferences[nodeDef.mesh]++;
+
+            // occlusion query? only meshes
+            if (nodeDef.extras !== undefined && nodeDef.extras.occlusionQuery !== undefined) {
+                node.occlusionQuery = (nodeDef.extras.occlusionQuery === 1);        // blender custom prop boolean is number 0 or 1
+            }
         }
         else {
             // todo: light, environment probe, irradiance volume
@@ -263,6 +268,7 @@ export class GLTFSceneBuilder {
         // todo: node transform
         // todo: hold translation, rotation, scale in Object3D？
         this.processNodeTransform(nodeDef, node);
+
 
         return node;
 
@@ -499,6 +505,10 @@ export class GLTFSceneBuilder {
             instGroup.set(instGroupId, instMesh);
             if (nodeDef.name !== undefined) {
                 instMesh.name = "instmesh_" + nodeDef.name;
+            }
+
+            if (nodeDef.extras !== undefined && nodeDef.extras.occlusionQuery !== undefined) {
+                instMesh.occlusionQuery = nodeDef.extras.occlusionQuery;
             }
 
             console.info("Instanced mesh: " + nodeDef.mesh);
