@@ -48,8 +48,11 @@ export class ShaderProgram {
         let linkLog = GLDevice.gl.getProgramInfoLog(this.glProgram);
         if (linkLog) {
             if (linkLog.length > 0) {
-                throw this.name + ":" + linkLog;
+                console.warn(this.name + " " + linkLog);
             }
+        }
+        if(!GLDevice.gl.getProgramParameter(this.glProgram, GLDevice.gl.LINK_STATUS)) {
+            throw "failed linking program: " + this.name;
         }
 
         // todo: cache uniform locations?
@@ -112,9 +115,12 @@ export class ShaderProgram {
             let compileLog = GLDevice.gl.getShaderInfoLog(shader);
             if (compileLog) {
                 if (compileLog.length > 0) {
-                    console.error("failed compiling shader:" + this.name + " :\n" + code + "\nerror: " + compileLog);
-                    throw compileLog;
+                    console.warn(this.name + " :\n" + code + "\nerror: " + compileLog);
+                    // throw compileLog;
                 }
+            }
+            if( ! GLDevice.gl.getShaderParameter(shader, GLDevice.gl.COMPILE_STATUS)) {
+                throw this.name + " :\n" + code + "\nerror: " + compileLog;
             }
         } else {
             throw new Error("Failed creating gl shader object");

@@ -13,8 +13,15 @@ export default /** glsl */`
 
         float viewZ = abs(hPosition.w);
         uint slice = uint(floor(log(viewZ) * u_view.clusterParams.z + u_view.clusterParams.w));
-        
-        return 0u;
+
+        // todo: calculate x and y
+        vec4 ndc = hPosition / hPosition.w;
+
+        uvec2 xy = uvec2(floor((ndc.xy * 0.5 + vec2(0.5)) * u_view.clusterParams.xy));
+        uvec2 colRows = uvec2(u_view.clusterParams.xy);
+
+        return slice * colRows.x * colRows.y + xy.y * colRows.x + xy.x;
+        // return 0u;
     }
 
     // 从 item 索引数组中取第 iidx 个索引
