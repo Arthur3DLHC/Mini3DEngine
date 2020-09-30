@@ -15,9 +15,9 @@ export default /** glsl */`
         uint slice = uint(floor(log(viewZ) * u_view.clusterParams.z + u_view.clusterParams.w));
 
         // todo: calculate x and y
-        vec4 ndc = hPosition / hPosition.w;
+        vec2 ndc = hPosition.xy / hPosition.w;
 
-        uvec2 xy = uvec2(floor((ndc.xy * 0.5 + vec2(0.5)) * u_view.clusterParams.xy));
+        uvec2 xy = uvec2(floor((ndc * 0.5 + vec2(0.5)) * u_view.clusterParams.xy));
         uvec2 colRows = uvec2(u_view.clusterParams.xy);
 
         return slice * colRows.x * colRows.y + xy.y * colRows.x + xy.x;
