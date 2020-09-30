@@ -2,6 +2,14 @@
  * cluster relative functions
  */
 export default /** glsl */`
+    uvec2 colRowFromNDCxy(vec2 ndc) {
+        return uvec2(floor((ndc * 0.5 + vec2(0.5)) * u_view.clusterParams.xy));
+    }
+
+    uint sliceFromViewZ(float viewZ) {
+        return uint(floor(log(viewZ) * u_view.clusterParams.z + u_view.clusterParams.w));
+    }
+
     uint clusterOfPixel(vec4 hPosition) {
         // http://www.aortiz.me/2018/12/21/CG.html, solving slice from DOOM like equation
 
@@ -12,15 +20,17 @@ export default /** glsl */`
             // clusterParams.w = - numSlices * Math.log(camera.near) / logFarOverNear;
 
         float viewZ = abs(hPosition.w);
-        uint slice = uint(floor(log(viewZ) * u_view.clusterParams.z + u_view.clusterParams.w));
+        uint slice = sliceFromViewZ(viewZ);
+        // uint slice = uint(floor(log(viewZ) * u_view.clusterParams.z + u_view.clusterParams.w));
 
         // todo: calculate x and y
         vec2 ndc = hPosition.xy / hPosition.w;
 
-        uvec2 xy = uvec2(floor((ndc * 0.5 + vec2(0.5)) * u_view.clusterParams.xy));
-        uvec2 colRows = uvec2(u_view.clusterParams.xy);
+        uvec2 xy = colRowFromNDCxy(ndc);
+        // uvec2 xy = uvec2(floor((ndc * 0.5 + vec2(0.5)) * u_view.clusterParams.xy));
+        uvec2 numColRows = uvec2(u_view.clusterParams.xy);
 
-        return slice * colRows.x * colRows.y + xy.y * colRows.x + xy.x;
+        return slice * numColRows.x * numColRows.y + xy.y * numColRows.x + xy.x;
         // return 0u;
     }
 
