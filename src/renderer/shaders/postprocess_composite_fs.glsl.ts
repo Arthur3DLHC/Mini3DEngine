@@ -181,14 +181,13 @@ void main(void) {
             float distToCam = length(probe.position - u_view.position);
             float fade = 1.0 - smoothstep(0.7, 1.0, distToCam / probe.visibleRange.x);
             
-            float weight = (1.0 / (distxradius * distxradius)) * fade;
+            // if multiply fade to weight, when there is only one envprobe, it will pop-in/out
+            float weight = (1.0 / (distxradius * distxradius)); // * fade;
 
-            // int ienvmap = int(i - envmapStart);
-            
             // IBL specular part
             vec3 ld = textureCubeArrayLod(s_envMapArray, reflV, int(probeIdx), roughness * MAX_SPECULAR_MIP_LEVEL).rgb;
             vec2 dfg = texture(s_specularDFG, vec2(NdotV, roughness)).rg;
-            iblSpecular += ld * (f0 * dfg.x + dfg.y) * weight;
+            iblSpecular += ld * (f0 * dfg.x + dfg.y) * weight * fade;
             // vec4 envmap = textureCubeArray(s_envMapArray, reflV, int(i - envmapStart));
             // reflection += envmap.rgb * weight;
             
