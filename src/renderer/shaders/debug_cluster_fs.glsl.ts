@@ -85,9 +85,13 @@ void main(void) {
         getEnvProbeIndicesInCluster(cluster, start, count);
         o_color = mix(vec4(0.0, 0.0, 1.0, 0.5), vec4(1.0, 1.0, 0.0, 0.5), clamp(float(count) / MAX_COUNT_REF, 0.0, 1.0));
     } else if (u_debugDrawMode == DRAW_IRR_COUNT) {
-
+        uint start = 0u;
+        uint count = 0u;
+        getIrrProbeIndicesInCluster(cluster, start, count);
+        o_color = mix(vec4(0.0, 0.0, 1.0, 0.5), vec4(1.0, 1.0, 0.0, 0.5), clamp(float(count) / MAX_COUNT_REF, 0.0, 1.0));
     } else if (u_debugDrawMode == DRAW_DECAL_COUNT) {
-
+        // no decal yet
+        o_color = vec4(0., 0., 0., 0.);
     } else {
         o_color = vec4(0., 0., 0., 0.);
     }
