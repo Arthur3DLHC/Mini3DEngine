@@ -33,7 +33,7 @@ export class DebugRenderer {
     public static readonly ClusterDrawMode_DecalCount = 6;
 
     // todo: public flags for render different debug infos
-    public showClusters: boolean = true;
+    public showClusters: boolean = false;
     public clusterDrawMode: number = DebugRenderer.ClusterDrawMode_Clusters;
 
     public constructor(context: ClusteredForwardRenderContext, sceneDepthTex: Texture2D) {

@@ -468,6 +468,7 @@ export class ClusteredForwardRenderer {
     private _debugRenderer: DebugRenderer;
 
     public get postprocessor(): PostProcessor { return this._postprocessor; }
+    public get debugRenderer(): DebugRenderer { return this._debugRenderer; }
 
     public sortTransparents: boolean = true;
 

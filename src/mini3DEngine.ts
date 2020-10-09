@@ -30,6 +30,7 @@ export * from "./renderer/postprocess/ssaoParams.js"
 export * from "./renderer/postprocess/ssrParams.js"
 export * from "./renderer/boundingRenderModes.js"
 export * from "./renderer/clusteredForwardRenderer.js";
+export * from "./renderer/debugRenderer.js";
 export * from "./renderer/postProcessor.js";
 export * from "./renderer/renderItem.js";
 export * from "./renderer/renderList.js";
