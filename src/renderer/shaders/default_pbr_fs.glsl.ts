@@ -197,10 +197,14 @@ void main(void)
         f_diffuse += iblDiffuse / totalWeight;
     }
 
-    uint lightCount = getLightCountInCluster(cluster);
-    for(uint i = 0u; i < lightCount; i++) {
+    uint lightStart;
+    uint lightCount; // = getLightCountInCluster(cluster);
+    getLightIndicesInCluster(cluster, lightStart, lightCount);
+    for(uint i = lightStart; i < lightStart + lightCount; i++) {
 
-        Light light = getLightInCluster(cluster, i);
+        // Light light = getLightInCluster(cluster, i);
+        uint lightIdx = getItemIndexAt(i);
+        Light light = u_lights.lights[lightIdx];
         uint lightType = getLightType(light);
         float lightRange = getLightRange(light);
 

@@ -16,6 +16,7 @@ export default /** glsl */`
         return u_clusters.clusters[cluster].lightCount;
     }
 
+    /*
     Light getLightInCluster(uint cluster, uint iLight)
     {
         // 获得cluster中的光源索引列表在对象索引数组的起始偏移
@@ -24,6 +25,7 @@ export default /** glsl */`
         uint lightIdx = getItemIndexAt(offset);
         return u_lights.lights[lightIdx];
     }
+    */
 
     //---------- environment (reflection) probes -----------
 

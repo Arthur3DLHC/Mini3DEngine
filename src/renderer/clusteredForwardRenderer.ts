@@ -83,6 +83,7 @@ import { RenderItem } from "./renderItem.js";
 import { BoxWireframeGeometry } from "../geometry/common/boxWireframeGeometry.js";
 import { SphereWireframeGeometry } from "../geometry/common/sphereWireframeGeometry.js";
 import { BoundingRenderModes } from "./boundingRenderModes.js";
+import { DebugRenderer } from "./debugRenderer.js";
 
 export class ClusteredForwardRenderer {
 
@@ -343,6 +344,10 @@ export class ClusteredForwardRenderer {
 
         this._subsurfProcessor = new SubsurfaceProcessor();
 
+        console.log("creating debugRenderer...");
+
+        this._debugRenderer = new DebugRenderer(this._renderContext, this._sceneDepthTexture);
+
         console.log("clustered forward renderer created.");
     }
 
@@ -460,6 +465,7 @@ export class ClusteredForwardRenderer {
 
     private _postprocessor: PostProcessor;
     private _subsurfProcessor: SubsurfaceProcessor;
+    private _debugRenderer: DebugRenderer;
 
     public get postprocessor(): PostProcessor { return this._postprocessor; }
 

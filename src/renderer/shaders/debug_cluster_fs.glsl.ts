@@ -6,6 +6,7 @@ export default /** glsl */`
 #include <samplers_postprocess>
 #include <function_cluster>
 #include <function_get_items>
+#include <function_depth>
 
 // todo: control what debug info to draw?
 //      cluster z slice with different colors;
@@ -51,28 +52,28 @@ void main(void) {
     vec4 hPosition = projectedPos * w;
     uint cluster = clusterOfPixel(hPosition);
 
-    vec4 colors[6] = vec4[6](vec3(1.0, 0.0, 0.0, 0.5),
-        vec3(0.0, 1.0, 0.0, 0.5),
-        vec3(0.0, 0.0, 1.0, 0.5),
-        vec3(0.0, 1.0, 1.0, 0.5),
-        vec3(1.0, 0.0, 1.0, 0.5),
-        vec3(1.0, 1.0, 0.0, 0.5)
+    vec4 colors[6] = vec4[6](vec4(1.0, 0.0, 0.0, 0.5),
+        vec4(0.0, 1.0, 0.0, 0.5),
+        vec4(0.0, 0.0, 1.0, 0.5),
+        vec4(0.0, 1.0, 1.0, 0.5),
+        vec4(1.0, 0.0, 1.0, 0.5),
+        vec4(1.0, 1.0, 0.0, 0.5)
     );
 
     uint idx = 0u;
     uint colorCount = 6u;
     if (u_debugDrawMode == DRAW_CLUSTER) {
-        idx = mod(cluster, colorCount);
+        idx = cluster % colorCount;
         o_color = colors[idx];
     } else if (u_debugDrawMode == DRAW_SLICE) {
         // todo: define colors?
         uint slice = sliceFromViewZ(w);
-        idx = mod(slice, colorCount);
+        idx = slice % colorCount;
         o_color = colors[idx];
     } else if (u_debugDrawMode == DRAW_COLROW) {
         uvec2 colRow = colRowFromNDCxy(projectedPos.xy);
         uvec2 numColRows = uvec2(u_view.clusterParams.xy);
-        idx = mod(colRow.y * numColRows.x + colRow.x, colorCount);
+        idx = (colRow.y * numColRows.x + colRow.x) % colorCount;
         o_color = colors[idx];
     } else if (u_debugDrawMode == DRAW_LIGHT_COUNT) {
         // todo: use a ramp color to describe the count
