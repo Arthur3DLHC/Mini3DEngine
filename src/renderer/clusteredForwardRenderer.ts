@@ -878,6 +878,8 @@ export class ClusteredForwardRenderer {
 
         this._postprocessor.processFinal(this.numReservedTextures);
 
+        this._debugRenderer.render(this.numReservedTextures, null);
+
         if (this._drawDebugTexture) {
             // shadowmap:
             // this.renderScreenRect(0, 0, 512.0 / 1280.0, 512.0 / 720.0, new vec4([1,1,1,1]), this._debugDepthTexture, 1, 0, 0, false);

@@ -23,10 +23,18 @@ export class DebugRenderer {
     private _rectGeom : PlaneGeometry;
     private _sceneDepthTexture: Texture2D;
     private _sceneDepthTexUnit: number = 0;
+    
+    public static readonly ClusterDrawMode_Clusters = 0;
+    public static readonly ClusterDrawMode_Slice = 1;
+    public static readonly ClusterDrawMode_ColRow = 2;
+    public static readonly ClusterDrawMode_LightCount = 3;
+    public static readonly ClusterDrawMode_ReflProbeCount = 4;
+    public static readonly ClusterDrawMode_IrrProbeCount = 5;
+    public static readonly ClusterDrawMode_DecalCount = 6;
 
     // todo: public flags for render different debug infos
     public showClusters: boolean = true;
-    public clusterDrawMode: number = 0;
+    public clusterDrawMode: number = DebugRenderer.ClusterDrawMode_Clusters;
 
     public constructor(context: ClusteredForwardRenderContext, sceneDepthTex: Texture2D) {
         if (GLPrograms.shaderCodes["fullscreen_rect_vs"] === undefined) {
@@ -56,7 +64,11 @@ export class DebugRenderer {
         this._sceneDepthTexture = sceneDepthTex;
     }
 
-    public render(startTexUnit: number, target: FrameBuffer) {
+    public render(startTexUnit: number, target: FrameBuffer | null) {
+        if (!this.showClusters) {
+            return;
+        }
+
         this._sceneDepthTexUnit = startTexUnit + 1;
 
         GLDevice.renderTarget = target;
