@@ -111,6 +111,11 @@ export class Frustum {
 		return true;
     }
 
+    /**
+     * note: the frustum is look at positive z axis; not in view space
+     * @param matProj projection matrix
+     * @param ignoreNearPlane 
+     */
     public setFromProjectionMatrix(matProj: mat4, ignoreNearPlane: boolean = false): Frustum {
         // from three.js
         // theory is at https://www.gamedevs.org/uploads/fast-extraction-viewing-frustum-planes-from-world-view-projection-matrix.pdf

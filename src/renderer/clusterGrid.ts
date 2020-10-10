@@ -103,6 +103,11 @@ export class ClusterGrid {
         // update frustum
         const matProj: mat4 = mat4.frustum(this.left, this.right, this.bottom, this.top, this.near, this.far);
         this._frustum.setFromProjectionMatrix(matProj, false);
+        // flip the frustum to view space (look at negative z axis)
+        // for (const plane of this._frustum.planes) {
+        //     plane.normal.z = -plane.normal.z;
+        //     plane.constant = -plane.constant;   // only affect near and far plane; because the other is 0
+        // }
     }
 
     /**
@@ -450,7 +455,7 @@ export class ClusterGrid {
     
     private calcAABBByFarCorners(k: number, minPtFar: vec3, maxPtFar: vec3, result: BoundingBox) {
         const sliceNearZ = this.getSliceZ(k);
-        const scale = sliceNearZ / minPtFar.z;
+        const scale = sliceNearZ / minPtFar.z;  // both negative
 
         this._tmpMinPointNear.z = sliceNearZ;
         this._tmpMinPointNear.x = minPtFar.x * scale;
@@ -481,7 +486,9 @@ export class ClusterGrid {
     protected getGridPoint(i: number, j: number, k: number, result: vec3) {
         result.z = this.getSliceZ(k);
 
+        // result.z is negative
         const scale = result.z / (-this.near);
+
         // x
         const xNear = this.left + (i / this.resolusion.x) * (this.right - this.left);
         result.x = scale * xNear;

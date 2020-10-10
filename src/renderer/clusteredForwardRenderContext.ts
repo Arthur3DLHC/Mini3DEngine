@@ -672,6 +672,9 @@ export class ClusteredForwardRenderContext extends RenderContext {
         let decalCount = 0;
         let envProbeCount = 0;
         let irrProbeCount = 0;
+
+        // todo: test frustum culling
+
         if (lights) {
             for (let iLight = 0; iLight < this.staticLightCount; iLight++) {
                 const light = this.staticLights[iLight];
