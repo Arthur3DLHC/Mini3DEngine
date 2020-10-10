@@ -153,7 +153,7 @@ export class ClusterGrid {
         if (light instanceof PointLight) {
             // point light: bounding sphere vs AABB
             this.checkClustersWithBoundingSphere(boundingSphere, (cluster: Cluster)=>{
-                cluster.lights.push(lightIdx);
+                cluster.addLight(lightIdx);
             });
             /*
             // slices
@@ -205,7 +205,7 @@ export class ClusterGrid {
             lightFrustum.setFromProjectionMatrix(matFrustum);
             // test frustum and aabb
             this.checkClustersWithFrustum(lightFrustum, (cluster: Cluster)=>{
-                cluster.lights.push(lightIdx);
+                cluster.addLight(lightIdx);
             });
             /*
             // slices
@@ -236,7 +236,7 @@ export class ClusterGrid {
                 for (let k = 0; k < this.resolusion.z; k++) {
                     for (let j = 0; j < this.resolusion.y; j++) {
                         for (let i = 0; i < this.resolusion.x; i++) {
-                            this.clusters[k][j][i].lights.push(lightIdx);
+                            this.clusters[k][j][i].addLight(lightIdx);
                         }
                     }
                 }
@@ -265,13 +265,13 @@ export class ClusterGrid {
                 lightFrustum.setFromProjectionMatrix(matFrustum);
                 // test frustum and aabb
                 this.checkClustersWithFrustum(lightFrustum, (cluster: Cluster) => {
-                    cluster.lights.push(lightIdx);
+                    cluster.addLight(lightIdx);
                 });
             }
         }
     }
 
-    public fillDecal(decal: Decal) {
+    public fillDecal(decal: Decal, idx: number) {
         // need to transform to view space
         // limit visible distance
 
@@ -279,22 +279,20 @@ export class ClusterGrid {
         // bounding box? 6 planes?
     }
 
-    public fillEnvironmentProbe(envProbe: EnvironmentProbe, idx: number) {
+    public fillReflectionProbe(reflProbe: EnvironmentProbe, idx: number) {
         
         // need to transform to view space
         // bounding sphere?
-        const boundingSphere = new BoundingSphere(vec3.zero, envProbe.range);
+        const boundingSphere = new BoundingSphere(vec3.zero, reflProbe.range);
         const matModelView = new mat4();
-        mat4.product(this.viewTransform, envProbe.worldTransform, matModelView);
+        mat4.product(this.viewTransform, reflProbe.worldTransform, matModelView);
         boundingSphere.transform(matModelView);
-        
+
         // check environment probes visible distance limit
         // because envprobes are static, it will be dispatched to rendercontext only when the current scene changed.
         // so we need to check the visible distance here.
-        if (envProbe.probeType === EnvironmentProbeType.Reflection) {
-            if(boundingSphere.center.squaredLength() > envProbe.visibleDistance * envProbe.visibleDistance) {
-                return;
-            }
+        if (boundingSphere.center.squaredLength() > reflProbe.visibleDistance * reflProbe.visibleDistance) {
+            return;
         }
 
         if (!this._frustum.intersectsSphere(boundingSphere)) {
@@ -302,11 +300,25 @@ export class ClusterGrid {
         }
 
         this.checkClustersWithBoundingSphere(boundingSphere, (cluster: Cluster)=>{
-            if (envProbe.probeType === EnvironmentProbeType.Reflection) {
-                cluster.reflProbes.push(idx);
-            } else {
-                cluster.irrProbes.push(idx);
-            }
+            cluster.addReflectionProbe(idx);
+        });
+    }
+
+    public fillIrradianceProbe(irrProbe: EnvironmentProbe, idx: number) {
+        
+        // need to transform to view space
+        // bounding sphere?
+        const boundingSphere = new BoundingSphere(vec3.zero, irrProbe.range);
+        const matModelView = new mat4();
+        mat4.product(this.viewTransform, irrProbe.worldTransform, matModelView);
+        boundingSphere.transform(matModelView);
+        
+        if (!this._frustum.intersectsSphere(boundingSphere)) {
+            return;
+        }
+
+        this.checkClustersWithBoundingSphere(boundingSphere, (cluster: Cluster)=>{
+            cluster.addIrradianceProbe(idx);
         });
     }
 

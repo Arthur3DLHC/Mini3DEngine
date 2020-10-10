@@ -564,11 +564,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 const left = -right;
                 const top = perspCamera.near * tanHalfFov;
                 const bottom = -top;
-                const clusterGrid = this._clusterGrid;
-                clusterGrid.setFrustumParams(left, right, bottom, top, camera.near, camera.far);
+                this._clusterGrid.setFrustumParams(left, right, bottom, top, camera.near, camera.far);
 
-                // todo: iterate lights, decals and envprobes, fill to cluster grid
-                // todo: use lists in clusters to update uniform buffers;
                 
                 // debug fill all
                 this.fillAllItemsToCluster(lights, decals, envprobes, camPosition, irrprobes);
@@ -583,6 +580,89 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubClusters.updateByData(this._tmpClusterData, 0, 0, this._clusterBuffer.length);
     }
 
+    private fillItemsToCluster(lights: boolean, decals: boolean, envprobes: boolean, camPosition: vec3, irrprobes: boolean) {
+        const clusterGrid = this._clusterGrid;
+        clusterGrid.clearItems();
+
+        // todo: iterate lights, decals and envprobes, fill to cluster grid
+        // fix me: is the range used to cull same as used in shader?
+        if (lights) {
+            for (let iLight = 0; iLight < this.staticLightCount; iLight++) {
+                const light = this.staticLights[iLight];
+                if (light.on) {
+                    clusterGrid.fillLight(light, iLight);
+                }
+            }
+            for (let iLight = 0; iLight < this.dynamicLightCount; iLight++) {
+                const light = this.dynamicLights[iLight];
+                if (light.on) {
+                    clusterGrid.fillLight(light, iLight + this.staticLightCount);
+                }
+            }
+        }
+
+        if (decals) {
+            for (let iDecal = 0; iDecal < this.staticDecalCount; iDecal++) {
+                const decal = this.staticDecals[iDecal];
+                if (decal.visible) {
+                    clusterGrid.fillDecal(decal, iDecal);
+                }
+            }
+            for (let iDecal = 0; iDecal < this.dynamicDecalCount; iDecal++) {
+                const decal = this.dynamicDecals[iDecal];
+                if (decal.visible) {
+                    clusterGrid.fillDecal(decal, iDecal + this.staticDecalCount);
+                }
+            }
+        }
+
+        if (envprobes) {
+            for (let iEnv = 0; iEnv < this.envProbeCount; iEnv++) {
+                const envProbe = this.envProbes[iEnv];
+                if (envProbe.visible) {
+                    clusterGrid.fillReflectionProbe(envProbe, iEnv);
+                }
+            }
+        }
+
+        if (irrprobes) {
+            for (let iIrr = 0; iIrr < this.irradianceProbeCount; iIrr++) {
+                const irrProbe = this.irradianceProbes[iIrr];
+                if (irrProbe.visible) {
+                    clusterGrid.fillIrradianceProbe(irrProbe, iIrr);
+                }
+            }
+        }
+
+        // todo: iterate all clusters, use lists in clusters to update uniform buffers;
+        let start: number = 0;
+        for (let slice = 0; slice < clusterGrid.resolusion.z; slice++) {
+            for (let row = 0; row < clusterGrid.resolusion.y; row++) {
+                for (let col = 0; col < clusterGrid.resolusion.x; col++) {
+                    const cluster = clusterGrid.clusters[slice][row][col];
+                    for (let iLight = 0; iLight < cluster.lightCount; iLight++) {
+                        this._idxBuffer.addNumber(cluster.getLight(iLight));
+                    }
+                    for (let iDecal = 0; iDecal < cluster.decalCount; iDecal++) {
+                        this._idxBuffer.addNumber(cluster.getDecal(iDecal));
+                    }
+                    for (let iRefl = 0; iRefl < cluster.reflProbeCount; iRefl++ ) {
+                        this._idxBuffer.addNumber(cluster.getReflProbe(iRefl));
+                    }
+                    for (let iIrr = 0; iIrr < cluster.irrProbeCount; iIrr++) {
+                        this._idxBuffer.addNumber(cluster.getIrrProbe(iIrr));
+                    }
+                    this._clusterBuffer.addNumber(start);
+                    this._clusterBuffer.addNumber(cluster.lightCount);
+                    this._clusterBuffer.addNumber(cluster.decalCount);
+                    this._clusterBuffer.addNumber(cluster.reflProbeCount * 65536 + cluster.irrProbeCount);
+
+                    start += cluster.lightCount + cluster.decalCount + cluster.reflProbeCount + cluster.irrProbeCount;
+                }
+            }
+        }
+    }
+
     private fillAllItemsToCluster(lights: boolean, decals: boolean, envprobes: boolean, camPosition: vec3, irrprobes: boolean) {
         let start = 0;
         let lightCount = 0;
@@ -593,8 +673,6 @@ export class ClusteredForwardRenderContext extends RenderContext {
             for (let iLight = 0; iLight < this.staticLightCount; iLight++) {
                 const light = this.staticLights[iLight];
                 if (light.on) {
-                    // todo: cull light against clusters
-                    // for test perpurse new, add them all:
                     this._idxBuffer.addNumber(iLight);
                     lightCount++;
                 }
