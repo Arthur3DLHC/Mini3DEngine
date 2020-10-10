@@ -19,11 +19,11 @@ import { DirectionalLightShadow } from "../scene/lights/directionalLightShadow.j
 export class ClusterGrid {
     public get near(): number {return this._near;}
     public get far(): number {return this._far;}
-    public get left(): number {return this.left;}
-    public get right(): number {return this.right;}
-    public get bottom(): number {return this.bottom;}
-    public get top(): number {return this.top;}
-    public get orthographic(): boolean {return this.orthographic;}        // orthographic or perspective
+    public get left(): number {return this._left;}
+    public get right(): number {return this._right;}
+    public get bottom(): number {return this._bottom;}
+    public get top(): number {return this._top;}
+    public get orthographic(): boolean {return this._orthographic;}        // orthographic or perspective
     public get resolusion(): vec3 {return this._resolusion;}
 
     public viewTransform: mat4 = new mat4();

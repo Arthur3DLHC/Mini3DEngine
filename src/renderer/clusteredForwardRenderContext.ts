@@ -549,7 +549,6 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
         // envprobes and irradiance probes are always static
         // test: add all item indices, and assume only one cluster
-        let start = 0;
         this._clusterBuffer.seek(0);
         this._idxBuffer.seek(0);
 
@@ -570,92 +569,100 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
                 // todo: iterate lights, decals and envprobes, fill to cluster grid
                 // todo: use lists in clusters to update uniform buffers;
+                
+                // debug fill all
+                this.fillAllItemsToCluster(lights, decals, envprobes, camPosition, irrprobes);
             }
         }
         else {
-            // todo: calculate clip space cluster AABB
-            // todo: cull all items (both static and dynamic) by this cluster
-            // fill visible item indices
-            let lightCount = 0;
-            let decalCount = 0;
-            let envProbeCount = 0;
-            let irrProbeCount = 0;
-            if (lights) {
-                for (let iLight = 0; iLight < this.staticLightCount; iLight++) {
-                    const light = this.staticLights[iLight];
-                    if (light.on) {
-                        // todo: cull light against clusters
-                        // for test perpurse new, add them all:
-                        this._idxBuffer.addNumber(iLight);
-                        lightCount++;
-                    }
-                }
-                for (let iLight = 0; iLight < this.dynamicLightCount; iLight++) {
-                    const light = this.dynamicLights[iLight];
-                    if (light.on) {
-                        this._idxBuffer.addNumber(iLight + this.staticLightCount);
-                        lightCount++;
-                    }
-                }
-            }
-
-            if (decals) {
-                for (let iDecal = 0; iDecal < this.staticDecalCount; iDecal++) {
-                    const decal = this.staticDecals[iDecal];
-                    // todo: check decal distance; cull against clusters
-                    if (decal.visible) {
-                        this._idxBuffer.addNumber(iDecal);
-                        decalCount++;
-                    }
-                }
-                for (let iDecal = 0; iDecal < this.dynamicDecalCount; iDecal++) {
-                    const decal = this.dynamicDecals[iDecal];
-                    if (decal.visible) {
-                        this._idxBuffer.addNumber(iDecal + this.staticDecalCount);
-                        decalCount++;
-                    }
-                }
-            }
-
-            if (envprobes) {
-                for (let iEnv = 0; iEnv < this.envProbeCount; iEnv++) {
-                    const envProbe = this.envProbes[iEnv];
-                    if (envProbe.visible) {
-                        // check visible distance
-                        // because envprobes are static, it will be dispatched to rendercontext only when the current scene changed.
-                        // so we need to check the visible distance here.
-                        const position = new vec3();
-                        envProbe.worldTransform.getTranslation(position);
-                        const dist = vec3.distance(position, camPosition);
-                        if (dist < envProbe.visibleDistance) {
-                            this._idxBuffer.addNumber(iEnv);
-                            envProbeCount++;
-                        }
-                    }
-                }
-            }
-
-            if (irrprobes) {
-                for (let iIrr = 0; iIrr < this.irradianceProbeCount; iIrr++) {
-                    const irrProbe = this.irradianceProbes[iIrr];
-                    if (irrProbe.visible) {
-                        this._idxBuffer.addNumber(iIrr);
-                        irrProbeCount++;
-                    }
-                }
-            }
-
-            this._clusterBuffer.addNumber(start);       // the start index of this cluster
-            this._clusterBuffer.addNumber(lightCount);       // light count
-            this._clusterBuffer.addNumber(decalCount);       // decal count
-            this._clusterBuffer.addNumber(envProbeCount * 65536 + irrProbeCount);        // envprobe (high 2 bytes) and irradiance volume count (low 2 bytes)
-            // this._clusterBuffer.addNumber(envProbeCount);
-            // this._clusterBuffer.addNumber(irrProbeCount);
-            start += lightCount + decalCount + envProbeCount + irrProbeCount;
+            // fill all items
+            this.fillAllItemsToCluster(lights, decals, envprobes, camPosition, irrprobes);
         }
 
         this._ubItemIndices.updateByData(this._tmpIdxData, 0, 0, this._idxBuffer.length);
         this._ubClusters.updateByData(this._tmpClusterData, 0, 0, this._clusterBuffer.length);
+    }
+
+    private fillAllItemsToCluster(lights: boolean, decals: boolean, envprobes: boolean, camPosition: vec3, irrprobes: boolean) {
+        let start = 0;
+        let lightCount = 0;
+        let decalCount = 0;
+        let envProbeCount = 0;
+        let irrProbeCount = 0;
+        if (lights) {
+            for (let iLight = 0; iLight < this.staticLightCount; iLight++) {
+                const light = this.staticLights[iLight];
+                if (light.on) {
+                    // todo: cull light against clusters
+                    // for test perpurse new, add them all:
+                    this._idxBuffer.addNumber(iLight);
+                    lightCount++;
+                }
+            }
+            for (let iLight = 0; iLight < this.dynamicLightCount; iLight++) {
+                const light = this.dynamicLights[iLight];
+                if (light.on) {
+                    this._idxBuffer.addNumber(iLight + this.staticLightCount);
+                    lightCount++;
+                }
+            }
+        }
+
+        if (decals) {
+            for (let iDecal = 0; iDecal < this.staticDecalCount; iDecal++) {
+                const decal = this.staticDecals[iDecal];
+                // todo: check decal distance; cull against clusters
+                if (decal.visible) {
+                    this._idxBuffer.addNumber(iDecal);
+                    decalCount++;
+                }
+            }
+            for (let iDecal = 0; iDecal < this.dynamicDecalCount; iDecal++) {
+                const decal = this.dynamicDecals[iDecal];
+                if (decal.visible) {
+                    this._idxBuffer.addNumber(iDecal + this.staticDecalCount);
+                    decalCount++;
+                }
+            }
+        }
+
+        if (envprobes) {
+            for (let iEnv = 0; iEnv < this.envProbeCount; iEnv++) {
+                const envProbe = this.envProbes[iEnv];
+                if (envProbe.visible) {
+                    // check visible distance
+                    // because envprobes are static, it will be dispatched to rendercontext only when the current scene changed.
+                    // so we need to check the visible distance here.
+                    const position = new vec3();
+                    envProbe.worldTransform.getTranslation(position);
+                    const dist = vec3.distance(position, camPosition);
+                    if (dist < envProbe.visibleDistance) {
+                        this._idxBuffer.addNumber(iEnv);
+                        envProbeCount++;
+                    }
+                }
+            }
+        }
+
+        if (irrprobes) {
+            for (let iIrr = 0; iIrr < this.irradianceProbeCount; iIrr++) {
+                const irrProbe = this.irradianceProbes[iIrr];
+                if (irrProbe.visible) {
+                    this._idxBuffer.addNumber(iIrr);
+                    irrProbeCount++;
+                }
+            }
+        }
+
+        this._clusterBuffer.addNumber(start); // the start index of this cluster
+        this._clusterBuffer.addNumber(lightCount); // light count
+        this._clusterBuffer.addNumber(decalCount); // decal count
+        this._clusterBuffer.addNumber(envProbeCount * 65536 + irrProbeCount); // envprobe (high 2 bytes) and irradiance volume count (low 2 bytes)
+
+
+        // this._clusterBuffer.addNumber(envProbeCount);
+        // this._clusterBuffer.addNumber(irrProbeCount);
+        start += lightCount + decalCount + envProbeCount + irrProbeCount;
     }
 
     public fillUniformBuffersPerLightView(light: BaseLight, viewIdx: number) {

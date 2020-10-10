@@ -826,7 +826,7 @@ export class ClusteredForwardRenderer {
 
             GLDevice.clear(camera.clearColor, camera.clearDepth, camera.clearStencil);
 
-            this._renderContext.fillUniformBuffersPerView(camera);
+            this._renderContext.fillUniformBuffersPerView(camera, true, true, true, true, true);
             this.getOcclusionQueryResults();
 
             // todo: sort the renderlists first?
