@@ -565,10 +565,13 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 const top = perspCamera.near * tanHalfFov;
                 const bottom = -top;
                 this._clusterGrid.setFrustumParams(left, right, bottom, top, camera.near, camera.far);
+                perspCamera.viewTransform.copy(this._clusterGrid.viewTransform);
+                // this._clusterGrid.viewTransform = perspCamera.viewTransform;
 
+                this.fillItemsToCluster(lights, decals, envprobes, irrprobes);
                 
                 // debug fill all
-                this.fillAllItemsToCluster(lights, decals, envprobes, camPosition, irrprobes);
+                // this.fillAllItemsToCluster(lights, decals, envprobes, camPosition, irrprobes);
             }
         }
         else {
@@ -580,7 +583,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubClusters.updateByData(this._tmpClusterData, 0, 0, this._clusterBuffer.length);
     }
 
-    private fillItemsToCluster(lights: boolean, decals: boolean, envprobes: boolean, camPosition: vec3, irrprobes: boolean) {
+    private fillItemsToCluster(lights: boolean, decals: boolean, envprobes: boolean, irrprobes: boolean) {
         const clusterGrid = this._clusterGrid;
         clusterGrid.clearItems();
 

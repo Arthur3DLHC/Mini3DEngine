@@ -138,10 +138,11 @@ export class ClusterGrid {
 
     public fillLight(light: BaseLight, lightIdx: number) {
         // need to transform to view space
-        const boundingSphere = new BoundingSphere(light.boundingSphere.center, light.boundingSphere.radius);
+        // const localSphere = new BoundingSphere(light.boundingSphere.center, light.boundingSphere.radius);
+        const boundingSphere = new BoundingSphere();
         const matModelView = new mat4();
         mat4.product(this.viewTransform, light.worldTransform, matModelView);
-        boundingSphere.transform(matModelView);
+        light.boundingSphere.transform(matModelView, boundingSphere);
 
         if (!this._frustum.intersectsSphere(boundingSphere)) {
             return;
@@ -283,10 +284,11 @@ export class ClusterGrid {
         
         // need to transform to view space
         // bounding sphere?
-        const boundingSphere = new BoundingSphere(vec3.zero, reflProbe.range);
+        const localSphere = new BoundingSphere(vec3.zero, reflProbe.range);
+        const boundingSphere = new BoundingSphere();
         const matModelView = new mat4();
         mat4.product(this.viewTransform, reflProbe.worldTransform, matModelView);
-        boundingSphere.transform(matModelView);
+        localSphere.transform(matModelView, boundingSphere);
 
         // check environment probes visible distance limit
         // because envprobes are static, it will be dispatched to rendercontext only when the current scene changed.
@@ -308,10 +310,11 @@ export class ClusterGrid {
         
         // need to transform to view space
         // bounding sphere?
-        const boundingSphere = new BoundingSphere(vec3.zero, irrProbe.range);
+        const localSphere = new BoundingSphere(vec3.zero, irrProbe.range);
+        const boundingSphere = new BoundingSphere();
         const matModelView = new mat4();
         mat4.product(this.viewTransform, irrProbe.worldTransform, matModelView);
-        boundingSphere.transform(matModelView);
+        localSphere.transform(matModelView, boundingSphere);
         
         if (!this._frustum.intersectsSphere(boundingSphere)) {
             return;
@@ -478,7 +481,7 @@ export class ClusterGrid {
     protected getGridPoint(i: number, j: number, k: number, result: vec3) {
         result.z = this.getSliceZ(k);
 
-        const scale = result.z / this.near;
+        const scale = result.z / (-this.near);
         // x
         const xNear = this.left + (i / this.resolusion.x) * (this.right - this.left);
         result.x = scale * xNear;
