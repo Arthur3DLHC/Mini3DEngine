@@ -49,6 +49,10 @@ export class ClusterGrid {
     private _tmpMinPointFar: vec3 = new vec3();
     private _tmpMaxPointFar: vec3 = new vec3();
 
+    private _tmpBoundingSphere: BoundingSphere = new BoundingSphere();
+    private _tmpBoundingBox: BoundingBox = new BoundingBox();
+
+    private _tmpModelView: mat4 = new mat4();
     private _tmpInvViewTransform: mat4 = new mat4();
 
     /**
@@ -138,9 +142,8 @@ export class ClusterGrid {
 
     public fillLight(light: BaseLight, lightIdx: number) {
         // need to transform to view space
-        // const localSphere = new BoundingSphere(light.boundingSphere.center, light.boundingSphere.radius);
-        const boundingSphere = new BoundingSphere();
-        const matModelView = new mat4();
+        const boundingSphere = this._tmpBoundingSphere;
+        const matModelView = this._tmpModelView; //new mat4();
         mat4.product(this.viewTransform, light.worldTransform, matModelView);
         light.boundingSphere.transform(matModelView, boundingSphere);
 
@@ -148,7 +151,7 @@ export class ClusterGrid {
             return;
         }
 
-        const boundingBox: BoundingBox = new BoundingBox();
+        // const boundingBox: BoundingBox = new BoundingBox();
 
         // iterate clusters hierarchically
         if (light instanceof PointLight) {
@@ -285,8 +288,8 @@ export class ClusterGrid {
         // need to transform to view space
         // bounding sphere?
         const localSphere = new BoundingSphere(vec3.zero, reflProbe.range);
-        const boundingSphere = new BoundingSphere();
-        const matModelView = new mat4();
+        const boundingSphere = this._tmpBoundingSphere;//new BoundingSphere();
+        const matModelView = this._tmpModelView; // new mat4();
         mat4.product(this.viewTransform, reflProbe.worldTransform, matModelView);
         localSphere.transform(matModelView, boundingSphere);
 
@@ -311,8 +314,8 @@ export class ClusterGrid {
         // need to transform to view space
         // bounding sphere?
         const localSphere = new BoundingSphere(vec3.zero, irrProbe.range);
-        const boundingSphere = new BoundingSphere();
-        const matModelView = new mat4();
+        const boundingSphere = this._tmpBoundingSphere;//new BoundingSphere();
+        const matModelView = this._tmpModelView; // new mat4();
         mat4.product(this.viewTransform, irrProbe.worldTransform, matModelView);
         localSphere.transform(matModelView, boundingSphere);
         
@@ -335,7 +338,7 @@ export class ClusterGrid {
         let intersectLastSlice: boolean = false;
         let intersectLastRow: boolean = false;
         let intersectLastCluster: boolean = false;
-        const boundingBox: BoundingBox = new BoundingBox();
+        const boundingBox: BoundingBox = this._tmpBoundingBox;// new BoundingBox();
 
         // slices
         for (let k = 0; k < this.resolusion.z; k++) {
@@ -385,7 +388,7 @@ export class ClusterGrid {
         let intersectLastRow: boolean = false;
         let intersectLastCluster: boolean = false;
         
-        const boundingBox: BoundingBox = new BoundingBox();
+        const boundingBox: BoundingBox = this._tmpBoundingBox; //new BoundingBox();
         
         // slices
         for (let k = 0; k < this.resolusion.z; k++) {
