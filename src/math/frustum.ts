@@ -112,7 +112,7 @@ export class Frustum {
     }
 
     /**
-     * note: the frustum is look at positive z axis; not in view space
+     * 
      * @param matProj projection matrix
      * @param ignoreNearPlane 
      */
@@ -120,6 +120,10 @@ export class Frustum {
         // from three.js
         // theory is at https://www.gamedevs.org/uploads/fast-extraction-viewing-frustum-planes-from-world-view-projection-matrix.pdf
         // also http://www.cs.otago.ac.nz/postgrads/alexis/planeExtraction.pdf
+
+        // note: there is an error in the theory document upon:
+        // it saids the frustom calculated from the pure projection matrix of camera is looking at positive z axis in opengl,
+        // but actually, its looking at negative z axis, in view space.
 
 		const me = matProj.values;
 		var me0 = me[ 0 ], me1 = me[ 1 ], me2 = me[ 2 ], me3 = me[ 3 ];
