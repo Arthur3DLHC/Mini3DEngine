@@ -471,6 +471,7 @@ export class ClusteredForwardRenderer {
     public get debugRenderer(): DebugRenderer { return this._debugRenderer; }
 
     public sortTransparents: boolean = true;
+    public useClusters: boolean = true;
 
     private createRenderStates() {
         const gl = GLDevice.gl;
@@ -826,7 +827,7 @@ export class ClusteredForwardRenderer {
 
             GLDevice.clear(camera.clearColor, camera.clearDepth, camera.clearStencil);
 
-            this._renderContext.fillUniformBuffersPerView(camera, true, true, true, true, true);
+            this._renderContext.fillUniformBuffersPerView(camera, true, true, true, true, this.useClusters);
             this.getOcclusionQueryResults();
 
             // todo: sort the renderlists first?

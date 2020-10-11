@@ -113,10 +113,10 @@ export class ClusteredForwardRenderContext extends RenderContext {
     public static readonly ENVPROBE_SIZE_FLOAT = 8;
     public static readonly IRRPROBE_SIZE_FLOAT = 4;
 
-    public static readonly NUM_CLUSTERS_X = 16;
-    public static readonly NUM_CLUSTERS_Y = 8;
-    public static readonly NUM_CLUSTERS_Z = 12;
-    public static readonly NUM_CLUSTERS = 16 * 8 * 12;
+    public static readonly NUM_CLUSTERS_X = 8;      // 16
+    public static readonly NUM_CLUSTERS_Y = 4;      // 8
+    public static readonly NUM_CLUSTERS_Z = 12;     // 24
+    public static readonly NUM_CLUSTERS = ClusteredForwardRenderContext.NUM_CLUSTERS_X * ClusteredForwardRenderContext.NUM_CLUSTERS_Y * ClusteredForwardRenderContext.NUM_CLUSTERS_Z;
     public static readonly CLUSTER_SIZE_INT = 4;
 
     public static readonly MAX_LIGHTS = 256;
