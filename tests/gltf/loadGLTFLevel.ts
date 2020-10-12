@@ -28,8 +28,8 @@ window.onload = () => {
 
     const renderer = new ClusteredForwardRenderer();
     renderer.debugRenderer.showClusters = true;
-    renderer.debugRenderer.clusterDrawMode = DebugRenderer.ClusterDrawMode_LightCount;
-    renderer.debugRenderer.itemCountRef = 10;
+    renderer.debugRenderer.clusterDrawMode = DebugRenderer.ClusterDrawMode_IrrProbeCount;
+    renderer.debugRenderer.itemCountRef = 4;
 
     const scene = new Scene();
     const camera = new PerspectiveCamera();
