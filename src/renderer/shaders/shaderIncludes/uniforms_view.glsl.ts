@@ -3,7 +3,8 @@
  */
 export default /** glsl */`
     #define MAX_ITEM_VEC4S_PERVIEW  1024 // (4096 / 4) ivec4s
-    #define NUM_CLUSTERS_PERVIEW    1536 //(16 * 8 * 12)
+    // #define NUM_CLUSTERS_PERVIEW    1536 //(16 * 8 * 12)
+    #define NUM_CLUSTERS_PERVIEW    384 //(8 * 4 * 12)
 
     layout (std140, column_major) uniform; 
 
