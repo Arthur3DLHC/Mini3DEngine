@@ -13,7 +13,7 @@ export class Cluster {
     /**
      * axis aligned bounding box in view space
      */
-    public boudingBox: BoundingBox = new BoundingBox();
+    public boundingBox: BoundingBox = new BoundingBox();
 
     // item idx list
     // todo: use Uint32Array to faster?

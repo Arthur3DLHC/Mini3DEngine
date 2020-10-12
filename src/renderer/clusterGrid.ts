@@ -55,6 +55,9 @@ export class ClusterGrid {
     private _tmpModelView: mat4 = new mat4();
     private _tmpInvViewTransform: mat4 = new mat4();
 
+    private _sliceBoundingBoxes: BoundingBox[] = [];
+    private _sliceRowBoundingBoxes: BoundingBox[][] = [];
+
     /**
      * call this only when the resolusion or frustum changed.
      */
@@ -64,12 +67,25 @@ export class ClusterGrid {
         this.resolusion.z = Math.max(1, this.resolusion.z);
 
         this.clusters = [];
+        this._sliceBoundingBoxes = [];
+        this._sliceRowBoundingBoxes = [];
 
         // generate clusters
         for (let k = 0; k < this.resolusion.z; k++) {
             const layer: Cluster[][] = [];
+
+            const sliceAABB = new BoundingBox();
+            this._sliceBoundingBoxes.push(sliceAABB);
+
+            const rowAABBs: BoundingBox[] = [];
+            this._sliceRowBoundingBoxes.push(rowAABBs);
+
             for (let j = 0; j < this.resolusion.y; j++) {
                 const row: Cluster[] = [];
+
+                const rowAABB = new BoundingBox();
+                rowAABBs.push(rowAABB);
+
                 for (let i = 0; i < this.resolusion.x; i++) {
                     const cluster: Cluster = new Cluster(i, j, k);
                     // this.getClusterAABB(i, j, k, cluster.boudingBox);
@@ -96,10 +112,14 @@ export class ClusterGrid {
 
     public updateClusterAABBs() {
         for (let k = 0; k < this.resolusion.z; k++) {
+            const sliceAABB = this._sliceBoundingBoxes[k];
+            this.getSliceAABB(k, sliceAABB);
             for (let j = 0; j < this.resolusion.y; j++) {
+                const rowAABB = this._sliceRowBoundingBoxes[k][j];
+                this.getRowAABB(j, k, rowAABB);
                 for (let i = 0; i < this.resolusion.x; i++) {
                     const cluster: Cluster = this.clusters[k][j][i];
-                    this.getClusterAABB(i, j, k, cluster.boudingBox);
+                    this.getClusterAABB(i, j, k, cluster.boundingBox);
                 }
             }
         }
@@ -338,24 +358,28 @@ export class ClusterGrid {
         let intersectLastSlice: boolean = false;
         let intersectLastRow: boolean = false;
         let intersectLastCluster: boolean = false;
-        const boundingBox: BoundingBox = this._tmpBoundingBox;// new BoundingBox();
+        let boundingBox: BoundingBox = this._tmpBoundingBox;// new BoundingBox();
 
         // slices
         for (let k = 0; k < this.resolusion.z; k++) {
-            this.getSliceAABB(k, boundingBox);
+            // this.getSliceAABB(k, boundingBox);
+            boundingBox = this._sliceBoundingBoxes[k];
             let intersectThisSlice = boundingBox.intersectSphere(boundingSphere);
             if (intersectThisSlice) {
                 // rows
                 intersectLastRow = false;
                 for (let j = 0; j < this.resolusion.y; j++) {
-                    this.getRowAABB(j, k, boundingBox);
+                    // this.getRowAABB(j, k, boundingBox);
+                    boundingBox = this._sliceRowBoundingBoxes[k][j];
                     let intersectThisRow = boundingBox.intersectSphere(boundingSphere);
                     if (intersectThisRow) {
                         // clusters
                         intersectLastCluster = false;
                         for (let i = 0; i < this.resolusion.x; i++) {
-                            this.getClusterAABB(i, j, k, boundingBox);
-                            let intersectThisCluster = boundingBox.intersectSphere(boundingSphere);
+                            // this.getClusterAABB(i, j, k, boundingBox);
+                            const cluster = this.clusters[k][j][i];
+
+                            let intersectThisCluster = cluster.boundingBox.intersectSphere(boundingSphere);
                             if (intersectThisCluster) {
                                 // this.clusters[k][j][i].envProbes.push(idx);
                                 onIntersect(this.clusters[k][j][i]);
@@ -388,24 +412,27 @@ export class ClusterGrid {
         let intersectLastRow: boolean = false;
         let intersectLastCluster: boolean = false;
         
-        const boundingBox: BoundingBox = this._tmpBoundingBox; //new BoundingBox();
+        let boundingBox: BoundingBox = this._tmpBoundingBox; //new BoundingBox();
         
         // slices
         for (let k = 0; k < this.resolusion.z; k++) {
-            this.getSliceAABB(k, boundingBox);
+            // this.getSliceAABB(k, boundingBox);
+            boundingBox = this._sliceBoundingBoxes[k];
             let intersectThisSlice = frustum.intersectsBox(boundingBox);
             if (intersectThisSlice) {
                 // rows
                 intersectLastRow = false;
                 for (let j = 0; j < this.resolusion.y; j++) {
-                    this.getRowAABB(j, k, boundingBox);
+                    // this.getRowAABB(j, k, boundingBox);
+                    boundingBox = this._sliceRowBoundingBoxes[k][j];
                     let intersectThisRow = frustum.intersectsBox(boundingBox);
                     if (intersectThisRow) {
                         // clusters
                         intersectLastCluster = false;
                         for (let i = 0; i < this.resolusion.x; i++) {
-                            this.getClusterAABB(i, j, k, boundingBox);
-                            let intersectThisCluster = frustum.intersectsBox(boundingBox);
+                            // this.getClusterAABB(i, j, k, boundingBox);
+                            const cluster = this.clusters[k][j][i];
+                            let intersectThisCluster = frustum.intersectsBox(cluster.boundingBox);
                             if (intersectThisCluster) {
                                 onIntersect(this.clusters[k][j][i]);
                             } else {
@@ -424,6 +451,8 @@ export class ClusterGrid {
             intersectLastSlice = intersectThisSlice;
         }
     }
+
+    // todo: cache the slice, row, cluster aabbs
 
     /**
      * get the cluster aabb in view space
