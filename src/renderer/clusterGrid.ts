@@ -382,7 +382,7 @@ export class ClusterGrid {
                             let intersectThisCluster = cluster.boundingBox.intersectSphere(boundingSphere);
                             if (intersectThisCluster) {
                                 // this.clusters[k][j][i].envProbes.push(idx);
-                                onIntersect(this.clusters[k][j][i]);
+                                onIntersect(cluster);
                             } else {
                                 if (intersectLastCluster) {
                                     break;
@@ -434,7 +434,7 @@ export class ClusterGrid {
                             const cluster = this.clusters[k][j][i];
                             let intersectThisCluster = frustum.intersectsBox(cluster.boundingBox);
                             if (intersectThisCluster) {
-                                onIntersect(this.clusters[k][j][i]);
+                                onIntersect(cluster);
                             } else {
                                 if (intersectLastCluster) break;
                             }
