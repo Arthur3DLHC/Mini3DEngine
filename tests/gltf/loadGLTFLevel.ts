@@ -27,8 +27,8 @@ window.onload = () => {
     const gltfLoader = new GLTFLoader(loadingManager);
 
     const renderer = new ClusteredForwardRenderer();
-    renderer.debugRenderer.showClusters = true;
-    renderer.debugRenderer.clusterDrawMode = DebugRenderer.ClusterDrawMode_Slice;
+    renderer.debugRenderer.showClusters = false;
+    renderer.debugRenderer.clusterDrawMode = DebugRenderer.ClusterDrawMode_LightCount;
 
     const scene = new Scene();
     const camera = new PerspectiveCamera();

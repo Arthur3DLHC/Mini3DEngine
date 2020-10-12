@@ -307,11 +307,13 @@ export class ClusterGrid {
         
         // need to transform to view space
         // bounding sphere?
-        const localSphere = new BoundingSphere(vec3.zero, reflProbe.range);
+        // const localSphere = new BoundingSphere(vec3.zero, reflProbe.range);
         const boundingSphere = this._tmpBoundingSphere;//new BoundingSphere();
         const matModelView = this._tmpModelView; // new mat4();
         mat4.product(this.viewTransform, reflProbe.worldTransform, matModelView);
-        localSphere.transform(matModelView, boundingSphere);
+        matModelView.getTranslation(boundingSphere.center);
+        boundingSphere.radius = reflProbe.radius;   // already in world space
+        // localSphere.transform(matModelView, boundingSphere);
 
         // check environment probes visible distance limit
         // because envprobes are static, it will be dispatched to rendercontext only when the current scene changed.
@@ -333,11 +335,13 @@ export class ClusterGrid {
         
         // need to transform to view space
         // bounding sphere?
-        const localSphere = new BoundingSphere(vec3.zero, irrProbe.range);
+        // const localSphere = new BoundingSphere(vec3.zero, irrProbe.range);
         const boundingSphere = this._tmpBoundingSphere;//new BoundingSphere();
         const matModelView = this._tmpModelView; // new mat4();
         mat4.product(this.viewTransform, irrProbe.worldTransform, matModelView);
-        localSphere.transform(matModelView, boundingSphere);
+        matModelView.getTranslation(boundingSphere.center);
+        boundingSphere.radius = irrProbe.radius;    // already in world space
+        // localSphere.transform(matModelView, boundingSphere);
         
         if (!this._frustum.intersectsSphere(boundingSphere)) {
             return;

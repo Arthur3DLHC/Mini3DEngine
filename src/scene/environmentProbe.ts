@@ -18,7 +18,7 @@ export class EnvironmentProbe extends Object3D {
         super();
         this.probeType = EnvironmentProbeType.Reflection;
         this.visibleDistance = 10;
-        this.range = 2;
+        this.localRange = new vec3([1,1,1]);
         this.clippingStart = 0.01;
         this.clippingEnd = 20;
         this.backgroundColor = new vec4([0, 0, 0, 1]);
@@ -41,7 +41,7 @@ export class EnvironmentProbe extends Object3D {
      * 'influence distance' in blender
      * the final influence distance will be calculated by range * scale of this node
      */
-    public range: number;
+    public localRange: vec3;
 
     public backgroundColor: vec4;
 
@@ -56,8 +56,11 @@ export class EnvironmentProbe extends Object3D {
     public get radius(): number {
         // fix me: if not changed, should not get every frame
         // fortunately, this prop will only accessed once when change the scene.
-        this.worldTransform.getScaling(EnvironmentProbe._tmpScale);
-        return Math.max(EnvironmentProbe._tmpScale.x, Math.max(EnvironmentProbe._tmpScale.y, EnvironmentProbe._tmpScale.z)) * this.range;
+        if (this._radius < 0) {
+            this.worldTransform.getScaling(EnvironmentProbe._tmpScale);
+            this._radius = Math.max(EnvironmentProbe._tmpScale.x * this.localRange.x, Math.max(EnvironmentProbe._tmpScale.y * this.localRange.y, EnvironmentProbe._tmpScale.z * this.localRange.z));
+        }
+       return this._radius;
     }
     // private scaling: vec3 = new vec3([1,1,1]);
 
@@ -71,6 +74,11 @@ export class EnvironmentProbe extends Object3D {
     public textureIndex: number;
 
     public debugDraw: boolean;
+
+    /**
+     * cached global radius for pass in ubo and cluster-sphere culling
+     */
+    private _radius: number = -1;
     private static _debugGeometry: BufferGeometry | null = null;
     private static _debugMaterial: Material | null = null;
     private static _tmpScale: vec3 = new vec3();
