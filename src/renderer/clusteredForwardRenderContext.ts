@@ -42,7 +42,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._tmpData = new Float32Array(4096);
         this._buffer = new BufferHelper(this._tmpData);
 
-        this._tmpIdxData = new Uint32Array(4096);
+        this._tmpIdxData = new Uint32Array(ClusteredForwardRenderContext.MAX_ITEMS);
         this._idxBuffer = new BufferHelper(this._tmpIdxData);
 
         this._tmpClusterData = new Uint32Array(ClusteredForwardRenderContext.NUM_CLUSTERS * ClusteredForwardRenderContext.CLUSTER_SIZE_INT);
@@ -123,7 +123,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
     public static readonly MAX_DECALS = 512;
     public static readonly MAX_ENVPROBES = 128;
     public static readonly MAX_IRRPROBES = 512;
-    public static readonly MAX_ITEMS = 4096;
+    public static readonly MAX_ITEMS = 8192;
     public static readonly MAX_BONES = 256;
 
     /**

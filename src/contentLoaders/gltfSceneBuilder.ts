@@ -317,6 +317,7 @@ export class GLTFSceneBuilder {
             envProbe.isStatic = true;
             envProbe.probeType = EnvironmentProbeType.Irradiance;
             envProbe.autoUpdateTransform = false;
+            envProbe.range = 1.0;
             if (extras.clippingStart !== undefined) envProbe.clippingStart = extras.clippingStart;
             if (extras.clippingEnd !== undefined) envProbe.clippingEnd = extras.clippingEnd;
             if (extras.influenceDist !== undefined) envProbe.range = extras.influenceDist;
@@ -326,6 +327,7 @@ export class GLTFSceneBuilder {
             ret = new Object3D();
             // put the envprobe on the center of every cell
             const cellSize = new vec3([1.0 / resX, 1.0 / resY, 1.0 / resZ]);
+            const range = 2.0 * Math.max(cellSize.x, Math.max(cellSize.y, cellSize.z));
             const halfCellSize = cellSize.copy();
             halfCellSize.scale(0.5);
             for (let k = 0; k < resZ; k++) {
@@ -337,7 +339,11 @@ export class GLTFSceneBuilder {
                         envProbe.autoUpdateTransform = false;
                         if (extras.clippingStart !== undefined) envProbe.clippingStart = extras.clippingStart;
                         if (extras.clippingEnd !== undefined) envProbe.clippingEnd = extras.clippingEnd;
-                        if (extras.influenceDist !== undefined) envProbe.range = extras.influenceDist;
+                        if (extras.influenceDist !== undefined) {
+                            envProbe.range = extras.influenceDist;
+                        } else {
+                            envProbe.range = range;
+                        }
 
                         envProbe.translation.x = i / (resX) + halfCellSize.x;
                         envProbe.translation.y = j / (resY) + halfCellSize.y;
