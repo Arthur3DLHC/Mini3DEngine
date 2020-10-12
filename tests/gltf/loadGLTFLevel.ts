@@ -27,7 +27,7 @@ window.onload = () => {
     const gltfLoader = new GLTFLoader(loadingManager);
 
     const renderer = new ClusteredForwardRenderer();
-    renderer.debugRenderer.showClusters = true;
+    renderer.debugRenderer.showClusters = false;
     renderer.debugRenderer.clusterDrawMode = DebugRenderer.ClusterDrawMode_IrrProbeCount;
     renderer.debugRenderer.itemCountRef = 4;
 

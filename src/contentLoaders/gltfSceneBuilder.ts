@@ -326,6 +326,7 @@ export class GLTFSceneBuilder {
             // else add envprobes as children
             ret = new Object3D();
             // put the envprobe on the center of every cell
+            // irradiane volume radius is 1 in blender, so the box size is 2?
             const cellSize = new vec3([1.0 / resX, 1.0 / resY, 1.0 / resZ]);
             const halfCellSize = cellSize.copy();
             halfCellSize.scale(0.5);
@@ -342,6 +343,7 @@ export class GLTFSceneBuilder {
                         //    envProbe.localRange.xyz = [extras.influenceDist, extras.influenceDist, extras.influenceDist];
                         //} else {
                             cellSize.copy(envProbe.localRange);
+                            envProbe.localRange.scale(2);   // default irradiance volume size is 2 in blender
                         //}
 
                         envProbe.translation.x = i / (resX) + halfCellSize.x;
