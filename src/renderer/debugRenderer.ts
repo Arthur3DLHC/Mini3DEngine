@@ -105,7 +105,7 @@ export class DebugRenderer {
         // uniforms
         gl.uniform1i(this._debugClusterProgram.getUniformLocation("s_sceneDepth"), this._sceneDepthTexUnit);
         gl.uniform1i(this._debugClusterProgram.getUniformLocation("u_debugDrawMode"), this.clusterDrawMode);
-        gl.uniform1i(this._debugClusterProgram.getUniformLocation("u_countRef"), this.itemCountRef);
+        gl.uniform1f(this._debugClusterProgram.getUniformLocation("u_countRef"), this.itemCountRef);
 
         // draw fullscreen quad
         this._rectGeom.draw(0, Infinity, this._debugClusterProgram.attributes);

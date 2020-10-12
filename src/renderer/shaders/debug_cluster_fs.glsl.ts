@@ -23,7 +23,7 @@ export default /** glsl */`
 // #define MAX_COUNT_REF       4.0
 
 uniform int u_debugDrawMode;
-uniform int u_countRef;
+uniform float u_countRef;
 
 float getLinearDepth(vec2 scrUV) {
     // now only have perspective camera
