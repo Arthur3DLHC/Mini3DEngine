@@ -20,9 +20,10 @@ export default /** glsl */`
 #define DRAW_IRR_COUNT      5
 #define DRAW_DECAL_COUNT    6
 
-#define MAX_COUNT_REF       4.0
+// #define MAX_COUNT_REF       4.0
 
 uniform int u_debugDrawMode;
+uniform int u_countRef;
 
 float getLinearDepth(vec2 scrUV) {
     // now only have perspective camera
@@ -79,17 +80,17 @@ void main(void) {
         // todo: use a ramp color to describe the count
         // lerp from blue to yellow?
         float lightCount = float(getLightCountInCluster(cluster));
-        o_color = mix(vec4(0.0, 0.0, 1.0, 0.5), vec4(1.0, 1.0, 0.0, 0.5), clamp(lightCount / MAX_COUNT_REF, 0.0, 1.0));
+        o_color = mix(vec4(0.0, 0.0, 1.0, 0.5), vec4(1.0, 1.0, 0.0, 0.5), clamp(lightCount / u_countRef, 0.0, 1.0));
     } else if (u_debugDrawMode == DRAW_REFL_COUNT) {
         uint start = 0u;
         uint count = 0u;
         getEnvProbeIndicesInCluster(cluster, start, count);
-        o_color = mix(vec4(0.0, 0.0, 1.0, 0.5), vec4(1.0, 1.0, 0.0, 0.5), clamp(float(count) / MAX_COUNT_REF, 0.0, 1.0));
+        o_color = mix(vec4(0.0, 0.0, 1.0, 0.5), vec4(1.0, 1.0, 0.0, 0.5), clamp(float(count) / u_countRef, 0.0, 1.0));
     } else if (u_debugDrawMode == DRAW_IRR_COUNT) {
         uint start = 0u;
         uint count = 0u;
         getIrrProbeIndicesInCluster(cluster, start, count);
-        o_color = mix(vec4(0.0, 0.0, 1.0, 0.5), vec4(1.0, 1.0, 0.0, 0.5), clamp(float(count) / MAX_COUNT_REF, 0.0, 1.0));
+        o_color = mix(vec4(0.0, 0.0, 1.0, 0.5), vec4(1.0, 1.0, 0.0, 0.5), clamp(float(count) / u_countRef, 0.0, 1.0));
     } else if (u_debugDrawMode == DRAW_DECAL_COUNT) {
         // no decal yet
         o_color = vec4(0., 0., 0., 0.);

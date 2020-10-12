@@ -338,11 +338,11 @@ export class GLTFSceneBuilder {
                         envProbe.autoUpdateTransform = false;
                         if (extras.clippingStart !== undefined) envProbe.clippingStart = extras.clippingStart;
                         if (extras.clippingEnd !== undefined) envProbe.clippingEnd = extras.clippingEnd;
-                        if (extras.influenceDist !== undefined) {
-                            envProbe.localRange.xyz = [extras.influenceDist, extras.influenceDist, extras.influenceDist];
-                        } else {
+                        // if (extras.influenceDist !== undefined) {
+                        //    envProbe.localRange.xyz = [extras.influenceDist, extras.influenceDist, extras.influenceDist];
+                        //} else {
                             cellSize.copy(envProbe.localRange);
-                        }
+                        //}
 
                         envProbe.translation.x = i / (resX) + halfCellSize.x;
                         envProbe.translation.y = j / (resY) + halfCellSize.y;
