@@ -266,7 +266,7 @@ void main(void) {
     float dist = distance(rayOrigin, hitPoint);
 
     float alpha = calculateAlpha(iterationCount, reflectivity, hitPixel, hitPoint, dist, rayDir) * float(intersect);
-
+    // float alpha = 1.0;
     vec3 hitNormal = getSceneNormal(hitPixel);
 
     // Ignore the pixel not face the ray
@@ -279,7 +279,6 @@ void main(void) {
     // vec4 color = decodeHDR(texture2DLodEXT(sourceTexture, hitPixel, clamp(dist / maxRayDistance, 0.0, 1.0) * maxMipmapLevel));
 
     if (!intersect) {
-        // todo: sample cubemaps in cluster
         discard;
     }
     vec4 color = texture(s_sceneColor, hitPixel);

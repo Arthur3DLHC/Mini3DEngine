@@ -31,6 +31,10 @@ window.onload = () => {
     renderer.debugRenderer.clusterDrawMode = DebugRenderer.ClusterDrawMode_IrrProbeCount;
     renderer.debugRenderer.itemCountRef = 4;
 
+    renderer.postprocessor.ssr.eyeFadeStart = 0.9;
+    renderer.postprocessor.ssr.eyeFadeEnd = 1.0;
+    // renderer.postprocessor.ssr.maxRayDistance = 100;
+
     const scene = new Scene();
     const camera = new PerspectiveCamera();
     camera.aspect = canvas.width / canvas.height;

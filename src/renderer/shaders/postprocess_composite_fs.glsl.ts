@@ -153,7 +153,6 @@ void main(void) {
     // o_color = vec4(F, 1.0);
     // return;
 
-    sumColor.rgb *= F;
     // sumColor.a *= length(sumColor.rgb);
 
     if(sumColor.a < 0.99) {
@@ -203,6 +202,9 @@ void main(void) {
         }
         // sumColor.rgb = n * 0.5 + vec3(0.5);
     }
+
+    sumColor.rgb *= F;
+
     // fix me: test add blend?
     // sumColor.a = (f0.r + f0.g + f0.b) * 0.33333;
     o_color = vec4(sumColor.rgb * sumAO, 0.0);
