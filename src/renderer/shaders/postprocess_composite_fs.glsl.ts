@@ -10,6 +10,11 @@ export default /** glsl */`
 uniform vec2 u_offset;
 // uniform float u_intensity;
 // uniform float u_power;
+// todo: flags for controlling composite contents
+uniform float u_ssrAmount;
+uniform float u_aoAmount;           // only affect specular
+// uniform float u_fogAmount;
+// uniform float u_envProbeAmount;
 
 // samplers
 #include <samplers_scene>
@@ -60,10 +65,14 @@ void main(void) {
     vec3 f90 = vec3(1.0);
 
     vec4 sumColor = vec4(0.0);
-    float sumAO = 0.0;
+    float sumAO = 1.0;
     // float sumWeightSSR = 0.0;
     // float sumWeightAO = 0.0;
     // float epsilon = 0.001;
+    if (u_aoAmount > 0.001) {
+        sumAO = 0.0;
+    }
+
     vec2 sumWeight = vec2(0.0);
     vec2 epsilon = vec2(0.001);
 
@@ -94,25 +103,27 @@ void main(void) {
             
             // float ao = texture(s_aoTex, uvAO).r;
             // vec4 refl = texture(s_reflTex, uvSSR);
-            float ao = texture(s_aoTex, uv.xy).r;
-            vec4 refl = texture(s_reflTex, uv.zw);
+            if (u_ssrAmount > 0.001) {
+                vec4 refl = texture(s_reflTex, uv.zw);
+                sumColor += refl * weight.y;
+            }
 
             // sumColor += refl * weightSSR;
             // sumAO += ao * weightAO;
             // sumWeightSSR += weightSSR;
             // sumWeightAO += weightAO;
-
-            sumAO += ao * weight.x;
-            sumColor += refl * weight.y;
+            if (u_aoAmount > 0.001) {
+                float ao = texture(s_aoTex, uv.xy).r;
+                sumAO += ao * weight.x;
+            }
             sumWeight += weight;
         }
     }
 
     // sumColor /= sumWeightSSR;
     // sumAO /= sumWeightAO;
-    sumAO /= sumWeight.x;
-    sumColor /= sumWeight.y;
-
+    if(u_aoAmount > 0.001) sumAO /= sumWeight.x;
+    if(u_ssrAmount > 0.001) sumColor /= sumWeight.y;
     // o_color = vec4(sumAO, sumAO, sumAO, 1.0);
     // return;
 

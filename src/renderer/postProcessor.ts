@@ -189,9 +189,8 @@ export class PostProcessor {
         if (this._rectGeom) { this._rectGeom.destroy(); }
     }
 
-    public enableSSR: boolean = true;
-    public enableFXAA: boolean = true;
-    public enableGlow: boolean = true;
+    //public enableFXAA: boolean = true;
+    //public enableGlow: boolean = true;
     public enableToneMapping: boolean = true;
     // todo: other post processing effects: color grading, glow...
 
@@ -495,6 +494,8 @@ export class PostProcessor {
         const texelW = 1.0 / this._ssrTexture.width;
         const texelH = 1.0 / this._ssrTexture.height;
         gl.uniform2f(this._compositeProgram.getUniformLocation("u_offset"), this.ssr.blurSize * texelW, this.ssr.blurSize * texelH);
+        gl.uniform1f(this._compositeProgram.getUniformLocation("u_ssrAmount"), this.ssr.enable ? 1.0 : 0.0);
+        gl.uniform1f(this._compositeProgram.getUniformLocation("u_aoAmount"), this.ssao.enable ? 1.0 : 0.0);    //NOTE: affect specular ao only
 
         this._rectGeom.draw(0, Infinity, this._compositeProgram.attributes);
 

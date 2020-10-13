@@ -31,6 +31,9 @@ window.onload = () => {
     renderer.debugRenderer.clusterDrawMode = DebugRenderer.ClusterDrawMode_IrrProbeCount;
     renderer.debugRenderer.itemCountRef = 4;
 
+    // renderer.postprocessor.ssao.enable = false;
+    // renderer.postprocessor.ssr.enable = false;
+
     renderer.postprocessor.ssr.eyeFadeStart = 0.9;
     renderer.postprocessor.ssr.eyeFadeEnd = 1.0;
     // renderer.postprocessor.ssr.maxRayDistance = 100;
