@@ -52,7 +52,7 @@ vec3 getNormal(vec3 v) {
         //ng = normalize(ex_worldNormal);
         ng = normal;
         t = normalize(t_ - ng * dot(ng, t_));
-        b = cross(ng, t);
+        b = normalize(cross(ng, t));
 
         // For a back-facing surface, the tangential basis vectors are negated.
         float facing = step(0.0, dot(v, ng)) * 2.0 - 1.0;
