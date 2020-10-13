@@ -484,6 +484,7 @@ TODO:       主要类结构
                 动画 Mixer？不着急实现
 
             后期特效开启、关闭的控制；
+                SSAO，SSR
 
             尝试一下简版次表面效果
                 gltf-Model-Viewer中的方法
@@ -520,7 +521,7 @@ TODO:       主要类结构
 
             平行光的处理
                 如果平行光指定了半径和距离，则以外的部分不应产生光照？
-                    目前光范围边缘会有个缝，漏光；
+                    目前光范围边缘会有个缝，漏光；可能是阴影图集采样不准确引起的
 
             阴影继续优化：柔化边缘
                 方差阴影？或者加入线性插值？
@@ -529,6 +530,9 @@ TODO:       主要类结构
             解决屏幕空间反射使用上一帧画面导致反射滞后现象
                 不是很紧急
                 比较复杂，需要生成速度图
+
+            有法线贴图时法线扭曲问题
+                可能是通过梯度计算切向空间不准确引起的？
 
             GameScene 管理
                 参考 Phaser 和 PIXI.js？
@@ -587,6 +591,7 @@ TODO:       主要类结构
             
             测试 Occlusion query?
                 在 blender 中给物体加一个自定义属性，occlustionQuery
+                拷贝 occlusion 相关属性的脚本；
                 测试Demo，调试
                     普通mesh的occlusion query
                     instancedMesh的occlusion query
@@ -594,15 +599,7 @@ TODO:       主要类结构
             Decals
 
             Clustered 光源、envmap、irradiance volume
-                fillItemsPerView
-                    加一个参数：checkClusters
-                        主画面渲染，设为true;
-                        Cubemap 或 Shadowmap 渲染，设为 false；分辨率较低，而且是类似 bake 阶段，无需 Clustered
-                shader 实现从像素位置获得 cluster id 的函数
-                如何绘制调试信息：
-                    Cluster划分
-                    Cluster内对象的数量
-                    使用一个统一的全屏后期特效？不会影响 defaultPBR shader，便于开启和关闭；
+                解决平行光在 clustered 时不正常问题；
 
             户外阴影方案
                 Cascaded shadow map? 
