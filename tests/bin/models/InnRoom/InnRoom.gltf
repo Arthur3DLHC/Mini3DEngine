@@ -173,7 +173,8 @@
                 "clippingStart" : 0.009999999776482582,
                 "clippingEnd" : 40,
                 "extType" : "environmentProbe",
-                "radius" : 2.5
+                "radius" : 2.5,
+                "influenceDist" : 5
             },
             "name" : "ReflectionCubemap",
             "translation" : [
@@ -187,7 +188,7 @@
                 "clippingStart" : 0.009999999776482582,
                 "clippingEnd" : 40,
                 "extType" : "environmentProbe",
-                "radius" : 2.5
+                "influenceDist" : 5
             },
             "name" : "ReflectionCubemap.001",
             "translation" : [
@@ -200,11 +201,11 @@
             "extras" : {
                 "resolutionZ" : 3,
                 "resolutionX" : 2,
-                "resolutionY" : 3,
+                "resolutionY" : 2,
                 "clippingStart" : 0.009999999776482582,
                 "clippingEnd" : 40,
                 "extType" : "irradianceVolume",
-                "radius" : 0.30000001192092896
+                "influenceDist" : 0.30000001192092896
             },
             "name" : "IrradianceVolume",
             "scale" : [
