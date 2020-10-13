@@ -673,7 +673,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         let envProbeCount = 0;
         let irrProbeCount = 0;
 
-        // todo: test frustum culling
+        // todo: frustum culling ?
 
         if (lights) {
             for (let iLight = 0; iLight < this.staticLightCount; iLight++) {
