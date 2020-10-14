@@ -178,9 +178,16 @@ void main(void)
         // todo: blend by distance to envprobe center position
         // todo: should also add radius weight: the smaller the probe, the stronger the weight.
         // https://www.xmswiki.com/wiki/SMS:Inverse_Distance_Weighted_Interpolation
-        float dist = length(probe.position - ex_worldPosition) + 0.1;
-        float distxradius = dist * probe.radius;
-        float weight = 1.0 / (distxradius * distxradius);
+        // float dist = length(probe.position - ex_worldPosition) + 0.1;
+        // float distxradius = dist * probe.radius;
+        // float weight = 1.0 / (distxradius * distxradius);
+
+        // try to remove the distinct boundary when using clusters
+        float dist = length(probe.position - ex_worldPosition);
+        float distWeight = clamp(1.0 - dist / probe.radius, 0.0, 1.0);
+        // smaller radius still get more weight?
+        float radiusWeight = 1.0 / probe.radius;
+        float weight = distWeight * radiusWeight;
 
         // IBL diffuse part
         // todo: simple subsurface?

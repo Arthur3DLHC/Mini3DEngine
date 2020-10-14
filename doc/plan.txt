@@ -599,7 +599,7 @@ TODO:       主要类结构
             Decals
 
             Clustered 光源、envmap、irradiance volume
-                解决平行光在 clustered 时不正常问题；
+                解决 cluster 时 irradiance probe 混合方式导致边界差别很大问题；
 
             户外阴影方案
                 Cascaded shadow map? 
