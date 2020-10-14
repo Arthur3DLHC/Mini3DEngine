@@ -301,6 +301,7 @@ void main(void)
 
             // subsuf = subsurfaceScattering(NdotL, curvature, u_material.subsurfaceColor, u_material.subsurface);
             // f_diffuse += subsuf.rgb * subsuf.a * intensity;
+
             f_subsurface += intensity * subsurfaceRadiance(n, v, l, u_material.subsurface, u_material.subsurfaceRadius, u_material.subsurfacePower, u_material.subsurfaceColor, u_material.subsurfaceThickness);
         }
 

@@ -57,7 +57,8 @@ export default /** glsl */`
         uint reflProbeCount = getEnvProbeCountInCluster(cluster);
         offset = u_clusters.clusters[cluster].start + u_clusters.clusters[cluster].lightCount
          + u_clusters.clusters[cluster].decalCount + reflProbeCount;
-        count = u_clusters.clusters[cluster].envProbeCount - reflProbeCount * 65536u;
+        // count = u_clusters.clusters[cluster].envProbeCount - reflProbeCount * 65536u;
+        count = u_clusters.clusters[cluster].envProbeCount % 65536u;
     }
 
     /*

@@ -36,6 +36,7 @@ export class DebugRenderer {
     public showClusters: boolean = false;
     public clusterDrawMode: number = DebugRenderer.ClusterDrawMode_Clusters;
     public itemCountRef: number = 4;
+    public overlayOpacity: number = 0.5;
 
     public constructor(context: ClusteredForwardRenderContext, sceneDepthTex: Texture2D) {
         if (GLPrograms.shaderCodes["fullscreen_rect_vs"] === undefined) {
@@ -106,6 +107,7 @@ export class DebugRenderer {
         gl.uniform1i(this._debugClusterProgram.getUniformLocation("s_sceneDepth"), this._sceneDepthTexUnit);
         gl.uniform1i(this._debugClusterProgram.getUniformLocation("u_debugDrawMode"), this.clusterDrawMode);
         gl.uniform1f(this._debugClusterProgram.getUniformLocation("u_countRef"), this.itemCountRef);
+        gl.uniform1f(this._debugClusterProgram.getUniformLocation("u_opacity"), this.overlayOpacity);
 
         // draw fullscreen quad
         this._rectGeom.draw(0, Infinity, this._debugClusterProgram.attributes);

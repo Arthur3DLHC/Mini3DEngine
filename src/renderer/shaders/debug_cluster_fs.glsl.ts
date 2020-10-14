@@ -24,6 +24,7 @@ export default /** glsl */`
 
 uniform int u_debugDrawMode;
 uniform float u_countRef;
+uniform float u_opacity;
 
 float getLinearDepth(vec2 scrUV) {
     // now only have perspective camera
@@ -97,5 +98,7 @@ void main(void) {
     } else {
         o_color = vec4(0., 0., 0., 0.);
     }
+
+    o_color.a = clamp(u_opacity, 0., 1.);
 }
 `;
