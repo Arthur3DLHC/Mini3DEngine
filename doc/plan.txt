@@ -474,6 +474,19 @@ TODO:       主要类结构
                     生成 reflect map 时需要应用 irradiance probes
                     Fix me: irradiance probe 附近的面会变暗，什么原因？
 
+            后期特效开启、关闭的控制；
+                SSAO，SSR
+
+            Blender python 脚本
+                补充光源属性到 gltf 的 extra 中
+                从 Blender 导出 Irradiance Volume 到 gltf；从 gltf 读取 Irradiance Volume，添加 probes 到场景；
+                    ** 导出 Irradiance voluem 和 reflection probe 的更多属性：影响半径等；
+                    渲染时，通过节点缩放乘以影响半径得到最终的影响半径；
+                        ## Reflect probe 的矫正体？实现 Parallax corrected cubemap? 不紧急
+                        ## 需要将矫正体空间变换矩阵加入uniform buffer
+                补充材质属性到 gltf 的 extra 中
+                    次表面反射参数；高光强度；
+
 -------------------------- 进行到这里了 ---------------------------
 
             动画控制
@@ -482,9 +495,6 @@ TODO:       主要类结构
                 优化动画性能：不每帧更新包围球？预处理 SkinMesh 时计算一个最大包围球？
                     经过实测，是否更新包围球对性能影响不大
                 动画 Mixer？不着急实现
-
-            后期特效开启、关闭的控制；
-                SSAO，SSR
 
             尝试一下简版次表面效果
                 gltf-Model-Viewer中的方法
@@ -505,16 +515,8 @@ TODO:       主要类结构
                 测试半透明物体的 Demo
                 半透明shader中应该应用 reflection probe, 而不是 diffuse probe?
                     复习一下 DOOM 中是怎么做的
-
-            Blender python 脚本
-                补充光源属性到 gltf 的 extra 中
-                从 Blender 导出 Irradiance Volume 到 gltf；从 gltf 读取 Irradiance Volume，添加 probes 到场景；
-                    ** 导出 Irradiance voluem 和 reflection probe 的更多属性：影响半径等；
-                    渲染时，通过节点缩放乘以影响半径得到最终的影响半径；
-                        Reflect probe 的矫正体？实现 Parallax corrected cubemap?
-                        需要将矫正体空间变换矩阵加入uniform buffer
-                补充材质属性到 gltf 的 extra 中
-                    次表面反射参数；高光强度；
+                    在 default_pbr shader 中通过材质不透明度判断？
+                    或者单写一个半透明的 shader？
 
             绘制光源和 envProbe 的调试图元
                 差光源的；
@@ -528,8 +530,11 @@ TODO:       主要类结构
                     取四点PCF，然后做线性插值？
 
             解决屏幕空间反射使用上一帧画面导致反射滞后现象
-                不是很紧急
+                ##不是很紧急
                 比较复杂，需要生成速度图
+
+            更多的后期特效：
+                全局雾，景深，辉光；
 
             有法线贴图时法线扭曲问题
                 可能是通过梯度计算切向空间不准确引起的？
@@ -585,7 +590,7 @@ TODO:       主要类结构
                     用 instanced 方式绘制包围盒
                 动态的 instancing 物体怎么处理
                     更新矩阵；包围盒？occlusion query?
-                    暂时不支持动态 instancing
+                    ** 暂时不支持动态 instancing
             
             物体是否做包围球检测的控制标志？ 
             
@@ -596,10 +601,12 @@ TODO:       主要类结构
                     普通mesh的occlusion query
                     instancedMesh的occlusion query
 
-            Decals
+            ## Decals
+                由于不太好从 Blender 导出 Decal 在图集中的纹理坐标，暂时不着急实现
 
             Clustered 光源、envmap、irradiance volume
-                解决 cluster 时 irradiance probe 混合方式导致边界差别很大问题；
+
+            ** 非 Cluster 时也做一下光源等的视见体剔除，以加快 reflect probe 和 irradiance probe 的生成速度
 
             户外阴影方案
                 Cascaded shadow map? 
@@ -617,6 +624,5 @@ TODO:       主要类结构
                 SDF
                 体积雾；全局雾；
                 雾带光照，并取样 shadowmap？
-
 
         物理系统
