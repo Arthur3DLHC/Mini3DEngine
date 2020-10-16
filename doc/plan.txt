@@ -606,7 +606,8 @@ TODO:       主要类结构
 
             Clustered 光源、envmap、irradiance volume
 
-            ** 非 Cluster 时也做一下光源等的视见体剔除，以加快 reflect probe 和 irradiance probe 的生成速度
+            ## 非 Cluster 时也做一下光源等的视见体剔除，以加快 reflect probe 和 irradiance probe 的生成速度?
+                暂时没有必要，因为 env probe 的贴图尺寸都很小；可能做了还没有不做快
 
             户外阴影方案
                 Cascaded shadow map? 

@@ -1789,22 +1789,25 @@ export class ClusteredForwardRenderer {
                     }
                 }
 
-                this.setRenderStateSet(this._renderStatesOpaque);
-
                 // render items in renderlist
                 // only render static items; (there should be only static meshes in renderlist now)
                 // fix me: is that necessary to use depth prepass and occlusion query?
 
-                // depth prepass, can prevent pixel overdraw
-                
+                // depth prepass, can prevent pixel overdraw？
+                this.setRenderStateSet(this._renderStatesDepthPrepass);
+                GLPrograms.useProgram(this._depthPrepassProgram);
+                this.renderItems(this._renderListDepthPrepass, this._frustum, true, false, false, true);
+
+                this.setRenderStateSet(this._renderStatesOpaque);
 
                 this.renderItems(this._renderListOpaque, this._frustum, false, false, false, true);
                 this.renderItems(this._renderListOpaqueOcclusionQuery, this._frustum, false, false, false, true);
 
                 // is that necessary to render transparent objects? yes, it is...
+                // but there will not be reflections on these objects yet;
+
 
                 // no after effects; to get accurate color values from environment
-
             }
         }
 
