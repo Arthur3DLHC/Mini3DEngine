@@ -1794,12 +1794,18 @@ export class ClusteredForwardRenderer {
                 // render items in renderlist
                 // only render static items; (there should be only static meshes in renderlist now)
                 // fix me: is that necessary to use depth prepass and occlusion query?
-                // no after effects?
+
+                // depth prepass, can prevent pixel overdraw
+                
+
                 this.renderItems(this._renderListOpaque, this._frustum, false, false, false, true);
                 this.renderItems(this._renderListOpaqueOcclusionQuery, this._frustum, false, false, false, true);
-                // is that necessary to render transparent objects? yes, it is...
-            }
 
+                // is that necessary to render transparent objects? yes, it is...
+
+                // no after effects; to get accurate color values from environment
+
+            }
         }
 
         envMapFBO.release();

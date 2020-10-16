@@ -674,6 +674,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
         let irrProbeCount = 0;
 
         // todo: frustum culling ?
+        // not necessary, because this funciton is mostly for rendering enviroment maps, and their size is small (about 64)
+        // maybe doing frustum culling by js is even slower than executing every lights,... for pixels in shader...
 
         if (lights) {
             for (let iLight = 0; iLight < this.staticLightCount; iLight++) {
