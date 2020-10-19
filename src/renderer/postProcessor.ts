@@ -562,5 +562,6 @@ export class PostProcessor {
     private applyGlow() {
         // https://github.com/mrdoob/three.js/blob/dev/examples/js/postprocessing/UnrealBloomPass.js
         // https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/
+        
     }
 }
