@@ -1,4 +1,5 @@
 export class GlowParams {
+    public enable: boolean = true;
     /**
      * the min brightness of pixels which can glow
      */
@@ -8,4 +9,6 @@ export class GlowParams {
      * radius factor
      */
     public glowRadius: number = 1;
+
+    public intensity: number = 1;
 }

@@ -30,6 +30,7 @@ import { ClusteredForwardRenderContext } from "./clusteredForwardRenderContext.j
 import { SSRParams } from "./postprocess/ssrParams.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { GlowParams } from "./postprocess/glowParams.js";
+import vec2 from "../../lib/tsm/vec2.js";
 
 /**
  * all post processes supported
@@ -210,6 +211,8 @@ export class PostProcessor {
 
         this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
 
+        this._blurUnitOffset = new vec2();
+
         this.ssao = new SSAOParams();
         this.ssr = new SSRParams();
         this.glow = new GlowParams();
@@ -302,6 +305,8 @@ export class PostProcessor {
     // start unit for custom textures of every effects
     private _customTexStartUnit: number = 0;
 
+    private _blurUnitOffset: vec2;
+
     public processOpaque(startTexUnit: number, target: FrameBuffer, prevFrame: Texture2D) {
         // todo: bind general texturess for once
         this._sceneColorTexUnit = startTexUnit;
@@ -351,6 +356,11 @@ export class PostProcessor {
         this._customTexStartUnit = startTexUnit + 4;
 
         this.applyToneMapping();
+
+        // glow should be applied after tone mapping?
+        if (this.glow.enable) {
+            this.applyGlow();
+        }
     }
     
     private setTexture(location: WebGLUniformLocation | null, unit: number, texture: Texture) {
@@ -601,10 +611,38 @@ export class PostProcessor {
         }
 
         // 先做 brightpass，将高亮部分的像素绘制到一个低分辨率 FBO 上
+        GLDevice.renderTarget = this._brightPassFBO;
+        gl.viewport(0, 0, this._brightPassTexture.width, this._brightPassTexture.height);
+        gl.scissor(0, 0, this._brightPassTexture.width, this._brightPassTexture.height);
+
+        this._renderStates.apply();
+
+        GLPrograms.useProgram(this._brightpassProgram);
+        this.setTexture(this._brightpassProgram.getUniformLocation("s_sceneColor"), this._customTexStartUnit, sourceImage);
+        gl.uniform1f(this._brightpassProgram.getUniformLocation("u_threshold"), this.glow.threshold);
+        gl.uniform1f(this._brightpassProgram.getUniformLocation("u_intensity"), this.glow.intensity);
+        this._rectGeom.draw(0, Infinity, this._brightpassProgram.attributes);
 
         // 然后做横向 blur
+        GLDevice.renderTarget = this._glowFBO;
+        // viewport is same
+        this._blurUnitOffset.x = this.glow.glowRadius / this._brightPassTexture.width;
+        this._blurUnitOffset.y = 0;
+        GLPrograms.useProgram(this._gaussianBlurProgram);
+        this.setTexture(this._gaussianBlurProgram.getUniformLocation("s_source"), this._customTexStartUnit, this._brightPassTexture);
+        gl.uniform2f(this._gaussianBlurProgram.getUniformLocation("u_unitOffset"), this._blurUnitOffset.x, this._blurUnitOffset.y);
+        this._rectGeom.draw(0, Infinity, this._gaussianBlurProgram.attributes);
 
         // 纵向 blur，输出到主屏幕
-
+        GLDevice.renderTarget = null;
+        GLRenderStates.setBlendState(this._compositeBlendState);
+        this._blurUnitOffset.x = 0;
+        this._blurUnitOffset.y = this.glow.glowRadius / this._glowTexture.height;
+        this.setTexture(this._gaussianBlurProgram.getUniformLocation("s_source"), this._customTexStartUnit, this._glowTexture);
+        gl.uniform2f(this._gaussianBlurProgram.getUniformLocation("u_unitOffset"), this._blurUnitOffset.x, this._blurUnitOffset.y);
+        this._rectGeom.draw(0, Infinity, this._gaussianBlurProgram.attributes);
+        
+        // clean up
+        GLTextures.setTextureAt(this._customTexStartUnit, null);
     }
 }

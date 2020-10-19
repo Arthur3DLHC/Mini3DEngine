@@ -4,6 +4,7 @@
  */
 export default /** glsl */`
 uniform float u_threshold;
+uniform float u_intensity;
 
 // samplers
 #include <samplers_postprocess>
@@ -15,6 +16,7 @@ void main(void) {
     // fix me: this can be done in tonemapping shader?
     vec4 sceneColor = texture(s_sceneColor, ex_texcoord);
     sceneColor.rgb -= vec3(u_threshold);
-    o_color = sceneColor;
+    sceneColor.rgb *= u_intensity;
+    o_color = max(sceneColor, vec4(0.));
 }
 `;
