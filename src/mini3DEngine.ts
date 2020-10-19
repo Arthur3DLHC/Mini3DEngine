@@ -26,9 +26,10 @@ export * from "./math/colorHelper.js";
 export * from "./math/frustum.js";
 export * from "./math/rectanglePacker.js";
 export * from "./math/srtTransform.js";
-export * from "./renderer/postprocess/ssaoParams.js"
-export * from "./renderer/postprocess/ssrParams.js"
-export * from "./renderer/boundingRenderModes.js"
+export * from "./renderer/postprocess/glowParams.js";
+export * from "./renderer/postprocess/ssaoParams.js";
+export * from "./renderer/postprocess/ssrParams.js";
+export * from "./renderer/boundingRenderModes.js";
 export * from "./renderer/clusteredForwardRenderer.js";
 export * from "./renderer/debugRenderer.js";
 export * from "./renderer/postProcessor.js";
