@@ -558,4 +558,9 @@ export class PostProcessor {
         this._rectGeom.draw(0, Infinity, this._toneMappingProgram.attributes);
         GLTextures.setTextureAt(this._customTexStartUnit, null);
     }
+
+    private applyGlow() {
+        // https://github.com/mrdoob/three.js/blob/dev/examples/js/postprocessing/UnrealBloomPass.js
+        // https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/
+    }
 }
