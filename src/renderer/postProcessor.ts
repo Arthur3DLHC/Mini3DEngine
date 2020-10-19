@@ -152,7 +152,7 @@ export class PostProcessor {
         this._ssrFBO.attachTexture(0, this._ssrTexture);
         this._ssrFBO.prepare();
 
-        this._brightPassTexture = new Texture2D(sceneDepthTex.width / 4, sceneDepthTex.height / 4, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
+        this._brightPassTexture = new Texture2D(sceneDepthTex.width / 8, sceneDepthTex.height / 8, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
         this._brightPassTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
         this._brightPassTexture.create();
 
@@ -160,7 +160,7 @@ export class PostProcessor {
         this._brightPassFBO.attachTexture(0, this._brightPassTexture);
         this._brightPassFBO.prepare();
 
-        this._glowTexture = new Texture2D(sceneDepthTex.width / 4, sceneDepthTex.height / 4, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
+        this._glowTexture = new Texture2D(sceneDepthTex.width / 8, sceneDepthTex.height / 8, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
         this._glowTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
         this._glowTexture.create();
 
@@ -635,6 +635,8 @@ export class PostProcessor {
 
         // 纵向 blur，输出到主屏幕
         GLDevice.renderTarget = null;
+        gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+        gl.scissor(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
         GLRenderStates.setBlendState(this._compositeBlendState);
         this._blurUnitOffset.x = 0;
         this._blurUnitOffset.y = this.glow.glowRadius / this._glowTexture.height;
