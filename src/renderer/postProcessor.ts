@@ -151,6 +151,22 @@ export class PostProcessor {
         this._ssrFBO.attachTexture(0, this._ssrTexture);
         this._ssrFBO.prepare();
 
+        this._brightPassTexture = new Texture2D(sceneDepthTex.width / 4, sceneDepthTex.height / 4, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
+        this._brightPassTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
+        this._brightPassTexture.create();
+
+        this._brightPassFBO = new FrameBuffer();
+        this._brightPassFBO.attachTexture(0, this._brightPassTexture);
+        this._brightPassFBO.prepare();
+
+        this._glowTexture = new Texture2D(sceneDepthTex.width / 4, sceneDepthTex.height / 4, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
+        this._glowTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
+        this._glowTexture.create();
+
+        this._glowFBO = new FrameBuffer();
+        this._glowFBO.attachTexture(0, this._glowTexture);
+        this._glowFBO.prepare();
+
         // this._tempFullSwapFBO = [];
 
         // for(let i = 0; i < 2; i++)
@@ -210,6 +226,10 @@ export class PostProcessor {
         if (this._ssaoTexture) { this._ssaoTexture.release(); }
         if (this._ssrFBO) { this._ssrFBO.release(); }
         if (this._ssrTexture) { this._ssrTexture.release(); }
+        if (this._brightPassFBO) { this._brightPassFBO.release();}
+        if (this._brightPassTexture) {this._brightPassTexture.release();}
+        if (this._glowFBO) {this._glowFBO.release();}
+        if (this._glowTexture) {this._glowTexture.release();}
         if (this._rectGeom) { this._rectGeom.destroy(); }
     }
 
@@ -249,6 +269,13 @@ export class PostProcessor {
     private _ssrTexture: Texture2D;
     private _ssrFBO: FrameBuffer;
 
+    // todo: optimze: reruse ssao and ssr textures?
+    private _brightPassTexture: Texture2D;
+    private _brightPassFBO: FrameBuffer;
+
+    private _glowTexture: Texture2D;
+    private _glowFBO: FrameBuffer;
+
     // todo: last frame image
     // 使用两个交替的 framebuffer，还是每帧最后拷贝一下？
     // 交替的开销更小一些？由 renderer 维护，负责每帧交替地传进来？
@@ -256,6 +283,7 @@ export class PostProcessor {
     private _renderStates: RenderStateSet;
     private _ssaoBlurBlendState: BlendState;
     private _compositeBlendState: BlendState;
+    // glow pass can use _compositeBlendState also.
 
     private _rectGeom: PlaneGeometry;
 
@@ -562,6 +590,21 @@ export class PostProcessor {
     private applyGlow() {
         // https://github.com/mrdoob/three.js/blob/dev/examples/js/postprocessing/UnrealBloomPass.js
         // https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/
-        
+        if (this._postProcessFBO === null) {
+            return;
+        }
+
+        const gl = GLDevice.gl;
+        const sourceImage = this._postProcessFBO.getTexture(0);
+        if (sourceImage === null) {
+            return;
+        }
+
+        // 先做 brightpass，将高亮部分的像素绘制到一个低分辨率 FBO 上
+
+        // 然后做横向 blur
+
+        // 纵向 blur，输出到主屏幕
+
     }
 }
