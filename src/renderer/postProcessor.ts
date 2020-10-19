@@ -5,6 +5,8 @@ import postprocess_ssao_blur_fs from "./shaders/postprocess_ssao_blur_fs.glsl.js
 import postprocess_ssr_fs from "./shaders/postprocess_ssr_fs.glsl.js";
 import postprocess_composite_fs from "./shaders/postprocess_composite_fs.glsl.js";
 import postprocess_tonemapping_fs from "./shaders/postprocess_tonemapping_fs.glsl.js";
+import postprocess_brightpass_fs from "./shaders/postprocess_brightpass_fs.glsl.js";
+import postprocess_blur_fs from "./shaders/postprocess_blur_fs.glsl.js";
 
 import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { FrameBuffer } from "../WebGLResources/frameBuffer.js";
@@ -27,6 +29,7 @@ import { GLUniformBuffers } from "../WebGLResources/glUnifomBuffers.js";
 import { ClusteredForwardRenderContext } from "./clusteredForwardRenderContext.js";
 import { SSRParams } from "./postprocess/ssrParams.js";
 import vec4 from "../../lib/tsm/vec4.js";
+import { GlowParams } from "./postprocess/glowParams.js";
 
 /**
  * all post processes supported
@@ -46,6 +49,12 @@ export class PostProcessor {
         }
         if (GLPrograms.shaderCodes["postprocess_ssr_fs"] === undefined) {
             GLPrograms.shaderCodes["postprocess_ssr_fs"] = postprocess_ssr_fs;
+        }
+        if (GLPrograms.shaderCodes["postprocess_brightpass_fs"] === undefined) {
+            GLPrograms.shaderCodes["postprocess_brightpass_fs"] = postprocess_brightpass_fs;
+        }
+        if (GLPrograms.shaderCodes["postprocess_blur_fs"] === undefined) {
+            GLPrograms.shaderCodes["postprocess_blur_fs"] = postprocess_blur_fs;
         }
         if (GLPrograms.shaderCodes["postprocess_composite_fs"] === undefined) {
             GLPrograms.shaderCodes["postprocess_composite_fs"] = postprocess_composite_fs;
@@ -79,6 +88,16 @@ export class PostProcessor {
         this._ssrProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssr_fs"]);
         this._ssrProgram.build();
 
+        this._brightpassProgram = new ShaderProgram();
+        this._brightpassProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
+        this._brightpassProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_brightpass_fs"]);
+        this._brightpassProgram.build();
+
+        this._gaussianBlurProgram = new ShaderProgram();
+        this._gaussianBlurProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
+        this._gaussianBlurProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_blur_fs"]);
+        this._gaussianBlurProgram.build();
+
         this._compositeProgram = new ShaderProgram();
         this._compositeProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
         this._compositeProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_composite_fs"]);
@@ -96,6 +115,8 @@ export class PostProcessor {
         context.bindUniformBlocks(this._ssaoProgram);
         context.bindUniformBlocks(this._ssaoBlurProgram);
         context.bindUniformBlocks(this._ssrProgram);
+        context.bindUniformBlocks(this._brightpassProgram);
+        context.bindUniformBlocks(this._gaussianBlurProgram);
         context.bindUniformBlocks(this._compositeProgram);
         context.bindUniformBlocks(this._toneMappingProgram);
 
@@ -175,12 +196,15 @@ export class PostProcessor {
 
         this.ssao = new SSAOParams();
         this.ssr = new SSRParams();
+        this.glow = new GlowParams();
     }
 
     public release() {
         if (this._ssaoProgram) { this._ssaoProgram.release(); }
         if (this._ssaoBlurProgram) { this._ssaoBlurProgram.release(); }
         if (this._ssrProgram) { this._ssrProgram.release(); }
+        if (this._brightpassProgram) { this._brightpassProgram.release(); }
+        if (this._gaussianBlurProgram) { this._gaussianBlurProgram.release(); }
         if (this._compositeProgram) { this._compositeProgram.release(); }
         if (this._ssaoFBO) { this._ssaoFBO.release(); }
         if (this._ssaoTexture) { this._ssaoTexture.release(); }
@@ -196,12 +220,15 @@ export class PostProcessor {
 
     public ssao: SSAOParams;
     public ssr: SSRParams;
+    public glow: GlowParams;
 
     // todo: shaders
 
     private _ssaoProgram: ShaderProgram;
     private _ssaoBlurProgram: ShaderProgram;
     private _ssrProgram: ShaderProgram;
+    private _brightpassProgram: ShaderProgram;
+    private _gaussianBlurProgram: ShaderProgram;
     private _compositeProgram: ShaderProgram;
     private _toneMappingProgram: ShaderProgram;
     // private _samplerUniformsSSAO: SamplerUniforms;
