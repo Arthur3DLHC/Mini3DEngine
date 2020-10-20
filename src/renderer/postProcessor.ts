@@ -152,7 +152,11 @@ export class PostProcessor {
         this._ssrFBO.attachTexture(0, this._ssrTexture);
         this._ssrFBO.prepare();
 
-        this._brightPassTexture = new Texture2D(sceneDepthTex.width / 8, sceneDepthTex.height / 8, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
+        const startSubDiv: number = 4;
+        let levelWidth = Math.max(2, Math.round(sceneDepthTex.width / startSubDiv));
+        let levelHeight = Math.max(2, Math.round(sceneDepthTex.height / startSubDiv));
+
+        this._brightPassTexture = new Texture2D(levelWidth, levelHeight, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
         this._brightPassTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
         this._brightPassTexture.create();
 
@@ -160,13 +164,40 @@ export class PostProcessor {
         this._brightPassFBO.attachTexture(0, this._brightPassTexture);
         this._brightPassFBO.prepare();
 
-        this._glowTexture = new Texture2D(sceneDepthTex.width / 8, sceneDepthTex.height / 8, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
-        this._glowTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
-        this._glowTexture.create();
+        this._numBloomLevels = 5;
+        this._bloomHorizTextures = [];
+        this._bloomVertiTextures = [];
+        this._bloomHorizFBOs = [];
+        this._bloomVertiFBOs = [];
 
-        this._glowFBO = new FrameBuffer();
-        this._glowFBO.attachTexture(0, this._glowTexture);
-        this._glowFBO.prepare();
+        for(let i = 0; i < this._numBloomLevels; i++) {
+            const horizTex: Texture2D = new Texture2D(levelWidth, levelHeight, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
+            horizTex.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
+            horizTex.create();
+
+            this._bloomHorizTextures.push(horizTex);
+    
+            const horizFBO = new FrameBuffer();
+            horizFBO.attachTexture(0, horizTex);
+            horizFBO.prepare();
+
+            this._bloomHorizFBOs.push(horizFBO);
+
+            const vertiTex: Texture2D = new Texture2D(levelWidth, levelHeight, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
+            vertiTex.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
+            vertiTex.create();
+
+            this._bloomVertiTextures.push(vertiTex);
+    
+            const vertiFBO = new FrameBuffer();
+            vertiFBO.attachTexture(0, vertiTex);
+            vertiFBO.prepare();
+
+            this._bloomVertiFBOs.push(vertiFBO);
+
+            levelWidth = Math.max(2, Math.round(levelWidth / 2));
+            levelHeight = Math.max(2, Math.round(levelHeight / 2));
+        }
 
         // this._tempFullSwapFBO = [];
 
@@ -229,10 +260,12 @@ export class PostProcessor {
         if (this._ssaoTexture) { this._ssaoTexture.release(); }
         if (this._ssrFBO) { this._ssrFBO.release(); }
         if (this._ssrTexture) { this._ssrTexture.release(); }
-        if (this._brightPassFBO) { this._brightPassFBO.release();}
-        if (this._brightPassTexture) {this._brightPassTexture.release();}
-        if (this._glowFBO) {this._glowFBO.release();}
-        if (this._glowTexture) {this._glowTexture.release();}
+        for (const tex of this._bloomHorizTextures) {if (tex) tex.release();}
+        for (const tex of this._bloomVertiTextures) {if (tex) tex.release();}
+        for (const fbo of this._bloomHorizFBOs) {if (fbo) fbo.release();}
+        for (const fbo of this._bloomVertiFBOs) {if (fbo) fbo.release();}
+        this._bloomHorizTextures = [];
+        this._bloomHorizFBOs = [];
         if (this._rectGeom) { this._rectGeom.destroy(); }
     }
 
@@ -275,9 +308,11 @@ export class PostProcessor {
     // todo: optimze: reruse ssao and ssr textures?
     private _brightPassTexture: Texture2D;
     private _brightPassFBO: FrameBuffer;
-
-    private _glowTexture: Texture2D;
-    private _glowFBO: FrameBuffer;
+    private _numBloomLevels: number;
+    private _bloomHorizTextures: Texture2D[];
+    private _bloomVertiTextures: Texture2D[];
+    private _bloomHorizFBOs: FrameBuffer[];
+    private _bloomVertiFBOs: FrameBuffer[];
 
     // todo: last frame image
     // 使用两个交替的 framebuffer，还是每帧最后拷贝一下？
@@ -623,26 +658,34 @@ export class PostProcessor {
         gl.uniform1f(this._brightpassProgram.getUniformLocation("u_intensity"), this.glow.intensity);
         this._rectGeom.draw(0, Infinity, this._brightpassProgram.attributes);
 
-        // 然后做横向 blur
-        GLDevice.renderTarget = this._glowFBO;
-        // viewport is same
-        this._blurUnitOffset.x = this.glow.glowRadius / this._brightPassTexture.width;
-        this._blurUnitOffset.y = 0;
-        GLPrograms.useProgram(this._gaussianBlurProgram);
-        this.setTexture(this._gaussianBlurProgram.getUniformLocation("s_source"), this._customTexStartUnit, this._brightPassTexture);
-        gl.uniform2f(this._gaussianBlurProgram.getUniformLocation("u_unitOffset"), this._blurUnitOffset.x, this._blurUnitOffset.y);
-        this._rectGeom.draw(0, Infinity, this._gaussianBlurProgram.attributes);
+        let curSourceTex = this._brightPassTexture;
 
-        // 纵向 blur，输出到主屏幕
-        GLDevice.renderTarget = null;
-        gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
-        gl.scissor(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
-        GLRenderStates.setBlendState(this._compositeBlendState);
-        this._blurUnitOffset.x = 0;
-        this._blurUnitOffset.y = this.glow.glowRadius / this._glowTexture.height;
-        this.setTexture(this._gaussianBlurProgram.getUniformLocation("s_source"), this._customTexStartUnit, this._glowTexture);
-        gl.uniform2f(this._gaussianBlurProgram.getUniformLocation("u_unitOffset"), this._blurUnitOffset.x, this._blurUnitOffset.y);
-        this._rectGeom.draw(0, Infinity, this._gaussianBlurProgram.attributes);
+        for (let i = 0; i < this._numBloomLevels; i++) {
+            // 然后做横向 blur
+            GLDevice.renderTarget = this._bloomHorizFBOs[i];
+            gl.viewport(0, 0, this._bloomHorizTextures[i].width, this._bloomHorizTextures[i].height);
+            gl.scissor(0, 0, this._bloomHorizTextures[i].width, this._bloomHorizTextures[i].height);
+            this._blurUnitOffset.x = this.glow.glowRadius / curSourceTex.width;
+            this._blurUnitOffset.y = 0;
+            GLPrograms.useProgram(this._gaussianBlurProgram);
+            this.setTexture(this._gaussianBlurProgram.getUniformLocation("s_source"), this._customTexStartUnit, curSourceTex);
+            gl.uniform2f(this._gaussianBlurProgram.getUniformLocation("u_unitOffset"), this._blurUnitOffset.x, this._blurUnitOffset.y);
+            this._rectGeom.draw(0, Infinity, this._gaussianBlurProgram.attributes);
+
+            curSourceTex = this._bloomHorizTextures[i];
+
+            // 纵向 blur
+            GLDevice.renderTarget = this._bloomVertiFBOs[i];
+            this._blurUnitOffset.x = 0;
+            this._blurUnitOffset.y = this.glow.glowRadius / curSourceTex.height;
+            this.setTexture(this._gaussianBlurProgram.getUniformLocation("s_source"), this._customTexStartUnit, curSourceTex);
+            gl.uniform2f(this._gaussianBlurProgram.getUniformLocation("u_unitOffset"), this._blurUnitOffset.x, this._blurUnitOffset.y);
+            this._rectGeom.draw(0, Infinity, this._gaussianBlurProgram.attributes);
+
+            curSourceTex = this._bloomVertiTextures[i];
+        }
+
+        // todo: 将所有 mip level 的 bloom texture 组合输出到主表面
         
         // clean up
         GLTextures.setTextureAt(this._customTexStartUnit, null);
