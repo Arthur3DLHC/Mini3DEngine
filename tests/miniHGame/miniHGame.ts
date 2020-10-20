@@ -26,6 +26,8 @@ window.onload = () => {
     const gltfLoader = new GLTFLoader(loadingManager);
 
     const renderer = new ClusteredForwardRenderer();
+    renderer.postprocessor.bloom.threshold = 5;
+    renderer.postprocessor.bloom.intensity = 0.5;
     const scene = new Scene();
     const camera = new PerspectiveCamera();
     camera.fov = 45;
