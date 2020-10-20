@@ -29,7 +29,7 @@ import { GLUniformBuffers } from "../WebGLResources/glUnifomBuffers.js";
 import { ClusteredForwardRenderContext } from "./clusteredForwardRenderContext.js";
 import { SSRParams } from "./postprocess/ssrParams.js";
 import vec4 from "../../lib/tsm/vec4.js";
-import { GlowParams } from "./postprocess/glowParams.js";
+import { BloomParams } from "./postprocess/bloomParams.js";
 import vec2 from "../../lib/tsm/vec2.js";
 
 /**
@@ -215,7 +215,7 @@ export class PostProcessor {
 
         this.ssao = new SSAOParams();
         this.ssr = new SSRParams();
-        this.glow = new GlowParams();
+        this.glow = new BloomParams();
     }
 
     public release() {
@@ -243,7 +243,7 @@ export class PostProcessor {
 
     public ssao: SSAOParams;
     public ssr: SSRParams;
-    public glow: GlowParams;
+    public glow: BloomParams;
 
     // todo: shaders
 

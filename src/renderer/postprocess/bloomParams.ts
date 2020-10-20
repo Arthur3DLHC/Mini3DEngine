@@ -1,4 +1,4 @@
-export class GlowParams {
+export class BloomParams {
     public enable: boolean = true;
     /**
      * the min brightness of pixels which can glow
