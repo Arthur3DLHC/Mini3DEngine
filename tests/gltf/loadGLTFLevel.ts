@@ -40,6 +40,7 @@ window.onload = () => {
     renderer.postprocessor.bloom.threshold = 3;
     renderer.postprocessor.bloom.radius = 1;
     renderer.postprocessor.bloom.intensity = 0.5;
+    // renderer.postprocessor.bloom.enable = false;
 
     const scene = new Scene();
     const camera = new PerspectiveCamera();
