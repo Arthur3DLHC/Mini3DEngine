@@ -7,6 +7,7 @@ import postprocess_composite_fs from "./shaders/postprocess_composite_fs.glsl.js
 import postprocess_tonemapping_fs from "./shaders/postprocess_tonemapping_fs.glsl.js";
 import postprocess_brightpass_fs from "./shaders/postprocess_brightpass_fs.glsl.js";
 import postprocess_blur_fs from "./shaders/postprocess_blur_fs.glsl.js";
+import postprocess_bloom_composite_fs from "./shaders/postprocess_bloom_composite_fs.glsl.js";
 
 import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { FrameBuffer } from "../WebGLResources/frameBuffer.js";
@@ -63,6 +64,9 @@ export class PostProcessor {
         if (GLPrograms.shaderCodes["postprocess_tonemapping_fs"] === undefined) {
             GLPrograms.shaderCodes["postprocess_tonemapping_fs"] = postprocess_tonemapping_fs;
         }
+        if (GLPrograms.shaderCodes["postprocess_bloom_composite_fs"] === undefined) {
+            GLPrograms.shaderCodes["postprocess_bloom_composite_fs"] = postprocess_bloom_composite_fs;
+        }
 
         if (GLPrograms.shaderCodes["samplers_postprocess"] === undefined) {
             GLPrograms.shaderCodes["samplers_postprocess"] = samplers_postprocess;
@@ -109,6 +113,11 @@ export class PostProcessor {
         this._toneMappingProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_tonemapping_fs"]);
         this._toneMappingProgram.build();
 
+        this._bloomCompositeProgram = new ShaderProgram();
+        this._bloomCompositeProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
+        this._bloomCompositeProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_bloom_composite_fs"]);
+        this._bloomCompositeProgram.build();
+
         // don't foget to bind the uniform blocks used.
         //GLUniformBuffers.bindUniformBlock(this._ssaoProgram, "View");
         //GLUniformBuffers.bindUniformBlock(this._ssaoBlurProgram, "View");
@@ -120,6 +129,7 @@ export class PostProcessor {
         context.bindUniformBlocks(this._gaussianBlurProgram);
         context.bindUniformBlocks(this._compositeProgram);
         context.bindUniformBlocks(this._toneMappingProgram);
+        context.bindUniformBlocks(this._bloomCompositeProgram);
 
         // this._samplerUniformsSSAO = new SamplerUniforms(this._ssaoProgram);
         // this._samplerUniformsSSAOComposite = new SamplerUniforms(this._compositeSSAOProgram);
@@ -169,6 +179,8 @@ export class PostProcessor {
         this._bloomVertiTextures = [];
         this._bloomHorizFBOs = [];
         this._bloomVertiFBOs = [];
+        this._bloomTexUniforms = [];
+        this._bloomTintColors = [];
 
         for(let i = 0; i < this._numBloomLevels; i++) {
             const horizTex: Texture2D = new Texture2D(levelWidth, levelHeight, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT);
@@ -197,6 +209,10 @@ export class PostProcessor {
 
             levelWidth = Math.max(2, Math.round(levelWidth / 2));
             levelHeight = Math.max(2, Math.round(levelHeight / 2));
+
+            this._bloomTexUniforms.push("s_bloomTex" + i);
+            // 5 vec3 values
+            this._bloomTintColors.push(1.0); this._bloomTintColors.push(1.0); this._bloomTintColors.push(1.0);
         }
 
         // this._tempFullSwapFBO = [];
@@ -246,7 +262,7 @@ export class PostProcessor {
 
         this.ssao = new SSAOParams();
         this.ssr = new SSRParams();
-        this.glow = new BloomParams();
+        this.bloom = new BloomParams();
     }
 
     public release() {
@@ -256,6 +272,8 @@ export class PostProcessor {
         if (this._brightpassProgram) { this._brightpassProgram.release(); }
         if (this._gaussianBlurProgram) { this._gaussianBlurProgram.release(); }
         if (this._compositeProgram) { this._compositeProgram.release(); }
+        if (this._toneMappingProgram) {this._toneMappingProgram.release();}
+        if (this._bloomCompositeProgram) {this._bloomCompositeProgram.release();}
         if (this._ssaoFBO) { this._ssaoFBO.release(); }
         if (this._ssaoTexture) { this._ssaoTexture.release(); }
         if (this._ssrFBO) { this._ssrFBO.release(); }
@@ -276,7 +294,7 @@ export class PostProcessor {
 
     public ssao: SSAOParams;
     public ssr: SSRParams;
-    public glow: BloomParams;
+    public bloom: BloomParams;
 
     // todo: shaders
 
@@ -287,6 +305,7 @@ export class PostProcessor {
     private _gaussianBlurProgram: ShaderProgram;
     private _compositeProgram: ShaderProgram;
     private _toneMappingProgram: ShaderProgram;
+    private _bloomCompositeProgram: ShaderProgram;
     // private _samplerUniformsSSAO: SamplerUniforms;
     // private _samplerUniformsSSAOComposite: SamplerUniforms;
 
@@ -313,6 +332,10 @@ export class PostProcessor {
     private _bloomVertiTextures: Texture2D[];
     private _bloomHorizFBOs: FrameBuffer[];
     private _bloomVertiFBOs: FrameBuffer[];
+
+    private _bloomTexUniforms: string[];
+    private _bloomLevelFactors: number[] = [1.0, 0.8, 0.6, 0.4, 0.2];
+    private _bloomTintColors: number[];
 
     // todo: last frame image
     // 使用两个交替的 framebuffer，还是每帧最后拷贝一下？
@@ -393,8 +416,8 @@ export class PostProcessor {
         this.applyToneMapping();
 
         // glow should be applied after tone mapping?
-        if (this.glow.enable) {
-            this.applyGlow();
+        if (this.bloom.enable) {
+            this.applyBloom();
         }
     }
     
@@ -632,7 +655,7 @@ export class PostProcessor {
         GLTextures.setTextureAt(this._customTexStartUnit, null);
     }
 
-    private applyGlow() {
+    private applyBloom() {
         // https://github.com/mrdoob/three.js/blob/dev/examples/js/postprocessing/UnrealBloomPass.js
         // https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/
         if (this._postProcessFBO === null) {
@@ -654,8 +677,8 @@ export class PostProcessor {
 
         GLPrograms.useProgram(this._brightpassProgram);
         this.setTexture(this._brightpassProgram.getUniformLocation("s_sceneColor"), this._customTexStartUnit, sourceImage);
-        gl.uniform1f(this._brightpassProgram.getUniformLocation("u_threshold"), this.glow.threshold);
-        gl.uniform1f(this._brightpassProgram.getUniformLocation("u_intensity"), this.glow.intensity);
+        gl.uniform1f(this._brightpassProgram.getUniformLocation("u_threshold"), this.bloom.threshold);
+        // gl.uniform1f(this._brightpassProgram.getUniformLocation("u_intensity"), this.bloom.intensity);
         this._rectGeom.draw(0, Infinity, this._brightpassProgram.attributes);
 
         let curSourceTex = this._brightPassTexture;
@@ -665,7 +688,7 @@ export class PostProcessor {
             GLDevice.renderTarget = this._bloomHorizFBOs[i];
             gl.viewport(0, 0, this._bloomHorizTextures[i].width, this._bloomHorizTextures[i].height);
             gl.scissor(0, 0, this._bloomHorizTextures[i].width, this._bloomHorizTextures[i].height);
-            this._blurUnitOffset.x = this.glow.glowRadius / curSourceTex.width;
+            this._blurUnitOffset.x = 1.0 / curSourceTex.width;
             this._blurUnitOffset.y = 0;
             GLPrograms.useProgram(this._gaussianBlurProgram);
             this.setTexture(this._gaussianBlurProgram.getUniformLocation("s_source"), this._customTexStartUnit, curSourceTex);
@@ -677,7 +700,7 @@ export class PostProcessor {
             // 纵向 blur
             GLDevice.renderTarget = this._bloomVertiFBOs[i];
             this._blurUnitOffset.x = 0;
-            this._blurUnitOffset.y = this.glow.glowRadius / curSourceTex.height;
+            this._blurUnitOffset.y = 1.0 / curSourceTex.height;
             this.setTexture(this._gaussianBlurProgram.getUniformLocation("s_source"), this._customTexStartUnit, curSourceTex);
             gl.uniform2f(this._gaussianBlurProgram.getUniformLocation("u_unitOffset"), this._blurUnitOffset.x, this._blurUnitOffset.y);
             this._rectGeom.draw(0, Infinity, this._gaussianBlurProgram.attributes);
@@ -686,6 +709,21 @@ export class PostProcessor {
         }
 
         // todo: 将所有 mip level 的 bloom texture 组合输出到主表面
+        GLDevice.renderTarget = null;
+        gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+        gl.scissor(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+
+        GLRenderStates.setBlendState(this._compositeBlendState);
+
+        GLPrograms.useProgram(this._bloomCompositeProgram);
+        for(let i = 0; i < this._numBloomLevels; i++) {
+            this.setTexture(this._bloomCompositeProgram.getUniformLocation(this._bloomTexUniforms[i]), this._customTexStartUnit + i, this._bloomVertiTextures[i]);
+        }
+        gl.uniform1f(this._bloomCompositeProgram.getUniformLocation("u_intensity"), this.bloom.intensity);
+        gl.uniform1f(this._bloomCompositeProgram.getUniformLocation("u_bloomRadius"), this.bloom.radius);
+        gl.uniform1fv(this._bloomCompositeProgram.getUniformLocation("u_bloomFactors"), this._bloomLevelFactors);
+        gl.uniform3fv(this._bloomCompositeProgram.getUniformLocation("u_bloomTintColors"), this._bloomTintColors);
+        this._rectGeom.draw(0, Infinity, this._bloomCompositeProgram.attributes);
         
         // clean up
         GLTextures.setTextureAt(this._customTexStartUnit, null);

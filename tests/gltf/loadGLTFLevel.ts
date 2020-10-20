@@ -37,8 +37,8 @@ window.onload = () => {
     renderer.postprocessor.ssr.eyeFadeStart = 0.9;
     renderer.postprocessor.ssr.eyeFadeEnd = 1.0;
     // renderer.postprocessor.ssr.maxRayDistance = 100;
-    renderer.postprocessor.glow.threshold = 3;
-    renderer.postprocessor.glow.glowRadius = 1;
+    renderer.postprocessor.bloom.threshold = 3;
+    renderer.postprocessor.bloom.radius = 1;
 
     const scene = new Scene();
     const camera = new PerspectiveCamera();

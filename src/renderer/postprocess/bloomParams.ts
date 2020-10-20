@@ -8,7 +8,7 @@ export class BloomParams {
     /**
      * radius factor
      */
-    public glowRadius: number = 1;
+    public radius: number = 1;
 
     public intensity: number = 1;
 }
