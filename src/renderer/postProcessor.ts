@@ -726,6 +726,8 @@ export class PostProcessor {
         this._rectGeom.draw(0, Infinity, this._bloomCompositeProgram.attributes);
         
         // clean up
-        GLTextures.setTextureAt(this._customTexStartUnit, null);
+        for(let i = 0; i < this._numBloomLevels; i++) {
+            GLTextures.setTextureAt(this._customTexStartUnit + i, null);
+        }
     }
 }
