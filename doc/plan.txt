@@ -566,7 +566,7 @@ TODO:       主要类结构
                     导出，测试 clustered, instancing, occlusion culling 等
                     Blender 的 Reflection probe 中加一个最远可视距离属性；
 
-                Action: 城堡，室外+室内，宽阔一些 或横板？夜间；无月光；雾；Local point lights：灯烛，火把；
+                Action: 日式城堡，室外+室内，宽阔一些 或横板？夜间；无月光；雾；Local point lights：灯烛，火把；
 
             经测试，需要注意：
                 1、blender 中的细节物体必须 apply 所有修改器后再复制，否则无法共享网格数据，导致无法 instancing
