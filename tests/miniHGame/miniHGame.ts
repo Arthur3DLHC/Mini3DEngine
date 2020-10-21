@@ -1,8 +1,11 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset, Object3D, BoundingRenderModes, ActionSelector, SkinMesh } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset, Object3D, BoundingRenderModes, ActionSelector, SkinMesh, ActionStateMachine, ActionState, AnimationAction, ActionTransition } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
 import { FirstPersonViewBehavior } from "../common/behaviors/firstPersonViewBehavior.js";
+import { MakePoseBehavior, MakePoses } from "./behaviors/makePoseBehavior.js";
+import { ActionControlBehavior } from "../common/behaviors/actionControlBehavior.js";
+import { MakePoseCondition } from "./actionStates/makePoseCondition.js";
 
 /**
  * Load gltf files using promise
@@ -332,6 +335,52 @@ window.onload = () => {
         for (const child of gltfNode.children) {
             prepareGLTFScene(child, maleActionPoses, femaleActionPoses);
         }
+    }
+
+    function setAnimationFor(state: ActionState, animName: string, animations: AnimationAction[]) {
+        const anim = animations.find((action: AnimationAction) => {return action.name === animName});
+        if (anim !== undefined) {
+            state.animation = anim;
+        }
+    }
+
+    function addNewState(stateMachine: ActionStateMachine, stateName: string, animName: string, animations: AnimationAction[]): ActionState {
+        const state = new ActionState(stateName);
+        setAnimationFor(state, animName, animations);
+        stateMachine.addState(state);
+        return state;
+    }
+
+    function buildFemaleBehavior(female: Object3D, animations: AnimationAction[]) {
+        // add behavior
+        const makePose = new MakePoseBehavior(female);
+        female.behaviors.push(makePose);
+
+        const actionCtrl = new ActionControlBehavior(female);
+        female.behaviors.push(actionCtrl);
+
+        // build action state machine
+        // states
+        const idle = addNewState(actionCtrl.stateMachine, "idle", "Female.Idle", animations);
+        const dance = addNewState(actionCtrl.stateMachine, "dance", "Female.Dance001", animations);
+        const masturbating = addNewState(actionCtrl.stateMachine, "masturbating", "Female.Masturbating", animations);
+        const breast = addNewState(actionCtrl.stateMachine, "breast", "Female.Breast", animations);
+        const oral = addNewState(actionCtrl.stateMachine, "oral", "Female.Oral", animations);
+
+        // transitions and their conditions
+        const idle_Dance = new ActionTransition(idle);
+        idle_Dance.targetState = dance;
+        idle_Dance.conditions.push(new MakePoseCondition(MakePoses.DANCE, makePose));
+        idle.transitions.push(idle_Dance);
+
+    }
+
+    function buildMaleBehavior(male: Object3D) {
+        // add behavior
+        const makePose = new MakePoseBehavior(male);
+        male.behaviors.push(makePose);
+
+        // add action state machine
     }
 }
 

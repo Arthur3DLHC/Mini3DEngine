@@ -4,6 +4,7 @@ export * from "./animation/stateMachine/actionCondition.js";
 export * from "./animation/stateMachine/actionState.js";
 export * from "./animation/stateMachine/actionStateMachine.js";
 export * from "./animation/stateMachine/actionTransition.js";
+export * from "./animation/stateMachine/timeUpCondition.js";
 export * from "./animation/animationAction.js";
 export * from "./contentLoaders/baseLoader.js";
 export * from "./contentLoaders/cache.js";
