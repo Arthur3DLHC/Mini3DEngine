@@ -366,6 +366,10 @@ window.onload = () => {
         const masturbating = addNewState(actionCtrl.stateMachine, "masturbating", "Female.Masturbating", animations);
         const breast = addNewState(actionCtrl.stateMachine, "breast", "Female.Breast", animations);
         const oral = addNewState(actionCtrl.stateMachine, "oral", "Female.Oral", animations);
+        const cowGirl = addNewState(actionCtrl.stateMachine, "cowGril", "Female.CowGirl", animations);
+        const cowGirlFast = addNewState(actionCtrl.stateMachine, "cowGrilFast", "Female.CowGirl.Fast", animations);
+        const cowGirlCum = addNewState(actionCtrl.stateMachine, "cowGrilCum", "Female.CowGirl.Cum", animations);
+        const cowGirlRest = addNewState(actionCtrl.stateMachine, "cowGrilRest", "Female.CowGirl.Rest", animations);
 
         // transitions and their conditions
         const idle_Dance = new ActionTransition(idle);
