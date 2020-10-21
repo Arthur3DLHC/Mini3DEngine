@@ -1785,7 +1785,9 @@ export class ClusteredForwardRenderer {
 
                 if (scene.background !== undefined) {
                     if (scene.background instanceof TextureCube) {
-                        this.renderSkyBox(scene.background, scene.backgroundIntensity, envprobe.worldTransform.getTranslation());
+                        this.renderSkyBox(scene.background,
+                            envprobe.probeType === EnvironmentProbeType.Irradiance? scene.irradianceIntensity : scene.backgroundIntensity,
+                            envprobe.worldTransform.getTranslation());
                     }
                 }
 

@@ -182,7 +182,7 @@ window.onload = () => {
         skyboxTexture.samplerState = new SamplerState();
         skyboxTexture.upload();
         scene.background = skyboxTexture;
-        scene.backgroundIntensity = 1;
+        // scene.backgroundIntensity = 1;
         
         // gltf asset should has been already loaded?
         console.log("building gltf scene...");
