@@ -32,6 +32,9 @@ window.onload = () => {
     renderer.debugRenderer.itemCountRef = 15;
     renderer.debugRenderer.clusterDrawMode = DebugRenderer.ClusterDrawMode_IrrProbeCount;
 
+    renderer.postprocessor.bloom.threshold = 5;
+    renderer.postprocessor.bloom.intensity = 0.5;
+
     const scene = new Scene();
     const camera = new PerspectiveCamera();
     camera.aspect = canvas.width / canvas.height;

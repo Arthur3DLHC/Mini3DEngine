@@ -688,6 +688,7 @@ export class PostProcessor {
             GLDevice.renderTarget = this._bloomHorizFBOs[i];
             gl.viewport(0, 0, this._bloomHorizTextures[i].width, this._bloomHorizTextures[i].height);
             gl.scissor(0, 0, this._bloomHorizTextures[i].width, this._bloomHorizTextures[i].height);
+            // must use same texel size for horiz and verti blur, or the bloom shape will not be a sphere
             this._blurUnitOffset.x = 1.0 / this._bloomHorizTextures[i].width;
             this._blurUnitOffset.y = 0;
             GLPrograms.useProgram(this._gaussianBlurProgram);
@@ -699,6 +700,7 @@ export class PostProcessor {
 
             // 纵向 blur
             GLDevice.renderTarget = this._bloomVertiFBOs[i];
+            // must use same texel size for horiz and verti blur, or the bloom shape will not be a sphere
             this._blurUnitOffset.x = 0;
             this._blurUnitOffset.y = 1.0 / this._bloomVertiTextures[i].height;
             this.setTexture(this._gaussianBlurProgram.getUniformLocation("s_source"), this._customTexStartUnit, curSourceTex);
