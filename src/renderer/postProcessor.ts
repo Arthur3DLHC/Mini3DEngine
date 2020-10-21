@@ -688,7 +688,7 @@ export class PostProcessor {
             GLDevice.renderTarget = this._bloomHorizFBOs[i];
             gl.viewport(0, 0, this._bloomHorizTextures[i].width, this._bloomHorizTextures[i].height);
             gl.scissor(0, 0, this._bloomHorizTextures[i].width, this._bloomHorizTextures[i].height);
-            this._blurUnitOffset.x = 1.0 / curSourceTex.width;
+            this._blurUnitOffset.x = 1.0 / this._bloomHorizTextures[i].width;
             this._blurUnitOffset.y = 0;
             GLPrograms.useProgram(this._gaussianBlurProgram);
             this.setTexture(this._gaussianBlurProgram.getUniformLocation("s_source"), this._customTexStartUnit, curSourceTex);
@@ -700,7 +700,7 @@ export class PostProcessor {
             // 纵向 blur
             GLDevice.renderTarget = this._bloomVertiFBOs[i];
             this._blurUnitOffset.x = 0;
-            this._blurUnitOffset.y = 1.0 / curSourceTex.height;
+            this._blurUnitOffset.y = 1.0 / this._bloomVertiTextures[i].height;
             this.setTexture(this._gaussianBlurProgram.getUniformLocation("s_source"), this._customTexStartUnit, curSourceTex);
             gl.uniform2f(this._gaussianBlurProgram.getUniformLocation("u_unitOffset"), this._blurUnitOffset.x, this._blurUnitOffset.y);
             this._rectGeom.draw(0, Infinity, this._gaussianBlurProgram.attributes);
