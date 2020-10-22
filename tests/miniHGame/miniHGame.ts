@@ -351,13 +351,14 @@ window.onload = () => {
         return state;
     }
 
-    function addStateTransition(from: ActionState, to: ActionState, conditions: ActionCondition[]) {
+    function addStateTransition(from: ActionState, to: ActionState, conditions: ActionCondition[]): ActionTransition {
         const transition = new ActionTransition(from);
         transition.targetState = to;
         for (const condition of conditions) {
             transition.conditions.push(condition);
         }
         from.transitions.push(transition);
+        return transition;
     }
 
     function buildFemaleBehavior(female: Object3D, animations: AnimationAction[]) {
