@@ -6,7 +6,9 @@ export const MakePoses = {
     MASTURBATE: "masturbate",
     BREAST: "breast",
     ORAL: "oral",
-    COWGIRL: "cowgirl"
+    COWGIRL: "cowgirl",
+    COWGIRL_FAST: "cowgirlfast",
+    COWGIRL_CUM: "cowgirlcum"
 }
 
 export class MakePoseBehavior extends Behavior {

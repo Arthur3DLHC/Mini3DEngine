@@ -8,4 +8,11 @@ export class ActionCondition {
     public get isTrue() {
         return false;
     }
+
+    /**
+     * reset when enter state
+     */
+    public reset() {
+
+    }
 }

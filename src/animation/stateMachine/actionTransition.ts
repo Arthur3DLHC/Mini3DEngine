@@ -28,4 +28,10 @@ export class ActionTransition {
 
         this._state.machine.curState = this.targetState;
     }
+
+    public resetConditions() {
+        for (const condition of this.conditions) {
+            condition.reset();
+        }
+    }
 }

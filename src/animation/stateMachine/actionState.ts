@@ -47,6 +47,10 @@ export class ActionState {
             this.animation.reset();
             this.animation.play();
         }
+
+        for (const transition of this.transitions) {
+            transition.resetConditions();
+        }
     }
 
     public onExit() {
