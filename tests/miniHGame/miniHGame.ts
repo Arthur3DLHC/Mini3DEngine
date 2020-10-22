@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset, Object3D, BoundingRenderModes, ActionSelector, SkinMesh, ActionStateMachine, ActionState, AnimationAction, ActionTransition, TimeUpCondition } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset, Object3D, BoundingRenderModes, ActionSelector, SkinMesh, ActionStateMachine, ActionState, AnimationAction, ActionTransition, TimeUpCondition, ActionCondition } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
@@ -351,6 +351,15 @@ window.onload = () => {
         return state;
     }
 
+    function addStateTransition(from: ActionState, to: ActionState, conditions: ActionCondition[]) {
+        const transition = new ActionTransition(from);
+        transition.targetState = to;
+        for (const condition of conditions) {
+            transition.conditions.push(condition);
+        }
+        from.transitions.push(transition);
+    }
+
     function buildFemaleBehavior(female: Object3D, animations: AnimationAction[]) {
         // add behavior
         const makePose = new MakePoseBehavior(female);
@@ -372,61 +381,18 @@ window.onload = () => {
         const cowGirlRest = addNewState(actionCtrl.stateMachine, "cowGrilRest", "Female.CowGirl.Rest", animations);
 
         // transitions and their conditions
-        const idle_dance = new ActionTransition(idle);
-        idle_dance.targetState = dance;
-        idle_dance.conditions.push(new MakePoseCondition(MakePoses.DANCE, makePose));
-        idle.transitions.push(idle_dance);
-
-        const dance_mastur = new ActionTransition(dance);
-        dance_mastur.targetState = masturbating;
-        dance_mastur.conditions.push(new MakePoseCondition(MakePoses.MASTURBATE, makePose));
-        dance.transitions.push(dance_mastur);
-
-        const mastur_breast = new ActionTransition(masturbating);
-        mastur_breast.targetState = breast;
-        mastur_breast.conditions.push(new MakePoseCondition(MakePoses.BREAST, makePose));
-        masturbating.transitions.push(mastur_breast);
-
-        const mastur_oral = new ActionTransition(masturbating);
-        mastur_oral.targetState = oral;
-        mastur_oral.conditions.push(new MakePoseCondition(MakePoses.ORAL, makePose));
-        masturbating.transitions.push(mastur_oral);
-
-        const breast_oral = new ActionTransition(breast);
-        breast_oral.targetState = oral;
-        breast_oral.conditions.push(new MakePoseCondition(MakePoses.ORAL, makePose));
-        breast.transitions.push(breast_oral);
-
-        const oral_cowgirl = new ActionTransition(oral);
-        oral_cowgirl.targetState = cowGirl;
-        oral_cowgirl.conditions.push(new MakePoseCondition(MakePoses.COWGIRL, makePose));
-        oral.transitions.push(oral_cowgirl);
-
-        const cowgirl_cowgirlfast = new ActionTransition(cowGirl);
-        cowgirl_cowgirlfast.targetState = cowGirlFast;
-        cowgirl_cowgirlfast.conditions.push(new MakePoseCondition(MakePoses.COWGIRL_FAST, makePose));
-        cowGirl.transitions.push(cowgirl_cowgirlfast);
-
-        const cowgirlfast_cowgirl = new ActionTransition(cowGirlFast);
-        cowgirlfast_cowgirl.targetState = cowGirl;
-        cowgirlfast_cowgirl.conditions.push(new MakePoseCondition(MakePoses.COWGIRL, makePose));
-        cowGirlFast.transitions.push(cowgirlfast_cowgirl);
-
-        const cowgirlfast_cum = new ActionTransition(cowGirlFast);
-        cowgirlfast_cum.targetState = cowGirlCum;
-        cowgirlfast_cum.conditions.push(new MakePoseCondition(MakePoses.COWGIRL_CUM, makePose));
-        cowGirlFast.transitions.push(cowgirlfast_cum);
-
-        const cowgirlcum_rest = new ActionTransition(cowGirlCum);
-        cowgirlcum_rest.targetState = cowGirlRest;
-        cowgirlcum_rest.conditions.push(new TimeUpCondition(cowGirlCum.animation? cowGirlCum.animation.duration : 5));
-        cowGirlCum.transitions.push(cowgirlcum_rest);
-
+        addStateTransition(idle, dance, [new MakePoseCondition(MakePoses.DANCE, makePose)]);
+        addStateTransition(dance, masturbating, [new MakePoseCondition(MakePoses.MASTURBATE, makePose)]);
+        addStateTransition(masturbating, breast, [new MakePoseCondition(MakePoses.BREAST, makePose)]);
+        addStateTransition(masturbating, oral, [new MakePoseCondition(MakePoses.ORAL, makePose)]);
+        addStateTransition(breast, oral, [new MakePoseCondition(MakePoses.ORAL, makePose)]);
+        addStateTransition(oral, cowGirl, [new MakePoseCondition(MakePoses.COWGIRL, makePose)]);
+        addStateTransition(cowGirl, cowGirlFast, [new MakePoseCondition(MakePoses.COWGIRL_FAST, makePose)]);
+        addStateTransition(cowGirlFast, cowGirl, [new MakePoseCondition(MakePoses.COWGIRL, makePose)]);
+        addStateTransition(cowGirlFast, cowGirlCum, [new MakePoseCondition(MakePoses.COWGIRL_CUM, makePose)]);
+        addStateTransition(cowGirlCum, cowGirlRest, [new TimeUpCondition(cowGirlCum.animation? cowGirlCum.animation.duration : 5)]);
         // rest to masturbating again?
-        const rest_masturbate = new ActionTransition(cowGirlRest);
-        rest_masturbate.targetState = masturbating;
-        rest_masturbate.conditions.push(new MakePoseCondition(MakePoses.MASTURBATE, makePose));
-        cowGirlRest.transitions.push(rest_masturbate);
+        addStateTransition(cowGirlRest, masturbating, [new MakePoseCondition(MakePoses.MASTURBATE, makePose)]);
     }
 
     function buildMaleBehavior(male: Object3D) {
