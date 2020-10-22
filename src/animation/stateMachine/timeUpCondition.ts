@@ -1,5 +1,5 @@
-import { Clock } from "../../scene/clock";
-import { ActionCondition } from "./actionCondition";
+import { Clock } from "../../scene/clock.js";
+import { ActionCondition } from "./actionCondition.js";
 
 export class TimeUpCondition extends ActionCondition {
     public timeLeft: number = 0;

@@ -372,11 +372,30 @@ window.onload = () => {
         const cowGirlRest = addNewState(actionCtrl.stateMachine, "cowGrilRest", "Female.CowGirl.Rest", animations);
 
         // transitions and their conditions
-        const idle_Dance = new ActionTransition(idle);
-        idle_Dance.targetState = dance;
-        idle_Dance.conditions.push(new MakePoseCondition(MakePoses.DANCE, makePose));
-        idle.transitions.push(idle_Dance);
+        const idle_dance = new ActionTransition(idle);
+        idle_dance.targetState = dance;
+        idle_dance.conditions.push(new MakePoseCondition(MakePoses.DANCE, makePose));
+        idle.transitions.push(idle_dance);
 
+        const dance_mastur = new ActionTransition(dance);
+        dance_mastur.targetState = masturbating;
+        dance_mastur.conditions.push(new MakePoseCondition(MakePoses.MASTURBATE, makePose));
+        dance.transitions.push(dance_mastur);
+
+        const mastur_breast = new ActionTransition(masturbating);
+        mastur_breast.targetState = breast;
+        mastur_breast.conditions.push(new MakePoseCondition(MakePoses.BREAST, makePose));
+        masturbating.transitions.push(mastur_breast);
+
+        const mastur_oral = new ActionTransition(masturbating);
+        mastur_oral.targetState = oral;
+        mastur_oral.conditions.push(new MakePoseCondition(MakePoses.ORAL, makePose));
+        masturbating.transitions.push(mastur_oral);
+
+        const breast_oral = new ActionTransition(breast);
+        breast_oral.targetState = oral;
+        breast_oral.conditions.push(new MakePoseCondition(MakePoses.ORAL, makePose));
+        breast.transitions.push(breast_oral);
     }
 
     function buildMaleBehavior(male: Object3D) {

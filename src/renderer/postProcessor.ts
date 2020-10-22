@@ -413,12 +413,12 @@ export class PostProcessor {
         this._sceneSpecRoughTexUnit = startTexUnit + 3;
         this._customTexStartUnit = startTexUnit + 4;
 
-        this.applyToneMapping();
-
-        // glow should be applied after tone mapping?
+        // bloom should be applied before tone mapping
+        // http://www.adriancourreges.com/blog/2016/09/09/doom-2016-graphics-study/
         if (this.bloom.enable) {
             this.applyBloom();
         }
+        this.applyToneMapping();
     }
     
     private setTexture(location: WebGLUniformLocation | null, unit: number, texture: Texture) {
@@ -711,7 +711,7 @@ export class PostProcessor {
         }
 
         // todo: 将所有 mip level 的 bloom texture 组合输出到主表面
-        GLDevice.renderTarget = null;
+        GLDevice.renderTarget = this._postProcessFBO;
         gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
         gl.scissor(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
 

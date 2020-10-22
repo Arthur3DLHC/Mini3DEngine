@@ -37,7 +37,7 @@ window.onload = () => {
     renderer.postprocessor.ssr.eyeFadeStart = 0.9;
     renderer.postprocessor.ssr.eyeFadeEnd = 1.0;
     // renderer.postprocessor.ssr.maxRayDistance = 100;
-    renderer.postprocessor.bloom.threshold = 3;
+    renderer.postprocessor.bloom.threshold = 2;
     renderer.postprocessor.bloom.radius = 1;
     renderer.postprocessor.bloom.intensity = 0.5;
     // renderer.postprocessor.bloom.enable = false;
