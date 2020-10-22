@@ -369,6 +369,8 @@ window.onload = () => {
         const actionCtrl = new ActionControlBehavior(female);
         female.behaviors.push(actionCtrl);
 
+        // fix me: how to change the action menu on UI when enter states?
+
         // build action state machine
         // states
         const idle = addNewState(actionCtrl.stateMachine, "idle", "Female.Idle", animations);
@@ -396,12 +398,40 @@ window.onload = () => {
         addStateTransition(cowGirlRest, masturbating, [new MakePoseCondition(MakePoses.MASTURBATE, makePose)]);
     }
 
-    function buildMaleBehavior(male: Object3D) {
+    function buildMaleBehavior(male: Object3D, animations: AnimationAction[]) {
         // add behavior
         const makePose = new MakePoseBehavior(male);
         male.behaviors.push(makePose);
 
-        // add action state machine
+        const actionCtrl = new ActionControlBehavior(male);
+        male.behaviors.push(actionCtrl);
+
+        // build action state machine
+        // states
+        const idle = addNewState(actionCtrl.stateMachine, "idle", "Male.Idle", animations);
+        const dance = addNewState(actionCtrl.stateMachine, "dance", "Male.Idle", animations);
+        const masturbating = addNewState(actionCtrl.stateMachine, "masturbating", "Male.Idle", animations);
+        const breast = addNewState(actionCtrl.stateMachine, "breast", "Male.Breast", animations);
+        const oral = addNewState(actionCtrl.stateMachine, "oral", "Male.Oral", animations);
+        const cowGirl = addNewState(actionCtrl.stateMachine, "cowGril", "Male.CowGirl", animations);
+        const cowGirlFast = addNewState(actionCtrl.stateMachine, "cowGrilFast", "Male.CowGirl.Fast", animations);
+        const cowGirlCum = addNewState(actionCtrl.stateMachine, "cowGrilCum", "Male.CowGirl.Cum", animations);
+        const cowGirlRest = addNewState(actionCtrl.stateMachine, "cowGrilRest", "Male.CowGirl.Rest", animations);
+
+        // transitions and their conditions
+        addStateTransition(idle, dance, [new MakePoseCondition(MakePoses.DANCE, makePose)]);
+        addStateTransition(dance, masturbating, [new MakePoseCondition(MakePoses.MASTURBATE, makePose)]);
+        addStateTransition(masturbating, breast, [new MakePoseCondition(MakePoses.BREAST, makePose)]);
+        addStateTransition(masturbating, oral, [new MakePoseCondition(MakePoses.ORAL, makePose)]);
+        addStateTransition(breast, oral, [new MakePoseCondition(MakePoses.ORAL, makePose)]);
+        addStateTransition(oral, cowGirl, [new MakePoseCondition(MakePoses.COWGIRL, makePose)]);
+        addStateTransition(cowGirl, cowGirlFast, [new MakePoseCondition(MakePoses.COWGIRL_FAST, makePose)]);
+        addStateTransition(cowGirlFast, cowGirl, [new MakePoseCondition(MakePoses.COWGIRL, makePose)]);
+        addStateTransition(cowGirlFast, cowGirlCum, [new MakePoseCondition(MakePoses.COWGIRL_CUM, makePose)]);
+        addStateTransition(cowGirlCum, cowGirlRest, [new TimeUpCondition(cowGirlCum.animation? cowGirlCum.animation.duration : 5)]);
+        // rest to masturbating again?
+        addStateTransition(cowGirlRest, masturbating, [new MakePoseCondition(MakePoses.MASTURBATE, makePose)]);
+    
     }
 }
 
