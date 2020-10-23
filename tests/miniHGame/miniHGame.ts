@@ -6,6 +6,7 @@ import { FirstPersonViewBehavior } from "../common/behaviors/firstPersonViewBeha
 import { MakePoseBehavior, MakePoses } from "./behaviors/makePoseBehavior.js";
 import { ActionControlBehavior } from "../common/behaviors/actionControlBehavior.js";
 import { MakePoseCondition } from "./actionStates/makePoseCondition.js";
+import { MakePoseState } from "./actionStates/makePoseState.js";
 
 /**
  * Load gltf files using promise
@@ -176,6 +177,7 @@ window.onload = () => {
         scene.attachChild(gltfSceneFemale);
 
         prepareGLTFCharacter(gltfSceneFemale);
+        const femaleBehavior = buildFemaleBehavior(gltfSceneFemale, actionSelectorFemale.actions, femaleActionPoses);
 
         const builderMale = new GLTFSceneBuilder();
 
@@ -186,6 +188,7 @@ window.onload = () => {
         scene.attachChild(gltfSceneMale);
 
         prepareGLTFCharacter(gltfSceneMale);
+        const maleBehavior = buildMaleBehavior(gltfSceneMale, actionSelectorMale.actions, maleActionPoses);
 
         const actionNames = [
             "Idle",
@@ -344,8 +347,12 @@ window.onload = () => {
         }
     }
 
-    function addNewState(stateMachine: ActionStateMachine, stateName: string, animName: string, animations: AnimationAction[]): ActionState {
-        const state = new ActionState(stateName);
+    function addNewState(character: Object3D, stateMachine: ActionStateMachine, stateName: string, animName: string, animations: AnimationAction[], locations: Map<string, Object3D>): ActionState {
+        const location = locations.get(animName);
+        if (location === undefined) {
+            throw new Error("Make location not found:" + animName);
+        }
+        const state = new MakePoseState(stateName, location, character);
         setAnimationFor(state, animName, animations);
         stateMachine.addState(state);
         return state;
@@ -361,7 +368,7 @@ window.onload = () => {
         return transition;
     }
 
-    function buildFemaleBehavior(female: Object3D, animations: AnimationAction[]) {
+    function buildFemaleBehavior(female: Object3D, animations: AnimationAction[], locations: Map<string, Object3D>): MakePoseBehavior {
         // add behavior
         const makePose = new MakePoseBehavior(female);
         female.behaviors.push(makePose);
@@ -373,50 +380,15 @@ window.onload = () => {
 
         // build action state machine
         // states
-        const idle = addNewState(actionCtrl.stateMachine, "idle", "Female.Idle", animations);
-        const dance = addNewState(actionCtrl.stateMachine, "dance", "Female.Dance001", animations);
-        const masturbating = addNewState(actionCtrl.stateMachine, "masturbating", "Female.Masturbating", animations);
-        const breast = addNewState(actionCtrl.stateMachine, "breast", "Female.Breast", animations);
-        const oral = addNewState(actionCtrl.stateMachine, "oral", "Female.Oral", animations);
-        const cowGirl = addNewState(actionCtrl.stateMachine, "cowGril", "Female.CowGirl", animations);
-        const cowGirlFast = addNewState(actionCtrl.stateMachine, "cowGrilFast", "Female.CowGirl.Fast", animations);
-        const cowGirlCum = addNewState(actionCtrl.stateMachine, "cowGrilCum", "Female.CowGirl.Cum", animations);
-        const cowGirlRest = addNewState(actionCtrl.stateMachine, "cowGrilRest", "Female.CowGirl.Rest", animations);
-
-        // transitions and their conditions
-        addStateTransition(idle, dance, [new MakePoseCondition(MakePoses.DANCE, makePose)]);
-        addStateTransition(dance, masturbating, [new MakePoseCondition(MakePoses.MASTURBATE, makePose)]);
-        addStateTransition(masturbating, breast, [new MakePoseCondition(MakePoses.BREAST, makePose)]);
-        addStateTransition(masturbating, oral, [new MakePoseCondition(MakePoses.ORAL, makePose)]);
-        addStateTransition(breast, oral, [new MakePoseCondition(MakePoses.ORAL, makePose)]);
-        addStateTransition(oral, cowGirl, [new MakePoseCondition(MakePoses.COWGIRL, makePose)]);
-        addStateTransition(cowGirl, cowGirlFast, [new MakePoseCondition(MakePoses.COWGIRL_FAST, makePose)]);
-        addStateTransition(cowGirlFast, cowGirl, [new MakePoseCondition(MakePoses.COWGIRL, makePose)]);
-        addStateTransition(cowGirlFast, cowGirlCum, [new MakePoseCondition(MakePoses.COWGIRL_CUM, makePose)]);
-        addStateTransition(cowGirlCum, cowGirlRest, [new TimeUpCondition(cowGirlCum.animation? cowGirlCum.animation.duration : 5)]);
-        // rest to masturbating again?
-        addStateTransition(cowGirlRest, masturbating, [new MakePoseCondition(MakePoses.MASTURBATE, makePose)]);
-    }
-
-    function buildMaleBehavior(male: Object3D, animations: AnimationAction[]) {
-        // add behavior
-        const makePose = new MakePoseBehavior(male);
-        male.behaviors.push(makePose);
-
-        const actionCtrl = new ActionControlBehavior(male);
-        male.behaviors.push(actionCtrl);
-
-        // build action state machine
-        // states
-        const idle = addNewState(actionCtrl.stateMachine, "idle", "Male.Idle", animations);
-        const dance = addNewState(actionCtrl.stateMachine, "dance", "Male.Idle", animations);
-        const masturbating = addNewState(actionCtrl.stateMachine, "masturbating", "Male.Idle", animations);
-        const breast = addNewState(actionCtrl.stateMachine, "breast", "Male.Breast", animations);
-        const oral = addNewState(actionCtrl.stateMachine, "oral", "Male.Oral", animations);
-        const cowGirl = addNewState(actionCtrl.stateMachine, "cowGril", "Male.CowGirl", animations);
-        const cowGirlFast = addNewState(actionCtrl.stateMachine, "cowGrilFast", "Male.CowGirl.Fast", animations);
-        const cowGirlCum = addNewState(actionCtrl.stateMachine, "cowGrilCum", "Male.CowGirl.Cum", animations);
-        const cowGirlRest = addNewState(actionCtrl.stateMachine, "cowGrilRest", "Male.CowGirl.Rest", animations);
+        const idle = addNewState(female, actionCtrl.stateMachine, "idle", "Female.Idle", animations, locations);
+        const dance = addNewState(female, actionCtrl.stateMachine, "dance", "Female.Dance001", animations, locations);
+        const masturbating = addNewState(female, actionCtrl.stateMachine, "masturbating", "Female.Masturbating", animations, locations);
+        const breast = addNewState(female, actionCtrl.stateMachine, "breast", "Female.Breast", animations, locations);
+        const oral = addNewState(female, actionCtrl.stateMachine, "oral", "Female.Oral", animations, locations);
+        const cowGirl = addNewState(female, actionCtrl.stateMachine, "cowGril", "Female.CowGirl", animations, locations);
+        const cowGirlFast = addNewState(female, actionCtrl.stateMachine, "cowGrilFast", "Female.CowGirl.Fast", animations, locations);
+        const cowGirlCum = addNewState(female, actionCtrl.stateMachine, "cowGrilCum", "Female.CowGirl.Cum", animations, locations);
+        const cowGirlRest = addNewState(female, actionCtrl.stateMachine, "cowGrilRest", "Female.CowGirl.Rest", animations, locations);
 
         // transitions and their conditions
         addStateTransition(idle, dance, [new MakePoseCondition(MakePoses.DANCE, makePose)]);
@@ -432,6 +404,50 @@ window.onload = () => {
         // rest to masturbating again?
         addStateTransition(cowGirlRest, masturbating, [new MakePoseCondition(MakePoses.MASTURBATE, makePose)]);
     
+        // enter
+        actionCtrl.stateMachine.curState = idle;
+
+        return makePose;
+    }
+
+    function buildMaleBehavior(male: Object3D, animations: AnimationAction[], locations: Map<string, Object3D>): MakePoseBehavior {
+        // add behavior
+        const makePose = new MakePoseBehavior(male);
+        male.behaviors.push(makePose);
+
+        const actionCtrl = new ActionControlBehavior(male);
+        male.behaviors.push(actionCtrl);
+
+        // build action state machine
+        // states
+        const idle = addNewState(male, actionCtrl.stateMachine, "idle", "Male.Idle", animations, locations);
+        const dance = addNewState(male, actionCtrl.stateMachine, "dance", "Male.Idle", animations, locations);
+        const masturbating = addNewState(male, actionCtrl.stateMachine, "masturbating", "Male.Idle", animations, locations);
+        const breast = addNewState(male, actionCtrl.stateMachine, "breast", "Male.Breast", animations, locations);
+        const oral = addNewState(male, actionCtrl.stateMachine, "oral", "Male.Oral", animations, locations);
+        const cowGirl = addNewState(male, actionCtrl.stateMachine, "cowGril", "Male.CowGirl", animations, locations);
+        const cowGirlFast = addNewState(male, actionCtrl.stateMachine, "cowGrilFast", "Male.CowGirl.Fast", animations, locations);
+        const cowGirlCum = addNewState(male, actionCtrl.stateMachine, "cowGrilCum", "Male.CowGirl.Cum", animations, locations);
+        const cowGirlRest = addNewState(male, actionCtrl.stateMachine, "cowGrilRest", "Male.CowGirl.Rest", animations, locations);
+
+        // transitions and their conditions
+        addStateTransition(idle, dance, [new MakePoseCondition(MakePoses.DANCE, makePose)]);
+        addStateTransition(dance, masturbating, [new MakePoseCondition(MakePoses.MASTURBATE, makePose)]);
+        addStateTransition(masturbating, breast, [new MakePoseCondition(MakePoses.BREAST, makePose)]);
+        addStateTransition(masturbating, oral, [new MakePoseCondition(MakePoses.ORAL, makePose)]);
+        addStateTransition(breast, oral, [new MakePoseCondition(MakePoses.ORAL, makePose)]);
+        addStateTransition(oral, cowGirl, [new MakePoseCondition(MakePoses.COWGIRL, makePose)]);
+        addStateTransition(cowGirl, cowGirlFast, [new MakePoseCondition(MakePoses.COWGIRL_FAST, makePose)]);
+        addStateTransition(cowGirlFast, cowGirl, [new MakePoseCondition(MakePoses.COWGIRL, makePose)]);
+        addStateTransition(cowGirlFast, cowGirlCum, [new MakePoseCondition(MakePoses.COWGIRL_CUM, makePose)]);
+        addStateTransition(cowGirlCum, cowGirlRest, [new TimeUpCondition(cowGirlCum.animation? cowGirlCum.animation.duration : 5)]);
+        // rest to masturbating again?
+        addStateTransition(cowGirlRest, masturbating, [new MakePoseCondition(MakePoses.MASTURBATE, makePose)]);
+
+        // enter
+        actionCtrl.stateMachine.curState = idle;
+
+        return makePose;
     }
 }
 
