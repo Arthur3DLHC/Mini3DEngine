@@ -9,7 +9,7 @@ export const MakePoses = {
     COWGIRL: "cowgirl",
     COWGIRL_FAST: "cowgirlfast",
     COWGIRL_CUM: "cowgirlcum"
-}
+};
 
 export class MakePoseBehavior extends Behavior {
     public curPose: string = MakePoses.IDLE;

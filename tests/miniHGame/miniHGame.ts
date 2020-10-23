@@ -164,31 +164,6 @@ window.onload = () => {
         scene.background = skyboxTexture;
         scene.backgroundIntensity = 1;
         scene.irradianceIntensity = 30;
-        
-        // gltf asset should has been already loaded?
-        console.log("building gltf scene...");
-
-        const builderFemale = new GLTFSceneBuilder();
-        
-        const gltfSceneFemale = builderFemale.build(loaded[0], 0, actionSelectorFemale.actions);
-        // gltfSceneFemale.rotation = quat.fromAxisAngle(new vec3([0, 1, 0]), Math.PI);
-        gltfSceneFemale.name = "Female";
-        gltfSceneFemale.autoUpdateTransform = true;
-        scene.attachChild(gltfSceneFemale);
-
-        prepareGLTFCharacter(gltfSceneFemale);
-        const femaleBehavior = buildFemaleBehavior(gltfSceneFemale, actionSelectorFemale.actions, femaleActionPoses);
-
-        const builderMale = new GLTFSceneBuilder();
-
-        const gltfSceneMale = builderMale.build(loaded[1], 0, actionSelectorMale.actions);
-        // gltfSceneMale.rotation = quat.fromAxisAngle(new vec3([0, 1, 0]), Math.PI);
-        gltfSceneMale.name = "Male";
-        gltfSceneMale.autoUpdateTransform = true;
-        scene.attachChild(gltfSceneMale);
-
-        prepareGLTFCharacter(gltfSceneMale);
-        const maleBehavior = buildMaleBehavior(gltfSceneMale, actionSelectorMale.actions, maleActionPoses);
 
         const actionNames = [
             "Idle",
@@ -225,6 +200,38 @@ window.onload = () => {
             "Male.CowGirl.Cum",
             "Male.CowGirl.Rest",
         ];
+
+        const femaleStateAnimNames: Map<string, string> = new Map<string, string>();
+        const maleStateAnimNames: Map<string, string> = new Map<string, string>();
+        for(let i = 0; i < actionNames.length; i++) {
+            femaleStateAnimNames.set(actionNames[i], femaleActionNames[i]);
+            maleStateAnimNames.set(actionNames[i], maleActionNames[i]);
+        }
+        
+        // gltf asset should has been already loaded?
+        console.log("building gltf scene...");
+
+        const builderFemale = new GLTFSceneBuilder();
+        
+        const gltfSceneFemale = builderFemale.build(loaded[0], 0, actionSelectorFemale.actions);
+        // gltfSceneFemale.rotation = quat.fromAxisAngle(new vec3([0, 1, 0]), Math.PI);
+        gltfSceneFemale.name = "Female";
+        gltfSceneFemale.autoUpdateTransform = true;
+        scene.attachChild(gltfSceneFemale);
+
+        prepareGLTFCharacter(gltfSceneFemale);
+        const femaleBehavior = buildActorBehavior(gltfSceneFemale, femaleStateAnimNames, actionSelectorFemale.actions, femaleActionPoses);
+
+        const builderMale = new GLTFSceneBuilder();
+
+        const gltfSceneMale = builderMale.build(loaded[1], 0, actionSelectorMale.actions);
+        // gltfSceneMale.rotation = quat.fromAxisAngle(new vec3([0, 1, 0]), Math.PI);
+        gltfSceneMale.name = "Male";
+        gltfSceneMale.autoUpdateTransform = true;
+        scene.attachChild(gltfSceneMale);
+
+        prepareGLTFCharacter(gltfSceneMale);
+        const maleBehavior = buildActorBehavior(gltfSceneMale, maleStateAnimNames, actionSelectorMale.actions, maleActionPoses);
 
         const builderRoom = new GLTFSceneBuilder()
         const gltfSceneRoom = builderRoom.build(loaded[2], 0);
@@ -347,7 +354,12 @@ window.onload = () => {
         }
     }
 
-    function addNewState(character: Object3D, stateMachine: ActionStateMachine, stateName: string, animName: string, animations: AnimationAction[], locations: Map<string, Object3D>): ActionState {
+    function addNewState(character: Object3D, stateMachine: ActionStateMachine, stateName: string, stateAnimNames: Map<string, string>, animations: AnimationAction[], locations: Map<string, Object3D>): ActionState {
+        const animName = stateAnimNames.get(stateName);
+        if (animName === undefined) {
+            throw new Error("Make animation not found:" + stateName);
+        }
+        
         const location = locations.get(animName);
         if (location === undefined) {
             throw new Error("Make location not found:" + animName);
@@ -368,7 +380,7 @@ window.onload = () => {
         return transition;
     }
 
-    function buildFemaleBehavior(female: Object3D, animations: AnimationAction[], locations: Map<string, Object3D>): MakePoseBehavior {
+    function buildActorBehavior(female: Object3D, stateAnimNames: Map<string, string>, animations: AnimationAction[], locations: Map<string, Object3D>): MakePoseBehavior {
         // add behavior
         const makePose = new MakePoseBehavior(female);
         female.behaviors.push(makePose);
@@ -380,15 +392,15 @@ window.onload = () => {
 
         // build action state machine
         // states
-        const idle = addNewState(female, actionCtrl.stateMachine, "idle", "Female.Idle", animations, locations);
-        const dance = addNewState(female, actionCtrl.stateMachine, "dance", "Female.Dance001", animations, locations);
-        const masturbating = addNewState(female, actionCtrl.stateMachine, "masturbating", "Female.Masturbating", animations, locations);
-        const breast = addNewState(female, actionCtrl.stateMachine, "breast", "Female.Breast", animations, locations);
-        const oral = addNewState(female, actionCtrl.stateMachine, "oral", "Female.Oral", animations, locations);
-        const cowGirl = addNewState(female, actionCtrl.stateMachine, "cowGril", "Female.CowGirl", animations, locations);
-        const cowGirlFast = addNewState(female, actionCtrl.stateMachine, "cowGrilFast", "Female.CowGirl.Fast", animations, locations);
-        const cowGirlCum = addNewState(female, actionCtrl.stateMachine, "cowGrilCum", "Female.CowGirl.Cum", animations, locations);
-        const cowGirlRest = addNewState(female, actionCtrl.stateMachine, "cowGrilRest", "Female.CowGirl.Rest", animations, locations);
+        const idle = addNewState(female, actionCtrl.stateMachine, "Idle", stateAnimNames, animations, locations);
+        const dance = addNewState(female, actionCtrl.stateMachine, "Dancing", stateAnimNames, animations, locations);
+        const masturbating = addNewState(female, actionCtrl.stateMachine, "Masturbating", stateAnimNames, animations, locations);
+        const breast = addNewState(female, actionCtrl.stateMachine, "Breast", stateAnimNames, animations, locations);
+        const oral = addNewState(female, actionCtrl.stateMachine, "Oral", stateAnimNames, animations, locations);
+        const cowGirl = addNewState(female, actionCtrl.stateMachine, "CowGirl", stateAnimNames, animations, locations);
+        const cowGirlFast = addNewState(female, actionCtrl.stateMachine, "CowGirl Fast", stateAnimNames, animations, locations);
+        const cowGirlCum = addNewState(female, actionCtrl.stateMachine, "CowGirl Cum", stateAnimNames, animations, locations);
+        const cowGirlRest = addNewState(female, actionCtrl.stateMachine, "CowGirl Rest", stateAnimNames, animations, locations);
 
         // transitions and their conditions
         addStateTransition(idle, dance, [new MakePoseCondition(MakePoses.DANCE, makePose)]);
@@ -410,6 +422,7 @@ window.onload = () => {
         return makePose;
     }
 
+    /*
     function buildMaleBehavior(male: Object3D, animations: AnimationAction[], locations: Map<string, Object3D>): MakePoseBehavior {
         // add behavior
         const makePose = new MakePoseBehavior(male);
@@ -449,6 +462,7 @@ window.onload = () => {
 
         return makePose;
     }
+    */
 }
 
 
