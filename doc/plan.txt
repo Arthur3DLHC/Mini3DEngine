@@ -632,7 +632,8 @@ TODO:       主要类结构
 
             particle system; sprite;
                 使用 GPU 计算 particle: transform feedback
-                https://gpfault.net/posts/webgl2-particles.txt.html
+                    https://gpfault.net/posts/webgl2-particles.txt.html
+                粒子物理：可以通过深度图获得场景位置，在 GPU 计算碰撞？https://nullprogram.com/webgl-particles/
 
             考虑技能特效等怎么实现；
                 刀光、击中特效等
