@@ -11,11 +11,11 @@ export class ActionStateMachine {
     public get curState(): ActionState | null {return this._curState;}
     public set curState(state: ActionState | null) {
         if (this._curState !== null) {
-            this._curState.onExit();
+            this._curState.exit();
         }
         this._curState = state;
         if (state !== null) {
-            state.onEnter();
+            state.enter();
         }
     }
 

@@ -1,5 +1,5 @@
-import { ActionCondition } from "../../../src/mini3DEngine";
-import { MakePoseBehavior } from "../behaviors/makePoseBehavior";
+import { ActionCondition } from "../../../src/mini3DEngine.js";
+import { MakePoseBehavior } from "../behaviors/makePoseBehavior.js";
 
 export class MakePoseCondition extends ActionCondition {
     public constructor(poseName: string, behavior: MakePoseBehavior) {

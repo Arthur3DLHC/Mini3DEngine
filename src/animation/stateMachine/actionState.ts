@@ -41,7 +41,7 @@ export class ActionState {
     /**
      * subclass can play animation, sound and so on in this method
      */
-    public onEnter() {
+    public enter() {
         // play action animation
         if (this.animation !== null) {
             this.animation.reset();
@@ -53,7 +53,7 @@ export class ActionState {
         }
     }
 
-    public onExit() {
+    public exit() {
         if (this.animation !== null) {
             this.animation.stop();
         }

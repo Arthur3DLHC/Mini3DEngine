@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset, Object3D, BoundingRenderModes, ActionSelector, SkinMesh, ActionStateMachine, ActionState, AnimationAction, ActionTransition, TimeUpCondition, ActionCondition } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset, Object3D, BoundingRenderModes, ActionSelector, SkinMesh, ActionStateMachine, ActionState, AnimationAction, ActionTransition, TimeUpCondition, ActionCondition, AnimationLoopMode } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
@@ -162,7 +162,7 @@ window.onload = () => {
         skyboxTexture.samplerState = new SamplerState();
         skyboxTexture.upload();
         scene.background = skyboxTexture;
-        scene.backgroundIntensity = 1;
+        scene.backgroundIntensity = 4;
         scene.irradianceIntensity = 30;
 
         const actionNames = [
@@ -207,6 +207,9 @@ window.onload = () => {
             femaleStateAnimNames.set(actionNames[i], femaleActionNames[i]);
             maleStateAnimNames.set(actionNames[i], maleActionNames[i]);
         }
+
+        const actionList: HTMLDivElement = document.getElementById("actionList") as HTMLDivElement;
+        actionList.innerHTML = "";
         
         // gltf asset should has been already loaded?
         console.log("building gltf scene...");
@@ -220,7 +223,6 @@ window.onload = () => {
         scene.attachChild(gltfSceneFemale);
 
         prepareGLTFCharacter(gltfSceneFemale);
-        const femaleBehavior = buildActorBehavior(gltfSceneFemale, femaleStateAnimNames, actionSelectorFemale.actions, femaleActionPoses);
 
         const builderMale = new GLTFSceneBuilder();
 
@@ -231,7 +233,6 @@ window.onload = () => {
         scene.attachChild(gltfSceneMale);
 
         prepareGLTFCharacter(gltfSceneMale);
-        const maleBehavior = buildActorBehavior(gltfSceneMale, maleStateAnimNames, actionSelectorMale.actions, maleActionPoses);
 
         const builderRoom = new GLTFSceneBuilder()
         const gltfSceneRoom = builderRoom.build(loaded[2], 0);
@@ -241,7 +242,12 @@ window.onload = () => {
 
         prepareGLTFScene(gltfSceneRoom, maleActionPoses, femaleActionPoses);
 
+        const femaleBehavior = buildActorBehavior(gltfSceneFemale, femaleStateAnimNames, actionSelectorFemale.actions, femaleActionPoses, onEnterState);
+        const maleBehavior = buildActorBehavior(gltfSceneMale, maleStateAnimNames, actionSelectorMale.actions, maleActionPoses, null);
+
         // todo: add all action names to action list UI
+        // todo: change to only add actions that current state can transit to?
+        /*
         const actionList: HTMLDivElement = document.getElementById("actionList") as HTMLDivElement;
         actionList.innerHTML = "";
 
@@ -251,6 +257,7 @@ window.onload = () => {
                 actionItem.innerHTML = actionNames[actidx];
                 actionItem.className = "actionItem";
                 actionItem.onclick = (ev: MouseEvent) => {
+
                     actionSelectorMale.playAction(maleActionNames[actidx]);
                     actionSelectorFemale.playAction(femaleActionNames[actidx]);
 
@@ -269,16 +276,70 @@ window.onload = () => {
                         lovePoseMale.rotation.copy(gltfSceneMale.rotation);
                         gltfSceneMale.updateLocalTransform();
                     }
-
                 }
                 actionList.appendChild(actionItem);
         }
+        */
 
         console.log("start game loop...");
 
         Clock.instance.start();
         requestAnimationFrame(gameLoop);
 
+        function onEnterState(state: MakePoseState) {
+            const actionList: HTMLDivElement = document.getElementById("actionList") as HTMLDivElement;
+            actionList.innerHTML = "";
+
+            // add all state names can transit to, by makeposecondition?
+            for (const transition of state.transitions) {
+                const targetState = transition.targetState;
+                if (targetState) {
+                    if(targetState.name === "CowGirl Rest") continue;
+                    const actionItem: HTMLDivElement = document.createElement("div");
+                    actionItem.id = "action_" + targetState.name.replace(" ", "_");
+                    actionItem.innerHTML = targetState.name;
+                    actionItem.className = "actionItem";
+                    actionItem.onclick = (ev: MouseEvent) => {
+                        // change the behavior?
+                        switch (targetState.name) {
+                            case "Idle":
+                                femaleBehavior.curPose = MakePoses.IDLE;
+                                maleBehavior.curPose = MakePoses.IDLE;
+                                break;
+                            case "Dancing":
+                                femaleBehavior.curPose = MakePoses.DANCE;
+                                maleBehavior.curPose = MakePoses.DANCE;
+                                break;
+                            case "Masturbating":
+                                femaleBehavior.curPose = MakePoses.MASTURBATE;
+                                maleBehavior.curPose = MakePoses.MASTURBATE;
+                                break;
+                            case "Breast":
+                                femaleBehavior.curPose = MakePoses.BREAST;
+                                maleBehavior.curPose = MakePoses.BREAST;
+                                break;
+                            case "Oral":
+                                femaleBehavior.curPose = MakePoses.ORAL;
+                                maleBehavior.curPose = MakePoses.ORAL;
+                                break;
+                            case "CowGirl":
+                                femaleBehavior.curPose = MakePoses.COWGIRL;
+                                maleBehavior.curPose = MakePoses.COWGIRL;
+                                break;
+                            case "CowGirl Fast":
+                                femaleBehavior.curPose = MakePoses.COWGIRL_FAST;
+                                maleBehavior.curPose = MakePoses.COWGIRL_FAST;
+                                break;
+                            case "CowGirl Cum":
+                                femaleBehavior.curPose = MakePoses.COWGIRL_CUM;
+                                maleBehavior.curPose = MakePoses.COWGIRL_CUM;
+                                break;
+                        }
+                    }
+                    actionList.appendChild(actionItem);
+                }
+            }
+        }
     });
     
     function gameLoop(now: number) {
@@ -347,14 +408,17 @@ window.onload = () => {
         }
     }
 
-    function setAnimationFor(state: ActionState, animName: string, animations: AnimationAction[]) {
+    function setAnimationFor(state: ActionState, animName: string, repeat: boolean, animations: AnimationAction[]) {
         const anim = animations.find((action: AnimationAction) => {return action.name === animName});
         if (anim !== undefined) {
             state.animation = anim;
+            if (!repeat) {
+                anim.LoopMode = AnimationLoopMode.Once;
+            }
         }
     }
 
-    function addNewState(character: Object3D, stateMachine: ActionStateMachine, stateName: string, stateAnimNames: Map<string, string>, animations: AnimationAction[], locations: Map<string, Object3D>): ActionState {
+    function addNewState(character: Object3D, stateMachine: ActionStateMachine, stateName: string, animRepeat: boolean, stateAnimNames: Map<string, string>, animations: AnimationAction[], locations: Map<string, Object3D>, callback:((state: MakePoseState) => void)|null): ActionState {
         const animName = stateAnimNames.get(stateName);
         if (animName === undefined) {
             throw new Error("Make animation not found:" + stateName);
@@ -365,7 +429,8 @@ window.onload = () => {
             throw new Error("Make location not found:" + animName);
         }
         const state = new MakePoseState(stateName, location, character);
-        setAnimationFor(state, animName, animations);
+        state.onEnter = callback;
+        setAnimationFor(state, animName, animRepeat, animations);
         stateMachine.addState(state);
         return state;
     }
@@ -380,7 +445,7 @@ window.onload = () => {
         return transition;
     }
 
-    function buildActorBehavior(female: Object3D, stateAnimNames: Map<string, string>, animations: AnimationAction[], locations: Map<string, Object3D>): MakePoseBehavior {
+    function buildActorBehavior(female: Object3D, stateAnimNames: Map<string, string>, animations: AnimationAction[], locations: Map<string, Object3D>, enterStateCallback: ((state: MakePoseState)=>void)|null): MakePoseBehavior {
         // add behavior
         const makePose = new MakePoseBehavior(female);
         female.behaviors.push(makePose);
@@ -392,15 +457,15 @@ window.onload = () => {
 
         // build action state machine
         // states
-        const idle = addNewState(female, actionCtrl.stateMachine, "Idle", stateAnimNames, animations, locations);
-        const dance = addNewState(female, actionCtrl.stateMachine, "Dancing", stateAnimNames, animations, locations);
-        const masturbating = addNewState(female, actionCtrl.stateMachine, "Masturbating", stateAnimNames, animations, locations);
-        const breast = addNewState(female, actionCtrl.stateMachine, "Breast", stateAnimNames, animations, locations);
-        const oral = addNewState(female, actionCtrl.stateMachine, "Oral", stateAnimNames, animations, locations);
-        const cowGirl = addNewState(female, actionCtrl.stateMachine, "CowGirl", stateAnimNames, animations, locations);
-        const cowGirlFast = addNewState(female, actionCtrl.stateMachine, "CowGirl Fast", stateAnimNames, animations, locations);
-        const cowGirlCum = addNewState(female, actionCtrl.stateMachine, "CowGirl Cum", stateAnimNames, animations, locations);
-        const cowGirlRest = addNewState(female, actionCtrl.stateMachine, "CowGirl Rest", stateAnimNames, animations, locations);
+        const idle = addNewState(female, actionCtrl.stateMachine, "Idle", true, stateAnimNames, animations, locations, enterStateCallback);
+        const dance = addNewState(female, actionCtrl.stateMachine, "Dancing", true, stateAnimNames, animations, locations, enterStateCallback);
+        const masturbating = addNewState(female, actionCtrl.stateMachine, "Masturbating", true, stateAnimNames, animations, locations, enterStateCallback);
+        const breast = addNewState(female, actionCtrl.stateMachine, "Breast", true, stateAnimNames, animations, locations, enterStateCallback);
+        const oral = addNewState(female, actionCtrl.stateMachine, "Oral", true, stateAnimNames, animations, locations, enterStateCallback);
+        const cowGirl = addNewState(female, actionCtrl.stateMachine, "CowGirl", true, stateAnimNames, animations, locations, enterStateCallback);
+        const cowGirlFast = addNewState(female, actionCtrl.stateMachine, "CowGirl Fast", true, stateAnimNames, animations, locations, enterStateCallback);
+        const cowGirlCum = addNewState(female, actionCtrl.stateMachine, "CowGirl Cum", false, stateAnimNames, animations, locations, enterStateCallback);
+        const cowGirlRest = addNewState(female, actionCtrl.stateMachine, "CowGirl Rest", true, stateAnimNames, animations, locations, enterStateCallback);
 
         // transitions and their conditions
         addStateTransition(idle, dance, [new MakePoseCondition(MakePoses.DANCE, makePose)]);
@@ -421,6 +486,7 @@ window.onload = () => {
 
         return makePose;
     }
+
 
     /*
     function buildMaleBehavior(male: Object3D, animations: AnimationAction[], locations: Map<string, Object3D>): MakePoseBehavior {
