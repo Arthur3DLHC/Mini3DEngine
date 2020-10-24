@@ -505,6 +505,8 @@ TODO:       主要类结构
                 gltf-Model-Viewer中的方法
                 https://www.alanzucconi.com/2017/08/30/fast-subsurface-scattering-2/
                 经过测试，效果并不太好
+                自定义次表面材质的反射模型；pre-integrated；只在明暗交界的部分修改颜色；
+                    阴影 bias 增大；阴影内部不使用次表面反射；
 
             支持材质自定义 Shader？
                 不紧急
@@ -601,7 +603,8 @@ TODO:       主要类结构
             物体是否做包围球检测的控制标志？ 
             
             测试 Occlusion query?
-                在 blender 中给物体加一个自定义属性，occlustionQuery
+                区分哪些网格是 occluder，哪些网格需要 occlusion query；使用 Custom Property 标志？
+                    在 blender 中给物体加一个自定义属性，occlustionQuery
                 拷贝 occlusion 相关属性的脚本；
                 测试Demo，调试
                     普通mesh的occlusion query
@@ -625,7 +628,6 @@ TODO:       主要类结构
                 从 GLTF 加载组件信息？
                     读取 object 的自定义属性：组件列表和组件属性？或者 prefab 名称？
                     使用 json 定义 object prefab 对象；
-                    区分哪些网格是 occluder，哪些网格需要 occlusion query；使用 Custom Property 标志？
 
             Volume Rendering?
                 SDF
