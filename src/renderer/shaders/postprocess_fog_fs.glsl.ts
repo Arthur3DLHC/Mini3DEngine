@@ -17,6 +17,7 @@ layout(location = 0) out vec4 o_color;
 #include <function_depth>
 
 void main(void) {
+    // todo: fog cauculation
     o_color = vec4(u_color, 0.5);
 }
 `;

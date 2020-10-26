@@ -4,6 +4,7 @@ import postprocess_ssao_fs from "./shaders/postprocess_ssao_fs.glsl.js";
 import postprocess_ssao_blur_fs from "./shaders/postprocess_ssao_blur_fs.glsl.js";
 import postprocess_ssr_fs from "./shaders/postprocess_ssr_fs.glsl.js";
 import postprocess_composite_fs from "./shaders/postprocess_composite_fs.glsl.js";
+import postprocess_fog_fs from "./shaders/postprocess_fog_fs.glsl.js";
 import postprocess_tonemapping_fs from "./shaders/postprocess_tonemapping_fs.glsl.js";
 import postprocess_brightpass_fs from "./shaders/postprocess_brightpass_fs.glsl.js";
 import postprocess_blur_fs from "./shaders/postprocess_blur_fs.glsl.js";
@@ -61,6 +62,9 @@ export class PostProcessor {
         }
         if (GLPrograms.shaderCodes["postprocess_composite_fs"] === undefined) {
             GLPrograms.shaderCodes["postprocess_composite_fs"] = postprocess_composite_fs;
+        }
+        if (GLPrograms.shaderCodes["postprocess_fog_fs"] === undefined) {
+            GLPrograms.shaderCodes["postprocess_fog_fs"] = postprocess_fog_fs;
         }
         if (GLPrograms.shaderCodes["postprocess_tonemapping_fs"] === undefined) {
             GLPrograms.shaderCodes["postprocess_tonemapping_fs"] = postprocess_tonemapping_fs;
