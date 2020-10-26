@@ -32,6 +32,7 @@ import { SSRParams } from "./postprocess/ssrParams.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { BloomParams } from "./postprocess/bloomParams.js";
 import vec2 from "../../lib/tsm/vec2.js";
+import { FogParams } from "./postprocess/fogParams.js";
 
 /**
  * all post processes supported
@@ -239,6 +240,7 @@ export class PostProcessor {
 
         // this._curOutputFBOIdx = 0;
 
+        // diable alpha blending
         this._renderStates = new RenderStateSet();
         this._renderStates.blendState = RenderStateCache.instance.getBlendState(false, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
         this._renderStates.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
@@ -256,6 +258,10 @@ export class PostProcessor {
         // if some surface's reflection is strong, it's diffuse must be dark. this is ensured by 'metallic' of it's PBR material.
         this._compositeBlendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.ONE, GLDevice.gl.ONE);
 
+        // alpha blend mode for fog
+        // srcColor * scrAlpha + destColor * (1 - srcAlpha)
+        this._fogBlendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+
         this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
 
         this._blurUnitOffset = new vec2();
@@ -263,6 +269,7 @@ export class PostProcessor {
         this.ssao = new SSAOParams();
         this.ssr = new SSRParams();
         this.bloom = new BloomParams();
+        this.fog = new FogParams();
     }
 
     public release() {
@@ -295,8 +302,9 @@ export class PostProcessor {
     public ssao: SSAOParams;
     public ssr: SSRParams;
     public bloom: BloomParams;
+    public fog: FogParams;
 
-    // todo: shaders
+    // shaders
 
     private _ssaoProgram: ShaderProgram;
     private _ssaoBlurProgram: ShaderProgram;
@@ -344,6 +352,7 @@ export class PostProcessor {
     private _renderStates: RenderStateSet;
     private _ssaoBlurBlendState: BlendState;
     private _compositeBlendState: BlendState;
+    private _fogBlendState: BlendState;
     // glow pass can use _compositeBlendState also.
 
     private _rectGeom: PlaneGeometry;
@@ -399,6 +408,8 @@ export class PostProcessor {
         }
 
         this.composite();
+
+        this.applyFog();
 
         // unbind textrues to allow them use as rendertarget next frame
         GLTextures.setTextureAt(this._sceneDepthTexUnit, null);
@@ -625,6 +636,10 @@ export class PostProcessor {
         // clear textures;
         GLTextures.setTextureAt(aoUnit, null);
         GLTextures.setTextureAt(reflUnit, null);
+    }
+
+    applyFog() {
+        // throw new Error("Method not implemented.");
     }
 
     private applyToneMapping() {
