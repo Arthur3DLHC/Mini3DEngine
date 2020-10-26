@@ -236,6 +236,9 @@ export class GLTFSceneBuilder {
             if (nodeDef.extras !== undefined && nodeDef.extras.occlusionQuery !== undefined) {
                 node.occlusionQuery = (nodeDef.extras.occlusionQuery === 1);        // blender custom prop boolean is number 0 or 1
             }
+
+            // drop shadow? only meshes
+            // blender does not have per object shadow control now
         }
         else {
             // todo: light, environment probe, irradiance volume
