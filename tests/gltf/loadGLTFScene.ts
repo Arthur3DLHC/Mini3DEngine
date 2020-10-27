@@ -121,7 +121,8 @@ window.onload = () => {
     console.log("loading gltf model...");
 
     // todo: adjust the way that promise and loadingManager cooperate
-    const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/InnRoom/InnRoom.gltf");
+    // const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/InnRoom/InnRoom.gltf");
+    const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/Washitsu/washitsu.gltf");
 
     // todo: use an outdoor scene skybox
     console.log("loading skybox...");
@@ -174,9 +175,10 @@ window.onload = () => {
         skyboxTexture.mipLevels = 1;
         skyboxTexture.samplerState = new SamplerState();
         skyboxTexture.upload();
-        scene.background = skyboxTexture;
-        scene.backgroundIntensity = 1;
-        scene.irradianceIntensity = 10;
+        // scene.background = skyboxTexture;
+        scene.background = new vec4([0,0,0,1]);
+        scene.backgroundIntensity = 0;
+        scene.irradianceIntensity = 0;
         
         // gltf asset should has been already loaded?
         console.log("building gltf scene...");
