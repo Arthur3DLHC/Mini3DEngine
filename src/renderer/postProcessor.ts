@@ -98,6 +98,11 @@ export class PostProcessor {
         this._ssrProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssr_fs"]);
         this._ssrProgram.build();
 
+        this._fogProgram = new ShaderProgram();
+        this._fogProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
+        this._fogProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_fog_fs"]);
+        this._fogProgram.build();
+
         this._brightpassProgram = new ShaderProgram();
         this._brightpassProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
         this._brightpassProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_brightpass_fs"]);
@@ -130,6 +135,7 @@ export class PostProcessor {
         context.bindUniformBlocks(this._ssaoProgram);
         context.bindUniformBlocks(this._ssaoBlurProgram);
         context.bindUniformBlocks(this._ssrProgram);
+        context.bindUniformBlocks(this._fogProgram);
         context.bindUniformBlocks(this._brightpassProgram);
         context.bindUniformBlocks(this._gaussianBlurProgram);
         context.bindUniformBlocks(this._compositeProgram);
@@ -280,6 +286,7 @@ export class PostProcessor {
         if (this._ssaoProgram) { this._ssaoProgram.release(); }
         if (this._ssaoBlurProgram) { this._ssaoBlurProgram.release(); }
         if (this._ssrProgram) { this._ssrProgram.release(); }
+        if (this._fogProgram) { this._fogProgram.release(); }
         if (this._brightpassProgram) { this._brightpassProgram.release(); }
         if (this._gaussianBlurProgram) { this._gaussianBlurProgram.release(); }
         if (this._compositeProgram) { this._compositeProgram.release(); }
@@ -313,6 +320,7 @@ export class PostProcessor {
     private _ssaoProgram: ShaderProgram;
     private _ssaoBlurProgram: ShaderProgram;
     private _ssrProgram: ShaderProgram;
+    private _fogProgram: ShaderProgram;
     private _brightpassProgram: ShaderProgram;
     private _gaussianBlurProgram: ShaderProgram;
     private _compositeProgram: ShaderProgram;
@@ -413,7 +421,9 @@ export class PostProcessor {
 
         this.composite();
 
-        this.applyFog();
+        if (this.fog.enable) {
+            this.applyFog();
+        }
 
         // unbind textrues to allow them use as rendertarget next frame
         GLTextures.setTextureAt(this._sceneDepthTexUnit, null);
@@ -643,7 +653,34 @@ export class PostProcessor {
     }
 
     applyFog() {
-        // throw new Error("Method not implemented.");
+        const gl = GLDevice.gl;
+        // render target
+        GLDevice.renderTarget = this._postProcessFBO;
+        gl.viewport(0, 0, this._sceneDepthTexture.width, this._sceneDepthTexture.height);
+        gl.scissor(0, 0, this._sceneDepthTexture.width, this._sceneDepthTexture.height);
+
+        // apply render state
+        this._renderStates.apply();
+
+        GLRenderStates.setBlendState(this._fogBlendState);
+
+        // program
+        GLPrograms.useProgram(this._fogProgram);
+
+        // textures
+        // need depth only?
+        gl.uniform1i(this._fogProgram.getUniformLocation("s_sceneDepth"), this._sceneDepthTexUnit);
+
+        // params
+        gl.uniform1f(this._fogProgram.getUniformLocation("u_density"), this.fog.density);
+        gl.uniform3f(this._fogProgram.getUniformLocation("u_color"), this.fog.color.x, this.fog.color.y, this.fog.color.z);
+        gl.uniform1i(this._fogProgram.getUniformLocation("u_halfSpace"), this.fog.halfSpace ? 1 : 0);
+        gl.uniform1f(this._fogProgram.getUniformLocation("u_height"), this.fog.height);
+
+        // draw fullscreen rect
+        this._rectGeom.draw(0, Infinity, this._fogProgram.attributes);
+
+        // clear textures
     }
 
     private applyToneMapping() {
