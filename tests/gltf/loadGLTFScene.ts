@@ -35,8 +35,12 @@ window.onload = () => {
     renderer.postprocessor.bloom.threshold = 2;
     renderer.postprocessor.bloom.intensity = 0.5;
 
-    renderer.postprocessor.fog.enable = false;
-    renderer.postprocessor.fog.density = 0.1;
+    // test exponentric height fog
+    renderer.postprocessor.fog.enable = true;
+    renderer.postprocessor.fog.density = 0.5;
+    renderer.postprocessor.fog.height = 2.5;
+    renderer.postprocessor.fog.heightFalloff = 1;
+    renderer.postprocessor.fog.startDist = 2;
 
     const scene = new Scene();
     const camera = new PerspectiveCamera();

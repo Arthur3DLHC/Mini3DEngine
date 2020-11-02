@@ -11,6 +11,7 @@ uniform float u_heightFalloff;
 // uniform int u_halfSpace;
 uniform float u_startDist;          // the distance the fog start to appear
 uniform vec3 u_color;
+// todo: max distance
 
 #include <uniforms_view>
 
@@ -38,17 +39,18 @@ void main(void) {
     vec3 viewPosition = getViewPosition(ex_texcoord, fragDepth, viewZ);
     float dist = length(viewPosition);
 
+    // todo: this can calculate on cpu side
     float deltaFogHeight = u_view.position.y - u_fogHeight;         // the height offset between camera and fog
 
     // density affected by height
     // float fogDensity = u_density;
     // if (u_halfSpace) {
-    float fogDensity = u_density * exp( -u_heightFalloff * deltaFogHeight );
+    float fogDensity = u_density * exp2( -u_heightFalloff * deltaFogHeight );
     // }
 
     vec3 worldPosition = (u_view.matInvView * vec4(viewPosition, 1.0)).xyz;
-    float deltaObjHeight = u_view.position.y - worldPosition.y;     // the height offset between camera and object
-    float falloff = u_heightFalloff * deltaObjHeight;
+    float deltaObjHeight = worldPosition.y - u_view.position.y;     // the height offset between camera and object
+    float falloff = max(-127.0, u_heightFalloff * deltaObjHeight);
 
     float fogFactor = (1.0 - exp2( -falloff )) / falloff;
 

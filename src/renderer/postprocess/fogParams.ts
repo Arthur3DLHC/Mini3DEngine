@@ -6,10 +6,10 @@ import vec3 from "../../../lib/tsm/vec3.js";
 export class FogParams {
     public constructor() {
         this.enable = false;
-        this.density = 0.001;
+        this.density = 1;
         this.color = vec3.one.copy()
         // this.halfSpace = false;
-        this.height = 256;
+        this.height = 0;
         this.heightFalloff = 1;
         this.startDist = 0;
     }
