@@ -6,10 +6,11 @@
  */
 export default /** glsl */`
 uniform float u_density;            // global density
-uniform vec3 u_color;
-uniform int u_halfSpace;
-uniform float u_distFallOff;
+uniform float u_fogHeight;          // the height of the fog
 uniform float u_heightFallOff;
+// uniform int u_halfSpace;
+uniform float u_startDist;          // the distance the fog start to appear
+uniform vec3 u_color;
 
 #include <uniforms_view>
 
@@ -37,16 +38,28 @@ void main(void) {
     vec3 viewPosition = getViewPosition(ex_texcoord, fragDepth, viewZ);
     float dist = length(viewPosition);
 
+    float deltaFogHeight = u_view.position.y - u_fogHeight;         // the height offset between camera and fog
+
     // density affected by height
-    float heightDensity = u_density;
-    if (u_halfSpace) {
-        heightDensity = u_density * exp(-u_heightFallOff * viewPosition.y);
-    }
+    // float fogDensity = u_density;
+    // if (u_halfSpace) {
+    float fogDensity = u_density * exp( -u_heightFallOff * deltaFogHeight );
+    // }
 
-    // multiply dist and height fog result? or use height density as input?
+    vec3 worldPosition = (u_view.matInvView * vec4(viewPosition, 1.0)).xyz;
+    float deltaObjHeight = u_view.position.y - worldPosition.y;     // the height offset between camera and object
+    float falloff = u_heightFallOff * deltaObjHeight;
 
-    float fogAmount = clamp( 1.0 - exp( -dist * heightDensity ), 0.0, 1.0 );
+    float fogFactor = (1.0 - exp2( -falloff )) / falloff;
 
-    o_color = vec4(u_color, fogAmount);
+    float fog = fogDensity * fogFactor * max(dist - u_startDist, 0.0);
+
+    // todo: inscatter?
+
+    // todo: raymarch volumetic fog?
+
+    // float fog = clamp( 1.0 - exp( -dist * fogDensity ), 0.0, 1.0 );
+
+    o_color = vec4(u_color, fog);
 }
 `;
