@@ -34,6 +34,7 @@ import vec4 from "../../lib/tsm/vec4.js";
 import { BloomParams } from "./postprocess/bloomParams.js";
 import vec2 from "../../lib/tsm/vec2.js";
 import { FogParams } from "./postprocess/fogParams.js";
+import { Camera } from "../scene/cameras/camera.js";
 
 /**
  * all post processes supported
@@ -141,6 +142,8 @@ export class PostProcessor {
         context.bindUniformBlocks(this._compositeProgram);
         context.bindUniformBlocks(this._toneMappingProgram);
         context.bindUniformBlocks(this._bloomCompositeProgram);
+
+        // this._context = context;
 
         // this._samplerUniformsSSAO = new SamplerUniforms(this._ssaoProgram);
         // this._samplerUniformsSSAOComposite = new SamplerUniforms(this._compositeSSAOProgram);
@@ -386,7 +389,9 @@ export class PostProcessor {
 
     private _blurUnitOffset: vec2;
 
-    public processOpaque(startTexUnit: number, target: FrameBuffer, prevFrame: Texture2D) {
+    // private _context: ClusteredForwardRenderContext;
+
+    public processOpaque(startTexUnit: number, target: FrameBuffer, prevFrame: Texture2D, camera: Camera) {
         // todo: bind general texturess for once
         this._sceneColorTexUnit = startTexUnit;
         this._sceneDepthTexUnit = startTexUnit + 1;
@@ -422,7 +427,7 @@ export class PostProcessor {
         this.composite();
 
         if (this.fog.enable) {
-            this.applyFog();
+            this.applyFog(camera);
         }
 
         // unbind textrues to allow them use as rendertarget next frame
@@ -652,7 +657,7 @@ export class PostProcessor {
         GLTextures.setTextureAt(reflUnit, null);
     }
 
-    applyFog() {
+    applyFog(camera: Camera) {
         const gl = GLDevice.gl;
         // render target
         GLDevice.renderTarget = this._postProcessFBO;
@@ -672,12 +677,19 @@ export class PostProcessor {
         gl.uniform1i(this._fogProgram.getUniformLocation("s_sceneDepth"), this._sceneDepthTexUnit);
 
         // params
-        gl.uniform1f(this._fogProgram.getUniformLocation("u_density"), this.fog.density);
-        gl.uniform3f(this._fogProgram.getUniformLocation("u_color"), this.fog.color.x, this.fog.color.y, this.fog.color.z);
+        // todo: pack to vec4s to reduce api calls
+        // gl.uniform1f(this._fogProgram.getUniformLocation("u_density"), this.fog.density);
         // gl.uniform1i(this._fogProgram.getUniformLocation("u_halfSpace"), this.fog.halfSpace ? 1 : 0);
-        gl.uniform1f(this._fogProgram.getUniformLocation("u_fogHeight"), this.fog.height);
+        
+        // calc fog height density
+        // exp2(x) in glsl means pow(2, x)
+        const heightFactor: number = Math.max(-127.0, this.fog.heightFalloff * (camera.position.y - this.fog.height));
+        const heightDensity: number = this.fog.density * Math.pow(2.0, -heightFactor);
+        
+        gl.uniform1f(this._fogProgram.getUniformLocation("u_fogHeightDensity"), heightDensity);
         gl.uniform1f(this._fogProgram.getUniformLocation("u_heightFalloff"), this.fog.heightFalloff);
         gl.uniform1f(this._fogProgram.getUniformLocation("u_startDist"), this.fog.startDist);
+        gl.uniform3f(this._fogProgram.getUniformLocation("u_color"), this.fog.color.x, this.fog.color.y, this.fog.color.z);
 
         // draw fullscreen rect
         this._rectGeom.draw(0, Infinity, this._fogProgram.attributes);

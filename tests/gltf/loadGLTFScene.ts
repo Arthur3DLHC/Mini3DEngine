@@ -38,9 +38,9 @@ window.onload = () => {
     // test exponentric height fog
     renderer.postprocessor.fog.enable = true;
     renderer.postprocessor.fog.density = 0.5;
-    renderer.postprocessor.fog.height = 2.5;
-    renderer.postprocessor.fog.heightFalloff = 1;
-    renderer.postprocessor.fog.startDist = 2;
+    renderer.postprocessor.fog.height = 0.5;
+    renderer.postprocessor.fog.heightFalloff = 5;
+    renderer.postprocessor.fog.startDist = 1.5;
 
     const scene = new Scene();
     const camera = new PerspectiveCamera();

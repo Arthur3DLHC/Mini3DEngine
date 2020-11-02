@@ -5,8 +5,8 @@
  * https://zhuanlan.zhihu.com/p/76627240
  */
 export default /** glsl */`
-uniform float u_density;            // global density
-uniform float u_fogHeight;          // the height of the fog
+// uniform float u_density;            // global density
+uniform float u_fogHeightDensity;      // globalDesity * exp2( -u_heightFalloff * (camHeight - fogHeight) )
 uniform float u_heightFalloff;
 // uniform int u_halfSpace;
 uniform float u_startDist;          // the distance the fog start to appear
@@ -39,14 +39,8 @@ void main(void) {
     vec3 viewPosition = getViewPosition(ex_texcoord, fragDepth, viewZ);
     float dist = length(viewPosition);
 
-    // todo: this can calculate on cpu side
-    float deltaFogHeight = u_view.position.y - u_fogHeight;         // the height offset between camera and fog
-
     // density affected by height
-    // float fogDensity = u_density;
-    // if (u_halfSpace) {
-    float fogDensity = u_density * exp2( -u_heightFalloff * deltaFogHeight );
-    // }
+    // float fogDensity = u_density * exp2( -u_heightFalloff * (u_view.position.y - u_fogHeight) );
 
     vec3 worldPosition = (u_view.matInvView * vec4(viewPosition, 1.0)).xyz;
     float deltaObjHeight = worldPosition.y - u_view.position.y;     // the height offset between camera and object
@@ -54,7 +48,9 @@ void main(void) {
 
     float fogFactor = (1.0 - exp2( -falloff )) / falloff;
 
-    float fog = fogDensity * fogFactor * max(dist - u_startDist, 0.0);
+    float fog = u_fogHeightDensity * fogFactor * max(dist - u_startDist, 0.0);
+
+    fog = clamp(fog, 0.0, 1.0);
 
     // todo: inscatter?
 
