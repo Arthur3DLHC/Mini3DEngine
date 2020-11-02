@@ -1,6 +1,8 @@
 /**
- * simple fog shader
- * exp fog, support height half space
+ * simple Exponential Height Fog shader
+ * mostly from unreal,
+ * https://docs.unrealengine.com/en-US/Engine/Actors/FogEffects/HeightFog/index.html
+ * https://zhuanlan.zhihu.com/p/76627240
  */
 export default /** glsl */`
 uniform float u_density;
