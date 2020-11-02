@@ -7,7 +7,7 @@
 export default /** glsl */`
 uniform float u_density;            // global density
 uniform float u_fogHeight;          // the height of the fog
-uniform float u_heightFallOff;
+uniform float u_heightFalloff;
 // uniform int u_halfSpace;
 uniform float u_startDist;          // the distance the fog start to appear
 uniform vec3 u_color;
@@ -43,12 +43,12 @@ void main(void) {
     // density affected by height
     // float fogDensity = u_density;
     // if (u_halfSpace) {
-    float fogDensity = u_density * exp( -u_heightFallOff * deltaFogHeight );
+    float fogDensity = u_density * exp( -u_heightFalloff * deltaFogHeight );
     // }
 
     vec3 worldPosition = (u_view.matInvView * vec4(viewPosition, 1.0)).xyz;
     float deltaObjHeight = u_view.position.y - worldPosition.y;     // the height offset between camera and object
-    float falloff = u_heightFallOff * deltaObjHeight;
+    float falloff = u_heightFalloff * deltaObjHeight;
 
     float fogFactor = (1.0 - exp2( -falloff )) / falloff;
 
