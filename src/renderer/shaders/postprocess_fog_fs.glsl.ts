@@ -5,10 +5,11 @@
  * https://zhuanlan.zhihu.com/p/76627240
  */
 export default /** glsl */`
-uniform float u_density;
+uniform float u_density;            // global density
 uniform vec3 u_color;
 uniform int u_halfSpace;
-uniform float u_height;
+uniform float u_distFallOff;
+uniform float u_heightFallOff;
 
 #include <uniforms_view>
 
@@ -36,7 +37,15 @@ void main(void) {
     vec3 viewPosition = getViewPosition(ex_texcoord, fragDepth, viewZ);
     float dist = length(viewPosition);
 
-    float fogAmount = clamp( 1.0 - exp( -dist * u_density ), 0.0, 1.0 );
+    // density affected by height
+    float heightDensity = u_density;
+    if (u_halfSpace) {
+        heightDensity = u_density * exp(-u_heightFallOff * viewPosition.y);
+    }
+
+    // multiply dist and height fog result? or use height density as input?
+
+    float fogAmount = clamp( 1.0 - exp( -dist * heightDensity ), 0.0, 1.0 );
 
     o_color = vec4(u_color, fogAmount);
 }
