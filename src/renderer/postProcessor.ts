@@ -686,10 +686,12 @@ export class PostProcessor {
         const heightFactor: number = Math.max(-127.0, this.fog.heightFalloff * (camera.position.y - this.fog.height));
         const heightDensity: number = this.fog.density * Math.pow(2.0, -heightFactor);
         
-        gl.uniform1f(this._fogProgram.getUniformLocation("u_fogHeightDensity"), heightDensity);
-        gl.uniform1f(this._fogProgram.getUniformLocation("u_heightFalloff"), this.fog.heightFalloff);
-        gl.uniform1f(this._fogProgram.getUniformLocation("u_startDist"), this.fog.startDistance);
-        gl.uniform1f(this._fogProgram.getUniformLocation("u_endDist"), this.fog.endDistance);
+        // gl.uniform1f(this._fogProgram.getUniformLocation("u_fogHeightDensity"), heightDensity);
+        // gl.uniform1f(this._fogProgram.getUniformLocation("u_heightFalloff"), this.fog.heightFalloff);
+        // gl.uniform1f(this._fogProgram.getUniformLocation("u_startDist"), this.fog.startDistance);
+        // gl.uniform1f(this._fogProgram.getUniformLocation("u_endDist"), this.fog.endDistance);
+        gl.uniform4f(this._fogProgram.getUniformLocation("u_fogParams"),
+            heightDensity, this.fog.heightFalloff, this.fog.startDistance, this.fog.endDistance);
         gl.uniform3f(this._fogProgram.getUniformLocation("u_color"), this.fog.color.x, this.fog.color.y, this.fog.color.z);
 
         // draw fullscreen rect

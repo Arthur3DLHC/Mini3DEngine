@@ -5,12 +5,22 @@
  * https://zhuanlan.zhihu.com/p/76627240
  */
 export default /** glsl */`
-uniform float u_fogHeightDensity;      // globalDesity * exp2( -u_heightFalloff * (camHeight - fogHeight) )
-uniform float u_heightFalloff;
-uniform float u_startDist;          // the distance the fog start to appear
-uniform float u_endDist;            // max distance; objects further will not be covered by fog
+// uniform float u_fogHeightDensity;      // globalDesity * exp2( -u_heightFalloff * (camHeight - fogHeight) )
+// uniform float u_heightFalloff;
+// uniform float u_startDist;          // the distance the fog start to appear
+// uniform float u_endDist;            // max distance; objects further will not be covered by fog
+
+// x: fogheightdensity, globalDesity * exp2( -u_heightFalloff * (camHeight - fogHeight) )
+// y: heightFalloff
+// z: startDist
+// w: endDist
+uniform vec4 u_fogParams;
 uniform vec3 u_color;
-// todo: max distance
+
+#define u_fogHeightDensity      u_fogParams.x
+#define u_heightFalloff         u_fogParams.y
+#define u_startDist             u_fogParams.z
+#define u_endDist               u_fogParams.w
 
 #include <uniforms_view>
 
