@@ -5,6 +5,8 @@ import postprocess_ssao_blur_fs from "./shaders/postprocess_ssao_blur_fs.glsl.js
 import postprocess_ssr_fs from "./shaders/postprocess_ssr_fs.glsl.js";
 import postprocess_composite_fs from "./shaders/postprocess_composite_fs.glsl.js";
 import postprocess_fog_fs from "./shaders/postprocess_fog_fs.glsl.js";
+import postprocess_fxaa_fs from "./shaders/postprocess_fxaa_fs.glsl.js";
+import postprocess_fxaa_vs from "./shaders/postprocess_fxaa_vs.glsl.js";
 import postprocess_tonemapping_fs from "./shaders/postprocess_tonemapping_fs.glsl.js";
 import postprocess_brightpass_fs from "./shaders/postprocess_brightpass_fs.glsl.js";
 import postprocess_blur_fs from "./shaders/postprocess_blur_fs.glsl.js";
@@ -105,6 +107,11 @@ export class PostProcessor {
         this._fogProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_fog_fs"]);
         this._fogProgram.build();
 
+        this._fxaaProgram = new ShaderProgram();
+        this._fxaaProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_fxaa_vs"]);
+        this._fxaaProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_fxaa_fs"]);
+        this._fxaaProgram.build();
+
         this._brightpassProgram = new ShaderProgram();
         this._brightpassProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
         this._brightpassProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_brightpass_fs"]);
@@ -138,6 +145,7 @@ export class PostProcessor {
         context.bindUniformBlocks(this._ssaoBlurProgram);
         context.bindUniformBlocks(this._ssrProgram);
         context.bindUniformBlocks(this._fogProgram);
+        context.bindUniformBlocks(this._fxaaProgram);
         context.bindUniformBlocks(this._brightpassProgram);
         context.bindUniformBlocks(this._gaussianBlurProgram);
         context.bindUniformBlocks(this._compositeProgram);
@@ -230,29 +238,13 @@ export class PostProcessor {
             this._bloomTintColors.push(1.0); this._bloomTintColors.push(1.0); this._bloomTintColors.push(1.0);
         }
 
-        // this._tempFullSwapFBO = [];
+        this._tmpTexture = new Texture2D(sceneDepthTex.width, sceneDepthTex.height, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT, false);
+        this._tmpTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.NEAREST, GLDevice.gl.NEAREST);
+        this._tmpTexture.create();
 
-        // for(let i = 0; i < 2; i++)
-        // {
-        //     const swapFBO = new FrameBuffer();
-
-        //     const swapTexture = new Texture2D();
-        //     swapTexture.width = width;
-        //     swapTexture.height = height;
-        //     swapTexture.depth = 1;
-        //     swapTexture.mipLevels = 1;
-        //     swapTexture.format = GLDevice.gl.RGBA;
-        //     swapTexture.componentType = GLDevice.gl.HALF_FLOAT;
-        //     swapTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
-        //     swapTexture.create();
-
-        //     swapFBO.setTexture(0, swapTexture);
-        //     swapFBO.prepare();
-    
-        //     this._tempFullSwapFBO.push(swapFBO);
-        // }
-
-        // this._curOutputFBOIdx = 0;
+        this._tmpFBO = new FrameBuffer();
+        this._tmpFBO.attachTexture(0, this._tmpTexture);
+        this._tmpFBO.prepare();
 
         // diable alpha blending
         this._renderStates = new RenderStateSet();
@@ -292,6 +284,7 @@ export class PostProcessor {
         if (this._ssaoBlurProgram) { this._ssaoBlurProgram.release(); }
         if (this._ssrProgram) { this._ssrProgram.release(); }
         if (this._fogProgram) { this._fogProgram.release(); }
+        if (this._fxaaProgram) { this._fxaaProgram.release(); }
         if (this._brightpassProgram) { this._brightpassProgram.release(); }
         if (this._gaussianBlurProgram) { this._gaussianBlurProgram.release(); }
         if (this._compositeProgram) { this._compositeProgram.release(); }
@@ -307,6 +300,8 @@ export class PostProcessor {
         for (const fbo of this._bloomVertiFBOs) {if (fbo) fbo.release();}
         this._bloomHorizTextures = [];
         this._bloomHorizFBOs = [];
+        if (this._tmpFBO) {this._tmpFBO.release();}
+        if (this._tmpTexture) {this._tmpTexture.release();}
         if (this._rectGeom) { this._rectGeom.destroy(); }
     }
 
@@ -332,6 +327,7 @@ export class PostProcessor {
     private _ssaoBlurProgram: ShaderProgram;
     private _ssrProgram: ShaderProgram;
     private _fogProgram: ShaderProgram;
+    private _fxaaProgram: ShaderProgram;
     private _brightpassProgram: ShaderProgram;
     private _gaussianBlurProgram: ShaderProgram;
     private _compositeProgram: ShaderProgram;
@@ -363,6 +359,13 @@ export class PostProcessor {
     private _bloomVertiTextures: Texture2D[];
     private _bloomHorizFBOs: FrameBuffer[];
     private _bloomVertiFBOs: FrameBuffer[];
+
+    /**
+     * full - size temporary render target
+     * now used by fxaa
+     */
+    private _tmpTexture: Texture2D;
+    private _tmpFBO: FrameBuffer;
 
     private _bloomTexUniforms: string[];
     private _bloomLevelFactors: number[] = [1.0, 0.8, 0.6, 0.4, 0.2];
@@ -457,6 +460,11 @@ export class PostProcessor {
             this.applyBloom();
         }
         this.applyToneMapping();
+
+        // fxaa only works after tone mapping
+        if (this.fxaa.enable) {
+            this.applyFXAA();
+        }
     }
     
     private setTexture(location: WebGLUniformLocation | null, unit: number, texture: Texture) {
@@ -723,15 +731,17 @@ export class PostProcessor {
             return;
         }
 
-        // 在整个渲染流程的最后向主屏幕输出
-        // 在场景画面输出之后再绘制 UI等
-        GLDevice.renderTarget = null;
+        if (this.fxaa.enable) {
+            // todo: 需要向一个 LDR 的 RT 输出，用于 FXAA
+            GLDevice.renderTarget = this._tmpFBO;
+        } else {
+            GLDevice.renderTarget = null;
+        }
         gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
         gl.scissor(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
 
         this._renderStates.apply();
 
-        // 暂时先只做 tonemapping，将来再加 bloom
         GLPrograms.useProgram(this._toneMappingProgram);
         this.setTexture(this._toneMappingProgram.getUniformLocation("s_sceneColor"), this._customTexStartUnit, sourceImage);
         gl.uniform1i(this._toneMappingProgram.getUniformLocation("u_Enable"), this.enableToneMapping ? 1 : 0);
@@ -815,5 +825,20 @@ export class PostProcessor {
         for(let i = 0; i < this._numBloomLevels; i++) {
             GLTextures.setTextureAt(this._customTexStartUnit + i, null);
         }
+    }
+
+    private applyFXAA() {
+
+        const gl = GLDevice.gl;
+        GLDevice.renderTarget = null;
+        gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+        gl.scissor(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+        this._renderStates.apply();
+
+        GLPrograms.useProgram(this._fxaaProgram);
+        this.setTexture(this._fxaaProgram.getUniformLocation("s_source"), this._customTexStartUnit, this._tmpTexture);
+        gl.uniform2f(this._fxaaProgram.getUniformLocation("u_texelSize"), 1.0 / this._tmpTexture.width, 1.0 / this._tmpTexture.height);
+        this._rectGeom.draw(0, Infinity, this._fxaaProgram.attributes);
+        GLTextures.setTextureAt(this._customTexStartUnit, null);
     }
 }
