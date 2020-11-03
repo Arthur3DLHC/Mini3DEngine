@@ -688,7 +688,8 @@ export class PostProcessor {
         
         gl.uniform1f(this._fogProgram.getUniformLocation("u_fogHeightDensity"), heightDensity);
         gl.uniform1f(this._fogProgram.getUniformLocation("u_heightFalloff"), this.fog.heightFalloff);
-        gl.uniform1f(this._fogProgram.getUniformLocation("u_startDist"), this.fog.startDist);
+        gl.uniform1f(this._fogProgram.getUniformLocation("u_startDist"), this.fog.startDistance);
+        gl.uniform1f(this._fogProgram.getUniformLocation("u_endDist"), this.fog.endDistance);
         gl.uniform3f(this._fogProgram.getUniformLocation("u_color"), this.fog.color.x, this.fog.color.y, this.fog.color.z);
 
         // draw fullscreen rect

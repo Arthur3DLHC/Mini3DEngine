@@ -11,7 +11,8 @@ export class FogParams {
         // this.halfSpace = false;
         this.height = 0;
         this.heightFalloff = 1;
-        this.startDist = 0;
+        this.startDistance = 0;
+        this.endDistance = 1000;
     }
 
     public enable: boolean;
@@ -35,5 +36,10 @@ export class FogParams {
     /**
      * the dist the fog start to appear
      */
-    public startDist: number;
+    public startDistance: number;
+
+    /**
+     * the dist the fog end. objects further will not be covered by fog
+     */
+    public endDistance: number;
 }

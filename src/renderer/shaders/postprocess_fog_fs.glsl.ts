@@ -5,11 +5,10 @@
  * https://zhuanlan.zhihu.com/p/76627240
  */
 export default /** glsl */`
-// uniform float u_density;            // global density
 uniform float u_fogHeightDensity;      // globalDesity * exp2( -u_heightFalloff * (camHeight - fogHeight) )
 uniform float u_heightFalloff;
-// uniform int u_halfSpace;
 uniform float u_startDist;          // the distance the fog start to appear
+uniform float u_endDist;            // max distance; objects further will not be covered by fog
 uniform vec3 u_color;
 // todo: max distance
 
@@ -38,6 +37,10 @@ void main(void) {
     float viewZ = perspectiveDepthToViewZ(fragDepth, u_view.zRange.x, u_view.zRange.y);
     vec3 viewPosition = getViewPosition(ex_texcoord, fragDepth, viewZ);
     float dist = length(viewPosition);
+
+    if (dist > u_endDist) {
+        discard;
+    }
 
     // density affected by height
     // float fogDensity = u_density * exp2( -u_heightFalloff * (u_view.position.y - u_fogHeight) );

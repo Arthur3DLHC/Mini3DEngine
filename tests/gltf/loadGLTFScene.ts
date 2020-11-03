@@ -40,7 +40,8 @@ window.onload = () => {
     renderer.postprocessor.fog.density = 0.5;
     renderer.postprocessor.fog.height = 0.5;
     renderer.postprocessor.fog.heightFalloff = 5;
-    renderer.postprocessor.fog.startDist = 1.5;
+    renderer.postprocessor.fog.startDistance = 1.5;
+    renderer.postprocessor.fog.endDistance = 15;
 
     const scene = new Scene();
     const camera = new PerspectiveCamera();
