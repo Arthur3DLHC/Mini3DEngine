@@ -76,6 +76,12 @@ export class PostProcessor {
         if (GLPrograms.shaderCodes["postprocess_bloom_composite_fs"] === undefined) {
             GLPrograms.shaderCodes["postprocess_bloom_composite_fs"] = postprocess_bloom_composite_fs;
         }
+        if (GLPrograms.shaderCodes["postprocess_fxaa_fs"] === undefined) {
+            GLPrograms.shaderCodes["postprocess_fxaa_fs"] = postprocess_fxaa_fs;
+        }
+        if (GLPrograms.shaderCodes["postprocess_fxaa_vs"] === undefined) {
+            GLPrograms.shaderCodes["postprocess_fxaa_vs"] = postprocess_fxaa_vs;
+        }
 
         if (GLPrograms.shaderCodes["samplers_postprocess"] === undefined) {
             GLPrograms.shaderCodes["samplers_postprocess"] = samplers_postprocess;
@@ -239,7 +245,7 @@ export class PostProcessor {
         }
 
         this._tmpTexture = new Texture2D(sceneDepthTex.width, sceneDepthTex.height, 1, 1, GLDevice.gl.RGBA, GLDevice.gl.HALF_FLOAT, false);
-        this._tmpTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.NEAREST, GLDevice.gl.NEAREST);
+        this._tmpTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
         this._tmpTexture.create();
 
         this._tmpFBO = new FrameBuffer();

@@ -6,8 +6,7 @@
  */
 export default /** glsl */`
 uniform sampler2D s_source;
-
-
+uniform vec2 u_texelSize;
 
 in vec2 ex_texcoord;
 in vec2 ex_texcoordS;
@@ -28,12 +27,16 @@ const vec3 kLumaCoefficients = vec3(0.2126, 0.7152, 0.0722);
 #define FxaaLuma(rgba) dot(rgba.rgb, kLumaCoefficients)
 
 void main(void) {
-vec2 posM;
+	// o_color = texture(s_source, ex_texcoord);
+	// o_color = vec4(1.0, 0.0, 0.0, 1.0);
+	// return;
 
-	posM.x = vUV.x;
-	posM.y = vUV.y;
+	vec2 posM;
 
-	vec4 rgbyM = texture(s_source, vUV, 0.0);
+	posM.x = ex_texcoord.x;
+	posM.y = ex_texcoord.y;
+
+	vec4 rgbyM = texture(s_source, ex_texcoord, 0.0);
 	float lumaM = FxaaLuma(rgbyM);
 	float lumaS = FxaaLuma(texture(s_source, ex_texcoordS, 0.0));
 	float lumaE = FxaaLuma(texture(s_source, ex_texcoordE, 0.0));
@@ -82,7 +85,7 @@ vec2 posM;
 	float edgeHorz = abs(edgeHorz3) + edgeHorz4;
 	float edgeVert = abs(edgeVert3) + edgeVert4;
 	float subpixNWSWNESE = lumaNWSW + lumaNESE;
-	float lengthSign = texelSize.x;
+	float lengthSign = u_texelSize.x;
 	bool horzSpan = edgeHorz >= edgeVert;
 	float subpixA = subpixNSWE * 2.0 + subpixNWSWNESE;
 
@@ -98,7 +101,7 @@ vec2 posM;
 
 	if (horzSpan) 
 	{
-		lengthSign = texelSize.y;
+		lengthSign = u_texelSize.y;
 	}
 
 	float subpixB = (subpixA * (1.0 / 12.0)) - lumaM;
@@ -122,8 +125,8 @@ vec2 posM;
 
 	vec2 offNP;
 
-	offNP.x = (!horzSpan) ? 0.0 : texelSize.x;
-	offNP.y = (horzSpan) ? 0.0 : texelSize.y;
+	offNP.x = (!horzSpan) ? 0.0 : u_texelSize.x;
+	offNP.y = (horzSpan) ? 0.0 : u_texelSize.y;
 
 	if (!horzSpan) 
 	{
