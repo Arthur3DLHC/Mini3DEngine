@@ -1,5 +1,8 @@
 /**
  * fxaa vertex shader
+ * mostly from babylon.js
+ * https://github.com/BabylonJS/Babylon.js/blob/master/src/Shaders/fxaa.vertex.fx
+ * with some modifications
  */
 export default /** glsl */`
 // uniforms

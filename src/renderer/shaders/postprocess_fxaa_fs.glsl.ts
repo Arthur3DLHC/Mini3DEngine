@@ -1,6 +1,8 @@
 /**
  * fxaa fragment shader
  * mostly from babylon.js
+ * https://github.com/BabylonJS/Babylon.js/blob/master/src/Shaders/fxaa.fragment.fx
+ * with some modifications
  */
 export default /** glsl */`
 uniform sampler2D s_source;
