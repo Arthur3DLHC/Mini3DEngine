@@ -279,10 +279,10 @@ export class PostProcessor {
 
         this._blurUnitOffset = new vec2();
 
-        this.ssao = new SSAOParams();
-        this.ssr = new SSRParams();
-        this.bloom = new BloomParams();
-        this.fog = new FogParams();
+        this._ssao = new SSAOParams();
+        this._ssr = new SSRParams();
+        this._bloom = new BloomParams();
+        this._fog = new FogParams();
     }
 
     public release() {
@@ -309,14 +309,18 @@ export class PostProcessor {
     }
 
     //public enableFXAA: boolean = true;
-    //public enableGlow: boolean = true;
     public enableToneMapping: boolean = true;
     // todo: other post processing effects: color grading, glow...
 
-    public ssao: SSAOParams;
-    public ssr: SSRParams;
-    public bloom: BloomParams;
-    public fog: FogParams;
+    public get ssao(): SSAOParams {return this._ssao;}
+    public get ssr(): SSRParams {return this._ssr;}
+    public get bloom(): BloomParams {return this._bloom;}
+    public get fog(): FogParams {return this._fog;}
+
+    private _ssao: SSAOParams;
+    private _ssr: SSRParams;
+    private _bloom: BloomParams;
+    private _fog: FogParams;
 
     // shaders
 
@@ -476,6 +480,7 @@ export class PostProcessor {
 
     private applySSAO() {
         const gl = GLDevice.gl;
+        const ssao = this._ssao;
         
         // 1. render ssao to half res result texture
 
@@ -510,16 +515,16 @@ export class PostProcessor {
         
         // calc texel size
         gl.uniform2f(this._ssaoProgram.getUniformLocation("u_texelSize"), texelW, texelH);
-        gl.uniform2f(this._ssaoProgram.getUniformLocation("u_noiseTexelSize"), 1.0 / this.ssao.noiseTexture.width, 1.0 / this.ssao.noiseTexture.height);
+        gl.uniform2f(this._ssaoProgram.getUniformLocation("u_noiseTexelSize"), 1.0 / ssao.noiseTexture.width, 1.0 / this.ssao.noiseTexture.height);
 
         // 3d sample kernels
-        gl.uniform3fv(this._ssaoProgram.getUniformLocation("u_kernel"), this.ssao.kernels);
+        gl.uniform3fv(this._ssaoProgram.getUniformLocation("u_kernel"), ssao.kernels);
 
         // params
         // fix me: pack these together to a vec3? call gl api only 1 time
-        gl.uniform1f(this._ssaoProgram.getUniformLocation("u_radius"), this.ssao.radius);
-        gl.uniform1f(this._ssaoProgram.getUniformLocation("u_minDistance"), this.ssao.minDistance);
-        gl.uniform1f(this._ssaoProgram.getUniformLocation("u_maxDistance"), this.ssao.maxDistance);
+        gl.uniform1f(this._ssaoProgram.getUniformLocation("u_radius"), ssao.radius);
+        gl.uniform1f(this._ssaoProgram.getUniformLocation("u_minDistance"), ssao.minDistance);
+        gl.uniform1f(this._ssaoProgram.getUniformLocation("u_maxDistance"), ssao.maxDistance);
 
         // draw fullscr rect
         this._rectGeom.draw(0, Infinity, this._ssaoProgram.attributes);
@@ -555,13 +560,13 @@ export class PostProcessor {
         // uniform float u_offset;
         texelW = 1.0 / this._ssaoTexture.width;
         texelH = 1.0 / this._ssaoTexture.height;
-        gl.uniform2f(this._ssaoBlurProgram.getUniformLocation("u_offset"), this.ssao.blurSize * texelW, this.ssao.blurSize * texelH);
+        gl.uniform2f(this._ssaoBlurProgram.getUniformLocation("u_offset"), ssao.blurSize * texelW, this.ssao.blurSize * texelH);
 
         // uniform float u_intensity;
-        gl.uniform1f(this._ssaoBlurProgram.getUniformLocation("u_intensity"), this.ssao.intensiy);
+        gl.uniform1f(this._ssaoBlurProgram.getUniformLocation("u_intensity"), ssao.intensiy);
 
         // uniform float u_power;
-        gl.uniform1f(this._ssaoBlurProgram.getUniformLocation("u_power"), this.ssao.power);
+        gl.uniform1f(this._ssaoBlurProgram.getUniformLocation("u_power"), ssao.power);
 
         this._rectGeom.draw(0, Infinity, this._ssaoBlurProgram.attributes);
 
@@ -595,15 +600,16 @@ export class PostProcessor {
 
         // uniforms
         // all uniform values are inited in glsl code
-        gl.uniform1f(this._ssrProgram.getUniformLocation("maxRayDistance"), this.ssr.maxRayDistance);
-        gl.uniform1f(this._ssrProgram.getUniformLocation("pixelStride"), this.ssr.pixelStride);
-        gl.uniform1f(this._ssrProgram.getUniformLocation("pixelStrideZCutoff"), this.ssr.pixelStrideZCutoff);
-        gl.uniform1f(this._ssrProgram.getUniformLocation("screenEdgeFadeStart"), this.ssr.screenEdgeFadeStart);
-        gl.uniform1f(this._ssrProgram.getUniformLocation("eyeFadeStart"), this.ssr.eyeFadeStart);
-        gl.uniform1f(this._ssrProgram.getUniformLocation("eyeFadeEnd"), this.ssr.eyeFadeEnd);
-        gl.uniform1f(this._ssrProgram.getUniformLocation("minGlossiness"), this.ssr.minGlossiness);
-        gl.uniform1f(this._ssrProgram.getUniformLocation("zThicknessThreshold"), this.ssr.zThicknessThreshold);
-        gl.uniform1f(this._ssrProgram.getUniformLocation("jitterOffset"), this.ssr.jitterOffset);
+        const ssr = this._ssr;
+        gl.uniform1f(this._ssrProgram.getUniformLocation("maxRayDistance"), ssr.maxRayDistance);
+        gl.uniform1f(this._ssrProgram.getUniformLocation("pixelStride"), ssr.pixelStride);
+        gl.uniform1f(this._ssrProgram.getUniformLocation("pixelStrideZCutoff"), ssr.pixelStrideZCutoff);
+        gl.uniform1f(this._ssrProgram.getUniformLocation("screenEdgeFadeStart"), ssr.screenEdgeFadeStart);
+        gl.uniform1f(this._ssrProgram.getUniformLocation("eyeFadeStart"), ssr.eyeFadeStart);
+        gl.uniform1f(this._ssrProgram.getUniformLocation("eyeFadeEnd"), ssr.eyeFadeEnd);
+        gl.uniform1f(this._ssrProgram.getUniformLocation("minGlossiness"), ssr.minGlossiness);
+        gl.uniform1f(this._ssrProgram.getUniformLocation("zThicknessThreshold"), ssr.zThicknessThreshold);
+        gl.uniform1f(this._ssrProgram.getUniformLocation("jitterOffset"), ssr.jitterOffset);
 
         this._rectGeom.draw(0, Infinity, this._ssrProgram.attributes);
 
@@ -659,6 +665,7 @@ export class PostProcessor {
 
     applyFog(camera: Camera) {
         const gl = GLDevice.gl;
+        const fog = this._fog;
         // render target
         GLDevice.renderTarget = this._postProcessFBO;
         gl.viewport(0, 0, this._sceneDepthTexture.width, this._sceneDepthTexture.height);
@@ -684,15 +691,15 @@ export class PostProcessor {
         // calc fog height density
         // exp2(x) in glsl means pow(2, x)
         const heightFactor: number = Math.max(-127.0, this.fog.heightFalloff * (camera.position.y - this.fog.height));
-        const heightDensity: number = this.fog.density * Math.pow(2.0, -heightFactor);
+        const heightDensity: number = fog.density * Math.pow(2.0, -heightFactor);
         
         // gl.uniform1f(this._fogProgram.getUniformLocation("u_fogHeightDensity"), heightDensity);
         // gl.uniform1f(this._fogProgram.getUniformLocation("u_heightFalloff"), this.fog.heightFalloff);
         // gl.uniform1f(this._fogProgram.getUniformLocation("u_startDist"), this.fog.startDistance);
         // gl.uniform1f(this._fogProgram.getUniformLocation("u_endDist"), this.fog.endDistance);
         gl.uniform4f(this._fogProgram.getUniformLocation("u_fogParams"),
-            heightDensity, this.fog.heightFalloff, this.fog.startDistance, this.fog.endDistance);
-        gl.uniform3f(this._fogProgram.getUniformLocation("u_color"), this.fog.color.x, this.fog.color.y, this.fog.color.z);
+            heightDensity, fog.heightFalloff, fog.startDistance, fog.endDistance);
+        gl.uniform3f(this._fogProgram.getUniformLocation("u_color"), fog.color.x, fog.color.y, fog.color.z);
 
         // draw fullscreen rect
         this._rectGeom.draw(0, Infinity, this._fogProgram.attributes);
