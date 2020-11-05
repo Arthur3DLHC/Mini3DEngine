@@ -515,15 +515,16 @@ TODO:       主要类结构
                     Cache key: shader code key, features;
                     程序的最开始，需要把 shader code 注册到全局列表
 
-            半透明物体的绘制？
+            ** 半透明物体的绘制？
                 需要由远到近排序？按照物体中心点；
-                先测试不排序的绘制；
-                是否使用OIT？
-                测试半透明物体的 Demo
                 半透明shader中应该应用 reflection probe, 而不是 diffuse probe?
-                    复习一下 DOOM 中是怎么做的
+                    否则玻璃等物体就没有环境反射了
                     在 default_pbr shader 中通过材质不透明度判断？
                     或者单写一个半透明的 shader？
+                    应该根据不透明度决定用多少 diffuse probe 和 reflection probe
+
+            优化 shader 效率？
+                目标 60 fps on GTX1660
 
             绘制光源和 envProbe 的调试图元
                 差光源的；
@@ -532,7 +533,7 @@ TODO:       主要类结构
                 如果平行光指定了半径和距离，则以外的部分不应产生光照？
                     目前光范围边缘会有个缝，漏光；可能是阴影图集采样不准确引起的
 
-            阴影继续优化：柔化边缘
+            ## 阴影继续优化：柔化边缘(不着急)
                 方差阴影？或者加入线性插值？
                     取四点PCF，然后做线性插值？
 
@@ -545,8 +546,10 @@ TODO:       主要类结构
                 Height fog；包含 noise?
                 FXAA
                 转场特效：渐入渐出，黑屏白屏；
+                    能否集成在 tonemapping 里？就不用再多一次绘制和一个RT了
                 色调调整：通过颜色 LUT
-                景深；
+                    能否也集成在 tonemapping 里？
+                景深；不着急做
 
             相机动画；
                 从 Blender 导出；
@@ -555,8 +558,11 @@ TODO:       主要类结构
 
             有法线贴图时法线扭曲问题
                 可能是通过梯度计算切向空间不准确引起的？
+                支持模型中的切向数据；
+                    shader 中 u_object 加一个标志：是否具有切线数据
+                    blender 导出 gltf 时勾选导出切线
 
-            GameScene 管理
+            ** GameScene 管理
                 参考 Phaser 和 PIXI.js？
                 H-Game Demo 场景管理和简单逻辑；
             
@@ -624,7 +630,7 @@ TODO:       主要类结构
 
             Clustered 光源、envmap、irradiance volume
 
-            ## 非 Cluster 时也做一下光源等的视见体剔除，以加快 reflect probe 和 irradiance probe 的生成速度?
+            xx 非 Cluster 时也做一下光源等的视见体剔除，以加快 reflect probe 和 irradiance probe 的生成速度?
                 暂时没有必要，因为 env probe 的贴图尺寸都很小；可能做了还没有不做快
 
             户外阴影方案
@@ -650,9 +656,11 @@ TODO:       主要类结构
                     使用 json 定义 object prefab 对象；
 
             Volume Rendering?
-                SDF
-                体积雾；全局雾；
-                雾带光照，并取样 shadowmap？
+                带高度渐变的全局雾；
+                SDF；
+                体积雾；
+                    体积雾带光照，并取样 shadowmap？
+                    Raymarch
 
         物理系统
             考虑使用 Cannon.es: https://github.com/pmndrs/cannon-es
