@@ -3,11 +3,11 @@ shader 命名规范
         第一个字母小写；其余单词按驼峰命名法，单词之间不加下划线；
 
         变量前缀
-            uniform blocks：        u_
+            uniform (blocks)：      u_
             uniforms in block:
                 矩阵：              mat
-                texture sampler:    s?
                 其他类型变量不加前缀
+            texture sampler:        s_
             vertex attributes:      a_
             vertex shader output / fragment shader input: ex_
             
