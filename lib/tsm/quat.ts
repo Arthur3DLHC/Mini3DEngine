@@ -98,6 +98,10 @@ export default class quat {
         this.values[index] = value;
     }
 
+    setComponents(x: number, y: number, z: number, w: number) {
+        this.x = x; this.y = y; this.z = z; this.w = w;
+    }
+
     reset(): void {
         for (let i = 0; i < 4; i++) {
             this.values[i] = 0

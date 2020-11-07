@@ -3,5 +3,5 @@
 import * as Cannon from "cannon-es";
 
 export class PhysicsWorld {
-    world: Cannon.World | null = null;
+    public world: Cannon.World | null = null;
 }

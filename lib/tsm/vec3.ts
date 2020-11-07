@@ -81,6 +81,12 @@ export default class vec3 {
         this._values[index] = value;
     }
 
+    setComponents(x: number, y: number, z: number) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
     reset(): void {
         this.x = 0
         this.y = 0
