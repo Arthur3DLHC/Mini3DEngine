@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset, Object3D, BoundingRenderModes, ActionSelector, SkinMesh, ActionStateMachine, ActionState, AnimationAction, ActionTransition, TimeUpCondition, ActionCondition, AnimationLoopMode, ActionStateSingle } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset, Object3D, BoundingRenderModes, ActionSelector, SkinMesh, ActionStateMachine, ActionState, AnimationAction, ActionTransition, TimeUpCondition, ActionCondition, AnimationLoopMode, ActionStateSingleAnim } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
@@ -408,7 +408,7 @@ window.onload = () => {
         }
     }
 
-    function setAnimationFor(state: ActionStateSingle, animName: string, repeat: boolean, animations: AnimationAction[]) {
+    function setAnimationFor(state: ActionStateSingleAnim, animName: string, repeat: boolean, animations: AnimationAction[]) {
         const anim = animations.find((action: AnimationAction) => {return action.name === animName});
         if (anim !== undefined) {
             state.animation = anim;
@@ -418,7 +418,7 @@ window.onload = () => {
         }
     }
 
-    function addNewState(character: Object3D, stateMachine: ActionStateMachine, stateName: string, animRepeat: boolean, stateAnimNames: Map<string, string>, animations: AnimationAction[], locations: Map<string, Object3D>, callback:((state: MakePoseState) => void)|null): ActionStateSingle {
+    function addNewState(character: Object3D, stateMachine: ActionStateMachine, stateName: string, animRepeat: boolean, stateAnimNames: Map<string, string>, animations: AnimationAction[], locations: Map<string, Object3D>, callback:((state: MakePoseState) => void)|null): ActionStateSingleAnim {
         const animName = stateAnimNames.get(stateName);
         if (animName === undefined) {
             throw new Error("Make animation not found:" + stateName);

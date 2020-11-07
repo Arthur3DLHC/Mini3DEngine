@@ -2,7 +2,7 @@ import { Clock } from "../../scene/clock.js";
 import { AnimationAction } from "../animationAction.js";
 import { ActionState } from "./actionState.js";
 
-export class ActionStateSingle extends ActionState {
+export class ActionStateSingleAnim extends ActionState {
     public constructor(name: string) {
         super(name);
         this.animation = null;
