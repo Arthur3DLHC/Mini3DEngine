@@ -2,6 +2,7 @@
 export * from "./animation/actionSelector.js";
 export * from "./animation/stateMachine/actionCondition.js";
 export * from "./animation/stateMachine/actionState.js";
+export * from "./animation/stateMachine/actionStateSingle.js";
 export * from "./animation/stateMachine/actionStateMachine.js";
 export * from "./animation/stateMachine/actionTransition.js";
 export * from "./animation/stateMachine/timeUpCondition.js";

@@ -10,15 +10,13 @@ export class ActionState {
     public constructor(name: string) {
         this._name = name;
         this.machine = null;
-        this.animation = null;
     }
 
     public machine: ActionStateMachine | null;
     private _name: string;
     public get name(): string {return this._name;}
 
-    // hold the animationAction of this state?
-    public animation: AnimationAction | null;
+    // todo: can either hold an animationAction or a blend tree;
 
     public transitions: ActionTransition[] = [];
 
@@ -29,10 +27,6 @@ export class ActionState {
     public update() {
         // check the current select action request
         // need to add another behavior to record current select action request?
-        if (this.animation !== null) {
-            this.animation.update(Clock.instance.curTime, Clock.instance.elapsedTime);
-        }
-
         for (const trans of this.transitions) {
             trans.checkTransit();
         }
@@ -42,20 +36,12 @@ export class ActionState {
      * subclass can play animation, sound and so on in this method
      */
     public enter() {
-        // play action animation
-        if (this.animation !== null) {
-            this.animation.reset();
-            this.animation.play();
-        }
-
         for (const transition of this.transitions) {
             transition.resetConditions();
         }
     }
 
     public exit() {
-        if (this.animation !== null) {
-            this.animation.stop();
-        }
+
     }
 }
