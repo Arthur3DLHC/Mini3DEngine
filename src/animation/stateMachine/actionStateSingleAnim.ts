@@ -19,6 +19,7 @@ export class ActionStateSingleAnim extends ActionState {
     }
 
     public enter() {
+        super.enter();
         // play action animation
         if (this.animation !== null) {
             this.animation.reset();
@@ -27,6 +28,7 @@ export class ActionStateSingleAnim extends ActionState {
     }
 
     public exit() {
+        super.exit();
         if (this.animation !== null) {
             this.animation.stop();
         }
