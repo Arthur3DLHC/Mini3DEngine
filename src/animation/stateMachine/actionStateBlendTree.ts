@@ -1,3 +1,4 @@
+import { AnimationBlendNode } from "../blendTree/animationBlendNode.js";
 import { ActionState } from "./actionState.js";
 
 /**
@@ -10,4 +11,5 @@ export class ActionStateBlendTree extends ActionState {
     }
 
     // todo: hold the animation blend tree
+    public rootNode: AnimationBlendNode | null = null;
 }
