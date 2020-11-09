@@ -672,6 +672,7 @@ TODO:       主要类结构
 
         物理系统
             考虑使用 Cannon.es: https://github.com/pmndrs/cannon-es
+            需要将 Cannon.es 的对象封装起来，因为前端应用代码无法直接 import cannon-es.js
             带物理的第一人称控制：https://github.com/mrdoob/three.js/blob/master/examples/js/controls/PointerLockControls.js
             场景物理对象的加载：参考 https://doc.babylonjs.com/how_to/using_the_physics_engine
             从 gltf 读取物理碰撞体到 cannon.js:
@@ -679,3 +680,4 @@ TODO:       主要类结构
                 在 Blender 中使用单位尺寸的物体；通过缩放控制形状和尺寸；给一个自定义属性表明是物理碰撞体，以及形状类别
                 在 gltfSceneBuilder 中，当读取到此类物体时，设置其为不可见，并创建为物理碰撞体类型对象
                 写一个物理场景生成器，遍历 scene 的节点，当节点是物理碰撞体时，根据其形状和变换信息，生成 Cannon.js 刚体对象
+            
