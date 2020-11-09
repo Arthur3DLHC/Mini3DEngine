@@ -1,10 +1,9 @@
-/// <reference path = "../../tsDefinitions/cannon-es.d.ts" />
-import * as Cannon from "cannon-es";
+/// <reference path = "../../tsDefinitions/cannon.d.ts" />
 import { MathConverter } from "./mathConverter.js";
 import { PhysicsBehavior } from "./physicsBehavior.js";
 
 export class RigidBody extends PhysicsBehavior {
-    public body: Cannon.Body | null = null;
+    public body: CANNON.Body | null = null;
 
     // encapsulate a cannon.es Body object ?
     public update() {

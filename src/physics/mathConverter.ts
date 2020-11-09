@@ -1,5 +1,4 @@
-/// <reference path = "../../tsDefinitions/cannon-es.d.ts" />
-import * as Cannon from "cannon-es";
+/// <reference path = "../../tsDefinitions/cannon.d.ts" />
 import quat from "../../lib/tsm/quat.js";
 import vec3 from "../../lib/tsm/vec3.js";
 
@@ -7,12 +6,12 @@ import vec3 from "../../lib/tsm/vec3.js";
  * physics math types <-> TMS math types
  */
 export class MathConverter {
-    public static CannonToTSMVec3(src: Cannon.Vec3, dest: vec3) {
+    public static CannonToTSMVec3(src: CANNON.Vec3, dest: vec3) {
         // dest.x = src.x; dest.y = src.y; dest.z = src.z;
         dest.setComponents(src.x, src.y, src.z);
     }
 
-    public static CannonToTSMQuat(src: Cannon.Quaternion, dest: quat) {
+    public static CannonToTSMQuat(src: CANNON.Quaternion, dest: quat) {
         dest.setComponents(src.x, src.y, src.z, src.w);
     }
 }

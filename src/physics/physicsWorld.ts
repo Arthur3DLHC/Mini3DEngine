@@ -1,10 +1,12 @@
-/// <reference path = "../../tsDefinitions/cannon-es.d.ts" />
+/// <reference path = "../../tsDefinitions/cannon.d.ts" />
 
-import * as Cannon from "cannon-es";
 import { Clock } from "../scene/clock.js";
 
 export class PhysicsWorld {
-    public world: Cannon.World | null = null;
+    public constructor() {
+        this.world = new CANNON.World();
+    }
+    public world: CANNON.World | null;
 
     public step() {
         if (this.world) {
