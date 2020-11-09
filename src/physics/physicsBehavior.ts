@@ -14,7 +14,7 @@ export class PhysicsBehavior extends Behavior {
     public get world() { return this._world; }
 
     public update() {
-
+        // subclasses do actual works
     }
 
     private _world: PhysicsWorld;

@@ -514,12 +514,11 @@ TODO:       主要类结构
                     阴影 bias 增大；阴影内部不使用次表面反射；
 
             支持材质自定义 Shader？
-                不紧急
                 非物理材质比如卡通材质
                 粒子系统，特效等；
                 Shader Cache 机制
                     Cache key: shader code key, features;
-                    程序的最开始，需要把 shader code 注册到全局列表
+                    程序的最开始，需要手动把要用到的所有自定义 shader code 注册到全局列表？
 
             ** 半透明物体的绘制？
                 需要由远到近排序？按照物体中心点；
