@@ -635,8 +635,8 @@ TODO:       主要类结构
                 由于不太好从 Blender 导出 Decal 在图集中的纹理坐标，暂时不着急实现
 
             Clustered 光源、envmap、irradiance volume
-            当视场角等投影参数变化时，更新 Cluster 的逻辑；
-            继续优化 CPU 端的 Cluster 检测？
+                当视场角等投影参数变化时，更新 Cluster 的逻辑；
+                继续优化 CPU 端的 Cluster 检测？
 
             xx 非 Cluster 时也做一下光源等的视见体剔除，以加快 reflect probe 和 irradiance probe 的生成速度?
                 暂时没有必要，因为 env probe 的贴图尺寸都很小；可能做了还没有不做快
@@ -649,6 +649,7 @@ TODO:       主要类结构
                 使用 GPU 计算 particle: transform feedback
                     https://gpfault.net/posts/webgl2-particles.txt.html
                 粒子物理：可以通过深度图获得场景位置，在 GPU 计算碰撞？https://nullprogram.com/webgl-particles/
+                使用一个默认的粒子系统 shader ？以及对应的粒子系统材质类？
 
             考虑技能特效等怎么实现；
                 刀光、击中特效等
