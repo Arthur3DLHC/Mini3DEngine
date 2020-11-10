@@ -4,9 +4,15 @@ import { Clock } from "../scene/clock.js";
 
 export class PhysicsWorld {
     public constructor() {
-        this.world = new CANNON.World();
+        this._world = new CANNON.World();
     }
-    public world: CANNON.World | null;
+
+    public get world(): CANNON.World
+    {
+        return this._world;
+    }
+
+    private _world: CANNON.World;
 
     public step() {
         if (this.world) {
