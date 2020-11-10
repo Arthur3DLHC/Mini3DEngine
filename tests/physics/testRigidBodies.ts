@@ -56,7 +56,8 @@ window.onload = () => {
         fpsBehavior.onKeyUp(ev);
     }
 
-    // todo: test multiple objects in scene at same time
+    // todo: add multiple objects with physics shapes to scene
+    // both dynamics and statics
 
     // test box geometry
     const boxMesh = new Mesh();

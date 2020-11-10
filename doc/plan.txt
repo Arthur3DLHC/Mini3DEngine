@@ -671,8 +671,6 @@ TODO:       主要类结构
                     Raymarch
 
         物理系统
-            考虑使用 Cannon.es: https://github.com/pmndrs/cannon-es
-            需要将 Cannon.es 的对象封装起来，因为前端应用代码无法直接 import cannon-es.js
             带物理的第一人称控制：https://github.com/mrdoob/three.js/blob/master/examples/js/controls/PointerLockControls.js
             场景物理对象的加载：参考 https://doc.babylonjs.com/how_to/using_the_physics_engine
             从 gltf 读取物理碰撞体到 cannon.js:
