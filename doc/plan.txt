@@ -586,6 +586,22 @@ TODO:       主要类结构
             优化 tsm 库？
 
         大场景相关
+        
+            particle system; sprite;
+                使用 GPU 计算 particle: transform feedback
+                    https://gpfault.net/posts/webgl2-particles.txt.html
+                粒子物理：可以通过深度图获得场景位置，在 GPU 计算碰撞？https://nullprogram.com/webgl-particles/
+                使用一个默认的粒子系统 shader ？以及对应的粒子系统材质类？
+
+
+        物理系统
+            带物理的第一人称控制：https://github.com/mrdoob/three.js/blob/master/examples/js/controls/PointerLockControls.js
+            场景物理对象的加载：参考 https://doc.babylonjs.com/how_to/using_the_physics_engine
+            从 gltf 读取物理碰撞体到 cannon.js:
+                尽量只使用 box, sphere, cylinder 等简单物体；
+                在 Blender 中使用单位尺寸的物体；通过缩放控制形状和尺寸；给一个自定义属性表明是物理碰撞体，以及形状类别
+                在 gltfSceneBuilder 中，当读取到此类物体时，设置其为不可见，并创建为物理碰撞体类型对象
+                写一个物理场景生成器，遍历 scene 的节点，当节点是物理碰撞体时，根据其形状和变换信息，生成 Cannon.js 刚体对象
 
             制作模块化的大一点的场景；
                 FPS：模块化类 DOOM 室内场景, 狭窄一些；Local point lights; 
@@ -631,8 +647,6 @@ TODO:       主要类结构
                     普通mesh的occlusion query
                     instancedMesh的occlusion query
 
-            ## Decals
-                由于不太好从 Blender 导出 Decal 在图集中的纹理坐标，暂时不着急实现
 
             Clustered 光源、envmap、irradiance volume
                 当视场角等投影参数变化时，更新 Cluster 的逻辑；
@@ -645,11 +659,6 @@ TODO:       主要类结构
                 Cascaded shadow map? 
                 或类似的简化方案：指定一个平行光作为日光，近景用跟随相机走的动态 shadowmap，远景过度到静态 shadowmap
 
-            particle system; sprite;
-                使用 GPU 计算 particle: transform feedback
-                    https://gpfault.net/posts/webgl2-particles.txt.html
-                粒子物理：可以通过深度图获得场景位置，在 GPU 计算碰撞？https://nullprogram.com/webgl-particles/
-                使用一个默认的粒子系统 shader ？以及对应的粒子系统材质类？
 
             考虑技能特效等怎么实现；
                 刀光、击中特效等
@@ -671,12 +680,7 @@ TODO:       主要类结构
                     体积雾带光照，并取样 shadowmap？
                     Raymarch
 
-        物理系统
-            带物理的第一人称控制：https://github.com/mrdoob/three.js/blob/master/examples/js/controls/PointerLockControls.js
-            场景物理对象的加载：参考 https://doc.babylonjs.com/how_to/using_the_physics_engine
-            从 gltf 读取物理碰撞体到 cannon.js:
-                尽量只使用 box, sphere, cylinder 等简单物体；
-                在 Blender 中使用单位尺寸的物体；通过缩放控制形状和尺寸；给一个自定义属性表明是物理碰撞体，以及形状类别
-                在 gltfSceneBuilder 中，当读取到此类物体时，设置其为不可见，并创建为物理碰撞体类型对象
-                写一个物理场景生成器，遍历 scene 的节点，当节点是物理碰撞体时，根据其形状和变换信息，生成 Cannon.js 刚体对象
+            ## Decals
+                由于不太好从 Blender 导出 Decal 在图集中的纹理坐标，暂时不着急实现
+
             
