@@ -6,6 +6,7 @@ import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
 import { FirstPersonViewBehavior } from "../common/behaviors/firstPersonViewBehavior.js";
 import mat4 from "../../lib/tsm/mat4.js";
 import { SceneHelper } from "../common/sceneHelper.js";
+import quat from "../../lib/tsm/quat.js";
 
 window.onload = () => {
     const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
@@ -149,13 +150,16 @@ window.onload = () => {
 
     scene.attachChild(cylinderMesh);
 
-    const matPlaneRot = new mat4();
-    const matPlaneTran = new mat4();
+    // const matPlaneRot = new mat4();
+    // const matPlaneTran = new mat4();
 
-    matPlaneRot.setIdentity();
-    matPlaneTran.fromTranslation(new vec3([0, -2, 0]));
+    // matPlaneRot.setIdentity();
+    // matPlaneTran.fromTranslation(new vec3([0, -2, 0]));
+
+    const planePosition = new vec3([0, -2, 0]);
+    const planeRotation = quat.fromEuler(0, 0, 0, "ZXY");
     
-    addPlane("floor", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), 0.5, 0.5, scene, physicsWorld);
+    addPlane("floor", 4, 4, planePosition, planeRotation, new vec4([1.0, 1.0, 1.0, 1.0]), 0.5, 0.5, scene, physicsWorld);
 
     // TODO: add some lights
     const dirLight01 = new DirectionalLight();
@@ -234,14 +238,16 @@ window.onload = () => {
         requestAnimationFrame(gameLoop);
     }
     
-    function addPlane(name: string, matPlaneTran: mat4, matPlaneRot: mat4, wallColor: vec4, metallic: number, roughness: number, scene: Scene, world: PhysicsWorld, textureUrl?:string) {
+    function addPlane(name: string, width: number, height: number, position: vec3, rotation: quat, wallColor: vec4, metallic: number, roughness: number, scene: Scene, world: PhysicsWorld, textureUrl?:string) {
         const planeMesh = new Mesh();
         planeMesh.name = name;
-        mat4.product(matPlaneTran, matPlaneRot, planeMesh.localTransform);
-        planeMesh.geometry = new PlaneGeometry(4, 4, 1, 1);
+        // mat4.product(matPlaneTran, matPlaneRot, planeMesh.localTransform);
+        planeMesh.geometry = new PlaneGeometry(width, height, 1, 1);
         planeMesh.castShadow = true;
         planeMesh.isStatic = true;
-        planeMesh.autoUpdateTransform = false;
+        planeMesh.translation = position;
+        planeMesh.rotation = rotation;
+        planeMesh.autoUpdateTransform = true;
         const planeMtl = new StandardPBRMaterial();
         planeMtl.color = wallColor.copy();
         planeMtl.metallic = metallic;// 0.05;
@@ -261,8 +267,9 @@ window.onload = () => {
         const planeShape = new CANNON.Plane();
         const planeBody = new RigidBody(planeMesh, physicsWorld, { mass:0 });
         
-        // todo: set position, rotations and scale
-
+        // todo: set position, rotations
+        planeBody.setPosition(position);
+        planeBody.setRotation(rotation);
 
         planeMesh.behaviors.push(planeBody);
         planeBody.body.addShape(planeShape);
