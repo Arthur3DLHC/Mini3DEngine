@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "../common/behaviors/autoRotateBehavior.js";
 import vec4 from "../../lib/tsm/vec4.js";
@@ -16,7 +16,11 @@ window.onload = () => {
 
     GLDevice.initialize(canvas);
 
-    const physicsWorld = new PhysicsWorld();
+    const physicsWorld = new PhysicsWorld({ numIterations: 10 });
+    const world = physicsWorld.world;
+    world.gravity.set(0.0, -9.0, 0.0);
+    world.defaultContactMaterial.contactEquationStiffness = 1e8
+    world.defaultContactMaterial.contactEquationRelaxation = 10
 
     const loadingManager = new LoadingManager();
     const imageLoader = new ImageLoader(loadingManager);
@@ -151,7 +155,7 @@ window.onload = () => {
     matPlaneRot.setIdentity();
     matPlaneTran.fromTranslation(new vec3([0, -2, 0]));
     
-    addPlane("floor", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), 0.5, 0.5, scene);
+    addPlane("floor", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), 0.5, 0.5, scene, physicsWorld);
 
     // TODO: add some lights
     const dirLight01 = new DirectionalLight();
@@ -230,7 +234,7 @@ window.onload = () => {
         requestAnimationFrame(gameLoop);
     }
     
-    function addPlane(name: string, matPlaneTran: mat4, matPlaneRot: mat4, wallColor: vec4, metallic: number, roughness: number, scene: Scene, textureUrl?:string) {
+    function addPlane(name: string, matPlaneTran: mat4, matPlaneRot: mat4, wallColor: vec4, metallic: number, roughness: number, scene: Scene, world: PhysicsWorld, textureUrl?:string) {
         const planeMesh = new Mesh();
         planeMesh.name = name;
         mat4.product(matPlaneTran, matPlaneRot, planeMesh.localTransform);
@@ -252,6 +256,17 @@ window.onload = () => {
     
         planeMesh.materials.push(planeMtl);
         scene.attachChild(planeMesh);
+
+        // physics plane
+        const planeShape = new CANNON.Plane();
+        const planeBody = new RigidBody(planeMesh, physicsWorld, { mass:0 });
+        
+        // todo: set position, rotations and scale
+
+
+        planeMesh.behaviors.push(planeBody);
+        planeBody.body.addShape(planeShape);
+        physicsWorld.world.addBody(planeBody.body);
     }
 }
 

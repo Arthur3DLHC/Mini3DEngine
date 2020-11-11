@@ -28,6 +28,7 @@ export * from "./math/colorHelper.js";
 export * from "./math/frustum.js";
 export * from "./math/rectanglePacker.js";
 export * from "./math/srtTransform.js";
+export * from "./physics/mathConverter.js";
 export * from "./physics/physicsBehavior.js";
 export * from "./physics/physicsWorld.js";
 export * from "./physics/rigidBody.js";
