@@ -35,7 +35,8 @@ export class PhysicsWorld {
 
     public step() {
         if (this.world) {
-            this.world.step(Clock.instance.elapsedTime);
+            this.world.step(1.0 / 60.0 );
+            // this.world.step(Clock.instance.elapsedTime);
         }
     }
 }

@@ -309,11 +309,13 @@ window.onload = () => {
 
         // physics plane
         const planeShape = new CANNON.Plane();
+        // planeShape.worldNormal.set(0, 1, 0);
         const planeBody = new RigidBody(planeMesh, physicsWorld, { mass:0 });
         
         // todo: set position, rotations
         planeBody.setPosition(position);
-        planeBody.setRotation(rotation);
+        // planeBody.setRotation(rotation);
+        planeBody.body.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
 
         planeMesh.behaviors.push(planeBody);
         planeBody.body.addShape(planeShape);
