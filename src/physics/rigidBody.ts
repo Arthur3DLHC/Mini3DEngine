@@ -35,6 +35,7 @@ export class RigidBody extends PhysicsBehavior {
     // encapsulate a cannon.es Body object ?
     public update() {
         // todo: copy the position and rotation to owner object
+        // if mass == 0, the body is static
         if (this.body !== null && this.body.mass > 0) {
             MathConverter.CannonToTSMQuat(this.body.quaternion, this.owner.rotation);
             MathConverter.CannonToTSMVec3(this.body.position, this.owner.translation);
