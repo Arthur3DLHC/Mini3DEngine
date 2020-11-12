@@ -594,7 +594,6 @@ TODO:       主要类结构
                 粒子物理：可以通过深度图获得场景位置，在 GPU 计算碰撞？https://nullprogram.com/webgl-particles/
                 使用一个默认的粒子系统 shader ？以及对应的粒子系统材质类？
 
-
         物理系统
             带物理的第一人称控制：https://github.com/mrdoob/three.js/blob/master/examples/js/controls/PointerLockControls.js
             场景物理对象的加载：参考 https://doc.babylonjs.com/how_to/using_the_physics_engine
@@ -608,6 +607,7 @@ TODO:       主要类结构
                 FPS：模块化类 DOOM 室内场景, 狭窄一些；Local point lights; 
                     导出，测试 clustered, instancing, occlusion culling 等
                     Blender 的 Reflection probe 中加一个最远可视距离属性；
+                    * 走廊地面和墙壁细节用法线贴图表示，节省一下三角形数量？
 
                 Action: 日式城堡，室外+室内，宽阔一些 或横板？夜间；无月光；雾；Local point lights：灯烛，火把；
 
@@ -648,7 +648,6 @@ TODO:       主要类结构
                     普通mesh的occlusion query
                     instancedMesh的occlusion query
 
-
             Clustered 光源、envmap、irradiance volume
                 当视场角等投影参数变化时，更新 Cluster 的逻辑；
                 继续优化 CPU 端的 Cluster 检测？
@@ -659,7 +658,6 @@ TODO:       主要类结构
             户外阴影方案
                 Cascaded shadow map? 
                 或类似的简化方案：指定一个平行光作为日光，近景用跟随相机走的动态 shadowmap，远景过度到静态 shadowmap
-
 
             考虑技能特效等怎么实现；
                 刀光、击中特效等
