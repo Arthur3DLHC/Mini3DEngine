@@ -18,6 +18,8 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     public smoothness: number = 0.25;
     public moveSpeed: number = 1.0;
 
+    public pointerLock: boolean = false;
+
     public keyForward: number = KeyCodes.w;
     public keyBackward: number = KeyCodes.s;
     public keyLeft: number = KeyCodes.a;

@@ -22,6 +22,8 @@ export class FirstPersonViewBehavior extends Behavior {
         this.keyUp = KeyCodes.q;
         this.keyDown = KeyCodes.e;
 
+        this.pointerLock = false;
+
         this._isMovingForward = false;
         this._isMovingBackward = false;
         this._isMovingLeft = false;
@@ -53,6 +55,8 @@ export class FirstPersonViewBehavior extends Behavior {
     public moveDir: vec3;
     public position: vec3;
 
+    public pointerLock: boolean;
+
     private _dragging: boolean;
     // private _oldMousePos: vec2;
     private _deltaRot: vec2;
@@ -83,12 +87,13 @@ export class FirstPersonViewBehavior extends Behavior {
     }
 
     public onMouseMove(ev: MouseEvent) {
-        if (!this._dragging) {
-            return;
+        if (this.pointerLock || this._dragging) {
+            this._deltaRot.x += ev.movementX * this.mouseSensitivity;
+            this._deltaRot.y += ev.movementY * this.mouseSensitivity;
         }
-
-        this._deltaRot.x += ev.movementX * this.mouseSensitivity;
-        this._deltaRot.y += ev.movementY * this.mouseSensitivity;
+        // if (!this._dragging) {
+        //     return;
+        // }
 
         // this._deltaRot.x += (ev.clientX - this._oldMousePos.x) * this.mouseSensitivity;
         // this._deltaRot.y += (ev.clientY - this._oldMousePos.y) * this.mouseSensitivity;
