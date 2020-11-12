@@ -66,6 +66,28 @@ export class ThirdPersonCtrlBehavior extends Behavior {
         }
     }
 
+    public onKeyDown(ev: KeyboardEvent) {
+        switch (ev.key) {
+            case this.keyForward:
+                this._isMovingForward = true;
+                break;
+            case this.keyBackward:
+                this._isMovingBackward = true;
+                break;
+            case this.keyLeft:
+                this._isMovingLeft = true;
+                break;
+            case this.keyRight:
+                this._isMovingRight = true;
+                break;
+            case this.keyJump:
+                // todo: check whether can jump and set the vertical velocity
+                break;
+            default:
+                break;
+        }
+    }
+
     public onKeyUp(ev: KeyboardEvent) {
         switch (ev.key) {
             case this.keyForward:
@@ -80,9 +102,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
             case this.keyRight:
                 this._isMovingRight = false;
                 break;
-            case this.keyJump:
-                // todo: check whether can jump and set the vertical velocity
-                break;
+
             default:
                 break;
         }
