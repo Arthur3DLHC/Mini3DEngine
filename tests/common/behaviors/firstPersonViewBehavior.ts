@@ -15,12 +15,12 @@ export class FirstPersonViewBehavior extends Behavior {
         this.position = new vec3();
         this.moveSpeed = 1.0;
 
-        this.keyForward = KeyCodes.w;
-        this.keyBackward = KeyCodes.s;
-        this.keyLeft = KeyCodes.a;
-        this.keyRight = KeyCodes.d;
-        this.keyUp = KeyCodes.q;
-        this.keyDown = KeyCodes.e;
+        this.keyForward = "w"; // KeyCodes.w;
+        this.keyBackward = "s"; //KeyCodes.s;
+        this.keyLeft = "a"; //KeyCodes.a;
+        this.keyRight = "d"; //KeyCodes.d;
+        this.keyUp = "q"; //KeyCodes.q;
+        this.keyDown = "e"; //KeyCodes.e;
 
         this.pointerLock = false;
 
@@ -43,12 +43,12 @@ export class FirstPersonViewBehavior extends Behavior {
     public smoothness: number;
     public moveSpeed: number;
 
-    public keyForward: number;
-    public keyBackward: number;
-    public keyLeft: number;
-    public keyRight: number;
-    public keyUp: number;
-    public keyDown: number;
+    public keyForward: string;
+    public keyBackward: string;
+    public keyLeft: string;
+    public keyRight: string;
+    public keyUp: string;
+    public keyDown: string;
 
     public yaw: number;
     public pitch: number;
@@ -103,7 +103,7 @@ export class FirstPersonViewBehavior extends Behavior {
     }
 
     public onKeyDown(ev: KeyboardEvent) {
-        switch (ev.keyCode) {
+        switch (ev.key) {
             case this.keyForward:
                 this._isMovingForward = true;
                 break;
@@ -128,7 +128,7 @@ export class FirstPersonViewBehavior extends Behavior {
     }
 
     public onKeyUp(ev: KeyboardEvent) {
-        switch (ev.keyCode) {
+        switch (ev.key) {
             case this.keyForward:
                 this._isMovingForward = false;
                 break;
