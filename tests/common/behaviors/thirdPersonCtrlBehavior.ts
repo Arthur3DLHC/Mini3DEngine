@@ -10,13 +10,20 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     public constructor(owner: Object3D, body: RigidBody) {
         super(owner);
         this._body = body;
-    }
+        this._velocity = this._body.body.velocity;
 
+        body.body.addEventListener("collide", (ev: any) => {
+            const contact: CANNON.ContactEquation = ev.contact;
+            // todo: check contact normal dir, set canJump flag
+            // fix me: what if the player fall down from an edge of cliff?
+        });
+    }
 
     public mouseSensitivity: number = 0.002;
     public smoothMouse: boolean = true;
     public smoothness: number = 0.25;
     public moveSpeed: number = 1.0;
+    public jumpSpeed: number = 1.0;
 
     public pointerLock: boolean = false;
 
@@ -30,6 +37,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     public pitch: number = 0;
 
     private _body: RigidBody;
+    private _velocity: CANNON.Vec3;     // alias of CANNON.Body.velocity
 
     // calc mouse movement when not using pointer lock API
     private _dragging: boolean = false;
@@ -40,6 +48,8 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     private _isMovingBackward: boolean = false;
     private _isMovingLeft: boolean = false;
     private _isMovingRight: boolean = false;
+
+    private _canJump: boolean = false;
 
     private _quatRotYaw: quat = new quat();
     private _quatRotPitch: quat = new quat();
@@ -82,6 +92,10 @@ export class ThirdPersonCtrlBehavior extends Behavior {
                 break;
             case this.keyJump:
                 // todo: check whether can jump and set the vertical velocity
+                if(this._canJump) {
+                    this._velocity.y = this.jumpSpeed;
+                }
+                this._canJump = false;
                 break;
             default:
                 break;
