@@ -22,15 +22,15 @@ export class FirstPersonViewBehavior extends Behavior {
         this.keyUp = KeyCodes.q;
         this.keyDown = KeyCodes.e;
 
-        this.isMovingForward = false;
-        this.isMovingBackward = false;
-        this.isMovingLeft = false;
-        this.isMovingRight = false;
-        this.isMovingUp = false;
-        this.isMovingDown = false;
+        this._isMovingForward = false;
+        this._isMovingBackward = false;
+        this._isMovingLeft = false;
+        this._isMovingRight = false;
+        this._isMovingUp = false;
+        this._isMovingDown = false;
 
         this._dragging = false;
-        this._oldMousePos = new vec2();
+        // this._oldMousePos = new vec2();
         this._deltaRot = new vec2();
         this._matRotYaw = mat4.identity.copy();
         this._matRotPitch = mat4.identity.copy();
@@ -54,28 +54,28 @@ export class FirstPersonViewBehavior extends Behavior {
     public position: vec3;
 
     private _dragging: boolean;
-    private _oldMousePos: vec2;
+    // private _oldMousePos: vec2;
     private _deltaRot: vec2;
     
-    private isMovingForward: boolean;
-    private isMovingBackward: boolean;
-    private isMovingLeft: boolean;
-    private isMovingRight: boolean;
-    private isMovingUp: boolean;
-    private isMovingDown: boolean;
+    private _isMovingForward: boolean;
+    private _isMovingBackward: boolean;
+    private _isMovingLeft: boolean;
+    private _isMovingRight: boolean;
+    private _isMovingUp: boolean;
+    private _isMovingDown: boolean;
 
     private _matRotYaw: mat4;
     private _matRotPitch: mat4;
 
-    // todo: keyboard and mouse input event handlers
+    // keyboard and mouse input event handlers
     public onMouseDown(ev: MouseEvent) {
         // left button
         if (ev.button !== 0) {
             return;
         }
         this._dragging = true;
-        this._oldMousePos.x = ev.clientX;
-        this._oldMousePos.y = ev.clientY;
+        // this._oldMousePos.x = ev.clientX;
+        // this._oldMousePos.y = ev.clientY;
     }
 
     public onMouseUp(ev: MouseEvent) {
@@ -87,32 +87,35 @@ export class FirstPersonViewBehavior extends Behavior {
             return;
         }
 
-        this._deltaRot.x += (ev.clientX - this._oldMousePos.x) * this.mouseSensitivity;
-        this._deltaRot.y += (ev.clientY - this._oldMousePos.y) * this.mouseSensitivity;
+        this._deltaRot.x += ev.movementX * this.mouseSensitivity;
+        this._deltaRot.y += ev.movementY * this.mouseSensitivity;
 
-        this._oldMousePos.x = ev.clientX;
-        this._oldMousePos.y = ev.clientY;
+        // this._deltaRot.x += (ev.clientX - this._oldMousePos.x) * this.mouseSensitivity;
+        // this._deltaRot.y += (ev.clientY - this._oldMousePos.y) * this.mouseSensitivity;
+
+        // this._oldMousePos.x = ev.clientX;
+        // this._oldMousePos.y = ev.clientY;
     }
 
     public onKeyDown(ev: KeyboardEvent) {
         switch (ev.keyCode) {
             case this.keyForward:
-                this.isMovingForward = true;
+                this._isMovingForward = true;
                 break;
             case this.keyBackward:
-                this.isMovingBackward = true;
+                this._isMovingBackward = true;
                 break;
             case this.keyLeft:
-                this.isMovingLeft = true;
+                this._isMovingLeft = true;
                 break;
             case this.keyRight:
-                this.isMovingRight = true;
+                this._isMovingRight = true;
                 break;
             case this.keyUp:
-                this.isMovingUp = true;
+                this._isMovingUp = true;
                 break;
             case this.keyDown:
-                this.isMovingDown = true;
+                this._isMovingDown = true;
                 break;
             default:
                 break;
@@ -122,22 +125,22 @@ export class FirstPersonViewBehavior extends Behavior {
     public onKeyUp(ev: KeyboardEvent) {
         switch (ev.keyCode) {
             case this.keyForward:
-                this.isMovingForward = false;
+                this._isMovingForward = false;
                 break;
             case this.keyBackward:
-                this.isMovingBackward = false;
+                this._isMovingBackward = false;
                 break;
             case this.keyLeft:
-                this.isMovingLeft = false;
+                this._isMovingLeft = false;
                 break;
             case this.keyRight:
-                this.isMovingRight = false;
+                this._isMovingRight = false;
                 break;
             case this.keyUp:
-                this.isMovingUp = false;
+                this._isMovingUp = false;
                 break;
             case this.keyDown:
-                this.isMovingDown = false;
+                this._isMovingDown = false;
                 break;
             default:
                 break;
@@ -168,19 +171,19 @@ export class FirstPersonViewBehavior extends Behavior {
         this.moveDir.x = 0;
         this.moveDir.y = 0;
         this.moveDir.z = 0;
-        if (this.isMovingForward) {
+        if (this._isMovingForward) {
             this.moveDir.z = -1;
-        } else if (this.isMovingBackward) {
+        } else if (this._isMovingBackward) {
             this.moveDir.z = 1;
         }
-        if (this.isMovingLeft) {
+        if (this._isMovingLeft) {
             this.moveDir.x = -1;
-        } else if (this.isMovingRight) {
+        } else if (this._isMovingRight) {
             this.moveDir.x = 1;
         }
-        if (this.isMovingUp) {
+        if (this._isMovingUp) {
             this.moveDir.y = 1;
-        } else if (this.isMovingDown) {
+        } else if (this._isMovingDown) {
             this.moveDir.y = -1;
         }
         this.moveDir.normalize();

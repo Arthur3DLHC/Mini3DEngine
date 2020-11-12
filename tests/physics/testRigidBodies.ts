@@ -36,9 +36,10 @@ window.onload = () => {
     camera.autoUpdateTransform = false;
 
     // first person view controller
+    // todo: add physics rigidbody
     const fpsBehavior = new FirstPersonViewBehavior(camera);
     camera.behaviors.push(fpsBehavior);
-    fpsBehavior.position = new vec3([0, 0, 2]);
+    fpsBehavior.position = new vec3([0, 2, 2]);
     scene.attachChild(camera);
 
     window.onmousedown = (ev: MouseEvent) => {
@@ -71,7 +72,7 @@ window.onload = () => {
     boxMesh.castShadow = true;
     boxMesh.isStatic = false;
     boxMesh.autoUpdateTransform = true; 
-    boxMesh.translation.setComponents(0, -1, 0);
+    boxMesh.translation.setComponents(0, 1, 0);
     // boxMesh.localTransform.fromTranslation(new vec3([0, 0, -5]));
     const boxMtl = new StandardPBRMaterial();
     boxMtl.color = new vec4([1.0, 1.0, 0.0, 1.0]);
@@ -105,7 +106,7 @@ window.onload = () => {
         sphereMesh.castShadow = true;
         sphereMesh.isStatic = false;
         sphereMesh.autoUpdateTransform = true;
-        sphereMesh.translation.setComponents(0, 0, 0.75);
+        sphereMesh.translation.setComponents(0, 1, 0.75);
         const sphereMtl = new StandardPBRMaterial();
         sphereMtl.color = new vec4([1.0, 1.0, 1.0, 1.0]);
         sphereMtl.metallic = 0.9;
@@ -135,7 +136,7 @@ window.onload = () => {
         sphereMesh.castShadow = true;
         sphereMesh.isStatic = false;
         sphereMesh.autoUpdateTransform = true;
-        sphereMesh.translation.setComponents(-0.75, -1.2, 0);
+        sphereMesh.translation.setComponents(-0.75, 1, 0);
         const sphereMtl = new StandardPBRMaterial();
         sphereMtl.color = new vec4([1.0, 1.0, 1.0, 1.0]);
         sphereMtl.metallic = 0.05;
@@ -169,7 +170,7 @@ window.onload = () => {
     cylinderMesh.castShadow = true;
     cylinderMesh.isStatic = true;
     cylinderMesh.autoUpdateTransform = true;
-    cylinderMesh.translation.setComponents(0.75, 0, 0);
+    cylinderMesh.translation.setComponents(0.75, 0.5, 0);
     const cylinderMtl = new StandardPBRMaterial();
     cylinderMtl.color = new vec4([0.0, 1.0, 0.0, 1.0]);
     cylinderMtl.emissive = new vec4([0.5, 0.5, 0.5, 1]);
@@ -199,7 +200,7 @@ window.onload = () => {
     // matPlaneRot.setIdentity();
     // matPlaneTran.fromTranslation(new vec3([0, -2, 0]));
 
-    const planePosition = new vec3([0, -2, 0]);
+    const planePosition = new vec3([0, 0, 0]);
     const planeRotation = quat.fromEuler(0, 0, 0, "ZXY");
     
     addPlane("floor", 4, 4, planePosition, planeRotation, new vec4([1.0, 1.0, 1.0, 1.0]), 0.5, 0.5, scene, physicsWorld);
@@ -222,8 +223,8 @@ window.onload = () => {
     scene.attachChild(dirLight01);
     
     // test environment probes
-    SceneHelper.addEnvProbe("envProbe01", 6, new vec3([ 0, 0, 0]), scene, EnvironmentProbeType.Reflection);
-    SceneHelper.addEnvProbe("irrProbe01", 6, new vec3([ 0, 0, 0]), scene, EnvironmentProbeType.Irradiance);
+    SceneHelper.addEnvProbe("envProbe01", 6, new vec3([ 0, 1, 0]), scene, EnvironmentProbeType.Reflection);
+    SceneHelper.addEnvProbe("irrProbe01", 6, new vec3([ 0, 1, 0]), scene, EnvironmentProbeType.Irradiance);
 
     const infoPanel: HTMLDivElement = document.getElementById("infoPanel") as HTMLDivElement;
 

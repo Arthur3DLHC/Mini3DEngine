@@ -109,7 +109,7 @@ export class TextureCube extends Texture {
         }
     }
 
-    // todo: define cube face ids
+    // define cube face ids
     public static readonly face_positive_x = 0;
     public static readonly face_negative_x = 1;
     public static readonly face_positive_y = 2;
