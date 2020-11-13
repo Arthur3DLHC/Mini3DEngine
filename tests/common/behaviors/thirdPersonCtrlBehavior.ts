@@ -5,6 +5,7 @@ import { Behavior, KeyCodes, Object3D, RigidBody } from "../../../src/mini3DEngi
 /**
  * third person control, with physics bodys
  * can look and move around, and jump.
+ * reference: https://github.com/schteppe/cannon.js/blob/master/examples/js/PointerLockControls.js
  */
 export class ThirdPersonCtrlBehavior extends Behavior {
     public constructor(owner: Object3D, body: RigidBody) {
@@ -15,7 +16,20 @@ export class ThirdPersonCtrlBehavior extends Behavior {
         body.body.addEventListener("collide", (ev: any) => {
             const contact: CANNON.ContactEquation = ev.contact;
             // todo: check contact normal dir, set canJump flag
-            // fix me: what if the player fall down from an edge of cliff?
+            // fix me: what if the player fall down from an edge?
+
+            // contact.bi and contact.bj are the colliding bodies, and contact.ni is the collision normal.
+            // We do not yet know which one is which! Let's check.
+            if (contact.bi.id === body.body.id) {       // bi is the player body, flip the contact normal
+                contact.ni.negate(this._contactNormal);
+            } else {
+                this._contactNormal.copy(contact.ni);   // bi is something else. Keep the normal as it is
+            }
+
+            // assuming the up vector is always [0, 1, 0]
+            if (this._contactNormal.y > 0.5) {
+                this._canJump = true;
+            }
         });
     }
 
@@ -38,6 +52,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
 
     private _body: RigidBody;
     private _velocity: CANNON.Vec3;     // alias of CANNON.Body.velocity
+    private _contactNormal: CANNON.Vec3 = new CANNON.Vec3();    // // Normal in the contact, pointing *out* of whatever the player touched
 
     // calc mouse movement when not using pointer lock API
     private _dragging: boolean = false;
