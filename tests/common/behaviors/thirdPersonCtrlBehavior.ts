@@ -1,17 +1,22 @@
 import quat from "../../../lib/tsm/quat.js";
 import vec2 from "../../../lib/tsm/vec2.js";
-import { Behavior, KeyCodes, Object3D, RigidBody } from "../../../src/mini3DEngine.js";
+import { Behavior, Camera, KeyCodes, Object3D, RigidBody } from "../../../src/mini3DEngine.js";
 
 /**
- * third person control, with physics bodys
+ * third person shooter control, with physics bodys
  * can look and move around, and jump.
  * reference: https://github.com/schteppe/cannon.js/blob/master/examples/js/PointerLockControls.js
+ * https://github.com/matthias-schuetz/THREE-BasicThirdPersonGame/blob/master/js/game/game.core.demo1.js
+ * usage:
+ *  attach this behavior to player object, and associate the camera object.
  */
 export class ThirdPersonCtrlBehavior extends Behavior {
-    public constructor(owner: Object3D, body: RigidBody) {
+    public constructor(owner: Object3D, body: RigidBody, camera: Camera) {
         super(owner);
         this._body = body;
         this._velocity = this._body.body.velocity;
+
+        this._camera = camera;
 
         body.body.addEventListener("collide", (ev: any) => {
             const contact: CANNON.ContactEquation = ev.contact;
@@ -49,6 +54,8 @@ export class ThirdPersonCtrlBehavior extends Behavior {
 
     public yaw: number = 0;
     public pitch: number = 0;
+
+    private _camera: Camera;
 
     private _body: RigidBody;
     private _velocity: CANNON.Vec3;     // alias of CANNON.Body.velocity
@@ -138,8 +145,38 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     }
 
     public update() {
+        // fix me: character orientation and camera orientation is not same
+        // who is parent? camera or character?
+        // or do not make them parent-child
+        // attach this behavior to player
+        // 1. calculate the global look orientation,
+        // 2. calculate player orientation from global look orientation and cur move dir
+        // 3. assign move speed to player rigidbody
+        // 4. calculate the camera orientation directly from global look orientation
+        // 5. calculate the camera position from player position (in last frame?)
+        // 6. the player rigidbody will upate positon of player in this frame
+
         // look dir
+        this.yaw -= this._deltaRot.x * this.smoothness;
+        this.pitch -= this._deltaRot.y * this.smoothness;
+
+        this._deltaRot.x -= this._deltaRot.x * this.smoothness;
+        this._deltaRot.y -= this._deltaRot.y * this.smoothness;
+
+        if (this.pitch > 1.56) {
+            this.pitch = 1.56;
+        }
+        if (this.pitch < -1.56) {
+            this.pitch = -1.56;
+        }
+
+        // camera orientation
+        // quat.fromEuler( this.pitch, this.yaw, 0, "ZXY", this.owner.rotation);
+
         // move dir
+
+        // player orientation
+
         // apply velocity to rigidbody
     }
 }
