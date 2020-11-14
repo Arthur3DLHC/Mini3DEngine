@@ -1,5 +1,6 @@
 import quat from "../../../lib/tsm/quat.js";
 import vec2 from "../../../lib/tsm/vec2.js";
+import vec3 from "../../../lib/tsm/vec3.js";
 import { Behavior, Camera, KeyCodes, Object3D, RigidBody } from "../../../src/mini3DEngine.js";
 
 /**
@@ -55,7 +56,11 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     public yaw: number = 0;
     public pitch: number = 0;
 
+    public moveYaw: number = 0;
+
     private _camera: Camera;
+
+    private _horizVelocity: vec3 = new vec3();
 
     private _body: RigidBody;
     private _velocity: CANNON.Vec3;     // alias of CANNON.Body.velocity
@@ -171,12 +176,62 @@ export class ThirdPersonCtrlBehavior extends Behavior {
         }
 
         // camera orientation
-        // quat.fromEuler( this.pitch, this.yaw, 0, "ZXY", this.owner.rotation);
+        quat.fromEuler( this.pitch, this.yaw, 0, "ZXY", this._camera.rotation);
+        
+        // fix me: the angles may be wrong
+        let isMoving = false;
+        if (this._isMovingForward) {
+            this.moveYaw = 90;
+            isMoving = true;
+        }
+        if (this._isMovingBackward) {
+            this.moveYaw = -90;
+            isMoving = true;
+        }
+        if (this._isMovingLeft) {
+            this.moveYaw = 180;
+            isMoving = true;
+        }
+        if (this._isMovingRight) {
+            this.moveYaw = 0;
+            isMoving = true;
+        }
 
-        // move dir
+        if (this._isMovingForward && this._isMovingLeft) {
+            this.moveYaw = 135;
+        }
+        if (this._isMovingForward && this._isMovingRight) {
+            this.moveYaw = 45;
+        }
+        if (this._isMovingBackward && this._isMovingLeft) {
+            this.moveYaw = -135;
+        }
+        if (this._isMovingBackward && this._isMovingRight) {
+            this.moveYaw = -45;
+        }
 
-        // player orientation
+        this.moveYaw = this.moveYaw * Math.PI / 180.0;
+        this.moveYaw += this.yaw;
 
-        // apply velocity to rigidbody
+        // horiz velocity
+        this._horizVelocity.x = 0;
+        this._horizVelocity.y = 0;
+        this._horizVelocity.z = 0;
+
+        if (isMoving) {
+            this._horizVelocity.x = this.moveSpeed * Math.cos(this.moveYaw);
+            this._horizVelocity.z = this.moveSpeed * Math.sin(this.moveYaw);
+        }
+
+        // apply horizontal velocty to rigid body
+        this._velocity.x = this._horizVelocity.x;
+        this._velocity.z = this._horizVelocity.z;
+
+        // todo: player orientation
+        // use nlerp of quaternions?
+
+        // camera position?
+        // 1 frame later than player?
+        this.owner.translation.copy(this._camera.translation);
     }
 }

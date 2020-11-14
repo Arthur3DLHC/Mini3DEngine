@@ -3,6 +3,9 @@ import vec2 from "../../../lib/tsm/vec2.js";
 import vec3 from "../../../lib/tsm/vec3.js";
 import mat4 from "../../../lib/tsm/mat4.js";
 
+/**
+ * unreal like first-person view controller, no physics. only for nevagating 3D scenes
+ */
 export class FirstPersonViewBehavior extends Behavior {
     public constructor(owner: Object3D) {
         super(owner);
@@ -172,7 +175,7 @@ export class FirstPersonViewBehavior extends Behavior {
         
         mat4.product(this._matRotYaw, this._matRotPitch, this.owner.localTransform);
 
-        // todo: compute move dir in local space
+        // compute move dir in local space
         this.moveDir.x = 0;
         this.moveDir.y = 0;
         this.moveDir.z = 0;
