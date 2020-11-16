@@ -32,12 +32,19 @@ export class RigidBody extends PhysicsBehavior {
         this._body.quaternion.set(val.x, val.y, val.z, val.w);
     }
 
+    /**
+     * apply rotation to owner object?
+     */
+    public affectRotation: boolean = true;
+
     // encapsulate a cannon.es Body object ?
     public update() {
         // todo: copy the position and rotation to owner object
         // if mass == 0, the body is static
         if (this.body !== null && this.body.mass > 0) {
-            MathConverter.CannonToTSMQuat(this.body.quaternion, this.owner.rotation);
+            if(this.affectRotation){
+                MathConverter.CannonToTSMQuat(this.body.quaternion, this.owner.rotation);
+            }
             MathConverter.CannonToTSMVec3(this.body.position, this.owner.translation);
         }
     }

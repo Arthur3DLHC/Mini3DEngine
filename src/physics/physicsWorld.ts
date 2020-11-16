@@ -34,7 +34,7 @@ export class PhysicsWorld {
     private _world: CANNON.World;
 
     public step() {
-        if (this.world) {
+        if (this.world && Clock.instance.elapsedTime > 0) {
             // this.world.step(1.0 / 60.0 );
             this.world.step(Math.min(Clock.instance.elapsedTime, 0.1));
         }

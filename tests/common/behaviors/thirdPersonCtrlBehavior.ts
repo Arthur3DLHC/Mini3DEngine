@@ -188,7 +188,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
         }
 
         // camera orientation
-        quat.fromEuler( this.pitch, this.yaw, 0, "ZXY", this._camera.rotation);
+        quat.fromEuler( this.pitch, this.yaw, 0, "YXZ", this._camera.rotation);
         
         // fix me: the angles may be wrong
         let isMoving = false;
@@ -232,19 +232,19 @@ export class ThirdPersonCtrlBehavior extends Behavior {
 
         if (isMoving) {
             this._horizVelocity.x = this.moveSpeed * Math.cos(this._moveYaw);
-            this._horizVelocity.z = this.moveSpeed * Math.sin(this._moveYaw);
+            this._horizVelocity.z = -this.moveSpeed * Math.sin(this._moveYaw);
+
+            // player orientation
+            // face to move direction
+            // because model is init facing z axis, so it's 90 degree offset with move yaw angle
+            const modelYaw = this._moveYaw - Math.PI * 0.5;
+
+            quat.fromAxisAngle(this._upVec, modelYaw, this.owner.rotation);
         }
 
         // apply horizontal velocty to rigid body
         this._velocity.x = this._horizVelocity.x;
         this._velocity.z = this._horizVelocity.z;
-
-        // player orientation
-        // face to move direction
-        // because model is init facing z axis, so it's 90 degree offset with move yaw angle
-        const modelYaw = this._moveYaw - Math.PI * 0.5;
-        
-        quat.fromAxisAngle(this._upVec, modelYaw, this.owner.rotation);
 
         // calc camera position from player position and view direction
         // 1 frame later than player?

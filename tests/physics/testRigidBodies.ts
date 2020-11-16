@@ -22,7 +22,21 @@ window.onload = () => {
     const world = physicsWorld.world;
     world.gravity.set(0.0, -9.0, 0.0);
     world.defaultContactMaterial.contactEquationStiffness = 1e8
-    world.defaultContactMaterial.contactEquationRelaxation = 10
+    world.defaultContactMaterial.contactEquationRelaxation = 3
+
+    // use a slippery material between player and ground
+    const playerPhysicsMtl = new CANNON.Material("playerMaterial");
+    const groundPhysicsMtl = new CANNON.Material("groundMaterial");
+    const widgetPhysicsMtl = new CANNON.Material("widgetMaterial");
+    const player_ground_cm = new CANNON.ContactMaterial(playerPhysicsMtl, groundPhysicsMtl,
+         { friction: 0.0, restitution: 0.3, contactEquationRelaxation: 3, contactEquationStiffness: 1e8, frictionEquationStiffness: 1e8, frictionEquationRelaxation: 3 });
+    const player_widget_cm = new CANNON.ContactMaterial(playerPhysicsMtl, widgetPhysicsMtl,
+         { friction: 0.4, restitution: 0.3, contactEquationRelaxation: 3, contactEquationStiffness: 1e8, frictionEquationStiffness: 1e8, frictionEquationRelaxation: 3 });
+    const widget_ground_cm = new CANNON.ContactMaterial(widgetPhysicsMtl, groundPhysicsMtl,
+         { friction: 0.4, restitution: 0.3, contactEquationRelaxation: 3, contactEquationStiffness: 1e8, frictionEquationStiffness: 1e8, frictionEquationRelaxation: 3 });
+    world.addContactMaterial(player_ground_cm);
+    world.addContactMaterial(player_widget_cm);
+    world.addContactMaterial(widget_ground_cm);
 
     const loadingManager = new LoadingManager();
     const imageLoader = new ImageLoader(loadingManager);
@@ -45,7 +59,7 @@ window.onload = () => {
     playerMesh.castShadow = true;
     playerMesh.isStatic = false;
     playerMesh.autoUpdateTransform = true;
-    playerMesh.translation.setComponents(0, 1, 0);
+    playerMesh.translation.setComponents(0, 1.5, 0);
 
     const playerMtl = new StandardPBRMaterial();
     playerMtl.color = new vec4([1, 1, 1, 1]);
@@ -58,8 +72,14 @@ window.onload = () => {
     // and add rigid body for player character
     // use a compound shape from two spheres
     // fixed rotation
-    const playerBody = new RigidBody(playerMesh, physicsWorld, {mass: 50});
+    const playerBody = new RigidBody(playerMesh, physicsWorld, {mass: 5, material: playerPhysicsMtl});
     physicsWorld.world.addBody(playerBody.body);
+    
+    // add rigid body last? after third person control
+    playerMesh.behaviors.push(playerBody);
+
+    playerBody.body.fixedRotation = true;
+    playerBody.affectRotation = false;
 
     playerBody.setPosition(playerMesh.translation);
     playerBody.setRotation(playerMesh.rotation);
@@ -80,6 +100,8 @@ window.onload = () => {
     const tpsBehavior = new ThirdPersonCtrlBehavior(playerMesh, playerBody, camera);
     playerMesh.behaviors.push(tpsBehavior);
     tpsBehavior.cameraVerticalOffset = 0.7;
+    tpsBehavior.cameraHorizontalOffset = new vec3([0.5, 0, 1.5]);
+    tpsBehavior.moveSpeed = 2;
 
     // const fpsBehavior = new FirstPersonViewBehavior(camera);
     // camera.behaviors.push(fpsBehavior);
@@ -110,8 +132,6 @@ window.onload = () => {
         tpsBehavior.onKeyUp(ev);
     }
 
-    // add rigid body last? after third person control
-    playerMesh.behaviors.push(playerBody);
 
     // todo: add multiple objects with physics shapes to scene
     // both dynamics and statics
@@ -133,7 +153,7 @@ window.onload = () => {
         boxMesh.materials.push(boxMtl);
 
         // physics
-        const boxBody = new RigidBody(boxMesh, physicsWorld, { mass: 0.2 });
+        const boxBody = new RigidBody(boxMesh, physicsWorld, { mass: 0.2, material: widgetPhysicsMtl });
         physicsWorld.world.addBody(boxBody.body);
         boxMesh.behaviors.push(boxBody);
 
@@ -170,7 +190,7 @@ window.onload = () => {
         scene.attachChild(sphereMesh);
 
         // physics
-        const sphereBody = new RigidBody(sphereMesh, physicsWorld, {mass:0.4});
+        const sphereBody = new RigidBody(sphereMesh, physicsWorld, {mass:0.4, material: widgetPhysicsMtl});
         physicsWorld.world.addBody(sphereBody.body);
         sphereMesh.behaviors.push(sphereBody);
         sphereBody.setPosition(sphereMesh.translation);
@@ -198,7 +218,7 @@ window.onload = () => {
         scene.attachChild(sphereMesh);
 
         // physics
-        const sphereBody = new RigidBody(sphereMesh, physicsWorld, { mass: 0.6 });
+        const sphereBody = new RigidBody(sphereMesh, physicsWorld, { mass: 0.6, material: widgetPhysicsMtl });
         physicsWorld.world.addBody(sphereBody.body);
         sphereMesh.behaviors.push(sphereBody);
         sphereBody.setPosition(sphereMesh.translation);
@@ -239,7 +259,7 @@ window.onload = () => {
         scene.attachChild(cylinderMesh);
 
         // physics
-        const cylinderBody = new RigidBody(cylinderMesh, physicsWorld, { mass: 0 });
+        const cylinderBody = new RigidBody(cylinderMesh, physicsWorld, { mass: 0, material: widgetPhysicsMtl });
         physicsWorld.world.addBody(cylinderBody.body);
         cylinderMesh.behaviors.push(cylinderBody);
         cylinderBody.setPosition(cylinderMesh.translation);
@@ -256,7 +276,7 @@ window.onload = () => {
     const planePosition = new vec3([0, 0, 0]);
     const planeRotation = quat.fromEuler(0, 0, 0, "ZXY");
     
-    addPlane("floor", 40, 40, planePosition, planeRotation, new vec4([1.0, 1.0, 1.0, 1.0]), 0.5, 0.5, scene, physicsWorld);
+    addPlane("floor", 40, 40, planePosition, planeRotation, new vec4([1.0, 1.0, 1.0, 1.0]), 0.5, 0.5, scene, physicsWorld, groundPhysicsMtl);
 
     // TODO: add some lights
     const dirLight01 = new DirectionalLight();
@@ -336,7 +356,7 @@ window.onload = () => {
         requestAnimationFrame(gameLoop);
     }
     
-    function addPlane(name: string, width: number, height: number, position: vec3, rotation: quat, wallColor: vec4, metallic: number, roughness: number, scene: Scene, world: PhysicsWorld, textureUrl?:string) {
+    function addPlane(name: string, width: number, height: number, position: vec3, rotation: quat, wallColor: vec4, metallic: number, roughness: number, scene: Scene, world: PhysicsWorld, physicsMtl: CANNON.Material, textureUrl?:string) {
         const planeMesh = new Mesh();
         planeMesh.name = name;
         // mat4.product(matPlaneTran, matPlaneRot, planeMesh.localTransform);
@@ -364,7 +384,7 @@ window.onload = () => {
         // physics plane
         const planeShape = new CANNON.Plane();
         // planeShape.worldNormal.set(0, 1, 0);
-        const planeBody = new RigidBody(planeMesh, physicsWorld, { mass:0 });
+        const planeBody = new RigidBody(planeMesh, physicsWorld, { mass:0, material: physicsMtl });
         
         // todo: set position, rotations
         planeBody.setPosition(position);
