@@ -116,37 +116,38 @@ window.onload = () => {
     // both dynamics and statics
 
     // test box geometry
-    const boxMesh = new Mesh();
-    boxMesh.name = "box01";
-    boxMesh.geometry = new BoxGeometry(0.25, 0.25, 0.25);
-    boxMesh.castShadow = true;
-    boxMesh.isStatic = false;
-    boxMesh.autoUpdateTransform = true; 
-    boxMesh.translation.setComponents(0, 1, 0);
-    // boxMesh.localTransform.fromTranslation(new vec3([0, 0, -5]));
-    const boxMtl = new StandardPBRMaterial();
-    boxMtl.color = new vec4([1.0, 1.0, 0.0, 1.0]);
-    boxMtl.metallic = 0.8;
-    boxMtl.roughness = 0.4;
-    boxMesh.materials.push(boxMtl);
+    {
+        const boxMesh = new Mesh();
+        boxMesh.name = "box01";
+        boxMesh.geometry = new BoxGeometry(0.25, 0.25, 0.25);
+        boxMesh.castShadow = true;
+        boxMesh.isStatic = false;
+        boxMesh.autoUpdateTransform = true;
+        boxMesh.translation.setComponents(0, 1, 0);
+        // boxMesh.localTransform.fromTranslation(new vec3([0, 0, -5]));
+        const boxMtl = new StandardPBRMaterial();
+        boxMtl.color = new vec4([1.0, 1.0, 0.0, 1.0]);
+        boxMtl.metallic = 0.8;
+        boxMtl.roughness = 0.4;
+        boxMesh.materials.push(boxMtl);
 
-    // physics
-    const boxBody = new RigidBody(boxMesh, physicsWorld, {mass: 0.2});
-    physicsWorld.world.addBody(boxBody.body);
-    boxMesh.behaviors.push(boxBody);
+        // physics
+        const boxBody = new RigidBody(boxMesh, physicsWorld, { mass: 0.2 });
+        physicsWorld.world.addBody(boxBody.body);
+        boxMesh.behaviors.push(boxBody);
 
-    boxBody.setPosition(boxMesh.translation);
-    boxBody.setRotation(boxMesh.rotation);
+        boxBody.setPosition(boxMesh.translation);
+        boxBody.setRotation(boxMesh.rotation);
 
-    const boxShape = new CANNON.Box(new CANNON.Vec3(0.125, 0.125, 0.125));
-    boxBody.body.addShape(boxShape);
+        const boxShape = new CANNON.Box(new CANNON.Vec3(0.125, 0.125, 0.125));
+        boxBody.body.addShape(boxShape);
 
-    // auto rotate
-    // const boxAutoRot = new AutoRotateBehavior(boxMesh);
-    // boxMesh.behaviors.push(boxAutoRot);
+        // auto rotate
+        // const boxAutoRot = new AutoRotateBehavior(boxMesh);
+        // boxMesh.behaviors.push(boxAutoRot);
 
-    scene.attachChild(boxMesh);
-
+        scene.attachChild(boxMesh);
+    }
     // dynamic sphere small
     {
         const sphereMesh = new Mesh();
@@ -213,37 +214,38 @@ window.onload = () => {
     */
 
     // static cylinder
-    const cylinderMesh = new Mesh();
-    cylinderMesh.name = "cylinder01";
-    // cylinderMesh.localTransform.fromTranslation(new vec3([0.75, 0, 0]));
-    cylinderMesh.geometry = new CylinderGeometry(0.25, 0.5, 24);
-    cylinderMesh.castShadow = true;
-    cylinderMesh.isStatic = true;
-    cylinderMesh.autoUpdateTransform = true;
-    cylinderMesh.translation.setComponents(0.75, 0.5, 0);
-    const cylinderMtl = new StandardPBRMaterial();
-    cylinderMtl.color = new vec4([0.0, 1.0, 0.0, 1.0]);
-    cylinderMtl.emissive = new vec4([0.5, 0.5, 0.5, 1]);
-    cylinderMtl.metallic = 0.2;
-    cylinderMtl.roughness = 0.6;
-    cylinderMesh.materials.push(cylinderMtl);
+    {
+        const cylinderMesh = new Mesh();
+        cylinderMesh.name = "cylinder01";
+        // cylinderMesh.localTransform.fromTranslation(new vec3([0.75, 0, 0]));
+        cylinderMesh.geometry = new CylinderGeometry(0.25, 0.5, 24);
+        cylinderMesh.castShadow = true;
+        cylinderMesh.isStatic = true;
+        cylinderMesh.autoUpdateTransform = true;
+        cylinderMesh.translation.setComponents(0.75, 0.5, 0);
+        const cylinderMtl = new StandardPBRMaterial();
+        cylinderMtl.color = new vec4([0.0, 1.0, 0.0, 1.0]);
+        cylinderMtl.emissive = new vec4([0.5, 0.5, 0.5, 1]);
+        cylinderMtl.metallic = 0.2;
+        cylinderMtl.roughness = 0.6;
+        cylinderMesh.materials.push(cylinderMtl);
 
-    /*
-    const cylinderAutoRot = new AutoRotateBehavior(cylinderMesh);
-    cylinderMesh.behaviors.push(cylinderAutoRot);
-    */
+        /*
+        const cylinderAutoRot = new AutoRotateBehavior(cylinderMesh);
+        cylinderMesh.behaviors.push(cylinderAutoRot);
+        */
 
-    scene.attachChild(cylinderMesh);
+        scene.attachChild(cylinderMesh);
 
-    // physics
-    const cylinderBody = new RigidBody(cylinderMesh, physicsWorld, {mass: 0});
-    physicsWorld.world.addBody(cylinderBody.body);
-    cylinderMesh.behaviors.push(cylinderBody);
-    cylinderBody.setPosition(cylinderMesh.translation);
+        // physics
+        const cylinderBody = new RigidBody(cylinderMesh, physicsWorld, { mass: 0 });
+        physicsWorld.world.addBody(cylinderBody.body);
+        cylinderMesh.behaviors.push(cylinderBody);
+        cylinderBody.setPosition(cylinderMesh.translation);
 
-    const cylinderShape = new CANNON.Cylinder(0.25, 0.25, 0.5, 12);
-    cylinderBody.body.addShape(cylinderShape);
-
+        const cylinderShape = new CANNON.Cylinder(0.25, 0.25, 0.5, 12);
+        cylinderBody.body.addShape(cylinderShape);
+    }
     // const matPlaneRot = new mat4();
     // const matPlaneTran = new mat4();
 
@@ -253,7 +255,7 @@ window.onload = () => {
     const planePosition = new vec3([0, 0, 0]);
     const planeRotation = quat.fromEuler(0, 0, 0, "ZXY");
     
-    addPlane("floor", 4, 4, planePosition, planeRotation, new vec4([1.0, 1.0, 1.0, 1.0]), 0.5, 0.5, scene, physicsWorld);
+    addPlane("floor", 40, 40, planePosition, planeRotation, new vec4([1.0, 1.0, 1.0, 1.0]), 0.5, 0.5, scene, physicsWorld);
 
     // TODO: add some lights
     const dirLight01 = new DirectionalLight();
