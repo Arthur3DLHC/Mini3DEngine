@@ -33,8 +33,8 @@ window.onload = () => {
     const camera = new PerspectiveCamera();
     camera.aspect = canvas.width / canvas.height;
     camera.far = 20;
-    camera.localTransform.fromTranslation(new vec3([0, 0, 2]));
-    camera.autoUpdateTransform = false;
+    // camera.localTransform.fromTranslation(new vec3([0, 0, 2]));
+    camera.autoUpdateTransform = true;
 
     scene.attachChild(camera);
 
@@ -79,6 +79,7 @@ window.onload = () => {
     // todo: use third person controller
     const tpsBehavior = new ThirdPersonCtrlBehavior(playerMesh, playerBody, camera);
     playerMesh.behaviors.push(tpsBehavior);
+    tpsBehavior.cameraVerticalOffset = 0.7;
 
     // const fpsBehavior = new FirstPersonViewBehavior(camera);
     // camera.behaviors.push(fpsBehavior);
