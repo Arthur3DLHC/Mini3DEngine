@@ -35,13 +35,45 @@ window.onload = () => {
     camera.localTransform.fromTranslation(new vec3([0, 0, 2]));
     camera.autoUpdateTransform = false;
 
-    // first person view controller
-    // todo: use third person controller
+    // add a box mesh to present the player character?
+    const playerMesh = new Mesh();
+    playerMesh.name = "player";
+    playerMesh.geometry = new BoxGeometry(0.5, 1.7, 0.3);
+    playerMesh.castShadow = true;
+    playerMesh.isStatic = false;
+    playerMesh.autoUpdateTransform = true;
+    playerMesh.translation.setComponents(0, 1, 0);
+
+    const playerMtl = new StandardPBRMaterial();
+    playerMtl.color = new vec4([1, 1, 1, 1]);
+    playerMtl.metallic = 0.02;
+    playerMtl.roughness = 0.4;
+    playerMesh.materials.push(playerMtl);
+
+    scene.attachChild(playerMesh);
+
     // and add rigid body for player character
     // use a compound shape from two spheres
     // fixed rotation
+    const playerBody = new RigidBody(playerMesh, physicsWorld, {mass: 50});
+    physicsWorld.world.addBody(playerBody.body);
 
-    // add a box mesh to present the player character?
+    playerBody.setPosition(playerMesh.translation);
+    playerBody.setRotation(playerMesh.rotation);
+
+    const playerShapeLow = new CANNON.Sphere(0.5);
+    const playerShapeHigh = new CANNON.Sphere(0.5);
+
+    playerBody.body.addShape(playerShapeLow, new CANNON.Vec3(0, -0.35, 0));
+    playerBody.body.addShape(playerShapeHigh, new CANNON.Vec3(0, 0.35, 0));
+
+    // NOTE: if use a animated character model load from gltf, the offsets should be:
+
+    // playerBody.body.addShape(playerShapeLow, new CANNON.Vec3(0, 0.5, 0));
+    // playerBody.body.addShape(playerShapeHigh, new CANNON.Vec3(0, 1.2, 0));
+
+    // first person view controller
+    // todo: use third person controller
 
     const fpsBehavior = new FirstPersonViewBehavior(camera);
     camera.behaviors.push(fpsBehavior);
@@ -68,6 +100,9 @@ window.onload = () => {
         fpsBehavior.onKeyUp(ev);
     }
 
+    // add rigid body last? after third person control
+    playerMesh.behaviors.push(playerBody);
+
     // todo: add multiple objects with physics shapes to scene
     // both dynamics and statics
 
@@ -87,7 +122,7 @@ window.onload = () => {
     boxMesh.materials.push(boxMtl);
 
     // physics
-    const boxBody = new RigidBody(boxMesh, physicsWorld, {mass:0.2});
+    const boxBody = new RigidBody(boxMesh, physicsWorld, {mass: 0.2});
     physicsWorld.world.addBody(boxBody.body);
     boxMesh.behaviors.push(boxBody);
 

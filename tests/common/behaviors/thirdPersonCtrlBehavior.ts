@@ -10,6 +10,8 @@ import { Behavior, Camera, KeyCodes, Object3D, RigidBody } from "../../../src/mi
  * https://github.com/matthias-schuetz/THREE-BasicThirdPersonGame/blob/master/js/game/game.core.demo1.js
  * usage:
  *  attach this behavior to player object, and associate the camera object.
+ *  the rigid body pivot need to be under the foot of the player,
+ *  and fix the rotation.
  */
 export class ThirdPersonCtrlBehavior extends Behavior {
     public constructor(owner: Object3D, body: RigidBody, camera: Camera) {
@@ -57,12 +59,12 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     public pitch: number = 0;
 
     /**
-     * camera horizontal offset
+     * camera horizontal offset from rigid body pivot
      */
     public cameraHorizontalOffset: vec3 = new vec3([0.5, 0.0, 0.5]);
 
     /**
-     * camera vertical offset
+     * camera vertical offset from rigid body pivot
      */
     public cameraVerticalOffset: number = 1.5;
 
