@@ -36,7 +36,13 @@ window.onload = () => {
     camera.autoUpdateTransform = false;
 
     // first person view controller
-    // todo: add physics rigidbody
+    // todo: use third person controller
+    // and add rigid body for player character
+    // use a compound shape from two spheres
+    // fixed rotation
+
+    // add a box mesh to present the player character?
+
     const fpsBehavior = new FirstPersonViewBehavior(camera);
     camera.behaviors.push(fpsBehavior);
     fpsBehavior.position = new vec3([0, 2, 2]);
