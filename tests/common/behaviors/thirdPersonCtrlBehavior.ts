@@ -56,9 +56,20 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     public yaw: number = 0;
     public pitch: number = 0;
 
-    public moveYaw: number = 0;
+    /**
+     * camera horizontal offset
+     */
+    public cameraHorizontalOffset: vec3 = new vec3([0.5, 0.0, 0.5]);
+
+    /**
+     * camera vertical offset
+     */
+    public cameraVerticalOffset: number = 1.5;
+
+    private _moveYaw: number = 0;
 
     private _camera: Camera;
+    private _cameraGlobalOffset: vec3 = new vec3();
 
     private _horizVelocity: vec3 = new vec3();
 
@@ -78,8 +89,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
 
     private _canJump: boolean = false;
 
-    private _quatRotYaw: quat = new quat();
-    private _quatRotPitch: quat = new quat();
+    private _upVec: vec3 = new vec3([0, 1, 0]);
 
     // keyboard and mouse events
     public onMouseDown(ev: MouseEvent) {
@@ -181,37 +191,37 @@ export class ThirdPersonCtrlBehavior extends Behavior {
         // fix me: the angles may be wrong
         let isMoving = false;
         if (this._isMovingForward) {
-            this.moveYaw = 90;
+            this._moveYaw = 90;
             isMoving = true;
         }
         if (this._isMovingBackward) {
-            this.moveYaw = -90;
+            this._moveYaw = -90;
             isMoving = true;
         }
         if (this._isMovingLeft) {
-            this.moveYaw = 180;
+            this._moveYaw = 180;
             isMoving = true;
         }
         if (this._isMovingRight) {
-            this.moveYaw = 0;
+            this._moveYaw = 0;
             isMoving = true;
         }
 
         if (this._isMovingForward && this._isMovingLeft) {
-            this.moveYaw = 135;
+            this._moveYaw = 135;
         }
         if (this._isMovingForward && this._isMovingRight) {
-            this.moveYaw = 45;
+            this._moveYaw = 45;
         }
         if (this._isMovingBackward && this._isMovingLeft) {
-            this.moveYaw = -135;
+            this._moveYaw = -135;
         }
         if (this._isMovingBackward && this._isMovingRight) {
-            this.moveYaw = -45;
+            this._moveYaw = -45;
         }
 
-        this.moveYaw = this.moveYaw * Math.PI / 180.0;
-        this.moveYaw += this.yaw;
+        this._moveYaw = this._moveYaw * Math.PI / 180.0;
+        this._moveYaw += this.yaw;
 
         // horiz velocity
         this._horizVelocity.x = 0;
@@ -219,19 +229,31 @@ export class ThirdPersonCtrlBehavior extends Behavior {
         this._horizVelocity.z = 0;
 
         if (isMoving) {
-            this._horizVelocity.x = this.moveSpeed * Math.cos(this.moveYaw);
-            this._horizVelocity.z = this.moveSpeed * Math.sin(this.moveYaw);
+            this._horizVelocity.x = this.moveSpeed * Math.cos(this._moveYaw);
+            this._horizVelocity.z = this.moveSpeed * Math.sin(this._moveYaw);
         }
 
         // apply horizontal velocty to rigid body
         this._velocity.x = this._horizVelocity.x;
         this._velocity.z = this._horizVelocity.z;
 
-        // todo: player orientation
-        // use nlerp of quaternions?
+        // player orientation
+        // face to move direction
+        // because model is init facing z axis, so it's 90 degree offset with move yaw angle
+        const modelYaw = this._moveYaw - Math.PI * 0.5;
+        
+        quat.fromAxisAngle(this._upVec, modelYaw, this.owner.rotation);
 
-        // camera position?
+        // calc camera position from player position and view direction
         // 1 frame later than player?
+
+        // rotate about origin point [0,0,0], under the foot
+        this._camera.rotation.multiplyVec3(this.cameraHorizontalOffset, this._cameraGlobalOffset);
+        
+        // move up to shoulder
+        this._cameraGlobalOffset.y = this.cameraVerticalOffset;
+
         this.owner.translation.copy(this._camera.translation);
+        this._camera.translation.add(this._cameraGlobalOffset);
     }
 }
