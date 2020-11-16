@@ -7,6 +7,7 @@ import { FirstPersonViewBehavior } from "../common/behaviors/firstPersonViewBeha
 import mat4 from "../../lib/tsm/mat4.js";
 import { SceneHelper } from "../common/sceneHelper.js";
 import quat from "../../lib/tsm/quat.js";
+import { ThirdPersonCtrlBehavior } from "../common/behaviors/thirdPersonCtrlBehavior.js";
 
 window.onload = () => {
     const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
@@ -34,6 +35,8 @@ window.onload = () => {
     camera.far = 20;
     camera.localTransform.fromTranslation(new vec3([0, 0, 2]));
     camera.autoUpdateTransform = false;
+
+    scene.attachChild(camera);
 
     // add a box mesh to present the player character?
     const playerMesh = new Mesh();
@@ -74,30 +77,36 @@ window.onload = () => {
 
     // first person view controller
     // todo: use third person controller
+    const tpsBehavior = new ThirdPersonCtrlBehavior(playerMesh, playerBody, camera);
+    playerMesh.behaviors.push(tpsBehavior);
 
-    const fpsBehavior = new FirstPersonViewBehavior(camera);
-    camera.behaviors.push(fpsBehavior);
-    fpsBehavior.position = new vec3([0, 2, 2]);
-    scene.attachChild(camera);
+    // const fpsBehavior = new FirstPersonViewBehavior(camera);
+    // camera.behaviors.push(fpsBehavior);
+    // fpsBehavior.position = new vec3([0, 2, 2]);
 
     window.onmousedown = (ev: MouseEvent) => {
-        fpsBehavior.onMouseDown(ev);
+        // fpsBehavior.onMouseDown(ev);
+        tpsBehavior.onMouseDown(ev);
     }
 
     window.onmouseup = (ev: MouseEvent) => {
-        fpsBehavior.onMouseUp(ev);
+        // fpsBehavior.onMouseUp(ev);
+        tpsBehavior.onMouseUp(ev);
     }
 
     window.onmousemove = (ev: MouseEvent) => {
-        fpsBehavior.onMouseMove(ev);
+        // fpsBehavior.onMouseMove(ev);
+        tpsBehavior.onMouseMove(ev);
     }
 
     window.onkeydown = (ev: KeyboardEvent) => {
-        fpsBehavior.onKeyDown(ev);
+        // fpsBehavior.onKeyDown(ev);
+        tpsBehavior.onKeyDown(ev);
     }
 
     window.onkeyup = (ev: KeyboardEvent) => {
-        fpsBehavior.onKeyUp(ev);
+        // fpsBehavior.onKeyUp(ev);
+        tpsBehavior.onKeyUp(ev);
     }
 
     // add rigid body last? after third person control
