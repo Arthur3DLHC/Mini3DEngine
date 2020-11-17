@@ -4,9 +4,9 @@ export class SSRParams {
     }
     public enable: boolean = true;
 
-    public maxRayDistance: number = 8;
-    public pixelStride: number = 16;
-    public pixelStrideZCutoff: number = 10;
+    public maxRayDistance: number = 20;
+    public pixelStride: number = 32;
+    public pixelStrideZCutoff: number = 50;
     public screenEdgeFadeStart: number = 0.9;
     public eyeFadeStart: number = 0.6;
     public eyeFadeEnd: number = 0.8;
