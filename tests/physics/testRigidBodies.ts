@@ -84,22 +84,26 @@ window.onload = () => {
     playerBody.setPosition(playerMesh.translation);
     playerBody.setRotation(playerMesh.rotation);
 
-    const playerShapeLow = new CANNON.Sphere(0.5);
-    const playerShapeHigh = new CANNON.Sphere(0.5);
+    // cannon does not have capsule shape, so use some spheres...
+    const playerShapeLow = new CANNON.Sphere(0.3);
+    const playerShapeMedium = new CANNON.Sphere(0.3);
+    const playerShapeHigh = new CANNON.Sphere(0.3);
 
-    playerBody.body.addShape(playerShapeLow, new CANNON.Vec3(0, -0.35, 0));
-    playerBody.body.addShape(playerShapeHigh, new CANNON.Vec3(0, 0.35, 0));
+    playerBody.body.addShape(playerShapeLow, new CANNON.Vec3(0, -0.55, 0));
+    playerBody.body.addShape(playerShapeMedium, new CANNON.Vec3(0, 0, 0));
+    playerBody.body.addShape(playerShapeHigh, new CANNON.Vec3(0, 0.55, 0));
 
     // NOTE: if use a animated character model load from gltf, the offsets should be:
 
-    // playerBody.body.addShape(playerShapeLow, new CANNON.Vec3(0, 0.5, 0));
-    // playerBody.body.addShape(playerShapeHigh, new CANNON.Vec3(0, 1.2, 0));
+    // playerBody.body.addShape(playerShapeLow, new CANNON.Vec3(0, 0.3, 0));
+    // playerBody.body.addShape(playerShapeMedium, new CANNON.Vec3(0, 0.85, 0));
+    // playerBody.body.addShape(playerShapeHigh, new CANNON.Vec3(0, 1.4, 0));
 
     // first person view controller
     // todo: use third person controller
     const tpsBehavior = new ThirdPersonCtrlBehavior(playerMesh, playerBody, camera);
     playerMesh.behaviors.push(tpsBehavior);
-    tpsBehavior.cameraVerticalOffset = 0.7;
+    tpsBehavior.cameraVerticalOffset = 0.8;
     tpsBehavior.cameraHorizontalOffset = new vec3([0.5, 0, 1.5]);
     tpsBehavior.moveSpeed = 2;
 
