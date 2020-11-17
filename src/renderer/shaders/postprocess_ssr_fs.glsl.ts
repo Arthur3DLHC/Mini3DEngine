@@ -203,7 +203,7 @@ float calculateAlpha(
 {
     float alpha = clamp(reflectivity, 0.0, 1.0);
     // Fade ray hits that approach the maximum iterations
-    alpha *= 1.0 - (iterationCount / float(MAX_ITERATION));
+    // alpha *= 1.0 - (iterationCount / float(MAX_ITERATION));
     // Fade ray hits that approach the screen edge
     vec2 hitPixelNDC = hitPixel * 2.0 - 1.0;
     float maxDimension = min(1.0, max(abs(hitPixelNDC.x), abs(hitPixelNDC.y)));
