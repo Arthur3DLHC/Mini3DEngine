@@ -109,12 +109,12 @@ export class GLTFSceneBuilder {
         this._instancedMeshGroups = [];
 
         if (instancing) {
-            // todo: sum mesh reference count; split by instancing groups?
+            // sum mesh reference count; split by instancing groups?
             // if is skinned mesh, do not use instancing;
             this.gatherInstances(gltf.gltf.nodes);
         }
 
-        // set a temp node array first? for joints?
+        // set a temp node array first
         const nodes: Object3D[] = [];
 
         for (const nodeDef of gltf.gltf.nodes) {
@@ -268,10 +268,7 @@ export class GLTFSceneBuilder {
 
         // parentObject.attachChild(node);
 
-        // todo: node transform
-        // todo: hold translation, rotation, scale in Object3D？
         this.processNodeTransform(nodeDef, node);
-
 
         return node;
 
