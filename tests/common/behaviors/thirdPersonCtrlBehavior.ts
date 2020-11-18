@@ -1,7 +1,7 @@
 import quat from "../../../lib/tsm/quat.js";
 import vec2 from "../../../lib/tsm/vec2.js";
 import vec3 from "../../../lib/tsm/vec3.js";
-import { Behavior, Camera, KeyCodes, Object3D, RigidBody } from "../../../src/mini3DEngine.js";
+import { Behavior, Camera, Clock, KeyCodes, Object3D, RigidBody } from "../../../src/mini3DEngine.js";
 
 /**
  * third person shooter control, with physics bodys
@@ -69,6 +69,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     public cameraVerticalOffset: number = 1.5;
 
     private _moveYaw: number = 0;
+    private _modelYaw: number = 0;
 
     private _camera: Camera;
     private _cameraGlobalOffset: vec3 = new vec3();
@@ -239,7 +240,18 @@ export class ThirdPersonCtrlBehavior extends Behavior {
             // because model is init facing z axis, so it's 90 degree offset with move yaw angle
             const modelYaw = this._moveYaw - Math.PI * 0.5;
 
-            quat.fromAxisAngle(this._upVec, modelYaw, this.owner.rotation);
+            const yawThreshold = 0.08;
+            const turnAmount = 2 * Math.PI * Clock.instance.elapsedTime;
+
+            if(this._modelYaw < modelYaw - yawThreshold) {
+                this._modelYaw += turnAmount;
+            } else if (this._modelYaw > modelYaw + yawThreshold) {
+                this._modelYaw -= turnAmount;
+            } else {
+                this._modelYaw = modelYaw;
+            }
+
+            quat.fromAxisAngle(this._upVec, this._modelYaw, this.owner.rotation);
         }
 
         // apply horizontal velocty to rigid body
