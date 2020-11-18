@@ -47,6 +47,8 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     public moveSpeed: number = 1.0;
     public jumpSpeed: number = 1.0;
 
+    public allowJump: boolean = false;
+
     public pointerLock: boolean = false;
 
     public keyForward: string = "w";
@@ -54,12 +56,18 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     public keyLeft: string = "a";
     public keyRight: string = "d";
     public keyJump: string = " ";
+    public keyAim: string = "f";
 
     public yaw: number = 0;
     public pitch: number = 0;
 
+    public get isAiming(): boolean { return this._isAiming; }
+
     // todo: aiming: model yaw keep same with camera horiz yaw;
     // move slowly;
+
+    // todo: allow jump or not?
+    // climb up and climb over?
 
     // todo: some state properties for animation state machine.
     // ismoving, isjumping, iscrouching? isAiming?
@@ -97,6 +105,8 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     private _isMovingBackward: boolean = false;
     private _isMovingLeft: boolean = false;
     private _isMovingRight: boolean = false;
+
+    private _isAiming: boolean = false;
 
     private _canJump: boolean = false;
 
@@ -140,10 +150,13 @@ export class ThirdPersonCtrlBehavior extends Behavior {
                 break;
             case this.keyJump:
                 // todo: check whether can jump and set the vertical velocity
-                if(this._canJump) {
+                if(this._canJump && this.allowJump) {
                     this._velocity.y = this.jumpSpeed;
                 }
                 this._canJump = false;
+                break;
+            case this.keyAim:
+                this._isAiming = !this._isAiming;
                 break;
             default:
                 break;
@@ -240,6 +253,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
         this._horizVelocity.z = 0;
 
         if (isMoving) {
+
             this._horizVelocity.x = this.moveSpeed * Math.cos(this._moveYaw);
             this._horizVelocity.z = -this.moveSpeed * Math.sin(this._moveYaw);
 
@@ -267,6 +281,13 @@ export class ThirdPersonCtrlBehavior extends Behavior {
                 this._modelYaw = modelYaw;
             }
 
+            quat.fromAxisAngle(this._upVec, this._modelYaw, this.owner.rotation);
+        }
+
+        if (this._isAiming) {
+            this._horizVelocity.x *= 0.5;
+            this._horizVelocity.z *= 0.5;
+            this._modelYaw = this.yaw;
             quat.fromAxisAngle(this._upVec, this._modelYaw, this.owner.rotation);
         }
 
