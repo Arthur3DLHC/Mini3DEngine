@@ -306,5 +306,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
 
         this.owner.translation.copy(this._camera.translation);
         this._camera.translation.add(this._cameraGlobalOffset);
+
+        // todo: camera collision with scene
     }
 }
