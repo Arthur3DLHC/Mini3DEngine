@@ -240,6 +240,14 @@ export class ThirdPersonCtrlBehavior extends Behavior {
             // because model is init facing z axis, so it's 90 degree offset with move yaw angle
             const modelYaw = this._moveYaw - Math.PI * 0.5;
 
+            if(Math.abs(this._modelYaw - modelYaw) > Math.PI) {
+                if (this._modelYaw > modelYaw) {
+                    this._modelYaw -= Math.PI * 2;
+                } else {
+                    this._modelYaw += Math.PI * 2;
+                }
+            }
+
             const yawThreshold = 0.08;
             const turnAmount = 2 * Math.PI * Clock.instance.elapsedTime;
 
