@@ -58,6 +58,14 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     public yaw: number = 0;
     public pitch: number = 0;
 
+    // todo: aiming: model yaw keep same with camera horiz yaw;
+    // move slowly;
+
+    // todo: some state properties for animation state machine.
+    // ismoving, isjumping, iscrouching? isAiming?
+
+    // corresponding action states and conditions
+
     /**
      * camera horizontal offset from rigid body pivot
      */
