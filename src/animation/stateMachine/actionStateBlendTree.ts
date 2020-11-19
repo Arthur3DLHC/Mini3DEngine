@@ -6,10 +6,15 @@ import { ActionState } from "./actionState.js";
  * See unity3d blend tree and action state manuals https://docs.unity3d.com/Manual/class-BlendTree.html
  */
 export class ActionStateBlendTree extends ActionState {
+
     public constructor(name: string) {
         super(name);
     }
 
     // todo: hold the animation blend tree
     public rootNode: AnimationBlendNode | null = null;
+
+    public fromJSON(stateDef: any) {
+        throw new Error("Method not implemented.");
+    }
 }

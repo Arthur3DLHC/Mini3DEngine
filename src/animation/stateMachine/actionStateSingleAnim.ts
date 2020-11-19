@@ -3,6 +3,7 @@ import { AnimationAction } from "../animationAction.js";
 import { ActionState } from "./actionState.js";
 
 export class ActionStateSingleAnim extends ActionState {
+
     public constructor(name: string) {
         super(name);
         this.animation = null;
@@ -32,5 +33,9 @@ export class ActionStateSingleAnim extends ActionState {
         if (this.animation !== null) {
             this.animation.stop();
         }
+    }
+
+    public fromJSON(stateDef: any) {
+        throw new Error("Method not implemented.");
     }
 }

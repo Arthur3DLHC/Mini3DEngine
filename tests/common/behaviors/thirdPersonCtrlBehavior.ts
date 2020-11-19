@@ -63,16 +63,13 @@ export class ThirdPersonCtrlBehavior extends Behavior {
 
     public get isAiming(): boolean { return this._isAiming; }
 
-    // todo: aiming: model yaw keep same with camera horiz yaw;
-    // move slowly;
-
-    // todo: allow jump or not?
-    // climb up and climb over?
-
     // todo: some state properties for animation state machine.
     // ismoving, isjumping, iscrouching? isAiming?
+    // todo: shooting animation
 
     // corresponding action states and conditions
+
+    // todo: interaction with scene objects: use, climb ladders...
 
     /**
      * camera horizontal offset from rigid body pivot
