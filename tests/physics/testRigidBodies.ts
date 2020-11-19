@@ -300,8 +300,8 @@ window.onload = () => {
     scene.attachChild(dirLight01);
     
     // test environment probes
-    SceneHelper.addEnvProbe("envProbe01", 6, new vec3([ 0, 1, 0]), scene, EnvironmentProbeType.Reflection);
-    SceneHelper.addEnvProbe("irrProbe01", 6, new vec3([ 0, 1, 0]), scene, EnvironmentProbeType.Irradiance);
+    SceneHelper.addEnvProbe("envProbe01", 20, new vec3([ 0, 1, 0]), scene, EnvironmentProbeType.Reflection);
+    SceneHelper.addEnvProbe("irrProbe01", 20, new vec3([ 0, 1, 0]), scene, EnvironmentProbeType.Irradiance);
 
     const infoPanel: HTMLDivElement = document.getElementById("infoPanel") as HTMLDivElement;
 
