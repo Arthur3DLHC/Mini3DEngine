@@ -1,3 +1,4 @@
+import { AnimationAction } from "../animationAction.js";
 import { ActionState } from "./actionState.js";
 import { ActionStateBlendTree } from "./actionStateBlendTree.js";
 import { ActionStateSingleAnim } from "./actionStateSingleAnim.js";
@@ -32,19 +33,19 @@ export class ActionStateMachine {
         }
     }
 
-    public fromJSON(json: any) {
+    public fromJSON(json: any, animations: AnimationAction[]) {
         this.states.clear();
         if (json.states !== undefined) {
             for (const stateDef of json.states) {
                 switch(stateDef.typeStr) {
                     case "single":
                         const single = new ActionStateSingleAnim(stateDef.name);
-                        single.fromJSON(stateDef);
+                        single.fromJSON(stateDef, animations);
                         this.addState(single);
                         break;
                     case "blendTree":
                         const blendtree = new ActionStateBlendTree(stateDef.name);
-                        blendtree.fromJSON(stateDef);
+                        blendtree.fromJSON(stateDef, animations);
                         this.addState(blendtree);
                         break;
                 }

@@ -1,3 +1,4 @@
+import { AnimationAction } from "../animationAction.js";
 import { AnimationBlendNode } from "../blendTree/animationBlendNode.js";
 import { ActionState } from "./actionState.js";
 
@@ -14,7 +15,7 @@ export class ActionStateBlendTree extends ActionState {
     // todo: hold the animation blend tree
     public rootNode: AnimationBlendNode | null = null;
 
-    public fromJSON(stateDef: any) {
+    public fromJSON(stateDef: any, animations: AnimationAction[]) {
         throw new Error("Method not implemented.");
     }
 }

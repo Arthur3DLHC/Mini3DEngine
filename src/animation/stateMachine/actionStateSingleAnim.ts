@@ -35,7 +35,7 @@ export class ActionStateSingleAnim extends ActionState {
         }
     }
 
-    public fromJSON(stateDef: any) {
+    public fromJSON(stateDef: any, animations: AnimationAction[]) {
         throw new Error("Method not implemented.");
     }
 }
