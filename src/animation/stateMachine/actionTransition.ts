@@ -41,12 +41,12 @@ export class ActionTransition {
         if (transDef.target === undefined || transDef.conditions === undefined) {
             throw new Error("Target state not presented in JSON object");
         }
-        const ts = states.get(transDef.target);
-        if (ts === undefined) {
+        const target = states.get(transDef.target);
+        if (target === undefined) {
             throw new Error("Target state not found: " + transDef.target);
         }
 
-        this.targetState = ts;
+        this.targetState = target;
 
         this.conditions = [];
 
@@ -60,7 +60,5 @@ export class ActionTransition {
                 this.conditions.push(condition);
             }
         }
-
-        throw new Error("Method not implemented.");
     }
 }
