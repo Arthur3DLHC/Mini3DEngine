@@ -2,6 +2,7 @@ import { Clock } from "../../scene/clock.js";
 import { ActionStateMachine } from "./actionStateMachine.js";
 import { AnimationAction } from "../animationAction.js";
 import { ActionTransition } from "./actionTransition.js";
+import { ActionCondition } from "./actionCondition.js";
 
 /**
  * base class of action states
@@ -27,8 +28,8 @@ export class ActionState {
     public update() {
         // check the current select action request
         // need to add another behavior to record current select action request?
-        for (const trans of this.transitions) {
-            trans.checkTransit();
+        for (const transition of this.transitions) {
+            transition.checkTransit();
         }
     }
 
@@ -45,7 +46,16 @@ export class ActionState {
 
     }
 
-    public fromJSON(stateDef: any, animations: AnimationAction[]) {
-        // todo: name, transitions
+    public fromJSON(stateDef: any, animations: AnimationAction[], machine: ActionStateMachine, customConditionCreation?: (conditionDef: any)=>ActionCondition) {
+        // name has assigned in constructor
+        this.transitions = [];
+        this.machine = machine;
+        if (stateDef.transitions !== undefined) {
+            for (const transDef of stateDef.transitions) {
+                const transition: ActionTransition = new ActionTransition(this);
+                transition.fromJSON(transDef, machine.states);
+                this.transitions.push(transition);
+            }
+        }
     }
 }

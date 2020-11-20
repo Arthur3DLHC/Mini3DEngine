@@ -2,6 +2,7 @@ import { ActionCondition } from "./actionCondition.js";
 import { ActionState } from "./actionState.js";
 
 export class ActionTransition {
+
     public constructor(state: ActionState) {
         this._state = state;
     }
@@ -33,5 +34,33 @@ export class ActionTransition {
         for (const condition of this.conditions) {
             condition.reset();
         }
+    }
+
+    public fromJSON(transDef: any, states: Map<string, ActionState>, customConditionCreation?: (conditionDef: any)=>ActionCondition) {
+        // should always have conditions?
+        if (transDef.target === undefined || transDef.conditions === undefined) {
+            throw new Error("Target state not presented in JSON object");
+        }
+        const ts = states.get(transDef.target);
+        if (ts === undefined) {
+            throw new Error("Target state not found: " + transDef.target);
+        }
+
+        this.targetState = ts;
+
+        this.conditions = [];
+
+        // read conditions
+        for (const conditionDef of transDef.conditions) {
+            // condition type
+            // fix me: how to handle custom conditions of games?
+            if(customConditionCreation) {
+                const condition = customConditionCreation(conditionDef);
+                condition.fromJSON(conditionDef);
+                this.conditions.push(condition);
+            }
+        }
+
+        throw new Error("Method not implemented.");
     }
 }

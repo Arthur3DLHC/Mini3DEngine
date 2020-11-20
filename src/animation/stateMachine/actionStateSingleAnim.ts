@@ -1,6 +1,8 @@
 import { Clock } from "../../scene/clock.js";
 import { AnimationAction } from "../animationAction.js";
+import { ActionCondition } from "./actionCondition.js";
 import { ActionState } from "./actionState.js";
+import { ActionStateMachine } from "./actionStateMachine.js";
 
 export class ActionStateSingleAnim extends ActionState {
 
@@ -35,8 +37,8 @@ export class ActionStateSingleAnim extends ActionState {
         }
     }
 
-    public fromJSON(stateDef: any, animations: AnimationAction[]) {
-        super.fromJSON(stateDef, animations);
+    public fromJSON(stateDef: any, animations: AnimationAction[], machine: ActionStateMachine, customConditionCreation?: (conditionDef: any)=>ActionCondition) {
+        super.fromJSON(stateDef, animations, machine, customConditionCreation);
         if(stateDef.animation === undefined) {
             throw new Error("Missing animation name in ActionStateSigleAnim JSON object");
         }

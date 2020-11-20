@@ -2,6 +2,7 @@
  * base class of all action transit conditions
  */
 export class ActionCondition {
+
     /**
      * subclasses override this method to implement their own check logic
      */
@@ -14,5 +15,9 @@ export class ActionCondition {
      */
     public reset() {
 
+    }
+
+    public fromJSON(conditionDef: any) {
+        // subclass do jobs
     }
 }

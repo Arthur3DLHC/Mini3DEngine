@@ -1,4 +1,5 @@
 import { AnimationAction } from "../animationAction.js";
+import { ActionCondition } from "./actionCondition.js";
 import { ActionState } from "./actionState.js";
 import { ActionStateBlendTree } from "./actionStateBlendTree.js";
 import { ActionStateSingleAnim } from "./actionStateSingleAnim.js";
@@ -33,20 +34,27 @@ export class ActionStateMachine {
         }
     }
 
-    public fromJSON(json: any, animations: AnimationAction[]) {
+    public fromJSON(json: any, animations: AnimationAction[], customStateCreation?: (stateDef: any)=> ActionState, customConditionCreation?: (conditionDef: any)=>ActionCondition) {
         this.states.clear();
         if (json.states !== undefined) {
             for (const stateDef of json.states) {
                 switch(stateDef.typeStr) {
                     case "single":
                         const single = new ActionStateSingleAnim(stateDef.name);
-                        single.fromJSON(stateDef, animations);
+                        single.fromJSON(stateDef, animations, this, customConditionCreation);
                         this.addState(single);
                         break;
                     case "blendTree":
                         const blendtree = new ActionStateBlendTree(stateDef.name);
-                        blendtree.fromJSON(stateDef, animations);
+                        blendtree.fromJSON(stateDef, animations, this, customConditionCreation);
                         this.addState(blendtree);
+                        break;
+                    default:
+                        if(customStateCreation) {
+                            const state = customStateCreation(stateDef);
+                            state.fromJSON(stateDef, animations, this, customConditionCreation);
+                            this.addState(state);
+                        }
                         break;
                 }
             }
