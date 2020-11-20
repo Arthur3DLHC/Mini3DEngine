@@ -16,6 +16,7 @@ export class ActionStateBlendTree extends ActionState {
     public rootNode: AnimationBlendNode | null = null;
 
     public fromJSON(stateDef: any, animations: AnimationAction[]) {
+        super.fromJSON(stateDef, animations);
         throw new Error("Method not implemented.");
     }
 }

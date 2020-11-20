@@ -36,6 +36,14 @@ export class ActionStateSingleAnim extends ActionState {
     }
 
     public fromJSON(stateDef: any, animations: AnimationAction[]) {
-        throw new Error("Method not implemented.");
+        super.fromJSON(stateDef, animations);
+        if(stateDef.animation === undefined) {
+            throw new Error("Missing animation name in ActionStateSigleAnim JSON object");
+        }
+        const anim = animations.find((action: AnimationAction) => {return action.name === stateDef.animation});
+        if (anim === undefined) {
+            throw new Error("Animation not found: " + stateDef.animation);
+        }
+        this.animation = anim;
     }
 }

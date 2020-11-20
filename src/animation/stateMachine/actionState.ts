@@ -44,4 +44,8 @@ export class ActionState {
     public exit() {
 
     }
+
+    public fromJSON(stateDef: any, animations: AnimationAction[]) {
+        // todo: name, transitions
+    }
 }
