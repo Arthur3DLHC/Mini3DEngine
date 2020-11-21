@@ -1,10 +1,9 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset, Object3D, BoundingRenderModes, ActionSelector, SkinMesh, ActionStateMachine, ActionState, AnimationAction, ActionTransition, TimeUpCondition, ActionCondition, AnimationLoopMode, ActionStateSingleAnim } from "../../src/mini3DEngine.js";
+import { ActionControlBehavior, GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset, Object3D, BoundingRenderModes, ActionSelector, SkinMesh, ActionStateMachine, ActionState, AnimationAction, ActionTransition, TimeUpCondition, ActionCondition, AnimationLoopMode, ActionStateSingleAnim } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
 import { FirstPersonViewBehavior } from "../common/behaviors/firstPersonViewBehavior.js";
 import { MakePoseBehavior, MakePoses } from "./behaviors/makePoseBehavior.js";
-import { ActionControlBehavior } from "../common/behaviors/actionControlBehavior.js";
 import { MakePoseCondition } from "./actionStates/makePoseCondition.js";
 import { MakePoseState } from "./actionStates/makePoseState.js";
 

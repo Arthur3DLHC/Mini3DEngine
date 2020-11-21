@@ -19,6 +19,11 @@ export class ActionStateBlendTree extends ActionState {
 
     public fromJSON(stateDef: any, animations: AnimationAction[], machine: ActionStateMachine, customConditionCreation?: (conditionDef: any)=>ActionCondition) {
         super.fromJSON(stateDef, animations, machine, customConditionCreation);
-        throw new Error("Method not implemented.");
+
+        if(stateDef.rootNode !== undefined) {
+            const node: AnimationBlendNode = new AnimationBlendNode();
+            node.fromJSON(stateDef.rootNode);
+            this.rootNode = node;
+        }
     }
 }
