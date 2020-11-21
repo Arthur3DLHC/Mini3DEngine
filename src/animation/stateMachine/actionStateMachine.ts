@@ -1,3 +1,4 @@
+import { ActionControlBehavior } from "../actionControlBehavior.js";
 import { AnimationAction } from "../animationAction.js";
 import { ActionCondition } from "./actionCondition.js";
 import { ActionState } from "./actionState.js";
@@ -8,6 +9,10 @@ import { ActionStateSingleAnim } from "./actionStateSingleAnim.js";
  * action state machine
  */
 export class ActionStateMachine {
+    public constructor(actionCtrl: ActionControlBehavior) {
+        this._actionCtrl = actionCtrl;
+    }
+
     public states: Map<string, ActionState> = new Map<string, ActionState>();
 
     private _curState: ActionState | null = null;
@@ -21,6 +26,12 @@ export class ActionStateMachine {
         if (state !== null) {
             state.enter();
         }
+    }
+
+    private _actionCtrl: ActionControlBehavior;
+
+    public get actionCtrl(): ActionControlBehavior {
+        return this._actionCtrl;
     }
 
     public addState(state: ActionState) {

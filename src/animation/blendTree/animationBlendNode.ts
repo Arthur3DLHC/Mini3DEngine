@@ -1,7 +1,12 @@
+import { AnimationAction } from "../animationAction.js";
+
 /**
  * base class of animation nodes
  */
 export class AnimationBlendNode {
+    public constructor() {
+
+    }
 
     // param name in ActionControlBehavior.actionParams
     // for computing children weights
@@ -19,15 +24,17 @@ export class AnimationBlendNode {
      */
     public actualWeight: number = 1;
 
+    public animation: AnimationAction | null = null;
+
     // every children has its weight
     public children: AnimationBlendNode[] = [];
     public parent: AnimationBlendNode | null = null;
 
-    public update() {
-
+    public update(actionParams: Map<string, number>) {
+        // calculate children weight according to blenderParameters
     }
 
-    fromJSON(nodeDef: any) {
+    fromJSON(nodeDef: any, animations: AnimationAction[]) {
         throw new Error("Method not implemented.");
     }
 }

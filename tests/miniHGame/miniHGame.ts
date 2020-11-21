@@ -444,27 +444,27 @@ window.onload = () => {
         return transition;
     }
 
-    function buildActorBehavior(female: Object3D, stateAnimNames: Map<string, string>, animations: AnimationAction[], locations: Map<string, Object3D>, enterStateCallback: ((state: MakePoseState)=>void)|null): MakePoseBehavior {
+    function buildActorBehavior(actor: Object3D, stateAnimNames: Map<string, string>, animations: AnimationAction[], locations: Map<string, Object3D>, enterStateCallback: ((state: MakePoseState)=>void)|null): MakePoseBehavior {
         // add behavior
-        const makePose = new MakePoseBehavior(female);
-        female.behaviors.push(makePose);
+        const makePose = new MakePoseBehavior(actor);
+        actor.behaviors.push(makePose);
 
-        const actionCtrl = new ActionControlBehavior(female);
-        female.behaviors.push(actionCtrl);
+        const actionCtrl = new ActionControlBehavior(actor, animations);
+        actor.behaviors.push(actionCtrl);
 
         // fix me: how to change the action menu on UI when enter states?
 
         // build action state machine
         // states
-        const idle = addNewState(female, actionCtrl.stateMachine, "Idle", true, stateAnimNames, animations, locations, enterStateCallback);
-        const dance = addNewState(female, actionCtrl.stateMachine, "Dancing", true, stateAnimNames, animations, locations, enterStateCallback);
-        const masturbating = addNewState(female, actionCtrl.stateMachine, "Masturbating", true, stateAnimNames, animations, locations, enterStateCallback);
-        const breast = addNewState(female, actionCtrl.stateMachine, "Breast", true, stateAnimNames, animations, locations, enterStateCallback);
-        const oral = addNewState(female, actionCtrl.stateMachine, "Oral", true, stateAnimNames, animations, locations, enterStateCallback);
-        const cowGirl = addNewState(female, actionCtrl.stateMachine, "CowGirl", true, stateAnimNames, animations, locations, enterStateCallback);
-        const cowGirlFast = addNewState(female, actionCtrl.stateMachine, "CowGirl Fast", true, stateAnimNames, animations, locations, enterStateCallback);
-        const cowGirlCum = addNewState(female, actionCtrl.stateMachine, "CowGirl Cum", false, stateAnimNames, animations, locations, enterStateCallback);
-        const cowGirlRest = addNewState(female, actionCtrl.stateMachine, "CowGirl Rest", true, stateAnimNames, animations, locations, enterStateCallback);
+        const idle = addNewState(actor, actionCtrl.stateMachine, "Idle", true, stateAnimNames, animations, locations, enterStateCallback);
+        const dance = addNewState(actor, actionCtrl.stateMachine, "Dancing", true, stateAnimNames, animations, locations, enterStateCallback);
+        const masturbating = addNewState(actor, actionCtrl.stateMachine, "Masturbating", true, stateAnimNames, animations, locations, enterStateCallback);
+        const breast = addNewState(actor, actionCtrl.stateMachine, "Breast", true, stateAnimNames, animations, locations, enterStateCallback);
+        const oral = addNewState(actor, actionCtrl.stateMachine, "Oral", true, stateAnimNames, animations, locations, enterStateCallback);
+        const cowGirl = addNewState(actor, actionCtrl.stateMachine, "CowGirl", true, stateAnimNames, animations, locations, enterStateCallback);
+        const cowGirlFast = addNewState(actor, actionCtrl.stateMachine, "CowGirl Fast", true, stateAnimNames, animations, locations, enterStateCallback);
+        const cowGirlCum = addNewState(actor, actionCtrl.stateMachine, "CowGirl Cum", false, stateAnimNames, animations, locations, enterStateCallback);
+        const cowGirlRest = addNewState(actor, actionCtrl.stateMachine, "CowGirl Rest", true, stateAnimNames, animations, locations, enterStateCallback);
 
         // transitions and their conditions
         addStateTransition(idle, dance, [new MakePoseCondition(MakePoses.DANCE, makePose)]);
