@@ -6,6 +6,7 @@ import { AnimationBlend2D } from "./animationBlend2D.js";
 /**
  * base class of animation nodes
  * todo: subclasses: 1D and 2D blending node
+ * todo: support layered animations (blend animation to some bone and it's children)
  */
 export class AnimationBlendNode {
     public constructor() {
