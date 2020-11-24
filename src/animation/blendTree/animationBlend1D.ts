@@ -1,6 +1,10 @@
 import { AnimationAction } from "../animationAction.js";
 import { AnimationBlendNode } from "./animationBlendNode.js";
 
+/**
+ * 1D blender
+ * can have multiple children; will blend them accroding to their param positions
+ */
 export class AnimationBlend1D extends AnimationBlendNode {
     public update(actionParams: Map<string, number>) {
         // there should be 1 and only 1 blendParameter
@@ -24,26 +28,37 @@ export class AnimationBlend1D extends AnimationBlendNode {
                 let maxLeftChild: AnimationBlendNode | null = null;
                 let minRightChild: AnimationBlendNode | null = null;
                 for (const child of this.children) {
-                    if (child.weightParamPositions.length > 0) {
+                    child.weight = 0;
+                    if (child.weightParamPosition.length > 0) {
                         // const dist = Math.abs(child.weightParamPositions[0] - paramVal);
-                        if (child.weightParamPositions[0] < paramVal) {
+                        if (child.weightParamPosition[0] < paramVal) {
                             // is a left child
-                            if (maxLeftChild === null || maxLeftChild.weightParamPositions[0] < child.weightParamPositions[0]) {
+                            if (maxLeftChild === null || maxLeftChild.weightParamPosition[0] < child.weightParamPosition[0]) {
                                 maxLeftChild = child;
                             }
                         } else {
                             // is a right child
-                            if(minRightChild === null || minRightChild.weightParamPositions[0] > child.weightParamPositions[0]) {
+                            if(minRightChild === null || minRightChild.weightParamPosition[0] > child.weightParamPosition[0]) {
                                 minRightChild = child;
                             }
                         }
-                    } else {
-                        child.weight = 0;
-                        // or throw an error?
                     }
                 }
                 // todo: calc blend weight of 2 children
-
+                // check
+                if (maxLeftChild !== null && minRightChild !== null) {
+                    const distL = paramVal - maxLeftChild.weightParamPosition[0];
+                    const distR = minRightChild.weightParamPosition[0] - paramVal;
+                    const distTotal = distL + distR;
+                    maxLeftChild.weight = distR / distTotal;    // = 1 - distL / distTotal
+                    minRightChild.weight = distL / distTotal;   // = 1 - distR / distTotal
+                } else{
+                    if (maxLeftChild !== null) {
+                        maxLeftChild.weight = 1;    // current value is at right of all children
+                    } else if(minRightChild !== null) {
+                        minRightChild.weight = 1;   // current value is at left of all children
+                    }
+                } 
             }
         }
         
@@ -51,9 +66,5 @@ export class AnimationBlend1D extends AnimationBlendNode {
         for (const child of this.children) {
             child.update(actionParams);
         }
-    }
-
-    public fromJSON(nodeDef: any, animations: AnimationAction[]) {
-        throw new Error("Method not implemented.");
     }
 }

@@ -1,5 +1,7 @@
 import { AnimationAction } from "../animationAction.js";
 import { ActionStateBlendTree } from "../stateMachine/actionStateBlendTree.js";
+import { AnimationBlend1D } from "./animationBlend1D.js";
+import { AnimationBlend2D } from "./animationBlend2D.js";
 
 /**
  * base class of animation nodes
@@ -17,17 +19,20 @@ export class AnimationBlendNode {
     // take from unity3d blendtree
     public blendParameters: string[] = [];
 
-    public weightParamPositions: number[] = [];
+    /**
+     * the k dimension weight posiiton of this node,
+     * in parent blend space
+     */
+    public weightParamPosition: number[] = [];
 
-    // todo: inputs and weights ?
     /**
      * weight of this node in parent scope
      */
-    public weight: number = 1;
+    public weight: number = 0;
     /**
      * weight of this node in global scope?
      */
-    public actualWeight: number = 1;
+    public actualWeight: number = 0;
 
     /**
      * max 1 animation per leaf node
@@ -35,7 +40,7 @@ export class AnimationBlendNode {
     public animation: AnimationAction | null = null;
 
     /**
-     * every child has its own weight
+     * every child has its own weight, and blend position
      */
     public children: AnimationBlendNode[] = [];
     public parent: AnimationBlendNode | null = null;
@@ -45,6 +50,48 @@ export class AnimationBlendNode {
     }
 
     public fromJSON(nodeDef: any, animations: AnimationAction[]) {
-        throw new Error("Method not implemented.");
+        this.blendParameters = [];
+        if (nodeDef.blendParameters !== undefined) {
+            for (const paramName of nodeDef.blendParameters) {
+                this.blendParameters.push(paramName);
+            }
+        }
+        this.weightParamPosition = [];
+        if (nodeDef.weightParamPosition !== undefined) {
+            for (const elem of nodeDef.weightParamPosition) {
+                this.weightParamPosition.push(elem);
+            }
+        }
+        this.weight = 0;
+        this.actualWeight = 0;
+        this.animation = null;
+        if (nodeDef.animation !== undefined) {
+            const animAction = animations.find((action: AnimationAction) => {return action.name === nodeDef.animation});
+            if (animAction !== undefined) {
+                this.animation = animAction;
+            }
+        }
+        // children
+        if (nodeDef.children !== undefined) {
+            for (const childDef of nodeDef.children) {
+                let child: AnimationBlendNode | null = null;
+                switch (childDef.nodeType) {
+                    case "1D":
+                        child = new AnimationBlend1D();
+                        break;
+                    case "2D":
+                        child = new AnimationBlend2D();
+                        break;
+                    default:
+                        throw new Error("Unkown blend node type: " + childDef.nodeType)
+                        break;
+                }
+                if(child !== null) {
+                    child.fromJSON(childDef, animations);
+                    child.parent = this;
+                    this.children.push(child);
+                }
+            }
+        }
     }
 }
