@@ -17,7 +17,6 @@ export enum BlendMethods {
 /**
  * base class of animation nodes
  * todo: subclasses: 1D and 2D blending node
- * todo: support layered (partial) animations (blend animation to some bone and it's children)
  */
 export class AnimationBlendNode {
     public constructor() {
@@ -32,6 +31,8 @@ export class AnimationBlendNode {
     public blendParameters: string[] = [];
 
     public blendMehtod: BlendMethods = BlendMethods.Simple1D;
+
+    // todo: support layered (partial) animations (blend animation only to some bone and it's children)
 
     /**
      * the k dimension weight posiiton of this node,
