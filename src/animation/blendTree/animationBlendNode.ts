@@ -1,12 +1,23 @@
 import { AnimationAction } from "../animationAction.js";
-import { ActionStateBlendTree } from "../stateMachine/actionStateBlendTree.js";
-import { AnimationBlend1D } from "./animationBlend1D.js";
-import { AnimationBlend2D } from "./animationBlend2D.js";
+
+/**
+ * take from unity3d...
+ */
+export enum BlendMethods {
+    Simple1D,
+    SimpleDirectional2D,
+    FreeformDirectional2D,
+    FreeformCartesian2D,
+    /**
+     * control children weights directly
+     */
+    Direct,
+}
 
 /**
  * base class of animation nodes
  * todo: subclasses: 1D and 2D blending node
- * todo: support layered animations (blend animation to some bone and it's children)
+ * todo: support layered (partial) animations (blend animation to some bone and it's children)
  */
 export class AnimationBlendNode {
     public constructor() {
@@ -19,6 +30,8 @@ export class AnimationBlendNode {
     // for computing children weights
     // take from unity3d blendtree
     public blendParameters: string[] = [];
+
+    public blendMehtod: BlendMethods = BlendMethods.Simple1D;
 
     /**
      * the k dimension weight posiiton of this node,
@@ -47,7 +60,94 @@ export class AnimationBlendNode {
     public parent: AnimationBlendNode | null = null;
 
     public update(actionParams: Map<string, number>) {
-        // subclasses calculate children weight according to blenderParameters
+        // update my actual weight
+        this.actualWeight = this.weight * (this.parent === null ? 1.0 : this.parent.actualWeight);
+    
+        switch(this.blendMehtod) {
+            case BlendMethods.Simple1D:
+                this.blendSimple1D(actionParams);
+                break;
+            case BlendMethods.SimpleDirectional2D:
+                this.blendSimpleDirectional2D(actionParams);
+                break;
+            case BlendMethods.FreeformDirectional2D:
+                this.blendFreeformDirectional2D(actionParams);
+                break;
+            case BlendMethods.FreeformCartesian2D:
+                this.blendFreeformCartesian2D(actionParams);
+                break;
+            case BlendMethods.Direct:
+                this.blendDirect(actionParams);
+                break;
+        }
+
+        // update children
+        for (const child of this.children) {
+            child.update(actionParams);
+        }
+    }
+    private blendDirect(actionParams: Map<string, number>) {
+        // do not need do anything. the weights of children need not to modify now.
+    }
+    private blendFreeformCartesian2D(actionParams: Map<string, number>) {
+        throw new Error("Method not implemented.");
+    }
+    private blendFreeformDirectional2D(actionParams: Map<string, number>) {
+        throw new Error("Method not implemented.");
+    }
+    private blendSimpleDirectional2D(actionParams: Map<string, number>) {
+        throw new Error("Method not implemented.");
+    }
+    private blendSimple1D(actionParams: Map<string, number>) {
+        // there should be 1 and only 1 blendParameter
+        if (this.blendParameters.length < 1) {
+            return;
+        }
+        const paramVal = actionParams.get(this.blendParameters[0]);
+        if (paramVal === undefined) {
+            return;
+        }
+        // calculate children weight according to blendParameters
+        if (this.children.length > 0) {
+            if (this.children.length < 2) {
+                this.children[0].weight = 1;
+            } else {
+                // find 2 closest children and blend between them
+                let maxLeftChild: AnimationBlendNode | null = null;
+                let minRightChild: AnimationBlendNode | null = null;
+                for (const child of this.children) {
+                    child.weight = 0;
+                    if (child.weightParamPosition.length > 0) {
+                        // const dist = Math.abs(child.weightParamPositions[0] - paramVal);
+                        if (child.weightParamPosition[0] < paramVal) {
+                            // is a left child
+                            if (maxLeftChild === null || maxLeftChild.weightParamPosition[0] < child.weightParamPosition[0]) {
+                                maxLeftChild = child;
+                            }
+                        } else {
+                            // is a right child
+                            if (minRightChild === null || minRightChild.weightParamPosition[0] > child.weightParamPosition[0]) {
+                                minRightChild = child;
+                            }
+                        }
+                    }
+                }
+                // calc weights of 2 nearest children
+                if (maxLeftChild !== null && minRightChild !== null) {
+                    const distL = paramVal - maxLeftChild.weightParamPosition[0];
+                    const distR = minRightChild.weightParamPosition[0] - paramVal;
+                    const distTotal = distL + distR;
+                    maxLeftChild.weight = distR / distTotal;    // = 1 - distL / distTotal
+                    minRightChild.weight = distL / distTotal;   // = 1 - distR / distTotal
+                } else {
+                    if (maxLeftChild !== null) {
+                        maxLeftChild.weight = 1;    // current value is at right of all children
+                    } else if (minRightChild !== null) {
+                        minRightChild.weight = 1;   // current value is at left of all children
+                    }
+                }
+            }
+        }
     }
 
     public fromJSON(nodeDef: any, animations: AnimationAction[]) {
@@ -72,21 +172,24 @@ export class AnimationBlendNode {
                 this.animation = animAction;
             }
         }
+        if (nodeDef.blendMethod !== undefined) {
+            this.blendMehtod = nodeDef.blendMethod;
+        }
         // children
         if (nodeDef.children !== undefined) {
             for (const childDef of nodeDef.children) {
-                let child: AnimationBlendNode | null = null;
-                switch (childDef.nodeType) {
-                    case "1D":
-                        child = new AnimationBlend1D();
-                        break;
-                    case "2D":
-                        child = new AnimationBlend2D();
-                        break;
-                    default:
-                        throw new Error("Unkown blend node type: " + childDef.nodeType)
-                        break;
-                }
+                let child: AnimationBlendNode = new AnimationBlendNode();
+                // switch (childDef.nodeType) {
+                //     case "1D":
+                //         child = new AnimationBlend1D();
+                //         break;
+                //     case "2D":
+                //         child = new AnimationBlend2D();
+                //         break;
+                //     default:
+                //         throw new Error("Unkown blend node type: " + childDef.nodeType)
+                //         break;
+                // }
                 if(child !== null) {
                     child.fromJSON(childDef, animations);
                     child.parent = this;
