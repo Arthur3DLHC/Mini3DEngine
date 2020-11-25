@@ -88,7 +88,7 @@ export class AnimationBlendNode {
         }
     }
     private blendDirect(actionParams: Map<string, number>) {
-        // do not need do anything. the weights of children need not to modify now.
+        // do not need do anything. the weights of children need not to be modified now.
     }
     private blendFreeformCartesian2D(actionParams: Map<string, number>) {
         throw new Error("Method not implemented.");
@@ -97,8 +97,48 @@ export class AnimationBlendNode {
         throw new Error("Method not implemented.");
     }
     private blendSimpleDirectional2D(actionParams: Map<string, number>) {
+        let paramX: number | undefined = 0;
+        let paramY: number | undefined = 0;
+        if (this.blendParameters.length > 0) {
+            paramX = actionParams.get(this.blendParameters[0]);
+        }
+        if (this.blendParameters.length > 1) {
+            paramY = actionParams.get(this.blendParameters[1]);
+        }
+
+        if (paramX === undefined || paramY === undefined) {
+            throw new Error("param(s) not found: " + this.blendParameters[0] + ", " + this.blendParameters[1]);
+        }
+
+        const phi = Math.atan2(paramY, paramX);
+
+        // find nearest 2 children in polar space
+        let maxLeftChild: AnimationBlendNode | null = null;
+        let minRightChild: AnimationBlendNode | null = null;
+
+        for (const child of this.children) {
+            
+        }
+
+        // blend between them
+
+        // find if there are children in center
+
+        // blend between 2 children and center
+
         throw new Error("Method not implemented.");
     }
+
+    private getRadialDifference(phi: number, sampleX: number, sampleY: number): number {
+        const samplePhi = Math.atan2(sampleY, sampleX);
+        let diffPhi = samplePhi - phi;
+        diffPhi = diffPhi % (2.0 * Math.PI);
+        if (diffPhi < 0) {
+            diffPhi += 2.0 * Math.PI;
+        }
+        return diffPhi;
+    }
+
     private blendSimple1D(actionParams: Map<string, number>) {
         // there should be 1 and only 1 blendParameter
         if (this.blendParameters.length < 1) {
@@ -106,7 +146,7 @@ export class AnimationBlendNode {
         }
         const paramVal = actionParams.get(this.blendParameters[0]);
         if (paramVal === undefined) {
-            return;
+            throw new Error("param not found: " + this.blendParameters[0]);
         }
         // calculate children weight according to blendParameters
         if (this.children.length > 0) {
