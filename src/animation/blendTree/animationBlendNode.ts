@@ -115,16 +115,56 @@ export class AnimationBlendNode {
         // find nearest 2 children in polar space
         let maxLeftChild: AnimationBlendNode | null = null;
         let minRightChild: AnimationBlendNode | null = null;
+        let maxLeftDiff: number = 0;
+        let minRightDiff: number = 0;
+
+        let centerChild: AnimationBlendNode | null = null;
 
         for (const child of this.children) {
-            
+            child.weight = 0;
+
+            let sampleX = child.weightParamPosition[0] || 0;
+            let sampleY = child.weightParamPosition[1] || 0;
+
+            if (sampleX === 0 && sampleY === 0) {
+                // center point, can not calc atan
+                centerChild = child;
+                continue;
+            }
+
+            const radialDiff = this.getRadialDifference(phi, sampleX, sampleY);
+
+            if (minRightChild === null || radialDiff < minRightDiff) {
+                minRightChild = child;
+                minRightDiff = radialDiff;
+            }
+            if (maxLeftChild === null || radialDiff > maxLeftDiff) {
+                maxLeftChild = child;
+                maxLeftDiff = radialDiff;
+            }
         }
 
-        // blend between them
+        // blend between them, use radial difference
+        if (maxLeftChild !== null && minRightChild !== null) {
+            const distL = Math.PI * 2 - maxLeftDiff;
+            const distR = minRightDiff;
+            const distTotal = distL + distR;
+            maxLeftChild.weight = distR / distTotal; // 1 - distL / distTotal
+            minRightChild.weight = distL / distTotal; // 1 - distR / distTotal
+        } else {
+            if (maxLeftChild !== null) {
+                maxLeftChild.weight = 1;
+            }
+            if (minRightChild !== null) {
+                minRightChild.weight = 1;
+            }
+        }
 
         // find if there are children in center
-
-        // blend between 2 children and center
+        if (centerChild !== null) {
+            // blend between 2 children and center
+            
+        }
 
         throw new Error("Method not implemented.");
     }
@@ -132,6 +172,7 @@ export class AnimationBlendNode {
     private getRadialDifference(phi: number, sampleX: number, sampleY: number): number {
         const samplePhi = Math.atan2(sampleY, sampleX);
         let diffPhi = samplePhi - phi;
+        // move the result to [0, 2pi];
         diffPhi = diffPhi % (2.0 * Math.PI);
         if (diffPhi < 0) {
             diffPhi += 2.0 * Math.PI;
