@@ -43,7 +43,7 @@ export class ActionControlBehavior extends Behavior {
     }
 
     public fromJSON(jsonData: any, customStateCreation?: (stateDef: any)=> ActionState, customConditionCreation?: (conditionDef: any)=>ActionCondition) {
-        // params
+        // add params first
         this._actionParams.clear();
 
         if (jsonData.actionParams !== undefined) {
