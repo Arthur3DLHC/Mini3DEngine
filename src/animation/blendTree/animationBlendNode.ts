@@ -165,8 +165,10 @@ export class AnimationBlendNode {
             const y1 = minRightChild.weightParamPosition[1] || 0;
 
             // Solving equations
-            t0 = (x1 * paramY - paramX * y1) / (x1 * y0 - x0 * y1);
-            t1 = (paramX - t0 * x0) / x1;
+            const denominator = (x1 * y0 - x0 * y1);
+            t0 = (x1 * paramY - paramX * y1) / denominator;
+            t1 = (paramX - t0 * x0) / x1;                       // 1 less multiplycation
+            // t1 = (paramX * y0 - x0 * paramY) / denominator;
 
             const tsum = t0 + t1;
 
