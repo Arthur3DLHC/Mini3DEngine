@@ -48,25 +48,36 @@ export class ActionStateMachine {
     public fromJSON(json: any, animations: AnimationAction[], customStateCreation?: (stateDef: any)=> ActionState, customConditionCreation?: (conditionDef: any)=>ActionCondition) {
         this.states.clear();
         if (json.states !== undefined) {
+            // need to add all states to machine first
+            // becaulse the actionTransition.fromJSON method need a complte list of all states
+            // to find it's target state
             for (const stateDef of json.states) {
                 switch(stateDef.typeStr) {
                     case "single":
                         const single = new ActionStateSingleAnim(stateDef.name);
-                        single.fromJSON(stateDef, animations, this, customConditionCreation);
+                        // single.fromJSON(stateDef, animations, this, customConditionCreation);
                         this.addState(single);
                         break;
                     case "blendTree":
                         const blendtree = new ActionStateBlendTree(stateDef.name);
-                        blendtree.fromJSON(stateDef, animations, this, customConditionCreation);
+                        // blendtree.fromJSON(stateDef, animations, this, customConditionCreation);
                         this.addState(blendtree);
                         break;
                     default:
                         if(customStateCreation) {
                             const state = customStateCreation(stateDef);
-                            state.fromJSON(stateDef, animations, this, customConditionCreation);
+                            // state.fromJSON(stateDef, animations, this, customConditionCreation);
                             this.addState(state);
                         }
                         break;
+                }
+            }
+            // then call the fromJSON for all states
+            for (let index = 0; index < json.states.length; index++) {
+                const stateDef = json.states[index];
+                const state = this.states.get(stateDef.name);
+                if (state !== undefined) {
+                    state.fromJSON(stateDef, animations, this, customConditionCreation);
                 }
             }
         }
