@@ -356,8 +356,11 @@ export class AnimationBlendNode {
             const animAction = animations.find((action: AnimationAction) => {return action.name === nodeDef.animation});
             if (animAction !== undefined) {
                 this.animation = animAction;
+            } else {
+                throw new Error("Animation not found: " + nodeDef.animation);
             }
         }
+        // note: the blendMethod in JSON should be numbers, 0 1 2 ... 
         if (nodeDef.blendMethod !== undefined) {
             this.blendMehtod = nodeDef.blendMethod;
         }
@@ -376,11 +379,11 @@ export class AnimationBlendNode {
                 //         throw new Error("Unkown blend node type: " + childDef.nodeType)
                 //         break;
                 // }
-                if(child !== null) {
+                //if(child !== null) {
                     child.fromJSON(childDef, animations);
                     child.parent = this;
                     this.children.push(child);
-                }
+                //}
             }
         }
     }
