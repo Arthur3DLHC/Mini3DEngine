@@ -97,6 +97,9 @@ export class AnimationBlendNode {
         throw new Error("Method not implemented.");
     }
     private blendSimpleDirectional2D(actionParams: Map<string, number>) {
+
+        // ref: https://blog.csdn.net/weixin_34111819/article/details/89286796
+
         let paramX: number | undefined = 0;
         let paramY: number | undefined = 0;
         if (this.blendParameters.length > 0) {
@@ -144,6 +147,55 @@ export class AnimationBlendNode {
             }
         }
 
+        // todo: use vector operation to find the blend factor
+        // let p = vec2(paramX, paramY)
+        // p0 = vec2(maxLeftChild.sampleX, maxLeftChild.sampleY)
+        // p1 = vec2(minRightChild.sampleX, minRightChild.sampleY)
+        // there should be t0, t1 to make:
+        // p = t0 * p0 + t1 * p1
+        // so   weight0 = t0 / (t0 + t1)
+        //      weight1 = t1 / (t0 + t1)
+        let t0 = 0.5;
+        let t1 = 0.5;
+        if (maxLeftChild !== null && minRightChild !== null) {
+            const x0 = maxLeftChild.weightParamPosition[0] || 0;
+            const y0 = maxLeftChild.weightParamPosition[1] || 0;
+    
+            const x1 = minRightChild.weightParamPosition[0] || 0;
+            const y1 = minRightChild.weightParamPosition[1] || 0;
+
+            // Solving equations
+            t0 = (x1 * paramY - paramX * y1) / (x1 * y0 - x0 * y1);
+            t1 = (paramX - t0 * x0) / x1;
+
+            const tsum = t0 + t1;
+
+            maxLeftChild.weight = t0 / tsum;    // not inverse; if t0 = 1, the p is at p0
+            minRightChild.weight = t1 / tsum;   // not inverse; if t1 = 1, the p is at p1
+        } else {
+            if (maxLeftChild !== null) {
+                maxLeftChild.weight = 1;
+                t0 = 1; t1 = 0;
+            }
+            if (minRightChild !== null) {
+                minRightChild.weight = 1;
+                t0 = 0; t1 = 1;
+            }
+        }
+        
+        // find if there are children in center
+        if (centerChild !== null) {
+            // blend between 2 children and center
+            centerChild.weight = Math.max(0, Math.min(t0 + t1, 1));
+            if (maxLeftChild !== null) {
+                maxLeftChild.weight *= 1 - centerChild.weight;
+            }
+            if (minRightChild !== null) {
+                minRightChild.weight *= 1 - centerChild.weight;
+            }
+        }
+
+        /*
         // blend between them, use radial difference
         if (maxLeftChild !== null && minRightChild !== null) {
             const distL = Math.PI * 2 - maxLeftDiff;
@@ -159,14 +211,7 @@ export class AnimationBlendNode {
                 minRightChild.weight = 1;
             }
         }
-
-        // find if there are children in center
-        if (centerChild !== null) {
-            // blend between 2 children and center
-            
-        }
-
-        throw new Error("Method not implemented.");
+        */
     }
 
     private getRadialDifference(phi: number, sampleX: number, sampleY: number): number {
