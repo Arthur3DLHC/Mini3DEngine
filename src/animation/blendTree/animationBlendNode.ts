@@ -1,4 +1,6 @@
+import { Clock } from "../../scene/clock.js";
 import { AnimationAction } from "../animationAction.js";
+import { AnimationApplyMode } from "../animationChannel.js";
 
 /**
  * take from unity3d...
@@ -60,7 +62,43 @@ export class AnimationBlendNode {
     public children: AnimationBlendNode[] = [];
     public parent: AnimationBlendNode | null = null;
 
-    public update(actionParams: Map<string, number>) {
+    public playAnimation() {
+        if (this.animation !== null) {
+            this.animation.reset();     // sync when start playing
+            this.animation.play();
+        }
+        for (const child of this.children) {
+            child.playAnimation();
+        }
+    }
+
+    public stopAnimation() {
+        if (this.animation !== null) {
+            this.animation.stop();
+        }
+        for (const child of this.children) {
+            child.stopAnimation();
+        }
+    }
+
+    public clearAnimationTargetChannelValues() {
+        // fix me: how to clear?
+        if (this.animation !== null) {
+            this.animation.weight = 0;
+            this.animation.applyMode = AnimationApplyMode.replace;
+            this.animation.update(Clock.instance.curTime, 0);
+        }
+
+        for (const child of this.children) {
+            child.clearAnimationTargetChannelValues();
+        }
+    }
+
+    /**
+     * upate weights of all nodes
+     * @param actionParams current action param values on animation controller
+     */
+    public updateWeights(actionParams: Map<string, number>) {
         // update my actual weight
         this.actualWeight = this.weight * (this.parent === null ? 1.0 : this.parent.actualWeight);
     
@@ -84,9 +122,28 @@ export class AnimationBlendNode {
 
         // update children
         for (const child of this.children) {
-            child.update(actionParams);
+            child.updateWeights(actionParams);
         }
     }
+
+    public updateAnimations() {
+        // if a node's weight is zero, all it's children will not affect the result animation
+        if (this.actualWeight < 0.001) {
+            return;
+        }
+
+        // blend animations with weight
+        if (this.animation !== null) {
+            this.animation.weight = this.actualWeight;
+            this.animation.applyMode = AnimationApplyMode.add;
+            this.animation.update(Clock.instance.curTime, Clock.instance.elapsedTime);
+        }
+
+        for (const child of this.children) {
+            child.updateAnimations();
+        }
+    }
+
     private blendDirect(actionParams: Map<string, number>) {
         // do not need do anything. the weights of children need not to be modified now.
     }

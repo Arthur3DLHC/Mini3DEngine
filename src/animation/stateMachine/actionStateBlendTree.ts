@@ -20,8 +20,27 @@ export class ActionStateBlendTree extends ActionState {
     public update() {
         super.update();
         if (this.rootNode !== null && this.machine !== null) {
-            // todo: blend the animations according to the global weights?
-            this.rootNode.update(this.machine.actionCtrl.actionParams);
+            this.rootNode.updateWeights(this.machine.actionCtrl.actionParams);
+            // todo: clear all target channel values of animations in node?
+            this.rootNode.clearAnimationTargetChannelValues();
+            // todo: blend the animations according to the node global weights?
+            this.rootNode.updateAnimations();
+        }
+    }
+
+    public enter() {
+        super.enter();
+        // play all leaf node animations
+        if (this.rootNode !== null) {
+            this.rootNode.playAnimation();
+        }
+    }
+
+    public exit() {
+        super.exit();
+        // stop all leaf node animations
+        if (this.rootNode !== null) {
+            this.rootNode.stopAnimation();
         }
     }
 

@@ -17,6 +17,7 @@ export class AnimationAction {
         this._curPlaybackTime = 0;
         this._speed = 1;
         this._weight = 1;
+        this._applyMode = AnimationApplyMode.replace;
         this._isPlaying = false;
         this.LoopMode = AnimationLoopMode.Repeat;
     }
@@ -42,6 +43,12 @@ export class AnimationAction {
         }
     }
 
+    public get weight(): number {return this._weight;}
+    public set weight(w: number) {this._weight = w;}
+
+    public get applyMode(): AnimationApplyMode {return this._applyMode;}
+    public set applyMode(mode: AnimationApplyMode) {this._applyMode = mode;}
+
     private _clip: AnimationClip;
     private _channels: AnimationChannel[];
 
@@ -50,6 +57,7 @@ export class AnimationAction {
 
     // todo: anim blend weight
     private _weight: number;
+    private _applyMode: AnimationApplyMode;
 
     private _isPlaying: boolean;
 
@@ -99,7 +107,7 @@ export class AnimationAction {
         }
 
         for (const channel of this._channels) {
-            channel.apply(this._curPlaybackTime, this._weight, AnimationApplyMode.replace);
+            channel.apply(this._curPlaybackTime, this._weight, this._applyMode);
         }
     }
 }
