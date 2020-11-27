@@ -22,7 +22,12 @@ export class AnimationLayer {
 
     public stateMachine : ActionStateMachine | null = null;
 
-    // todo: apply blendWeight to animations
+    // todo: apply blendWeight to animations, how?
+    public update() {
+        if (this.stateMachine !== null) {
+            this.stateMachine.update();
+        }
+    }
 
     public fromJSON(jsonData: any, jointRoot: Object3D, actionControl: ActionControlBehavior, animations: AnimationAction[], customStateCreation?: (stateDef: any) => ActionState, customConditionCreation?: (conditionDef: any) => ActionCondition) {
         if (jsonData.name === undefined) {

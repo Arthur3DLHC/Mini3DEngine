@@ -1,6 +1,7 @@
 import { Behavior } from "../scene/behavior.js";
 import { Object3D } from "../scene/object3D.js";
 import { AnimationAction } from "./animationAction.js";
+import { AnimationLayer } from "./animationLayer.js";
 import { ActionCondition } from "./stateMachine/actionCondition.js";
 import { ActionState } from "./stateMachine/actionState.js";
 import { ActionStateMachine } from "./stateMachine/actionStateMachine.js";
@@ -11,18 +12,24 @@ import { ActionStateMachine } from "./stateMachine/actionStateMachine.js";
 export class ActionControlBehavior extends Behavior {
     public constructor(owner: Object3D, anims: AnimationAction[]) {
         super(owner);
-        this._stateMachine = new ActionStateMachine(this);
+        // this._stateMachine = new ActionStateMachine(this);
         this._actionParams = new Map<string, number>();
         this._animations = anims;
+        this.animationLayers = [];
     }
 
-    private _stateMachine: ActionStateMachine;
+    // private _stateMachine: ActionStateMachine;
     private _actionParams: Map<string, number>
     private _animations: AnimationAction[];
 
-    public get stateMachine(): ActionStateMachine {
-        return this._stateMachine;
-    }
+    // public get stateMachine(): ActionStateMachine {
+    //     return this._stateMachine;
+    // }
+
+    /**
+     * if layer's blendMode is replace, the later elements will replace the former
+     */
+    public animationLayers: AnimationLayer[];
 
     /**
      * the parameters driving the state machine
@@ -39,7 +46,9 @@ export class ActionControlBehavior extends Behavior {
     }
 
     public update() {
-        this._stateMachine.update();
+        for (const layer of this.animationLayers) {
+            layer.update();
+        }
     }
 
     public fromJSON(jsonData: any, customStateCreation?: (stateDef: any)=> ActionState, customConditionCreation?: (conditionDef: any)=>ActionCondition) {
@@ -56,10 +65,19 @@ export class ActionControlBehavior extends Behavior {
                 }
             }
         }
+
+        if (jsonData.animationLayers !== undefined) {
+            this.animationLayers = [];
+            for (const layerDef of jsonData.animationLayers) {
+                const layer = new AnimationLayer();
+                layer.fromJSON(layerDef, this.owner, this, this._animations, customStateCreation, customConditionCreation);
+                this.animationLayers.push(layer);
+            }
+        }
         
         // state machine
-        if (jsonData.stateMachine !== undefined) {
-            this._stateMachine.fromJSON(jsonData.stateMachine, this._animations, customStateCreation, customConditionCreation);
-        }
+        // if (jsonData.stateMachine !== undefined) {
+        //     this._stateMachine.fromJSON(jsonData.stateMachine, this._animations, customStateCreation, customConditionCreation);
+        // }
     }
 }

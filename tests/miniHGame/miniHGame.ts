@@ -1,4 +1,4 @@
-import { ActionControlBehavior, GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset, Object3D, BoundingRenderModes, ActionSelector, SkinMesh, ActionStateMachine, ActionState, AnimationAction, ActionTransition, TimeUpCondition, ActionCondition, AnimationLoopMode, ActionStateSingleAnim } from "../../src/mini3DEngine.js";
+import { ActionControlBehavior, GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, GLTFLoader, GLTFSceneBuilder, GltfAsset, Object3D, BoundingRenderModes, ActionSelector, SkinMesh, ActionStateMachine, ActionState, AnimationAction, ActionTransition, TimeUpCondition, ActionCondition, AnimationLoopMode, ActionStateSingleAnim, AnimationLayer } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
@@ -452,19 +452,24 @@ window.onload = () => {
         const actionCtrl = new ActionControlBehavior(actor, animations);
         actor.behaviors.push(actionCtrl);
 
+        const layer = new AnimationLayer();
+        layer.name = "BaseLayer";
+        actionCtrl.animationLayers.push(layer);
+
+        layer.stateMachine = new ActionStateMachine(actionCtrl);
         // fix me: how to change the action menu on UI when enter states?
 
         // build action state machine
         // states
-        const idle = addNewState(actor, actionCtrl.stateMachine, "Idle", true, stateAnimNames, animations, locations, enterStateCallback);
-        const dance = addNewState(actor, actionCtrl.stateMachine, "Dancing", true, stateAnimNames, animations, locations, enterStateCallback);
-        const masturbating = addNewState(actor, actionCtrl.stateMachine, "Masturbating", true, stateAnimNames, animations, locations, enterStateCallback);
-        const breast = addNewState(actor, actionCtrl.stateMachine, "Breast", true, stateAnimNames, animations, locations, enterStateCallback);
-        const oral = addNewState(actor, actionCtrl.stateMachine, "Oral", true, stateAnimNames, animations, locations, enterStateCallback);
-        const cowGirl = addNewState(actor, actionCtrl.stateMachine, "CowGirl", true, stateAnimNames, animations, locations, enterStateCallback);
-        const cowGirlFast = addNewState(actor, actionCtrl.stateMachine, "CowGirl Fast", true, stateAnimNames, animations, locations, enterStateCallback);
-        const cowGirlCum = addNewState(actor, actionCtrl.stateMachine, "CowGirl Cum", false, stateAnimNames, animations, locations, enterStateCallback);
-        const cowGirlRest = addNewState(actor, actionCtrl.stateMachine, "CowGirl Rest", true, stateAnimNames, animations, locations, enterStateCallback);
+        const idle = addNewState(actor, layer.stateMachine, "Idle", true, stateAnimNames, animations, locations, enterStateCallback);
+        const dance = addNewState(actor, layer.stateMachine, "Dancing", true, stateAnimNames, animations, locations, enterStateCallback);
+        const masturbating = addNewState(actor, layer.stateMachine, "Masturbating", true, stateAnimNames, animations, locations, enterStateCallback);
+        const breast = addNewState(actor, layer.stateMachine, "Breast", true, stateAnimNames, animations, locations, enterStateCallback);
+        const oral = addNewState(actor, layer.stateMachine, "Oral", true, stateAnimNames, animations, locations, enterStateCallback);
+        const cowGirl = addNewState(actor, layer.stateMachine, "CowGirl", true, stateAnimNames, animations, locations, enterStateCallback);
+        const cowGirlFast = addNewState(actor, layer.stateMachine, "CowGirl Fast", true, stateAnimNames, animations, locations, enterStateCallback);
+        const cowGirlCum = addNewState(actor, layer.stateMachine, "CowGirl Cum", false, stateAnimNames, animations, locations, enterStateCallback);
+        const cowGirlRest = addNewState(actor, layer.stateMachine, "CowGirl Rest", true, stateAnimNames, animations, locations, enterStateCallback);
 
         // transitions and their conditions
         addStateTransition(idle, dance, [new MakePoseCondition(MakePoses.DANCE, makePose)]);
@@ -481,7 +486,7 @@ window.onload = () => {
         addStateTransition(cowGirlRest, masturbating, [new MakePoseCondition(MakePoses.MASTURBATE, makePose)]);
     
         // enter
-        actionCtrl.stateMachine.curState = idle;
+        layer.stateMachine.curState = idle;
 
         return makePose;
     }

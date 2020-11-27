@@ -1,5 +1,7 @@
 // TODO: export all public classes of engine
 export * from "./animation/actionControlBehavior.js";
+export * from "./animation/animationLayer.js";
+export * from "./animation/animationMask.js";
 export * from "./animation/actionSelector.js";
 export * from "./animation/stateMachine/actionCondition.js";
 export * from "./animation/stateMachine/actionState.js";
