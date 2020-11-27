@@ -138,6 +138,18 @@ export class Object3D {
         return null;
     }
 
+    public getObjectByPath(path: string): Object3D | null {
+        const names = path.split("|");
+        let ret: Object3D | null = this;
+        for (const name of names) {
+            if (ret === null) {
+                return null;
+            }
+            ret = ret.getChildByName(name);
+        }
+        return ret;
+    }
+
     public activate(activateParents: boolean, activateChildren: boolean) {
         if (activateParents && this.parent) {
             this.parent.activate(true, false);

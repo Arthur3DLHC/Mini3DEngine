@@ -1,3 +1,4 @@
+import { Object3D } from "../scene/object3D.js";
 import { ActionControlBehavior } from "./actionControlBehavior.js";
 import { AnimationAction } from "./animationAction.js";
 import { AnimationApplyMode } from "./animationChannel.js";
@@ -21,7 +22,9 @@ export class AnimationLayer {
 
     public stateMachine : ActionStateMachine | null = null;
 
-    public fromJSON(jsonData: any, actionControl: ActionControlBehavior, animations: AnimationAction[], customStateCreation?: (stateDef: any) => ActionState, customConditionCreation?: (conditionDef: any) => ActionCondition) {
+    // todo: apply blendWeight to animations
+
+    public fromJSON(jsonData: any, jointRoot: Object3D, actionControl: ActionControlBehavior, animations: AnimationAction[], customStateCreation?: (stateDef: any) => ActionState, customConditionCreation?: (conditionDef: any) => ActionCondition) {
         if (jsonData.name === undefined) {
             throw new Error("animation layer name not found");
         }
@@ -30,7 +33,7 @@ export class AnimationLayer {
 
         if (jsonData.mask !== undefined) {
             this.mask = new AnimationMask();
-            this.mask.fromJSON(jsonData.mask);
+            this.mask.fromJSON(jsonData.mask, jointRoot);
         }
 
         if (jsonData.blendWeight !== undefined) {
