@@ -1,8 +1,8 @@
-import { ActionStateSingleAnim, Object3D } from "../../../src/mini3DEngine.js";
+import { ActionStateMachine, ActionStateSingleAnim, Object3D } from "../../../src/mini3DEngine.js";
 
 export class MakePoseState extends ActionStateSingleAnim {
-    public constructor(name: string, location: Object3D, owner: Object3D) {
-        super(name);
+    public constructor(name: string, location: Object3D, owner: Object3D, machine: ActionStateMachine) {
+        super(name, machine);
         this._location = location;
         this._owner = owner;
         this.onEnter = null;

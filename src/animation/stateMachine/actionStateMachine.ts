@@ -1,5 +1,6 @@
 import { ActionControlBehavior } from "../actionControlBehavior.js";
 import { AnimationAction } from "../animationAction.js";
+import { AnimationLayer } from "../animationLayer.js";
 import { ActionCondition } from "./actionCondition.js";
 import { ActionState } from "./actionState.js";
 import { ActionStateBlendTree } from "./actionStateBlendTree.js";
@@ -9,8 +10,9 @@ import { ActionStateSingleAnim } from "./actionStateSingleAnim.js";
  * action state machine
  */
 export class ActionStateMachine {
-    public constructor(actionCtrl: ActionControlBehavior) {
+    public constructor(actionCtrl: ActionControlBehavior, animLayer: AnimationLayer) {
         this._actionCtrl = actionCtrl;
+        this._animLayer = animLayer;
     }
 
     public states: Map<string, ActionState> = new Map<string, ActionState>();
@@ -34,8 +36,13 @@ export class ActionStateMachine {
         return this._actionCtrl;
     }
 
+    private _animLayer: AnimationLayer;
+
+    public get animationLayer(): AnimationLayer {
+        return this._animLayer;
+    }
+
     public addState(state: ActionState) {
-        state.machine = this;
         this.states.set(state.name, state);
     }
 
@@ -54,12 +61,12 @@ export class ActionStateMachine {
             for (const stateDef of json.states) {
                 switch(stateDef.typeStr) {
                     case "single":
-                        const single = new ActionStateSingleAnim(stateDef.name);
+                        const single = new ActionStateSingleAnim(stateDef.name, this);
                         // single.fromJSON(stateDef, animations, this, customConditionCreation);
                         this.addState(single);
                         break;
                     case "blendTree":
-                        const blendtree = new ActionStateBlendTree(stateDef.name);
+                        const blendtree = new ActionStateBlendTree(stateDef.name, this);
                         // blendtree.fromJSON(stateDef, animations, this, customConditionCreation);
                         this.addState(blendtree);
                         break;

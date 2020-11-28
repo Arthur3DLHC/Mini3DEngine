@@ -1,6 +1,7 @@
 import { Clock } from "../../scene/clock.js";
 import { AnimationAction } from "../animationAction.js";
 import { AnimationApplyMode } from "../animationChannel.js";
+import { ActionStateBlendTree } from "../stateMachine/actionStateBlendTree.js";
 
 /**
  * take from unity3d...
@@ -21,8 +22,8 @@ export enum BlendMethods {
  * todo: subclasses: 1D and 2D blending node
  */
 export class AnimationBlendNode {
-    public constructor() {
-
+    public constructor(tree: ActionStateBlendTree) {
+        this._tree = tree;
     }
 
     // public blendTree: ActionStateBlendTree | null = null;
@@ -61,6 +62,9 @@ export class AnimationBlendNode {
      */
     public children: AnimationBlendNode[] = [];
     public parent: AnimationBlendNode | null = null;
+
+    public get tree(): ActionStateBlendTree {return this._tree;}
+    private _tree: ActionStateBlendTree;
 
     public playAnimation() {
         if (this.animation !== null) {
@@ -134,8 +138,11 @@ export class AnimationBlendNode {
 
         // blend animations with weight
         if (this.animation !== null) {
+            // the layer weight has been applied to root node of blend tree
             this.animation.weight = this.actualWeight;
+            // the values have been cleared to 0 before
             this.animation.applyMode = AnimationApplyMode.add;
+            this.animation.mask = this.tree.machine.animationLayer.mask;
             this.animation.update(Clock.instance.curTime, Clock.instance.elapsedTime);
         }
 
@@ -367,7 +374,7 @@ export class AnimationBlendNode {
         // children
         if (nodeDef.children !== undefined) {
             for (const childDef of nodeDef.children) {
-                let child: AnimationBlendNode = new AnimationBlendNode();
+                let child: AnimationBlendNode = new AnimationBlendNode(this.tree);
                 // switch (childDef.nodeType) {
                 //     case "1D":
                 //         child = new AnimationBlend1D();

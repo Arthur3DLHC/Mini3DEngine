@@ -6,8 +6,8 @@ import { ActionStateMachine } from "./actionStateMachine.js";
 
 export class ActionStateSingleAnim extends ActionState {
 
-    public constructor(name: string) {
-        super(name);
+    public constructor(name: string, machine: ActionStateMachine) {
+        super(name, machine);
         this.animation = null;
     }
 
@@ -17,6 +17,12 @@ export class ActionStateSingleAnim extends ActionState {
     public update() {
         super.update();
         if (this.animation !== null) {
+            if (this.machine !== null) {
+                // fix me: how to use the blendMode of the layer?
+                this.animation.weight = this.machine.animationLayer.blendWeight;
+                this.animation.mask = this.machine.animationLayer.mask;
+            }
+            
             this.animation.update(Clock.instance.curTime, Clock.instance.elapsedTime);
         }
     }

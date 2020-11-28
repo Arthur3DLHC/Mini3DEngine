@@ -51,7 +51,7 @@ export class AnimationLayer {
         
         // state machine
         if (jsonData.stateMachine !== undefined) {
-            this.stateMachine = new ActionStateMachine(actionControl);
+            this.stateMachine = new ActionStateMachine(actionControl, this);
             this.stateMachine.fromJSON(jsonData.stateMachine, animations, customStateCreation, customConditionCreation);
         }
     }

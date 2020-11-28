@@ -8,12 +8,14 @@ import { ActionCondition } from "./actionCondition.js";
  * base class of action states
  */
 export class ActionState {
-    public constructor(name: string) {
+    public constructor(name: string, machine: ActionStateMachine) {
         this._name = name;
-        this.machine = null;
+        this._machine = machine;
     }
 
-    public machine: ActionStateMachine | null;
+    private _machine: ActionStateMachine;
+    public get machine(): ActionStateMachine {return this._machine;}
+    public set machine(mc: ActionStateMachine) {this._machine = mc;}
     private _name: string;
     public get name(): string {return this._name;}
 
@@ -49,7 +51,6 @@ export class ActionState {
     public fromJSON(stateDef: any, animations: AnimationAction[], machine: ActionStateMachine, customConditionCreation?: (conditionDef: any)=>ActionCondition) {
         // name has assigned in constructor
         this.transitions = [];
-        this.machine = machine;
         if (stateDef.transitions !== undefined) {
             for (const transDef of stateDef.transitions) {
                 const transition: ActionTransition = new ActionTransition(this);

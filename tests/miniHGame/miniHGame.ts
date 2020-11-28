@@ -427,7 +427,7 @@ window.onload = () => {
         if (location === undefined) {
             throw new Error("Make location not found:" + animName);
         }
-        const state = new MakePoseState(stateName, location, character);
+        const state = new MakePoseState(stateName, location, character, stateMachine);
         state.onEnter = callback;
         setAnimationFor(state, animName, animRepeat, animations);
         stateMachine.addState(state);
@@ -456,7 +456,7 @@ window.onload = () => {
         layer.name = "BaseLayer";
         actionCtrl.animationLayers.push(layer);
 
-        layer.stateMachine = new ActionStateMachine(actionCtrl);
+        layer.stateMachine = new ActionStateMachine(actionCtrl, layer);
         // fix me: how to change the action menu on UI when enter states?
 
         // build action state machine

@@ -10,8 +10,8 @@ import { ActionStateMachine } from "./actionStateMachine.js";
  */
 export class ActionStateBlendTree extends ActionState {
 
-    public constructor(name: string) {
-        super(name);
+    public constructor(name: string, machine: ActionStateMachine) {
+        super(name, machine);
     }
 
     // hold the animation blend tree
@@ -20,6 +20,7 @@ export class ActionStateBlendTree extends ActionState {
     public update() {
         super.update();
         if (this.rootNode !== null && this.machine !== null) {
+            this.rootNode.weight = this.machine.animationLayer.blendWeight;
             this.rootNode.updateWeights(this.machine.actionCtrl.actionParams);
             // todo: clear all target channel values of animations in node?
             this.rootNode.clearAnimationTargetChannelValues();
@@ -48,7 +49,7 @@ export class ActionStateBlendTree extends ActionState {
         super.fromJSON(stateDef, animations, machine, customConditionCreation);
 
         if(stateDef.rootNode !== undefined) {
-            const node: AnimationBlendNode = new AnimationBlendNode();
+            const node: AnimationBlendNode = new AnimationBlendNode(this);
             node.fromJSON(stateDef.rootNode, animations);
             this.rootNode = node;
         }
