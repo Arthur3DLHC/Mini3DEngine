@@ -11,7 +11,12 @@ export class AnimationMask {
     // public jointPathes: string[] = [];
 
     // cache the target joint objects? for performance
+    // todo: use a map? to improve performance?
     public joints: Object3D[] = [];
+
+    public contains(joint: Object3D): boolean {
+        return this.joints.find((j)=>{j === joint}) !== undefined;
+    }
 
     /**
      * load from json data

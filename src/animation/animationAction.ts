@@ -1,5 +1,7 @@
 import { AnimationClip } from "./animationClip.js";
 import { AnimationChannel, AnimationApplyMode } from "./animationChannel.js";
+import { Object3D } from "../scene/object3D.js";
+import { AnimationMask } from "./animationMask.js";
 
 export enum AnimationLoopMode {
     Once,
@@ -18,6 +20,7 @@ export class AnimationAction {
         this._speed = 1;
         this._weight = 1;
         this._applyMode = AnimationApplyMode.replace;
+        this._mask = null;
         this._isPlaying = false;
         this.LoopMode = AnimationLoopMode.Repeat;
     }
@@ -49,6 +52,9 @@ export class AnimationAction {
     public get applyMode(): AnimationApplyMode {return this._applyMode;}
     public set applyMode(mode: AnimationApplyMode) {this._applyMode = mode;}
 
+    public get mask(): AnimationMask | null {return this._mask;}
+    public set mask(m: AnimationMask | null) {this._mask = m;}
+
     private _clip: AnimationClip;
     private _channels: AnimationChannel[];
 
@@ -58,6 +64,7 @@ export class AnimationAction {
     // todo: anim blend weight
     private _weight: number;
     private _applyMode: AnimationApplyMode;
+    private _mask: AnimationMask | null;
 
     private _isPlaying: boolean;
 
@@ -106,8 +113,17 @@ export class AnimationAction {
             }
         }
 
-        for (const channel of this._channels) {
-            channel.apply(this._curPlaybackTime, this._weight, this._applyMode);
+        // have mask?
+        if (this._mask === null) {
+            for (const channel of this._channels) {
+                channel.apply(this._curPlaybackTime, this._weight, this._applyMode);
+            } 
+        } else {
+            for (const channel of this._channels) {
+                if (this._mask.contains(channel.target)) {
+                    channel.apply(this._curPlaybackTime, this._weight, this._applyMode);
+                }
+            }
         }
     }
 }
