@@ -310,36 +310,23 @@ window.onload = () => {
         //          |- idle
         //          |- walk
         //          |- jog
-        blendTree.rootNode = new AnimationBlendNode(blendTree);
-        blendTree.rootNode.blendMehtod = BlendMethods.Simple1D;
-        blendTree.rootNode.blendParameters.push("aiming");
-        
-        const aimingNode = new AnimationBlendNode(blendTree);
+        blendTree.rootNode = new AnimationBlendNode(blendTree, ["aiming"], BlendMethods.Simple1D, undefined, 1);
+
+        // aiming == 1
+        const aimingNode = new AnimationBlendNode(blendTree, ["moveSpeed"], BlendMethods.Simple1D, [1]);
         blendTree.rootNode.addChild(aimingNode);
-        aimingNode.weightParamPosition.push(1); // aiming: 1
-        aimingNode.blendMehtod = BlendMethods.Simple1D;
-        aimingNode.blendParameters.push("moveSpeed");
         
-        const aimingBackwardNode = new AnimationBlendNode(blendTree);
+        // moveSpeed == -1
+        const aimingBackwardNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [-1], 1, getAnimationByName(animations, "Female.Aim.Walk.Backward"));
         aimingNode.addChild(aimingBackwardNode);
-        aimingBackwardNode.weightParamPosition.push(-1);    // moveSpeed: -1
-        aimingBackwardNode.blendMehtod = BlendMethods.Direct;
-        aimingBackwardNode.weight = 1;
-        aimingBackwardNode.animation = getAnimationByName(animations, "Female.Aim.Walk.Backward");
 
-        const aimingIdleNode = new AnimationBlendNode(blendTree);
+        // moveSpeed == 0
+        const aimingIdleNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [0], 1,  getAnimationByName(animations, "Female.Aim.Middle"));
         aimingNode.addChild(aimingIdleNode);
-        aimingIdleNode.weightParamPosition.push(0);     // moveSpeed: 0
-        aimingIdleNode.blendMehtod = BlendMethods.Direct;
-        aimingIdleNode.weight = 1;
-        aimingIdleNode.animation = getAnimationByName(animations, "Female.Aim.Middle");
 
-        const aimingForwardNode = new AnimationBlendNode(blendTree);
+        // moveSpeed == 1
+        const aimingForwardNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [1], 1, getAnimationByName(animations, "Female.Aim.Walk.Forward"));
         aimingNode.addChild(aimingForwardNode);
-        aimingForwardNode.weightParamPosition.push(1)       // moveSpeed: 1
-        aimingForwardNode.blendMehtod = BlendMethods.Direct;
-        aimingForwardNode.weight = 1;
-        aimingForwardNode.animation = getAnimationByName(animations, "Female.Aim.Walk.Forward");
 
         /*
         // not aiming state

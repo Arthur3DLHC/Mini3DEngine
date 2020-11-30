@@ -23,8 +23,19 @@ export enum BlendMethods {
  */
 export class AnimationBlendNode {
 
-    public constructor(tree: ActionStateBlendTree) {
+    public constructor(tree: ActionStateBlendTree,
+        blendParams?: string[],
+        blendMethod?: BlendMethods,
+        weightParamPosition?: number[],
+        weight?: number,
+        animation?: AnimationAction ) {
         this._tree = tree;
+
+        if(blendParams !== undefined) this.blendParameters = blendParams;
+        if(blendMethod !== undefined) this.blendMehtod = blendMethod;
+        if(weightParamPosition !== undefined) this.weightParamPosition = weightParamPosition;
+        if(weight !== undefined) this.weight = weight;
+        if(animation !== undefined) this.animation = animation;
     }
 
     // public blendTree: ActionStateBlendTree | null = null;
@@ -39,7 +50,7 @@ export class AnimationBlendNode {
     // todo: support layered (partial) animations (blend animation only to some bone and it's children)
 
     /**
-     * the k dimension weight posiiton of this node,
+     * the k dimension param posiiton of this node where my weight == 1,
      * in parent blend space
      */
     public weightParamPosition: number[] = [];
