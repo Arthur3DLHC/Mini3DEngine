@@ -1,12 +1,10 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition, ActionStateBlendTree, AnimationBlendNode, BlendMethods } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
 import { SceneHelper } from "../common/sceneHelper.js";
 import quat from "../../lib/tsm/quat.js";
 import { ThirdPersonCtrlBehavior } from "../common/behaviors/thirdPersonCtrlBehavior.js";
-import { AnimationBlendNode } from "../../src/animation/blendTree/animationBlendNode.js";
-import { ActionStateBlendTree } from "../../src/animation/stateMachine/actionStateBlendTree.js";
 
 window.onload = () => {
     const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
@@ -302,8 +300,46 @@ window.onload = () => {
         const blendTree = new ActionStateBlendTree("tpsTree", baseLayer.stateMachine);
         baseLayer.stateMachine.addState(blendTree);
 
+        // root node
+        //      |- aiming
+        //      |   |- aiming idle
+        //      |   |- aiming forward
+        //      |   |- aiming backward
+        //      |
+        //      |- not aiming
+        //          |- idle
+        //          |- walk
+        //          |- jog
         blendTree.rootNode = new AnimationBlendNode(blendTree);
+        blendTree.rootNode.blendMehtod = BlendMethods.Simple1D;
+        blendTree.rootNode.blendParameters.push("aiming");
         
+        const aimingNode = new AnimationBlendNode(blendTree);
+        blendTree.rootNode.addChild(aimingNode);
+        aimingNode.weightParamPosition.push(1); // aiming: 1
+        aimingNode.blendMehtod = BlendMethods.Simple1D;
+        aimingNode.blendParameters.push("moveSpeed");
+        
+        const aimingBackwardNode = new AnimationBlendNode(blendTree);
+        aimingNode.addChild(aimingBackwardNode);
+        aimingBackwardNode.weightParamPosition.push(-1);    // moveSpeed: -1
+        aimingBackwardNode.blendMehtod = BlendMethods.Direct;
+        aimingBackwardNode.weight = 1;
+        aimingBackwardNode.animation = getAnimationByName(animations, "Female.Aim.Walk.Backward");
+
+        const aimingIdleNode = new AnimationBlendNode(blendTree);
+        aimingNode.addChild(aimingIdleNode);
+        aimingIdleNode.weightParamPosition.push(0);     // moveSpeed: 0
+        aimingIdleNode.blendMehtod = BlendMethods.Direct;
+        aimingIdleNode.weight = 1;
+        aimingIdleNode.animation = getAnimationByName(animations, "Female.Aim.Middle");
+
+        const aimingForwardNode = new AnimationBlendNode(blendTree);
+        aimingNode.addChild(aimingForwardNode);
+        aimingForwardNode.weightParamPosition.push(1)       // moveSpeed: 1
+        aimingForwardNode.blendMehtod = BlendMethods.Direct;
+        aimingForwardNode.weight = 1;
+        aimingForwardNode.animation = getAnimationByName(animations, "Female.Aim.Walk.Forward");
 
         /*
         // not aiming state

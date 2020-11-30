@@ -3,9 +3,11 @@ export * from "./animation/actionControlBehavior.js";
 export * from "./animation/animationLayer.js";
 export * from "./animation/animationMask.js";
 export * from "./animation/actionSelector.js";
+export * from "./animation/blendTree/animationBlendNode.js";
 export * from "./animation/stateMachine/actionCondition.js";
 export * from "./animation/stateMachine/actionState.js";
 export * from "./animation/stateMachine/actionStateSingleAnim.js";
+export * from "./animation/stateMachine/actionStateBlendTree.js"
 export * from "./animation/stateMachine/actionStateMachine.js";
 export * from "./animation/stateMachine/actionTransition.js";
 export * from "./animation/stateMachine/timeUpCondition.js";

@@ -22,6 +22,7 @@ export enum BlendMethods {
  * todo: subclasses: 1D and 2D blending node
  */
 export class AnimationBlendNode {
+
     public constructor(tree: ActionStateBlendTree) {
         this._tree = tree;
     }
@@ -340,6 +341,19 @@ export class AnimationBlendNode {
                     }
                 }
             }
+        }
+    }
+
+    public addChild(child: AnimationBlendNode) {
+        this.children.push(child);
+        child.parent = this;
+    }
+
+    public removeChild(child: AnimationBlendNode) {
+        const idx = this.children.indexOf(child);
+        if (idx >= 0) {
+            this.children.splice(idx, 1);
+            child.parent = null;
         }
     }
 
