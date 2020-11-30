@@ -244,42 +244,6 @@ window.onload = () => {
         const femaleBehavior = buildActorBehavior(gltfSceneFemale, femaleStateAnimNames, actionSelectorFemale.actions, femaleActionPoses, onEnterState);
         const maleBehavior = buildActorBehavior(gltfSceneMale, maleStateAnimNames, actionSelectorMale.actions, maleActionPoses, null);
 
-        // todo: add all action names to action list UI
-        // todo: change to only add actions that current state can transit to?
-        /*
-        const actionList: HTMLDivElement = document.getElementById("actionList") as HTMLDivElement;
-        actionList.innerHTML = "";
-
-        for (let actidx = 0; actidx < actionNames.length; actidx++) {
-            const actionItem: HTMLDivElement = document.createElement("div");
-                actionItem.id = "action_" + actidx;
-                actionItem.innerHTML = actionNames[actidx];
-                actionItem.className = "actionItem";
-                actionItem.onclick = (ev: MouseEvent) => {
-
-                    actionSelectorMale.playAction(maleActionNames[actidx]);
-                    actionSelectorFemale.playAction(femaleActionNames[actidx]);
-
-                    // todo: put characters on love pose location
-                    const lovePoseFemale = femaleActionPoses.get(femaleActionNames[actidx]);
-                    if (lovePoseFemale !== undefined) {
-                        lovePoseFemale.translation.copy(gltfSceneFemale.translation);
-                        lovePoseFemale.rotation.copy(gltfSceneFemale.rotation);
-                        gltfSceneFemale.updateLocalTransform();
-                    }
-
-                    const lovePoseMale = maleActionPoses.get(maleActionNames[actidx]);
-                    if (lovePoseMale !== undefined) {
-                        // the rotation and translation should be relative to the room scene root node
-                        lovePoseMale.translation.copy(gltfSceneMale.translation);
-                        lovePoseMale.rotation.copy(gltfSceneMale.rotation);
-                        gltfSceneMale.updateLocalTransform();
-                    }
-                }
-                actionList.appendChild(actionItem);
-        }
-        */
-
         console.log("start game loop...");
 
         Clock.instance.start();
@@ -345,8 +309,9 @@ window.onload = () => {
         Clock.instance.update(now);
         scene.updateBehavior();
 
-        actionSelectorFemale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
-        actionSelectorMale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
+        // not used anymore
+        // actionSelectorFemale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
+        // actionSelectorMale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
 
         scene.updateWorldTransform(false, true);
         SkinMesh.updateSkinMeshes(scene);

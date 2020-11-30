@@ -133,12 +133,14 @@ void main(void)
     float roughness = metallicRoughness.y;
 
     // fix me: subsurface amount and color use textures?
+    /*
     float curvature = 0.0;
     if(u_material.subsurface > 0.0) {
         // fix me: using position and normal, the curvature is too blocky
         curvature = 0.2;
         // curvature = calcCurvature(n, ex_worldPosition);
     }
+    */
 
     // vec2 dither = getDither();
 
@@ -301,6 +303,7 @@ void main(void)
         // todo: test the new simple subsurface scattering function
         // 
         // vec4 subsuf = vec4(0.0);
+        /*
         if(u_material.subsurface > 0.0) {
             // TODO: 根据 ndotl 和 curvature 取样 subsurface BRDF texture
             // vec3 subsuf = subsurfaceScattering(NdotL, curvature, u_material.subsurfaceColor, u_material.subsurface);
@@ -311,6 +314,7 @@ void main(void)
 
             f_subsurface += intensity * subsurfaceRadiance(n, v, l, u_material.subsurface, u_material.subsurfaceRadius, u_material.subsurfacePower, u_material.subsurfaceColor, u_material.subsurfaceThickness);
         }
+        */
 
         // float NdotV = clampedDot(n, v);  // 前面已经算过了，与光源无关
         if (NdotL > 0.0 || NdotV > 0.0)

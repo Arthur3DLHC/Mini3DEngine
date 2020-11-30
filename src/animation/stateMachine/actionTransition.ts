@@ -3,8 +3,8 @@ import { ActionState } from "./actionState.js";
 
 export class ActionTransition {
 
-    public constructor(state: ActionState) {
-        this._state = state;
+    public constructor(ownerState: ActionState) {
+        this._state = ownerState;
     }
 
     public conditions: ActionCondition[] = [];
