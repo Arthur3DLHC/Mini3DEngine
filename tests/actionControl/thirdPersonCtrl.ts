@@ -362,10 +362,61 @@ window.onload = () => {
         upperBodyLayer.blendWeight = 0;
 
         // todo: mask
+        // write a help function to add a joint and all it's children to the layer mask
 
         // state machine
+        upperBodyLayer.stateMachine = new ActionStateMachine(actionCtrlBehavior, upperBodyLayer);
+
+        // 2 states
         // aim state (blend tree)
+        const aimBlendTree = new ActionStateBlendTree("upperAimTree", upperBodyLayer.stateMachine);
+        upperBodyLayer.stateMachine.addState(aimBlendTree);
+
+        // root node
+        //      | -aim down
+        //      | -aim straight
+        //      | -aim up
+        aimBlendTree.rootNode = new AnimationBlendNode(aimBlendTree, ["aimUpDown"], BlendMethods.Simple1D, undefined, 1);
+
+        // aimUpDown == -1
+        const aimDownNode = new AnimationBlendNode(aimBlendTree, undefined, BlendMethods.Direct, [-1], 0, getAnimationByName(animations, "Female.Aim.Down"));
+        aimBlendTree.rootNode.addChild(aimDownNode);
+
+        // aimUpDown == 0
+        const aimStraightNode = new AnimationBlendNode(aimBlendTree, undefined, BlendMethods.Direct, [0], 1, getAnimationByName(animations, "Female.Aim.Middle"));
+        aimBlendTree.rootNode.addChild(aimStraightNode);
+
+        // aimUpDown == 1
+        const aimUpNode = new AnimationBlendNode(aimBlendTree, undefined, BlendMethods.Direct, [1], 0, getAnimationByName(animations, "Female.Aim.Down"));
+        aimBlendTree.rootNode.addChild(aimUpNode);
+
         // fire state (blend tree)
+        const fireBlendTree = new ActionStateBlendTree("upperFireTree", upperBodyLayer.stateMachine);
+        upperBodyLayer.stateMachine.addState(fireBlendTree);
+
+        // fix me: model animations not done
+        // root node
+        //      | -fire down
+        //      | -fire straight
+        //      | -fire up
+
+        fireBlendTree.rootNode = new AnimationBlendNode(fireBlendTree, ["aimUpDown"], BlendMethods.Simple1D, undefined, 1);
+
+        // aimUpDown == -1
+        const fireDownNode = new AnimationBlendNode(fireBlendTree, undefined, BlendMethods.Direct, [-1], 0,
+            getAnimationByName(animations, "Female.Aim.Down"));
+        fireBlendTree.rootNode.addChild(fireDownNode);
+
+        // aimUpDown == 0
+        const fireStraitNode = new AnimationBlendNode(fireBlendTree, undefined, BlendMethods.Direct, [0], 1,
+            getAnimationByName(animations, "Female.Aim.Middle"));
+        fireBlendTree.rootNode.addChild(fireStraitNode);
+
+        // aimUpDown == 1
+        const fireUpNode = new AnimationBlendNode(fireBlendTree, undefined, BlendMethods.Direct, [1], 0,
+            getAnimationByName(animations, "Female.Aim.Down"));
+        fireBlendTree.rootNode.addChild(fireUpNode);
+
         // the weight of this layer will be zero in other states
     }
 }
