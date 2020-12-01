@@ -47,8 +47,6 @@ export class AnimationBlendNode {
 
     public blendMehtod: BlendMethods = BlendMethods.Simple1D;
 
-    // todo: support layered (partial) animations (blend animation only to some bone and it's children)
-
     /**
      * the k dimension param posiiton of this node where my weight == 1,
      * in parent blend space

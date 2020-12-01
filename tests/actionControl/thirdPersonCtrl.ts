@@ -303,8 +303,8 @@ window.onload = () => {
         // root node
         //      |- aiming
         //      |   |- aiming idle
-        //      |   |- aiming forward
-        //      |   |- aiming backward
+        //      |   |- aiming move forward
+        //      |   |- aiming move backward
         //      |
         //      |- not aiming
         //          |- idle
@@ -313,7 +313,7 @@ window.onload = () => {
         blendTree.rootNode = new AnimationBlendNode(blendTree, ["aiming"], BlendMethods.Simple1D, undefined, 1);
 
         // aiming == 1
-        const aimingNode = new AnimationBlendNode(blendTree, ["moveSpeed"], BlendMethods.Simple1D, [1]);
+        const aimingNode = new AnimationBlendNode(blendTree, ["moveSpeed"], BlendMethods.Simple1D, [1], 0);
         blendTree.rootNode.addChild(aimingNode);
         
         // moveSpeed == -1
@@ -327,6 +327,22 @@ window.onload = () => {
         // moveSpeed == 1
         const aimingForwardNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [1], 1, getAnimationByName(animations, "Female.Aim.Walk.Forward"));
         aimingNode.addChild(aimingForwardNode);
+
+        // aiming == 0
+        const notAimingNode = new AnimationBlendNode(blendTree, ["moveSpeed"], BlendMethods.Simple1D, [0], 1);
+        blendTree.rootNode.addChild(notAimingNode);
+
+        // moveSpeed == 0
+        const idleNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [0], 1, getAnimationByName(animations, "Female.Idle"));
+        notAimingNode.addChild(idleNode);
+
+        // moveSpeed == 0.5
+        const walkNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [0.5], 0, getAnimationByName(animations, "Female.Walk"));
+        notAimingNode.addChild(walkNode);
+
+        // moveSpeed == 1
+        const jogNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [1], 0, getAnimationByName(animations, "Female.Jog"));
+        notAimingNode.addChild(jogNode);
 
         /*
         // not aiming state
