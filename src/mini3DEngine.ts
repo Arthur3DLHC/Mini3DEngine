@@ -10,6 +10,7 @@ export * from "./animation/stateMachine/actionStateSingleAnim.js";
 export * from "./animation/stateMachine/actionStateBlendTree.js"
 export * from "./animation/stateMachine/actionStateMachine.js";
 export * from "./animation/stateMachine/actionTransition.js";
+export * from "./animation/stateMachine/singleParamCondition.js";
 export * from "./animation/stateMachine/timeUpCondition.js";
 export * from "./animation/animationAction.js";
 export * from "./contentLoaders/baseLoader.js";

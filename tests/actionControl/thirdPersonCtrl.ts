@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition, ActionStateBlendTree, AnimationBlendNode, BlendMethods } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition, ActionStateBlendTree, AnimationBlendNode, BlendMethods, SingleParamCondition, TimeUpCondition } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
@@ -418,6 +418,23 @@ window.onload = () => {
         fireBlendTree.rootNode.addChild(fireUpNode);
 
         // the weight of this layer will be zero in other states
+
+        // todo: state transitions and conditions
+        // add a general condition class?
+        // evaluate condition according to the params on actionControlBehavior?
+
+        // aim to fire
+        // use SingleParamCondition
+        const aim_fire = new ActionTransition(aimBlendTree);
+        aimBlendTree.transitions.push(aim_fire);
+        aim_fire.targetState = fireBlendTree;
+        aim_fire.conditions.push(new SingleParamCondition(actionCtrlBehavior, "fire", "===", 1));
+
+        // fire to aim (timeup?)
+        const fire_aim = new ActionTransition(fireBlendTree);
+        fireBlendTree.transitions.push(fire_aim);
+        fire_aim.targetState = aimBlendTree;
+        fire_aim.conditions.push(new TimeUpCondition(0.5));
     }
 }
 

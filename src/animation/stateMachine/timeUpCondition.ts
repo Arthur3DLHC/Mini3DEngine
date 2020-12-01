@@ -2,12 +2,14 @@ import { Clock } from "../../scene/clock.js";
 import { ActionCondition } from "./actionCondition.js";
 
 export class TimeUpCondition extends ActionCondition {
-    public constructor(duration: number) {
+    public constructor(duration?: number) {
         super();
-        this._duration = duration;
-        this._timeLeft = duration;
+        if( duration !== undefined ) {
+            this._duration = duration;
+            this._timeLeft = duration;
+        }
     }
-    private _duration: number;
+    private _duration: number = 1;
     private _timeLeft: number = 0;
 
     public get isTrue() {
@@ -17,5 +19,13 @@ export class TimeUpCondition extends ActionCondition {
 
     public reset() {
         this._timeLeft = this._duration;
+    }
+
+    public fromJSON(conditionDef: any) {
+        // subclass do jobs
+        if (conditionDef.duration !== undefined) {
+            this._duration = conditionDef.duration;
+            this._timeLeft = conditionDef.duration;
+        }
     }
 }
