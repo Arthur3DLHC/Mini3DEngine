@@ -287,6 +287,8 @@ window.onload = () => {
         actionCtrlBehavior.actionParams.set("aimUpDown", 0.0);
         // -1 - move backward (aiming only); 0 - idle; 1 - move forward
         actionCtrlBehavior.actionParams.set("moveSpeed", 0.0);
+        // 0 - not shooting; 1 - shooting
+        actionCtrlBehavior.actionParams.set("shoot", 0.0);
 
         const baseLayer = new AnimationLayer();
         actionCtrlBehavior.animationLayers.push(baseLayer);
@@ -397,32 +399,32 @@ window.onload = () => {
         const aimUpNode = new AnimationBlendNode(aimBlendTree, undefined, BlendMethods.Direct, [1], 0, getAnimationByName(animations, "Female.Aim.Down"));
         aimBlendTree.rootNode.addChild(aimUpNode);
 
-        // fire state (blend tree)
-        const fireBlendTree = new ActionStateBlendTree("upperFireTree", upperBodyLayer.stateMachine);
-        upperBodyLayer.stateMachine.addState(fireBlendTree);
+        // shoot state (blend tree)
+        const shootBlendTree = new ActionStateBlendTree("upperShootTree", upperBodyLayer.stateMachine);
+        upperBodyLayer.stateMachine.addState(shootBlendTree);
 
         // fix me: model animations not done
         // root node
-        //      | -fire down
-        //      | -fire straight
-        //      | -fire up
+        //      | -shoot down
+        //      | -shoot straight
+        //      | -shoot up
 
-        fireBlendTree.rootNode = new AnimationBlendNode(fireBlendTree, ["aimUpDown"], BlendMethods.Simple1D, undefined, 1);
+        shootBlendTree.rootNode = new AnimationBlendNode(shootBlendTree, ["aimUpDown"], BlendMethods.Simple1D, undefined, 1);
 
         // aimUpDown == -1
-        const fireDownNode = new AnimationBlendNode(fireBlendTree, undefined, BlendMethods.Direct, [-1], 0,
-            getAnimationByName(animations, "Female.Aim.Down"));
-        fireBlendTree.rootNode.addChild(fireDownNode);
+        const shootDownNode = new AnimationBlendNode(shootBlendTree, undefined, BlendMethods.Direct, [-1], 0,
+            getAnimationByName(animations, "Female.Shoot.Down"));
+        shootBlendTree.rootNode.addChild(shootDownNode);
 
         // aimUpDown == 0
-        const fireStraitNode = new AnimationBlendNode(fireBlendTree, undefined, BlendMethods.Direct, [0], 1,
-            getAnimationByName(animations, "Female.Aim.Middle"));
-        fireBlendTree.rootNode.addChild(fireStraitNode);
+        const shootStraitNode = new AnimationBlendNode(shootBlendTree, undefined, BlendMethods.Direct, [0], 1,
+            getAnimationByName(animations, "Female.Shoot.Middle"));
+        shootBlendTree.rootNode.addChild(shootStraitNode);
 
         // aimUpDown == 1
-        const fireUpNode = new AnimationBlendNode(fireBlendTree, undefined, BlendMethods.Direct, [1], 0,
-            getAnimationByName(animations, "Female.Aim.Down"));
-        fireBlendTree.rootNode.addChild(fireUpNode);
+        const shootUpNode = new AnimationBlendNode(shootBlendTree, undefined, BlendMethods.Direct, [1], 0,
+            getAnimationByName(animations, "Female.Shoot.Down"));
+        shootBlendTree.rootNode.addChild(shootUpNode);
 
         // the weight of this layer will be zero in other states
 
@@ -430,18 +432,18 @@ window.onload = () => {
         // add a general condition class?
         // evaluate condition according to the params on actionControlBehavior?
 
-        // aim to fire
+        // aim to shoot
         // use SingleParamCondition
-        const aim_fire = new ActionTransition(aimBlendTree);
-        aimBlendTree.transitions.push(aim_fire);
-        aim_fire.targetState = fireBlendTree;
-        aim_fire.conditions.push(new SingleParamCondition(actionCtrlBehavior, "fire", "===", 1));
+        const aim_shoot = new ActionTransition(aimBlendTree);
+        aimBlendTree.transitions.push(aim_shoot);
+        aim_shoot.targetState = shootBlendTree;
+        aim_shoot.conditions.push(new SingleParamCondition(actionCtrlBehavior, "shoot", "===", 1));
 
-        // fire to aim (timeup?)
-        const fire_aim = new ActionTransition(fireBlendTree);
-        fireBlendTree.transitions.push(fire_aim);
-        fire_aim.targetState = aimBlendTree;
-        fire_aim.conditions.push(new TimeUpCondition(0.5));
+        // shoot to aim (timeup?)
+        const shoot_aim = new ActionTransition(shootBlendTree);
+        shootBlendTree.transitions.push(shoot_aim);
+        shoot_aim.targetState = aimBlendTree;
+        shoot_aim.conditions.push(new TimeUpCondition(0.5));
     }
 }
 

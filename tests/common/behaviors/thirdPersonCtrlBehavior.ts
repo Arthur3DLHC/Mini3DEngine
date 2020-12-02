@@ -202,6 +202,8 @@ export class ThirdPersonCtrlBehavior extends Behavior {
         this._deltaRot.x -= this._deltaRot.x * this.smoothness;
         this._deltaRot.y -= this._deltaRot.y * this.smoothness;
 
+        // todo: pitch limit property
+
         if (this.pitch > 1.56) {
             this.pitch = 1.56;
         }
