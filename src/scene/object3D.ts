@@ -129,12 +129,20 @@ export class Object3D {
         }
     }
 
-    public getChildByName(name: string): Object3D | null {
+    public getChildByName(name: string, recursive: boolean = false): Object3D | null {
         for (const child of this._children) {
             if (child.name === name) {
                 return child;
             }
+
+            if (recursive) {
+                const ret = child.getChildByName(name, recursive)
+                if (ret !== null) {
+                    return ret;
+                }
+            }
         }
+        
         return null;
     }
 

@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition, ActionStateBlendTree, AnimationBlendNode, BlendMethods, SingleParamCondition, TimeUpCondition } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition, ActionStateBlendTree, AnimationBlendNode, BlendMethods, SingleParamCondition, TimeUpCondition, AnimationMask } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
@@ -361,8 +361,15 @@ window.onload = () => {
         upperBodyLayer.name = "upperBody";
         upperBodyLayer.blendWeight = 0;
 
-        // todo: mask
-        // write a help function to add a joint and all it's children to the layer mask
+        // mask
+        upperBodyLayer.mask = new AnimationMask();
+
+        const maskRootName = "spine.001";
+        const upperBodyRootJoint = actor.getChildByName(maskRootName, true);
+        if (upperBodyRootJoint === null) {
+            throw new Error("Mask root joint not found: " + maskRootName);
+        }
+        addJointHierarchyToLayerMask(upperBodyRootJoint, upperBodyLayer.mask);
 
         // state machine
         upperBodyLayer.stateMachine = new ActionStateMachine(actionCtrlBehavior, upperBodyLayer);
@@ -435,6 +442,13 @@ window.onload = () => {
         fireBlendTree.transitions.push(fire_aim);
         fire_aim.targetState = aimBlendTree;
         fire_aim.conditions.push(new TimeUpCondition(0.5));
+    }
+}
+
+function addJointHierarchyToLayerMask(rootJoint: Object3D, mask: AnimationMask) {
+    mask.joints.push(rootJoint);
+    for (const child of rootJoint.children) {
+        addJointHierarchyToLayerMask(child, mask);
     }
 }
 
