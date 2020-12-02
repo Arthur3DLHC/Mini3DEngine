@@ -61,6 +61,9 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     public yaw: number = 0;
     public pitch: number = 0;
 
+    public get moveYaw(): number {return this._moveYaw;}
+    public get modelYaw(): number {return this._modelYaw;}
+
     public get isAiming(): boolean { return this._isAiming; }
 
     // todo: some state properties for animation state machine.
