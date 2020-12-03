@@ -59,7 +59,7 @@ export class ThirdPersonShooterBehavior extends ThirdPersonCtrlBehavior {
         let updown = Math.max(-pitchLimit, Math.min(this.pitch, pitchLimit));
         updown /= pitchLimit;
 
-        this._actionCtrl.actionParams.set("aimUpDown", updown);
+        this._actionCtrl.actionParams.set("aimPitch", updown);
 
         // shooting?
         this._actionCtrl.actionParams.set("shoot", this._isShooting ? 1 : 0);

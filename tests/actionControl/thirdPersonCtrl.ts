@@ -16,6 +16,11 @@ window.onload = () => {
 
     GLDevice.initialize(canvas);
 
+    const infoPanel: HTMLDivElement = document.getElementById("infoPanel") as HTMLDivElement;
+
+    let lastUpdateFPSTime = 0;
+    let curFPS = 0;
+
     const physicsWorld = new PhysicsWorld({ numIterations: 10 });
     const world = physicsWorld.world;
     world.gravity.set(0.0, -9.0, 0.0);
@@ -203,11 +208,6 @@ window.onload = () => {
         requestAnimationFrame(gameLoop);
     });
 
-    const infoPanel: HTMLDivElement = document.getElementById("infoPanel") as HTMLDivElement;
-
-    let lastUpdateFPSTime = 0;
-    let curFPS = 0;
-
     function gameLoop(now: number) {
         Clock.instance.update(now);
         physicsWorld.step();
@@ -287,7 +287,7 @@ window.onload = () => {
         // 0 - not aiming; 1 - aiming
         actionCtrlBehavior.actionParams.set("aiming", 0.0);
         // -1 - aim down; 0 - aim strait; 1 - aim up
-        actionCtrlBehavior.actionParams.set("aimUpDown", 0.0);
+        actionCtrlBehavior.actionParams.set("aimPitch", 0.0);
         // -1 - move backward (aiming only); 0 - idle; 1 - move forward
         actionCtrlBehavior.actionParams.set("moveSpeed", 0.0);
         // 0 - not shooting; 1 - shooting
@@ -388,18 +388,18 @@ window.onload = () => {
         //      | -aim down
         //      | -aim straight
         //      | -aim up
-        aimBlendTree.rootNode = new AnimationBlendNode(aimBlendTree, ["aimUpDown"], BlendMethods.Simple1D, undefined, 1);
+        aimBlendTree.rootNode = new AnimationBlendNode(aimBlendTree, ["aimPitch"], BlendMethods.Simple1D, undefined, 1);
 
-        // aimUpDown == -1
+        // aimPitch == -1
         const aimDownNode = new AnimationBlendNode(aimBlendTree, undefined, BlendMethods.Direct, [-1], 0, getAnimationByName(animations, "Female.Aim.Down"));
         aimBlendTree.rootNode.addChild(aimDownNode);
 
-        // aimUpDown == 0
+        // aimPitch == 0
         const aimStraightNode = new AnimationBlendNode(aimBlendTree, undefined, BlendMethods.Direct, [0], 1, getAnimationByName(animations, "Female.Aim.Middle"));
         aimBlendTree.rootNode.addChild(aimStraightNode);
 
-        // aimUpDown == 1
-        const aimUpNode = new AnimationBlendNode(aimBlendTree, undefined, BlendMethods.Direct, [1], 0, getAnimationByName(animations, "Female.Aim.Down"));
+        // aimPitch == 1
+        const aimUpNode = new AnimationBlendNode(aimBlendTree, undefined, BlendMethods.Direct, [1], 0, getAnimationByName(animations, "Female.Aim.Up"));
         aimBlendTree.rootNode.addChild(aimUpNode);
 
         // shoot state (blend tree)
@@ -412,21 +412,21 @@ window.onload = () => {
         //      | -shoot straight
         //      | -shoot up
 
-        shootBlendTree.rootNode = new AnimationBlendNode(shootBlendTree, ["aimUpDown"], BlendMethods.Simple1D, undefined, 1);
+        shootBlendTree.rootNode = new AnimationBlendNode(shootBlendTree, ["aimPitch"], BlendMethods.Simple1D, undefined, 1);
 
-        // aimUpDown == -1
+        // aimPitch == -1
         const shootDownNode = new AnimationBlendNode(shootBlendTree, undefined, BlendMethods.Direct, [-1], 0,
             getAnimationByName(animations, "Female.Shoot.Down"));
         shootBlendTree.rootNode.addChild(shootDownNode);
 
-        // aimUpDown == 0
+        // aimPitch == 0
         const shootStraitNode = new AnimationBlendNode(shootBlendTree, undefined, BlendMethods.Direct, [0], 1,
             getAnimationByName(animations, "Female.Shoot.Middle"));
         shootBlendTree.rootNode.addChild(shootStraitNode);
 
-        // aimUpDown == 1
+        // aimPitch == 1
         const shootUpNode = new AnimationBlendNode(shootBlendTree, undefined, BlendMethods.Direct, [1], 0,
-            getAnimationByName(animations, "Female.Shoot.Down"));
+            getAnimationByName(animations, "Female.Shoot.Up"));
         shootBlendTree.rootNode.addChild(shootUpNode);
 
         // the weight of this layer will be zero in other states
