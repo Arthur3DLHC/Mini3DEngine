@@ -192,29 +192,29 @@ window.onload = () => {
         // animation layer, state machine (manually / json)
         addActionControl(gltfSceneFemale, animations, actionCtrlBehavior);
 
-        canvas.onmousedown = (ev: MouseEvent) => {
+        window.onmousedown = (ev: MouseEvent) => {
             // fpsBehavior.onMouseDown(ev);
             if (tpsBehavior !== null) {
                 tpsBehavior.onMouseDown(ev);
             }
         }
 
-        canvas.onmouseup = (ev: MouseEvent) => {
+        window.onmouseup = (ev: MouseEvent) => {
             // fpsBehavior.onMouseUp(ev);
             if (tpsBehavior !== null) tpsBehavior.onMouseUp(ev);
         }
 
-        canvas.onmousemove = (ev: MouseEvent) => {
+        window.onmousemove = (ev: MouseEvent) => {
             // fpsBehavior.onMouseMove(ev);
             if (tpsBehavior !== null) tpsBehavior.onMouseMove(ev);
         }
 
-        canvas.onkeydown = (ev: KeyboardEvent) => {
+        window.onkeydown = (ev: KeyboardEvent) => {
             // fpsBehavior.onKeyDown(ev);
             if (tpsBehavior !== null) tpsBehavior.onKeyDown(ev);
         }
 
-        canvas.onkeyup = (ev: KeyboardEvent) => {
+        window.onkeyup = (ev: KeyboardEvent) => {
             // fpsBehavior.onKeyUp(ev);
             if (tpsBehavior !== null) tpsBehavior.onKeyUp(ev);
         }
