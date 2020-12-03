@@ -15,7 +15,7 @@ export class AnimationMask {
     public joints: Object3D[] = [];
 
     public contains(joint: Object3D): boolean {
-        return this.joints.find((j)=>{j === joint}) !== undefined;
+        return (this.joints.find((j)=>{return j === joint;}) !== undefined);
     }
 
     /**

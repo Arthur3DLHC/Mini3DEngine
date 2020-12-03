@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition, ActionStateBlendTree, AnimationBlendNode, BlendMethods, SingleParamCondition, TimeUpCondition, AnimationMask } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition, ActionStateBlendTree, AnimationBlendNode, BlendMethods, SingleParamCondition, TimeUpCondition, AnimationMask, SkinMesh } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
@@ -115,8 +115,8 @@ window.onload = () => {
         skyboxTexture.samplerState = new SamplerState();
         skyboxTexture.upload();
         scene.background = skyboxTexture;
-        scene.backgroundIntensity = 4;
-        scene.irradianceIntensity = 30;
+        scene.backgroundIntensity = 1;
+        scene.irradianceIntensity = 1;
 
         const builderFemale = new GLTFSceneBuilder();
         const animations: AnimationAction[] = [];
@@ -192,6 +192,8 @@ window.onload = () => {
         // animation layer, state machine (manually / json)
         addActionControl(gltfSceneFemale, animations, actionCtrlBehavior);
 
+        tpsBehavior.upperBodyLayer = actionCtrlBehavior.animationLayers.find((layer)=>{return layer.name === "upperBody";});
+
         window.onmousedown = (ev: MouseEvent) => {
             // fpsBehavior.onMouseDown(ev);
             if (tpsBehavior !== null) {
@@ -239,6 +241,8 @@ window.onload = () => {
         physicsWorld.step();
         scene.updateBehavior();
         scene.updateWorldTransform(false, true);
+        SkinMesh.updateSkinMeshes(scene);
+
         renderer.render(scene);
 
         if (now - lastUpdateFPSTime > 1000) {
@@ -368,12 +372,14 @@ window.onload = () => {
         notAimingNode.addChild(idleNode);
 
         // moveSpeed == 0.5
-        const walkNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [0.5], 0, getAnimationByName(animations, "Female.Walk"));
-        notAimingNode.addChild(walkNode);
+        // const walkNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [0.5], 0, getAnimationByName(animations, "Female.Walk"));
+        // notAimingNode.addChild(walkNode);
 
         // moveSpeed == 1
         const jogNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [1], 0, getAnimationByName(animations, "Female.Jog"));
         notAimingNode.addChild(jogNode);
+
+        baseLayer.stateMachine.curState = blendTree;
 
         /*
         // not aiming state
@@ -395,8 +401,18 @@ window.onload = () => {
         // mask
         upperBodyLayer.mask = new AnimationMask();
 
-        const maskRootName = "spine.001";
-        const upperBodyRootJoint = actor.getChildByName(maskRootName, true);
+        let maskRootName = "spine.001";
+        let upperBodyRootJoint = actor.getChildByName(maskRootName, true);
+        if (upperBodyRootJoint === null) {
+            throw new Error("Mask root joint not found: " + maskRootName);
+        }
+        addJointHierarchyToLayerMask(upperBodyRootJoint, upperBodyLayer.mask);
+
+        // for the convenience of making rig animation,
+        // the parent of spine.002 is spine.IK, not spine.001. It use a copylocatoin constraint to spine.001 instead.
+        // so here we need to add spine.IK and all it's children to the mask too
+        maskRootName = "spine.IK";
+        upperBodyRootJoint = actor.getChildByName(maskRootName, true);
         if (upperBodyRootJoint === null) {
             throw new Error("Mask root joint not found: " + maskRootName);
         }
@@ -473,6 +489,8 @@ window.onload = () => {
         shootBlendTree.transitions.push(shoot_aim);
         shoot_aim.targetState = aimBlendTree;
         shoot_aim.conditions.push(new TimeUpCondition(0.5));
+
+        upperBodyLayer.stateMachine.curState = aimBlendTree;
 
         return actionCtrlBehavior;
     }

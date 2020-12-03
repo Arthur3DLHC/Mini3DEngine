@@ -7,7 +7,7 @@ export class ThirdPersonShooterBehavior extends ThirdPersonCtrlBehavior {
         this._actionCtrl = actionCtrl;
         this._isShooting = false;
 
-        this._upperBodyLayer = actionCtrl.animationLayers.find((layer) => layer.name === "upperBody");
+        this._upperBodyLayer = undefined;
 
         // todo: pointer lock?
     }
@@ -16,17 +16,20 @@ export class ThirdPersonShooterBehavior extends ThirdPersonCtrlBehavior {
     private _isShooting: boolean;
     private _upperBodyLayer: AnimationLayer | undefined;
 
+    public set upperBodyLayer(layer: AnimationLayer | undefined) {this._upperBodyLayer = layer;}
+    public get upperBodyLayer(): AnimationLayer | undefined {return this._upperBodyLayer;}
+
     public onMouseDown(ev: MouseEvent) {
         super.onMouseDown(ev);
 
         if (ev.button === 0) {
-            this._isShooting = true;
+            //this._isShooting = true;
         }
     }
 
     public onMouseUp(ev: MouseEvent) {
         if (ev.button === 0) {
-            this._isShooting = false;
+            //this._isShooting = false;
         }
     }
 
@@ -34,7 +37,7 @@ export class ThirdPersonShooterBehavior extends ThirdPersonCtrlBehavior {
         super.update();
 
         // aiming?
-        this._actionCtrl.actionParams.set("aiming", this.isAiming ? 0 : 1);
+        this._actionCtrl.actionParams.set("aiming", this.isAiming ? 1 : 0);
 
         let moveBlend = 0;
         if (this.isAiming) {
@@ -51,22 +54,25 @@ export class ThirdPersonShooterBehavior extends ThirdPersonCtrlBehavior {
             if (this.moveSpeed > 0) {
                 moveBlend = this.horizVelocity.length() / this.moveSpeed;
             }
+            if(moveBlend > 0) {
+                moveBlend = Math.max(0, Math.min(moveBlend, 1));
+            }
         }        
         this._actionCtrl.actionParams.set("moveSpeed", moveBlend);
 
         // pitch
         const pitchLimit = 60 * Math.PI / 180;
-        let updown = Math.max(-pitchLimit, Math.min(this.pitch, pitchLimit));
-        updown /= pitchLimit;
+        let pitch = Math.max(-pitchLimit, Math.min(this.pitch, pitchLimit));
+        pitch /= pitchLimit;
 
-        this._actionCtrl.actionParams.set("aimPitch", updown);
+        this._actionCtrl.actionParams.set("aimPitch", pitch);
 
         // shooting?
         this._actionCtrl.actionParams.set("shoot", this._isShooting ? 1 : 0);
 
         // upperbody animaiton layer
         if (this._upperBodyLayer !== undefined) {
-            if (this._isShooting) {
+            if (this._isShooting || this.isAiming) {
                 this._upperBodyLayer.blendWeight = 1;
             } else {
                 this._upperBodyLayer.blendWeight = 0;

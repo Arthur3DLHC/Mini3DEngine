@@ -265,7 +265,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
             // player orientation
             // face to move direction
             // because model is init facing z axis, so it's 90 degree offset with move yaw angle
-            const modelYaw = this._moveYaw - Math.PI * 0.5;
+            const modelYaw = this._moveYaw + Math.PI * 0.5;
 
             if(Math.abs(this._modelYaw - modelYaw) > Math.PI) {
                 if (this._modelYaw > modelYaw) {
@@ -275,7 +275,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
                 }
             }
 
-            const yawThreshold = 0.08;
+            const yawThreshold = 0.1;
             const turnAmount = 2 * Math.PI * Clock.instance.elapsedTime;
 
             if(this._modelYaw < modelYaw - yawThreshold) {
@@ -294,7 +294,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
 
             this._horizVelocity.x *= rate;
             this._horizVelocity.z *= rate;
-            this._modelYaw = this.yaw;
+            this._modelYaw = this.yaw - Math.PI;
             quat.fromAxisAngle(this._upVec, this._modelYaw, this.owner.rotation);
         }
 
