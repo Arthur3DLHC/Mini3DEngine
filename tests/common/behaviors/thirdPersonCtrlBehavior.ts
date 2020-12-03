@@ -45,6 +45,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     public smoothMouse: boolean = true;
     public smoothness: number = 0.25;
     public moveSpeed: number = 1.0;
+    public aimMoveSpeed: number = 0.5;
     public jumpSpeed: number = 1.0;
 
     public allowJump: boolean = false;
@@ -84,6 +85,8 @@ export class ThirdPersonCtrlBehavior extends Behavior {
      */
     public cameraVerticalOffset: number = 1.5;
 
+    public get horizVelocity(): vec3 {return this._horizVelocity;}
+
     private _moveYaw: number = 0;
     private _modelYaw: number = 0;
 
@@ -101,10 +104,10 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     // private _oldMousePos: vec2 = new vec2();
     private _deltaRot: vec2 = new vec2();
 
-    private _isMovingForward: boolean = false;
-    private _isMovingBackward: boolean = false;
-    private _isMovingLeft: boolean = false;
-    private _isMovingRight: boolean = false;
+    protected _isMovingForward: boolean = false;
+    protected _isMovingBackward: boolean = false;
+    protected _isMovingLeft: boolean = false;
+    protected _isMovingRight: boolean = false;
 
     private _isAiming: boolean = false;
 
@@ -287,8 +290,10 @@ export class ThirdPersonCtrlBehavior extends Behavior {
         }
 
         if (this._isAiming) {
-            this._horizVelocity.x *= 0.5;
-            this._horizVelocity.z *= 0.5;
+            const rate = this.aimMoveSpeed / this.moveSpeed;
+
+            this._horizVelocity.x *= rate;
+            this._horizVelocity.z *= rate;
             this._modelYaw = this.yaw;
             quat.fromAxisAngle(this._upVec, this._modelYaw, this.owner.rotation);
         }

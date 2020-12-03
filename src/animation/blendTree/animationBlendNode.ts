@@ -100,6 +100,7 @@ export class AnimationBlendNode {
         if (this.animation !== null) {
             this.animation.weight = 0;
             this.animation.applyMode = AnimationApplyMode.replace;
+            this.animation.mask = this.tree.machine.animationLayer.mask;
             this.animation.update(Clock.instance.curTime, 0);
         }
 

@@ -24,8 +24,10 @@ export class AnimationLayer {
 
     // todo: apply blendWeight to animations, how?
     public update() {
-        if (this.stateMachine !== null) {
-            this.stateMachine.update();
+        if (this.blendWeight > 0) {
+            if (this.stateMachine !== null) {
+                this.stateMachine.update();
+            }
         }
     }
 
