@@ -5,6 +5,7 @@ import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
 import { SceneHelper } from "../common/sceneHelper.js";
 import quat from "../../lib/tsm/quat.js";
 import { ThirdPersonCtrlBehavior } from "../common/behaviors/thirdPersonCtrlBehavior.js";
+import { ThirdPersonShooterBehavior } from "./thirdPersonShooterBehavior.js";
 
 window.onload = () => {
     const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
@@ -156,17 +157,20 @@ window.onload = () => {
         playerBody.body.addShape(playerShapeMedium, new CANNON.Vec3(0, 0.85, 0));
         playerBody.body.addShape(playerShapeHigh, new CANNON.Vec3(0, 1.4, 0));
 
+        const actionCtrlBehavior = new ActionControlBehavior(gltfSceneFemale, animations);
+
         // first person view controller
         // todo: use third person controller
-        const tpsBehavior = new ThirdPersonCtrlBehavior(gltfSceneFemale, playerBody, camera);
+        const tpsBehavior = new ThirdPersonShooterBehavior(gltfSceneFemale, playerBody, camera, actionCtrlBehavior);
         gltfSceneFemale.behaviors.push(tpsBehavior);
-        tpsBehavior.cameraVerticalOffset = 0.8;
+        tpsBehavior.cameraVerticalOffset = 1.6;
         tpsBehavior.cameraHorizontalOffset = new vec3([0.5, 0, 1.5]);
         tpsBehavior.moveSpeed = 2;
+        tpsBehavior.aimMoveSpeed = 1;
         
         // todo: create animation control behavior
         // animation layer, state machine (manually / json)
-        addActionControl(gltfSceneFemale, animations);
+        addActionControl(gltfSceneFemale, animations, actionCtrlBehavior);
 
         window.onmousedown = (ev: MouseEvent) => {
             // fpsBehavior.onMouseDown(ev);
@@ -277,8 +281,7 @@ window.onload = () => {
         }
     }
 
-    function addActionControl(actor: Object3D, animations: AnimationAction[]) {
-        const actionCtrlBehavior = new ActionControlBehavior(actor, animations);
+    function addActionControl(actor: Object3D, animations: AnimationAction[], actionCtrlBehavior: ActionControlBehavior)  {
         actor.behaviors.push(actionCtrlBehavior);
 
         // 0 - not aiming; 1 - aiming
@@ -444,6 +447,8 @@ window.onload = () => {
         shootBlendTree.transitions.push(shoot_aim);
         shoot_aim.targetState = aimBlendTree;
         shoot_aim.conditions.push(new TimeUpCondition(0.5));
+
+        return actionCtrlBehavior;
     }
 }
 
