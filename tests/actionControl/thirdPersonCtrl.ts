@@ -16,6 +16,20 @@ window.onload = () => {
 
     GLDevice.initialize(canvas);
 
+    // todo: pointer lock
+    const havePointerLock = "pointerLockElement" in document;
+    if (havePointerLock) {
+        canvas.onclick = function() {
+            canvas.requestPointerLock();
+        }
+        document.addEventListener("pointerlockchange", pointerLockChange, false);
+    } else {
+        // no pointer lock...
+        alert("Your browser doesn\'t seem to support Pointer Lock API");
+    }
+
+    let tpsBehavior: ThirdPersonShooterBehavior | null = null;
+
     const infoPanel: HTMLDivElement = document.getElementById("infoPanel") as HTMLDivElement;
 
     let lastUpdateFPSTime = 0;
@@ -166,47 +180,59 @@ window.onload = () => {
 
         // first person view controller
         // todo: use third person controller
-        const tpsBehavior = new ThirdPersonShooterBehavior(gltfSceneFemale, playerBody, camera, actionCtrlBehavior);
+        tpsBehavior = new ThirdPersonShooterBehavior(gltfSceneFemale, playerBody, camera, actionCtrlBehavior);
         gltfSceneFemale.behaviors.push(tpsBehavior);
         tpsBehavior.cameraVerticalOffset = 1.6;
         tpsBehavior.cameraHorizontalOffset = new vec3([0.5, 0, 1.5]);
         tpsBehavior.moveSpeed = 2;
         tpsBehavior.aimMoveSpeed = 1;
+        tpsBehavior.pointerLock = false;
         
         // todo: create animation control behavior
         // animation layer, state machine (manually / json)
         addActionControl(gltfSceneFemale, animations, actionCtrlBehavior);
 
-        window.onmousedown = (ev: MouseEvent) => {
+        canvas.onmousedown = (ev: MouseEvent) => {
             // fpsBehavior.onMouseDown(ev);
-            tpsBehavior.onMouseDown(ev);
+            if (tpsBehavior !== null) {
+                tpsBehavior.onMouseDown(ev);
+            }
         }
 
-        window.onmouseup = (ev: MouseEvent) => {
+        canvas.onmouseup = (ev: MouseEvent) => {
             // fpsBehavior.onMouseUp(ev);
-            tpsBehavior.onMouseUp(ev);
+            if (tpsBehavior !== null) tpsBehavior.onMouseUp(ev);
         }
 
-        window.onmousemove = (ev: MouseEvent) => {
+        canvas.onmousemove = (ev: MouseEvent) => {
             // fpsBehavior.onMouseMove(ev);
-            tpsBehavior.onMouseMove(ev);
+            if (tpsBehavior !== null) tpsBehavior.onMouseMove(ev);
         }
 
-        window.onkeydown = (ev: KeyboardEvent) => {
+        canvas.onkeydown = (ev: KeyboardEvent) => {
             // fpsBehavior.onKeyDown(ev);
-            tpsBehavior.onKeyDown(ev);
+            if (tpsBehavior !== null) tpsBehavior.onKeyDown(ev);
         }
 
-        window.onkeyup = (ev: KeyboardEvent) => {
+        canvas.onkeyup = (ev: KeyboardEvent) => {
             // fpsBehavior.onKeyUp(ev);
-            tpsBehavior.onKeyUp(ev);
+            if (tpsBehavior !== null) tpsBehavior.onKeyUp(ev);
         }
 
         console.log("start game loop...");
 
         Clock.instance.start();
         requestAnimationFrame(gameLoop);
+
     });
+
+    function pointerLockChange() {
+        if (document.pointerLockElement === canvas) {
+            if (tpsBehavior !== null) tpsBehavior.pointerLock = true;
+        } else {
+            if (tpsBehavior !== null) tpsBehavior.pointerLock = false;
+        }
+    }
 
     function gameLoop(now: number) {
         Clock.instance.update(now);
@@ -460,7 +486,7 @@ function addJointHierarchyToLayerMask(rootJoint: Object3D, mask: AnimationMask) 
 }
 
 function getAnimationByName(animations: AnimationAction[], animName: string) {
-    const anim = animations.find((anim) => { anim.name === animName; });
+    const anim = animations.find((anim: AnimationAction) => { return anim.name === animName; });
     if (anim === undefined) {
         throw new Error("Animation not found: " + animName);
     }
