@@ -23,13 +23,13 @@ export class ThirdPersonShooterBehavior extends ThirdPersonCtrlBehavior {
         super.onMouseDown(ev);
 
         if (ev.button === 0) {
-            //this._isShooting = true;
+            this._isShooting = true;
         }
     }
 
     public onMouseUp(ev: MouseEvent) {
         if (ev.button === 0) {
-            //this._isShooting = false;
+            this._isShooting = false;
         }
     }
 
