@@ -34,6 +34,8 @@ import { PointLight } from "../scene/lights/pointLight.js";
 import { SpotLight } from "../scene/lights/spotLight.js";
 import { EnvironmentProbe, EnvironmentProbeType } from "../scene/environmentProbe.js";
 import { DirectionalLightShadow } from "../scene/lights/directionalLightShadow.js";
+import { RigidBody } from "../physics/rigidBody.js";
+import { PhysicsWorld } from "../physics/physicsWorld.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -74,6 +76,10 @@ export class GLTFSceneBuilder {
      * set lights as static
      */
     public setLightsStatic: boolean = true;
+
+    /** if not null, the collider rigid bodies will be created and added to this world */
+    public physicsWorld: PhysicsWorld | null = null;
+    public physicsMaterial: CANNON.Material | null = null;
 
     /**
      * build scene hierarchy from gltf asset. NOTE: don't call this before all binary datas has been loaded.
@@ -254,6 +260,9 @@ export class GLTFSceneBuilder {
                     node = this.processIrradianceVolume(nodeDef, gltf);
                 } else if (nodeDef.extras.extType === "environmentProbe") {
                     node = this.processEnvironmentProbe(nodeDef, gltf);
+                } else if (this.isPhysicsCollider(nodeDef)) {
+                    // how to get the collider shape type?
+                    node = this.processCollider(nodeDef, gltf);
                 } else {
                     // todo: other extra object types
                     node = new Object3D();
@@ -277,6 +286,63 @@ export class GLTFSceneBuilder {
         //        this.processNode(childId, node, gltf);
         //    }
         //}
+    }
+
+    private isPhysicsCollider(nodeDef: Node): boolean {
+        if (nodeDef.extras !== undefined) {
+            return nodeDef.extras.extType === "collider";
+        }
+        return false;
+    }
+
+    /**
+     * process physics colliders
+     * @param nodeDef 
+     * @param gltf 
+     */
+    processCollider(nodeDef: Node, gltf: GltfAsset): Object3D {
+        // nodeDef must have srt
+        if (nodeDef.scale === undefined || nodeDef.rotation === undefined || nodeDef.translation === undefined) {
+            throw new Error("physics collider does not have scale, rotation or translation: " + nodeDef.name || "");
+        }
+        const node = new Object3D();
+        if (this.physicsWorld !== null && this.physicsMaterial !== null) {
+            let shape: string = "unkown";    // cannon.box
+            if (nodeDef.extras.colliderShape !== undefined) {
+                shape = nodeDef.extras.colliderShape;
+            }
+            let body: RigidBody | null = null;
+            switch (shape) {
+                case "box":
+                    body = new RigidBody(node, this.physicsWorld, {mass: 0, material: this.physicsMaterial});
+                    const boxShape = new CANNON.Box(new CANNON.Vec3(nodeDef.scale[0], nodeDef.scale[1], nodeDef.scale[2]));
+                    body.body.addShape(boxShape);
+                    break;
+                case "sphere":
+                    body = new RigidBody(node, this.physicsWorld, {mass: 0, material: this.physicsMaterial});
+                    const sphereShape = new CANNON.Sphere(nodeDef.scale[0]);
+                    body.body.addShape(sphereShape);
+                    break;
+                case "cylinder":
+                    body = new RigidBody(node, this.physicsWorld, {mass: 0, material: this.physicsMaterial});
+                    const cylinderShape = new CANNON.Cylinder(nodeDef.scale[0], nodeDef.scale[0], nodeDef.scale[1], 8);
+                    body.body.addShape(cylinderShape);
+                    break;
+                default:
+                    // report the colliders without a shape?
+                    throw new Error("collider does not have shape:" + nodeDef.name || "unnamed_collider");
+                    break;
+            }
+            if (body !== null) {
+                this.physicsWorld.world.addBody(body.body);
+                node.behaviors.push(body);
+
+                body.setPosition(new vec3([nodeDef.translation[0], nodeDef.translation[1], nodeDef.translation[2]]));
+                body.setRotation(new quat([nodeDef.rotation[0], nodeDef.rotation[1], nodeDef.rotation[2], nodeDef.rotation[3]]));
+            }
+        }
+        
+        return node;
     }
 
     private processEnvironmentProbe(nodeDef: Node, gltf: GltfAsset): Object3D {
@@ -471,10 +537,12 @@ export class GLTFSceneBuilder {
             }
 
             if (nodeDef.scale !== undefined) {
-                node.scale = new vec3([nodeDef.scale[0], nodeDef.scale[1], nodeDef.scale[2]]);
+                // if is a physics collider, the scale should be ignored?
+                if (!this.isPhysicsCollider(nodeDef)) {
+                    node.scale = new vec3([nodeDef.scale[0], nodeDef.scale[1], nodeDef.scale[2]]);
+                }
             }
 
-            // todo: update local matrix or update it later when scene update every frame?
             node.updateLocalTransform();
         }
     }
