@@ -183,9 +183,9 @@ window.onload = () => {
         tpsBehavior = new ThirdPersonShooterBehavior(gltfSceneFemale, playerBody, camera, actionCtrlBehavior);
         gltfSceneFemale.behaviors.push(tpsBehavior);
         tpsBehavior.cameraVerticalOffset = 1.6;
-        tpsBehavior.cameraHorizontalOffset = new vec3([0.5, 0, 1.5]);
+        tpsBehavior.cameraHorizontalOffset = new vec3([0.4, 0, 1.5]);
         tpsBehavior.moveSpeed = 2;
-        tpsBehavior.aimMoveSpeed = 1;
+        tpsBehavior.aimMoveSpeed = 0.5;
         tpsBehavior.pointerLock = false;
         
         // todo: create animation control behavior
