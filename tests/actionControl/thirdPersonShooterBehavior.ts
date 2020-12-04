@@ -72,7 +72,7 @@ export class ThirdPersonShooterBehavior extends ThirdPersonCtrlBehavior {
 
         // upperbody animaiton layer
         if (this._upperBodyLayer !== undefined) {
-            if (this._isShooting || this.isAiming) {
+            if (this.isAiming) {
                 this._upperBodyLayer.blendWeight = 1;
             } else {
                 this._upperBodyLayer.blendWeight = 0;

@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition, ActionStateBlendTree, AnimationBlendNode, BlendMethods, SingleParamCondition, TimeUpCondition, AnimationMask, SkinMesh } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition, ActionStateBlendTree, AnimationBlendNode, BlendMethods, SingleParamCondition, TimeUpCondition, AnimationMask, SkinMesh, AnimationLoopMode } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
@@ -185,7 +185,7 @@ window.onload = () => {
         tpsBehavior.cameraVerticalOffset = 1.6;
         tpsBehavior.cameraHorizontalOffset = new vec3([0.4, 0, 1.5]);
         tpsBehavior.moveSpeed = 2;
-        tpsBehavior.aimMoveSpeed = 0.5;
+        tpsBehavior.aimMoveSpeed = 0.6;
         tpsBehavior.pointerLock = false;
         
         // todo: create animation control behavior
@@ -457,18 +457,21 @@ window.onload = () => {
         shootBlendTree.rootNode = new AnimationBlendNode(shootBlendTree, ["aimPitch"], BlendMethods.Simple1D, undefined, 1);
 
         // aimPitch == -1
-        const shootDownNode = new AnimationBlendNode(shootBlendTree, undefined, BlendMethods.Direct, [-1], 0,
-            getAnimationByName(animations, "Female.Shoot.Down"));
+        let shootAnim = getAnimationByName(animations, "Female.Shoot.Down");
+        shootAnim.LoopMode = AnimationLoopMode.Once;
+        const shootDownNode = new AnimationBlendNode(shootBlendTree, undefined, BlendMethods.Direct, [-1], 0, shootAnim);
         shootBlendTree.rootNode.addChild(shootDownNode);
 
         // aimPitch == 0
-        const shootStraitNode = new AnimationBlendNode(shootBlendTree, undefined, BlendMethods.Direct, [0], 1,
-            getAnimationByName(animations, "Female.Shoot.Middle"));
+        shootAnim = getAnimationByName(animations, "Female.Shoot.Middle");
+        shootAnim.LoopMode = AnimationLoopMode.Once;
+        const shootStraitNode = new AnimationBlendNode(shootBlendTree, undefined, BlendMethods.Direct, [0], 1, shootAnim);
         shootBlendTree.rootNode.addChild(shootStraitNode);
 
         // aimPitch == 1
-        const shootUpNode = new AnimationBlendNode(shootBlendTree, undefined, BlendMethods.Direct, [1], 0,
-            getAnimationByName(animations, "Female.Shoot.Up"));
+        shootAnim = getAnimationByName(animations, "Female.Shoot.Up");
+        shootAnim.LoopMode = AnimationLoopMode.Once;
+        const shootUpNode = new AnimationBlendNode(shootBlendTree, undefined, BlendMethods.Direct, [1], 0, shootAnim);
         shootBlendTree.rootNode.addChild(shootUpNode);
 
         // the weight of this layer will be zero in other states
