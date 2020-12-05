@@ -582,6 +582,17 @@ window.onload = () => {
                         ]
                     }
                 },
+                {
+                    "name": "upperBody",
+                    "blendWeight": 0,
+                    "blendMode": 1,
+                    "mask": {
+                        // todo: jonits
+                        "jointPathes": [
+                            "spine.001",
+                        ]
+                    }
+                }
             ]
         };
     }
