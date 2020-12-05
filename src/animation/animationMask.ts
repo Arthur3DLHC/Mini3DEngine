@@ -26,14 +26,36 @@ export class AnimationMask {
     public fromJSON(jsonData: any, jointRoot: Object3D) {
         this.joints = [];
         if (jsonData.jointPathes !== undefined) {
-            for (const path of jsonData.jointPathes) {
-                // this.jointPathes.push(path);
-                const joint = jointRoot.getObjectByPath(path);
-                if (joint === null) {
-                    // json data error
-                    throw new Error("joint not found: " + path);
+            for (const jointDef of jsonData.joints) {
+                let joint: Object3D | null = null;
+
+                // get by path / search by name
+                if (jointDef.path !== undefined) {
+                    joint = jointRoot.getObjectByPath(jointDef.path);
+                    if (joint === null) {
+                        throw new Error("joint not found: " + jointDef.path);
+                    }
+                } else if (jointDef.name !== undefined) {
+                    joint = jointRoot.getChildByName(jointDef.name, true);
+                    if (joint === null) {
+                        throw new Error("joint not found: " + jointDef.name);
+                    }
                 }
-                this.joints.push(joint);
+
+                if (joint !== null) {
+                    this.addJoint(joint, jointDef.recursive);
+                }
+            }
+        }
+    }
+
+    public addJoint(joint: Object3D, recursive: boolean) {
+        if (this.joints.find((j) => {return j === joint;}) === undefined) {
+            this.joints.push(joint);
+        }
+        if (recursive) {
+            for (const child of joint.children) {
+                this.addJoint(child, recursive);
             }
         }
     }

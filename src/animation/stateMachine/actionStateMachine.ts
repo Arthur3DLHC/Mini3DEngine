@@ -88,5 +88,14 @@ export class ActionStateMachine {
                 }
             }
         }
+        if (json.curState !== undefined) {
+            const defState = this.states.get(json.curState);
+            if (defState === undefined) {
+                throw new Error("default state not found: " + json.curState);
+            }
+            this.curState = defState;
+        } else {
+            console.warn("statemachine has no default state.");
+        }
     }
 }

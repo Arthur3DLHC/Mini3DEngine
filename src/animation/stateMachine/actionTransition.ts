@@ -1,5 +1,7 @@
 import { ActionCondition } from "./actionCondition.js";
 import { ActionState } from "./actionState.js";
+import { SingleParamCondition } from "./singleParamCondition.js";
+import { TimeUpCondition } from "./timeUpCondition.js";
 
 export class ActionTransition {
 
@@ -53,9 +55,15 @@ export class ActionTransition {
         // read conditions
         for (const conditionDef of transDef.conditions) {
             // condition type
-            // fix me: how to handle custom conditions of games?
-            if(customConditionCreation) {
-                const condition = customConditionCreation(conditionDef);
+            let condition: ActionCondition | null = null;
+            if (conditionDef.typeStr === "singleParam") {
+                condition = new SingleParamCondition(this._state.machine.actionCtrl);
+            } else if(conditionDef.typeStr === "timeUp") {
+                condition = new TimeUpCondition();
+            } else if(customConditionCreation) {
+                condition = customConditionCreation(conditionDef);
+            }
+            if (condition !== null) {
                 condition.fromJSON(conditionDef);
                 this.conditions.push(condition);
             }

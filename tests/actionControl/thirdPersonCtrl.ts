@@ -454,7 +454,7 @@ window.onload = () => {
         //      | -shoot straight
         //      | -shoot up
 
-        shootBlendTree.rootNode = new AnimationBlendNode(shootBlendTree, ["aimPitch"], BlendMethods.Simple1D, undefined, 1);
+        shootBlendTree.rootNode = new AnimationBlendNode(shootBlendTree, ["aimPitch"], BlendMethods.Simple1D, undefined, 0);
 
         // aimPitch == -1
         let shootAnim = getAnimationByName(animations, "Female.Shoot.Down");
@@ -514,6 +514,7 @@ window.onload = () => {
                     "blendWeight": 1,
                     "blendMode": 1,
                     "stateMachine": {
+                        "curState": "tpsTree",
                         "states": [
                             {
                                 "typeStr": "blendTree",
@@ -587,9 +588,111 @@ window.onload = () => {
                     "blendWeight": 0,
                     "blendMode": 1,
                     "mask": {
-                        // todo: jonits
-                        "jointPathes": [
-                            "spine.001",
+                        "joints": [
+                            {
+                                "path": "spine.001",
+                                "recursive": true,
+                            },
+                            {
+                                "path": "spine.IK",
+                                "recursive": true,
+                            }
+                        ]
+                    },
+                    "stateMachine": {
+                        "curState": "upperAimTree",
+                        "states": [
+                            {
+                                "typeStr": "blendTree",
+                                "name": "upperAimTree",
+                                "transitions": [
+                                    {
+                                        "target": "upperShootTree",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "shoot",
+                                                "compareOp": "===",
+                                                "compareValue": 1
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "rootNode": {
+                                    "blendParameters": ["aimPitch"],
+                                    "blendMethod": 0,
+                                    "weight": 1,
+                                    "children": [
+                                        {
+                                            // aim down
+                                            "blendMethod": 4,
+                                            "weigth": 0,
+                                            "weightParamPosition": [-1],
+                                            "animation": "Female.Aim.Down"
+                                        },
+                                        {
+                                            // aim middle
+                                            "blendMethod": 4,
+                                            "weigth": 1,
+                                            "weightParamPosition": [0],
+                                            "animation": "Female.Aim.Middle"
+                                        },
+                                        {
+                                            // aim up
+                                            "blendMethod": 4,
+                                            "weigth": 0,
+                                            "weightParamPosition": [1],
+                                            "animation": "Female.Aim.Up"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "typeStr": "blendTree",
+                                "name": "upperShootTree",
+                                "transitions": [
+                                    {
+                                        "target": "upperAimTree",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "timeUp",
+                                                "duration": 0.5,
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "rootNode": {
+                                    "blendParameters": ["aimPitch"],
+                                    "blendMethod": 0,
+                                    "weight": 1,
+                                    "children": [
+                                        {
+                                            // shoot down
+                                            "blendMethod": 4,
+                                            "weigth": 0,
+                                            "weightParamPosition": [-1],
+                                            "animation": "Female.Shoot.Down",
+                                            "animLoopMode": 0
+                                        },
+                                        {
+                                            // shoot middle
+                                            "blendMethod": 4,
+                                            "weigth": 1,
+                                            "weightParamPosition": [0],
+                                            "animation": "Female.Shoot.Middle",
+                                            "animLoopMode": 0
+                                        },
+                                        {
+                                            // shoot up
+                                            "blendMethod": 4,
+                                            "weigth": 0,
+                                            "weightParamPosition": [1],
+                                            "animation": "Female.Shoot.Up",
+                                            "animLoopMode": 0
+                                        }
+                                    ]
+                                }
+                            }
                         ]
                     }
                 }

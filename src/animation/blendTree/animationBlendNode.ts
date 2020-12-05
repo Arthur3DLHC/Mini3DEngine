@@ -390,6 +390,9 @@ export class AnimationBlendNode {
             const animAction = animations.find((action: AnimationAction) => {return action.name === nodeDef.animation});
             if (animAction !== undefined) {
                 this.animation = animAction;
+                if (nodeDef.animLoopMode !== undefined) {
+                    this.animation.LoopMode = nodeDef.animLoopMode;
+                }
             } else {
                 throw new Error("Animation not found: " + nodeDef.animation);
             }
