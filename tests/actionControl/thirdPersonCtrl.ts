@@ -352,7 +352,7 @@ window.onload = () => {
         blendTree.rootNode.addChild(aimingNode);
         
         // moveSpeed == -1
-        const aimingBackwardNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [-1], 1, getAnimationByName(animations, "Female.Aim.Walk.Backward"));
+        const aimingBackwardNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [-1], 0, getAnimationByName(animations, "Female.Aim.Walk.Backward"));
         aimingNode.addChild(aimingBackwardNode);
 
         // moveSpeed == 0
@@ -360,7 +360,7 @@ window.onload = () => {
         aimingNode.addChild(aimingIdleNode);
 
         // moveSpeed == 1
-        const aimingForwardNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [1], 1, getAnimationByName(animations, "Female.Aim.Walk.Forward"));
+        const aimingForwardNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [1], 0, getAnimationByName(animations, "Female.Aim.Walk.Forward"));
         aimingNode.addChild(aimingForwardNode);
 
         // aiming == 0
@@ -524,7 +524,57 @@ window.onload = () => {
                                     "weight": 1,
                                     "children": [
                                         {
-                                            
+                                            // aiming
+                                            "blendParameters": ["moveSpeed"],
+                                            "blendMethod": 0,
+                                            "weigth": 0,
+                                            "weightParamPosition": [1],
+                                            "children": [
+                                                {
+                                                    // aim move backward
+                                                    "blendMethod": 4,
+                                                    "weigth": 0,
+                                                    "weightParamPosition": [-1],
+                                                    "animation": "Female.Aim.Walk.Backward"
+                                                },
+                                                {
+                                                    // aim stand
+                                                    "blendMethod": 4,
+                                                    "weigth": 1,
+                                                    "weightParamPosition": [0],
+                                                    "animation": "Female.Aim.Middle"
+                                                },
+                                                {
+                                                    // aim move forward
+                                                    "blendMethod": 4,
+                                                    "weigth": 0,
+                                                    "weightParamPosition": [1],
+                                                    "animation": "Female.Aim.Walk.Forward"
+                                                },
+                                            ]
+                                        },
+                                        {
+                                            // not aiming
+                                            "blendParameters": ["moveSpeed"],
+                                            "blendMethod": 0,
+                                            "weigth": 1,
+                                            "weightParamPosition": [0],
+                                            "children": [
+                                                {
+                                                    // idle
+                                                    "blendMethod": 4,
+                                                    "weigth": 1,
+                                                    "weightParamPosition": [0],
+                                                    "animation": "Female.Idle"
+                                                },
+                                                {
+                                                    // jog
+                                                    "blendMethod": 4,
+                                                    "weigth": 0,
+                                                    "weightParamPosition": [1],
+                                                    "animation": "Female.Jog"
+                                                }
+                                            ]
                                         }
                                     ]
                                 }
