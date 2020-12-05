@@ -381,6 +381,9 @@ export class AnimationBlendNode {
             }
         }
         this.weight = 0;
+        if (nodeDef.weight !== undefined) {
+            this.weight = nodeDef.weight;
+        }
         this.actualWeight = 0;
         this.animation = null;
         if (nodeDef.animation !== undefined) {

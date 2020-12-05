@@ -497,6 +497,44 @@ window.onload = () => {
 
         return actionCtrlBehavior;
     }
+
+    function addActionControlJSON(actor: Object3D, animations: AnimationAction[], actionCtrlBehavior: ActionControlBehavior) {
+        actor.behaviors.push(actionCtrlBehavior);
+
+        const actionCtrlDef: any = {
+            "actionParams": {
+                "aiming": 0,
+                "aimPitch": 0,
+                "moveSpeed": 0,
+                "shoot": 0,
+            },
+            "animationLayers": [
+                {
+                    "name": "baseLayer",
+                    "blendWeight": 1,
+                    "blendMode": 1,
+                    "stateMachine": {
+                        "states": [
+                            {
+                                "typeStr": "blendTree",
+                                "name": "tpsTree",
+                                "rootNode": {
+                                    "blendParameters": ["aiming"],
+                                    "blendMethod": 0,
+                                    "weight": 1,
+                                    "children": [
+                                        {
+                                            
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+            ]
+        };
+    }
 }
 
 function addJointHierarchyToLayerMask(rootJoint: Object3D, mask: AnimationMask) {

@@ -79,6 +79,8 @@ export class GLTFSceneBuilder {
 
     /** if not null, the collider rigid bodies will be created and added to this world */
     public physicsWorld: PhysicsWorld | null = null;
+
+    /** the default physics material of colliders in gltf */
     public physicsMaterial: CANNON.Material | null = null;
 
     /**
@@ -261,7 +263,6 @@ export class GLTFSceneBuilder {
                 } else if (nodeDef.extras.extType === "environmentProbe") {
                     node = this.processEnvironmentProbe(nodeDef, gltf);
                 } else if (this.isPhysicsCollider(nodeDef)) {
-                    // how to get the collider shape type?
                     node = this.processCollider(nodeDef, gltf);
                 } else {
                     // todo: other extra object types
@@ -300,7 +301,7 @@ export class GLTFSceneBuilder {
      * @param nodeDef 
      * @param gltf 
      */
-    processCollider(nodeDef: Node, gltf: GltfAsset): Object3D {
+    private processCollider(nodeDef: Node, gltf: GltfAsset): Object3D {
         // nodeDef must have srt
         if (nodeDef.scale === undefined || nodeDef.rotation === undefined || nodeDef.translation === undefined) {
             throw new Error("physics collider does not have scale, rotation or translation: " + nodeDef.name || "");
