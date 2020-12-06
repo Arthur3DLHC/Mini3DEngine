@@ -698,6 +698,8 @@ window.onload = () => {
                 }
             ]
         };
+
+        actionCtrlBehavior.fromJSON(actionCtrlDef);
     }
 }
 
