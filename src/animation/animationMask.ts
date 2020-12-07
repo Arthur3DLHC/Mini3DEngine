@@ -25,7 +25,7 @@ export class AnimationMask {
      */
     public fromJSON(jsonData: any, jointRoot: Object3D) {
         this.joints = [];
-        if (jsonData.jointPathes !== undefined) {
+        if (jsonData.joints !== undefined) {
             for (const jointDef of jsonData.joints) {
                 let joint: Object3D | null = null;
 

@@ -22,6 +22,7 @@ export class TimeUpCondition extends ActionCondition {
     }
 
     public fromJSON(conditionDef: any) {
+        super.fromJSON(conditionDef);
         // subclass do jobs
         if (conditionDef.duration !== undefined) {
             this._duration = conditionDef.duration;

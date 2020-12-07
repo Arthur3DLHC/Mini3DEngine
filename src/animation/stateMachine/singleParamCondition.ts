@@ -78,6 +78,7 @@ export class SingleParamCondition extends ActionCondition {
     }
 
     public fromJSON(conditionDef: any) {
+        super.fromJSON(conditionDef);
         if (conditionDef.paramName !== undefined) {
             this.paramName = conditionDef.paramName;
         }

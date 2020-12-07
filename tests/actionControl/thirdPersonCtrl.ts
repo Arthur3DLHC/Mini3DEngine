@@ -591,11 +591,13 @@ window.onload = () => {
                     "mask": {
                         "joints": [
                             {
-                                "path": "spine.001",
+                                // "path": "spine.001",
+                                "name": "spine.001",
                                 "recursive": true,
                             },
                             {
-                                "path": "spine.IK",
+                                // "path": "spine.IK",
+                                "name": "spine.IK",
                                 "recursive": true,
                             }
                         ]
