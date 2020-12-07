@@ -190,7 +190,8 @@ window.onload = () => {
         
         // todo: create animation control behavior
         // animation layer, state machine (manually / json)
-        addActionControl(gltfSceneFemale, animations, actionCtrlBehavior);
+        // addActionControl(gltfSceneFemale, animations, actionCtrlBehavior);
+        addActionControlJSON(gltfSceneFemale, animations, actionCtrlBehavior);
 
         tpsBehavior.upperBodyLayer = actionCtrlBehavior.animationLayers.find((layer)=>{return layer.name === "upperBody";});
 
