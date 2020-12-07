@@ -375,7 +375,6 @@ export class GLTFSceneBuilder {
         if (extras.resolutionY !== undefined) resY = extras.resolutionY;
         if (extras.resolutionZ !== undefined) resZ = extras.resolutionZ;
 
-
         let ret: Object3D;
 
         if(resX === 1 && resY === 1 && resZ === 1) {
