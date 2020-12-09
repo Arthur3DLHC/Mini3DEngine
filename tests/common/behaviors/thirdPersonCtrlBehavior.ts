@@ -275,7 +275,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
                 }
             }
 
-            const yawThreshold = 0.1;
+            const yawThreshold = 5.0 * Clock.instance.elapsedTime;// 0.1;
             const turnAmount = 2 * Math.PI * Clock.instance.elapsedTime;
 
             if(this._modelYaw < modelYaw - yawThreshold) {

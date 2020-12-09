@@ -526,7 +526,7 @@ window.onload = () => {
                                     "weight": 1,
                                     "children": [
                                         {
-                                            // aiming
+                                            // aiming move (front back only)
                                             "blendParameters": ["moveSpeed"],
                                             "blendMethod": 0,
                                             "weigth": 0,
