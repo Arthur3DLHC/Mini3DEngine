@@ -729,7 +729,7 @@ function createScene(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CANNON.Materi
         boxMesh.castShadow = true;
         boxMesh.isStatic = false;
         boxMesh.autoUpdateTransform = true;
-        boxMesh.translation.setComponents(0, 1, 0);
+        boxMesh.translation.setComponents(-1, 1, -1);
         // boxMesh.localTransform.fromTranslation(new vec3([0, 0, -5]));
         const boxMtl = new StandardPBRMaterial();
         boxMtl.color = new vec4([1.0, 1.0, 0.0, 1.0]);
