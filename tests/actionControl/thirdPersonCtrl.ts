@@ -560,7 +560,7 @@ window.onload = () => {
                                         */
                                         {
                                             // aiming move (directional)
-                                            "blendParameters": ["moveSpeed", "strafeSpeed"],
+                                            "blendParameters": ["strafeSpeed", "moveSpeed"],
                                             "blendMethod": 1,
                                             "weigth": 0,
                                             "weightParamPosition": [1], // aiming === 1
@@ -569,7 +569,7 @@ window.onload = () => {
                                                     // aim move backward
                                                     "blendMethod": 4,
                                                     "weigth": 0,
-                                                    "weightParamPosition": [-1, 0],
+                                                    "weightParamPosition": [0, -1],
                                                     "animation": "Female.Aim.Walk.Backward"
                                                 },
                                                 {
@@ -583,21 +583,21 @@ window.onload = () => {
                                                     // aim move forward
                                                     "blendMethod": 4,
                                                     "weigth": 0,
-                                                    "weightParamPosition": [1, 0],
+                                                    "weightParamPosition": [0, 1],
                                                     "animation": "Female.Aim.Walk.Forward"
                                                 },
                                                 {
                                                     // aim strafe left
                                                     "blendMethod": 4,
                                                     "weigth": 0,
-                                                    "weightParamPosition": [0, -1],
+                                                    "weightParamPosition": [-1, 0],
                                                     "animation": "Female.Aim.Walk.Left"
                                                 },
                                                 {
                                                     // aim strafe right
                                                     "blendMethod": 4,
                                                     "weigth": 0,
-                                                    "weightParamPosition": [0, 1],
+                                                    "weightParamPosition": [1, 0],
                                                     "animation": "Female.Aim.Walk.Right"
                                                 },
                                             ]

@@ -51,9 +51,9 @@ export class ThirdPersonShooterBehavior extends ThirdPersonCtrlBehavior {
                 // if (this._isMovingBackward) {
                 //     moveBlend = -moveBlend;
                 // }
-                const localMoveAngle = this.moveYaw - this.modelYaw;
+                const localMoveAngle = this.moveYaw - this.yaw;
                 moveBlend *= Math.cos(localMoveAngle);
-                strafeBlend *= Math.sin(localMoveAngle);
+                strafeBlend *= -Math.sin(localMoveAngle);
             }
         } else {
             if (this.moveSpeed > 0) {

@@ -189,89 +189,120 @@ export class AnimationBlendNode {
             throw new Error("param(s) not found: " + this.blendParameters[0] + ", " + this.blendParameters[1]);
         }
 
-        const phi = Math.atan2(paramY, paramX);
+        // if at center, use witch node?
+        const paramLenSq = paramX * paramX + paramY * paramY;
 
-        // find nearest 2 children in polar space
-        let maxLeftChild: AnimationBlendNode | null = null;
-        let minRightChild: AnimationBlendNode | null = null;
-        let maxLeftDiff: number = 0;
-        let minRightDiff: number = 0;
+        if (paramLenSq > 0) {
+            const phi = Math.atan2(paramY, paramX);
+            // find nearest 2 children in polar space
+            let maxLeftChild: AnimationBlendNode | null = null;
+            let minRightChild: AnimationBlendNode | null = null;
+            let maxLeftDiff: number = 0;
+            let minRightDiff: number = 0;
 
-        let centerChild: AnimationBlendNode | null = null;
+            let centerChild: AnimationBlendNode | null = null;
 
-        for (const child of this.children) {
-            child.weight = 0;
+            for (const child of this.children) {
+                child.weight = 0;
 
-            let sampleX = child.weightParamPosition[0] || 0;
-            let sampleY = child.weightParamPosition[1] || 0;
+                let sampleX = child.weightParamPosition[0] || 0;
+                let sampleY = child.weightParamPosition[1] || 0;
 
-            if (sampleX === 0 && sampleY === 0) {
-                // center point, can not calc atan
-                centerChild = child;
-                continue;
+                if (sampleX === 0 && sampleY === 0) {
+                    // center point, can not calc atan
+                    centerChild = child;
+                    continue;
+                }
+
+                const radialDiff = this.getRadialDifference(phi, sampleX, sampleY);
+
+                if (minRightChild === null || radialDiff < minRightDiff) {
+                    minRightChild = child;
+                    minRightDiff = radialDiff;
+                }
+                if (maxLeftChild === null || radialDiff > maxLeftDiff) {
+                    maxLeftChild = child;
+                    maxLeftDiff = radialDiff;
+                }
             }
 
-            const radialDiff = this.getRadialDifference(phi, sampleX, sampleY);
+            // todo: use vector operation to find the blend factor
+            // let p = vec2(paramX, paramY)
+            // p0 = vec2(maxLeftChild.sampleX, maxLeftChild.sampleY)
+            // p1 = vec2(minRightChild.sampleX, minRightChild.sampleY)
+            // there should be t0, t1 to make:
+            // p = t0 * p0 + t1 * p1
+            // so   weight0 = t0 / (t0 + t1)
+            //      weight1 = t1 / (t0 + t1)
+            let t0 = 0.5;
+            let t1 = 0.5;
+            if (maxLeftChild !== null && minRightChild !== null) {
+                const x0 = maxLeftChild.weightParamPosition[0] || 0;
+                const y0 = maxLeftChild.weightParamPosition[1] || 0;
 
-            if (minRightChild === null || radialDiff < minRightDiff) {
-                minRightChild = child;
-                minRightDiff = radialDiff;
+                const x1 = minRightChild.weightParamPosition[0] || 0;
+                const y1 = minRightChild.weightParamPosition[1] || 0;
+
+                // Solving equations
+                const denominator = (x1 * y0 - x0 * y1);
+                if(denominator !== 0){
+                    t0 = (x1 * paramY - paramX * y1) / denominator;
+                    // t1 = (paramX - t0 * x0) / x1;                       // may div by 0
+                    t1 = (paramX * y0 - x0 * paramY) / denominator;
+                }
+
+                const tsum = t0 + t1;
+
+                if (tsum > 0) {
+                    maxLeftChild.weight = t0 / tsum;    // not inverse; if t0 = 1, the p is at p0
+                    minRightChild.weight = t1 / tsum;   // not inverse; if t1 = 1, the p is at p1
+                }
+            } else {
+                if (maxLeftChild !== null) {
+                    maxLeftChild.weight = 1;
+                    t0 = 1; t1 = 0;
+                }
+                if (minRightChild !== null) {
+                    minRightChild.weight = 1;
+                    t0 = 0; t1 = 1;
+                }
             }
-            if (maxLeftChild === null || radialDiff > maxLeftDiff) {
-                maxLeftChild = child;
-                maxLeftDiff = radialDiff;
+
+            // find if there are children in center
+            if (centerChild !== null) {
+                const nodeInfluence = Math.max(0, Math.min(t0 + t1, 1));
+                // blend between 2 children and center
+                centerChild.weight = 1 - nodeInfluence;
+                if (maxLeftChild !== null) {
+                    maxLeftChild.weight *= nodeInfluence;
+                }
+                if (minRightChild !== null) {
+                    minRightChild.weight *= nodeInfluence;
+                }
             }
-        }
+        } 
+        else {  // all params are 0
+            let centerChild: AnimationBlendNode | null = null;
+            for (const child of this.children) {
+                
+                let sampleX = child.weightParamPosition[0] || 0;
+                let sampleY = child.weightParamPosition[1] || 0;
 
-        // todo: use vector operation to find the blend factor
-        // let p = vec2(paramX, paramY)
-        // p0 = vec2(maxLeftChild.sampleX, maxLeftChild.sampleY)
-        // p1 = vec2(minRightChild.sampleX, minRightChild.sampleY)
-        // there should be t0, t1 to make:
-        // p = t0 * p0 + t1 * p1
-        // so   weight0 = t0 / (t0 + t1)
-        //      weight1 = t1 / (t0 + t1)
-        let t0 = 0.5;
-        let t1 = 0.5;
-        if (maxLeftChild !== null && minRightChild !== null) {
-            const x0 = maxLeftChild.weightParamPosition[0] || 0;
-            const y0 = maxLeftChild.weightParamPosition[1] || 0;
-    
-            const x1 = minRightChild.weightParamPosition[0] || 0;
-            const y1 = minRightChild.weightParamPosition[1] || 0;
-
-            // Solving equations
-            const denominator = (x1 * y0 - x0 * y1);
-            t0 = (x1 * paramY - paramX * y1) / denominator;
-            t1 = (paramX - t0 * x0) / x1;                       // 1 less multiplycation
-            // t1 = (paramX * y0 - x0 * paramY) / denominator;
-
-            const tsum = t0 + t1;
-
-            maxLeftChild.weight = t0 / tsum;    // not inverse; if t0 = 1, the p is at p0
-            minRightChild.weight = t1 / tsum;   // not inverse; if t1 = 1, the p is at p1
-        } else {
-            if (maxLeftChild !== null) {
-                maxLeftChild.weight = 1;
-                t0 = 1; t1 = 0;
+                if (sampleX === 0 && sampleY === 0) {
+                    // center point, can not calc atan
+                    centerChild = child;
+                    child.weight = 1;
+                } else {
+                    child.weight = 0;
+                }
             }
-            if (minRightChild !== null) {
-                minRightChild.weight = 1;
-                t0 = 0; t1 = 1;
+            if (centerChild === null) {
+                for (const child of this.children) {
+                    child.weight = 1.0 / this.children.length;
+                }
             }
         }
         
-        // find if there are children in center
-        if (centerChild !== null) {
-            // blend between 2 children and center
-            centerChild.weight = Math.max(0, Math.min(t0 + t1, 1));
-            if (maxLeftChild !== null) {
-                maxLeftChild.weight *= 1 - centerChild.weight;
-            }
-            if (minRightChild !== null) {
-                minRightChild.weight *= 1 - centerChild.weight;
-            }
-        }
 
         /*
         // blend between them, use radial difference
