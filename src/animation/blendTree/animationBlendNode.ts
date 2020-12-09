@@ -143,9 +143,10 @@ export class AnimationBlendNode {
 
     public updateAnimations() {
         // if a node's weight is zero, all it's children will not affect the result animation
-        if (this.actualWeight < 0.001) {
-            return;
-        }
+        // but we still need update animation playtime... to keep children of same node sync
+        // if (this.actualWeight < 0.001) {
+        //     return;
+        // }
 
         // blend animations with weight
         if (this.animation !== null) {

@@ -91,7 +91,7 @@ export class AnimationAction {
     }
 
     public update(time: number, deltaTime: number) {
-        // todo: update internal anim time, according to playback speeds and so on
+        // update internal anim time, according to playback speeds and so on
         if (this._isPlaying) {
             this._curPlaybackTime += deltaTime * this._speed;
 
@@ -111,6 +111,11 @@ export class AnimationAction {
                     }
                 }
             }
+        }
+
+        // if applyMode is add and my weight is 0, skip all channels for performance
+        if (this._applyMode === AnimationApplyMode.add && this._weight < 0.001) {
+            return;
         }
 
         // have mask?
