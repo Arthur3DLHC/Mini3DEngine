@@ -507,6 +507,7 @@ window.onload = () => {
                 "aiming": 0,
                 "aimPitch": 0,
                 "moveSpeed": 0,
+                "strafeSpeed": 0,
                 "shoot": 0,
             },
             "animationLayers": [
@@ -525,6 +526,7 @@ window.onload = () => {
                                     "blendMethod": 0,
                                     "weight": 1,
                                     "children": [
+                                        /*
                                         {
                                             // aiming move (front back only)
                                             "blendParameters": ["moveSpeed"],
@@ -552,6 +554,51 @@ window.onload = () => {
                                                     "weigth": 0,
                                                     "weightParamPosition": [1],
                                                     "animation": "Female.Aim.Walk.Forward"
+                                                },
+                                            ]
+                                        },
+                                        */
+                                        {
+                                            // aiming move (directional)
+                                            "blendParameters": ["moveSpeed", "strafeSpeed"],
+                                            "blendMethod": 1,
+                                            "weigth": 0,
+                                            "weightParamPosition": [1], // aiming === 1
+                                            "children": [
+                                                {
+                                                    // aim move backward
+                                                    "blendMethod": 4,
+                                                    "weigth": 0,
+                                                    "weightParamPosition": [-1, 0],
+                                                    "animation": "Female.Aim.Walk.Backward"
+                                                },
+                                                {
+                                                    // aim stand
+                                                    "blendMethod": 4,
+                                                    "weigth": 1,
+                                                    "weightParamPosition": [0, 0],
+                                                    "animation": "Female.Aim.Middle"
+                                                },
+                                                {
+                                                    // aim move forward
+                                                    "blendMethod": 4,
+                                                    "weigth": 0,
+                                                    "weightParamPosition": [1, 0],
+                                                    "animation": "Female.Aim.Walk.Forward"
+                                                },
+                                                {
+                                                    // aim strafe left
+                                                    "blendMethod": 4,
+                                                    "weigth": 0,
+                                                    "weightParamPosition": [0, -1],
+                                                    "animation": "Female.Aim.Walk.Left"
+                                                },
+                                                {
+                                                    // aim strafe right
+                                                    "blendMethod": 4,
+                                                    "weigth": 0,
+                                                    "weightParamPosition": [0, 1],
+                                                    "animation": "Female.Aim.Walk.Right"
                                                 },
                                             ]
                                         },

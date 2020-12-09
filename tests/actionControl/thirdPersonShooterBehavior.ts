@@ -40,25 +40,31 @@ export class ThirdPersonShooterBehavior extends ThirdPersonCtrlBehavior {
         this._actionCtrl.actionParams.set("aiming", this.isAiming ? 1 : 0);
 
         let moveBlend = 0;
+        let strafeBlend = 0;
         if (this.isAiming) {
             // todo: should use this.modelyaw and this.moveyaw to calc a local move dir,
             // then set as params for a 2D directional blend
             // now use a simple 1D blend
             if (this.aimMoveSpeed > 0) {
                 moveBlend = this.horizVelocity.length() / this.aimMoveSpeed;
-                if (this._isMovingBackward) {
-                    moveBlend = -moveBlend;
-                }
+                strafeBlend = moveBlend;
+                // if (this._isMovingBackward) {
+                //     moveBlend = -moveBlend;
+                // }
+                const localMoveAngle = this.moveYaw - this.modelYaw;
+                moveBlend *= Math.cos(localMoveAngle);
+                strafeBlend *= Math.sin(localMoveAngle);
             }
         } else {
             if (this.moveSpeed > 0) {
                 moveBlend = this.horizVelocity.length() / this.moveSpeed;
             }
-            if(moveBlend > 0) {
+            // if(moveBlend > 0) {
                 moveBlend = Math.max(0, Math.min(moveBlend, 1));
-            }
+            // }
         }        
         this._actionCtrl.actionParams.set("moveSpeed", moveBlend);
+        this._actionCtrl.actionParams.set("strafeSpeed", strafeBlend);
 
         // pitch
         const pitchLimit = 60 * Math.PI / 180;
