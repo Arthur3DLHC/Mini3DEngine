@@ -195,10 +195,10 @@ export class AnimationBlendNode {
         if (paramLenSq > 0) {
             const phi = Math.atan2(paramY, paramX);
             // find nearest 2 children in polar space
-            let maxLeftChild: AnimationBlendNode | null = null;
-            let minRightChild: AnimationBlendNode | null = null;
-            let maxLeftDiff: number = 0;
-            let minRightDiff: number = 0;
+            let minLeftChild: AnimationBlendNode | null = null;
+            let maxRightChild: AnimationBlendNode | null = null;
+            let minLeftDiff: number = 0;
+            let maxRightDiff: number = 0;
 
             let centerChild: AnimationBlendNode | null = null;
 
@@ -216,13 +216,14 @@ export class AnimationBlendNode {
 
                 const radialDiff = this.getRadialDifference(phi, sampleX, sampleY);
 
-                if (minRightChild === null || radialDiff < minRightDiff) {
-                    minRightChild = child;
-                    minRightDiff = radialDiff;
+                // counter clock is positive
+                if (maxRightChild === null || radialDiff > maxRightDiff) {
+                    maxRightChild = child;
+                    maxRightDiff = radialDiff;
                 }
-                if (maxLeftChild === null || radialDiff > maxLeftDiff) {
-                    maxLeftChild = child;
-                    maxLeftDiff = radialDiff;
+                if (minLeftChild === null || radialDiff < minLeftDiff) {
+                    minLeftChild = child;
+                    minLeftDiff = radialDiff;
                 }
             }
 
@@ -236,12 +237,12 @@ export class AnimationBlendNode {
             //      weight1 = t1 / (t0 + t1)
             let t0 = 0.5;
             let t1 = 0.5;
-            if (maxLeftChild !== null && minRightChild !== null) {
-                const x0 = maxLeftChild.weightParamPosition[0] || 0;
-                const y0 = maxLeftChild.weightParamPosition[1] || 0;
+            if (minLeftChild !== null && maxRightChild !== null) {
+                const x0 = minLeftChild.weightParamPosition[0] || 0;
+                const y0 = minLeftChild.weightParamPosition[1] || 0;
 
-                const x1 = minRightChild.weightParamPosition[0] || 0;
-                const y1 = minRightChild.weightParamPosition[1] || 0;
+                const x1 = maxRightChild.weightParamPosition[0] || 0;
+                const y1 = maxRightChild.weightParamPosition[1] || 0;
 
                 // Solving equations
                 const denominator = (x1 * y0 - x0 * y1);
@@ -254,16 +255,16 @@ export class AnimationBlendNode {
                 const tsum = t0 + t1;
 
                 if (tsum > 0) {
-                    maxLeftChild.weight = t0 / tsum;    // not inverse; if t0 = 1, the p is at p0
-                    minRightChild.weight = t1 / tsum;   // not inverse; if t1 = 1, the p is at p1
+                    minLeftChild.weight = t0 / tsum;    // not inverse; if t0 = 1, the p is at p0
+                    maxRightChild.weight = t1 / tsum;   // not inverse; if t1 = 1, the p is at p1
                 }
             } else {
-                if (maxLeftChild !== null) {
-                    maxLeftChild.weight = 1;
+                if (minLeftChild !== null) {
+                    minLeftChild.weight = 1;
                     t0 = 1; t1 = 0;
                 }
-                if (minRightChild !== null) {
-                    minRightChild.weight = 1;
+                if (maxRightChild !== null) {
+                    maxRightChild.weight = 1;
                     t0 = 0; t1 = 1;
                 }
             }
@@ -273,11 +274,11 @@ export class AnimationBlendNode {
                 const nodeInfluence = Math.max(0, Math.min(t0 + t1, 1));
                 // blend between 2 children and center
                 centerChild.weight = 1 - nodeInfluence;
-                if (maxLeftChild !== null) {
-                    maxLeftChild.weight *= nodeInfluence;
+                if (minLeftChild !== null) {
+                    minLeftChild.weight *= nodeInfluence;
                 }
-                if (minRightChild !== null) {
-                    minRightChild.weight *= nodeInfluence;
+                if (maxRightChild !== null) {
+                    maxRightChild.weight *= nodeInfluence;
                 }
             }
         } 
