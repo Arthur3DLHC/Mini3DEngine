@@ -566,6 +566,14 @@ TODO:       主要类结构
                     能否也集成在 tonemapping 里？
                 景深；不着急做
 
+            屏幕像素级点选和 Hover 效果
+                用于实现射击、对象交互
+                点选时将 object ID 绘制到一个FBO，然后 blit 选取范围到内存 FBO，CPU 读取出此 ID
+                Hover效果：
+                    只高亮 Hover 物体，不用读取其ID
+                    每帧绘制 object ID 到 FBO
+                    然后使用一个描边后期特效：取该 FBO 中鼠标或准星所在位置的 ID；将当前像素周围 ID 与之比较，如果有部分相同则描边；
+
             相机动画；
                 从 Blender 导出；
                 能否导出相机的视野属性动画？
