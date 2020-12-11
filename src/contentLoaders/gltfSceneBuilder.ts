@@ -71,7 +71,7 @@ export class GLTFSceneBuilder {
         [GLTF_ATTRIBUTES.JOINTS_0, VertexBufferAttribute.defaultNameJoints0],
         [GLTF_ATTRIBUTES.WEIGHTS_0, VertexBufferAttribute.defaultNameWeights0],
     ]);
-
+    
     /**
      * set lights as static
      */
@@ -81,7 +81,9 @@ export class GLTFSceneBuilder {
     public physicsWorld: PhysicsWorld | null = null;
 
     /** the default physics material of colliders in gltf */
-    public physicsMaterial: CANNON.Material | null = null;
+    public defaultPhysicsMaterial: CANNON.Material | null = null;
+
+    public physicsMaterials: Map<string, CANNON.Material> | null = null;
 
     /**
      * build scene hierarchy from gltf asset. NOTE: don't call this before all binary datas has been loaded.
@@ -266,6 +268,9 @@ export class GLTFSceneBuilder {
                     node = this.processCollider(nodeDef, gltf);
                 } else {
                     // todo: other extra object types
+                    // todo: object prefab?
+                    // define components in prefab json file,
+                    // then add the prefab file path to object in blender
                     node = new Object3D();
                 }
             }
@@ -307,7 +312,36 @@ export class GLTFSceneBuilder {
             throw new Error("physics collider does not have scale, rotation or translation: " + nodeDef.name || "");
         }
         const node = new Object3D();
-        if (this.physicsWorld !== null && this.physicsMaterial !== null) {
+        if (this.physicsWorld !== null && this.defaultPhysicsMaterial !== null) {
+            let physicsMaterial: CANNON.Material = this.defaultPhysicsMaterial;
+            // object has material properties presented?
+
+            if (nodeDef.extras.physicsMtl !== undefined) {
+                if (this.physicsMaterials !== null) {
+                    let foundMtl = this.physicsMaterials.get(nodeDef.extras.physicsMtl);
+                    if (foundMtl !== undefined) {
+                        physicsMaterial = foundMtl;
+                    } else {
+                        console.warn("physics material not found: " + nodeDef.extras.physicsMtl);
+                    }
+                } else {
+                    console.warn("node has physics material name but builder do not has material map");
+                }
+            }
+
+            // let friction: number = this.defaultPhysicsMaterial.friction;
+            // let restitution: number = this.defaultPhysicsMaterial.restitution;
+
+            // if (nodeDef.extras.friction !== undefined) friction = nodeDef.extras.friction;
+            // if (nodeDef.extras.restitution !== undefined) restitution = nodeDef.extras.restitution;
+
+            // if (friction !== this.defaultPhysicsMaterial.friction || restitution !== this.defaultPhysicsMaterial.restitution) {
+            //     let cachedMtl = this._physicsMaterialCache.find((mtl)=>{return mtl.friction === friction && mtl.restitution === restitution;});
+            //     if (cachedMtl === undefined) {
+            //         cachedMtl = new CANNON.Material({});
+            //     }
+            // }
+            
             let shape: string = "unkown";    // cannon.box
             if (nodeDef.extras.colliderShape !== undefined) {
                 shape = nodeDef.extras.colliderShape;
@@ -315,17 +349,17 @@ export class GLTFSceneBuilder {
             let body: RigidBody | null = null;
             switch (shape) {
                 case "box":
-                    body = new RigidBody(node, this.physicsWorld, {mass: 0, material: this.physicsMaterial});
+                    body = new RigidBody(node, this.physicsWorld, {mass: 0, material: physicsMaterial});
                     const boxShape = new CANNON.Box(new CANNON.Vec3(nodeDef.scale[0], nodeDef.scale[1], nodeDef.scale[2]));
                     body.body.addShape(boxShape);
                     break;
                 case "sphere":
-                    body = new RigidBody(node, this.physicsWorld, {mass: 0, material: this.physicsMaterial});
+                    body = new RigidBody(node, this.physicsWorld, {mass: 0, material: physicsMaterial});
                     const sphereShape = new CANNON.Sphere(nodeDef.scale[0]);
                     body.body.addShape(sphereShape);
                     break;
                 case "cylinder":
-                    body = new RigidBody(node, this.physicsWorld, {mass: 0, material: this.physicsMaterial});
+                    body = new RigidBody(node, this.physicsWorld, {mass: 0, material: physicsMaterial});
                     const cylinderShape = new CANNON.Cylinder(nodeDef.scale[0], nodeDef.scale[0], nodeDef.scale[1], 8);
                     body.body.addShape(cylinderShape);
                     break;
