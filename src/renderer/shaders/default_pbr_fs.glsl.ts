@@ -317,7 +317,8 @@ void main(void)
         */
 
         // float NdotV = clampedDot(n, v);  // 前面已经算过了，与光源无关
-        if (NdotL > 0.0 || NdotV > 0.0)
+        // if (NdotL > 0.0 || NdotV > 0.0)
+        if (NdotL > 0.0)
         {
             NdotL = clamp(NdotL, 0.0, 1.0);
             // apply shadow while diffuse?
