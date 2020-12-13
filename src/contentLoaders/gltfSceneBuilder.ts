@@ -350,6 +350,7 @@ export class GLTFSceneBuilder {
             switch (shape) {
                 case "box":
                     body = new RigidBody(node, this.physicsWorld, {mass: 0, material: physicsMaterial});
+                    // the param is half extends, == the scale in blender
                     const boxShape = new CANNON.Box(new CANNON.Vec3(nodeDef.scale[0], nodeDef.scale[1], nodeDef.scale[2]));
                     body.body.addShape(boxShape);
                     break;
