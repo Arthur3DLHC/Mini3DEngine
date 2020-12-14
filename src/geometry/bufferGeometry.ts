@@ -63,6 +63,9 @@ export class BufferGeometry {
         }
         GLGeometryBuffers.clearVertexAttributes();
 
+        // must enable all active attributes of shader?
+        // GLGeometryBuffers.enableVertexAttributes(attribLocations);
+
         // GLGeometryBuffers.bindVertexBuffer(this.vertexBuffer);
         // 在 OpenGL 中只要将 VertexBufferObject 绑定到 Vertex attribute pointer 上，就可以直接用后者绘制了，不用再绑定 VBO
         for (const attr of this.attributes) {
@@ -103,6 +106,9 @@ export class BufferGeometry {
         //     return;
         // }
         GLGeometryBuffers.clearVertexAttributes();
+
+        // GLGeometryBuffers.enableVertexAttributes(attribLocations);
+
         // bind geometry vertex buffer
         for (const attr of this.attributes) {
             if (attr.buffer.data === null || attr.buffer.glBuffer === null) {

@@ -198,7 +198,7 @@ window.onload = () => {
         scene.attachChild(gltfSceneLevel);
         prepareGLTFLevel(gltfSceneLevel);
         // update once for static objects
-        gltfSceneLevel.updateWorldTransform(false, true);
+        scene.updateWorldTransform(false, true);
         InstancedMesh.updateInstancedMeshes(gltfSceneLevel);
 
         window.onmousedown = (ev: MouseEvent) => {

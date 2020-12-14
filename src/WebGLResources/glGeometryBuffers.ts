@@ -49,6 +49,16 @@ export class GLGeometryBuffers {
         }
     }
 
+    public static enableVertexAttributes(attribLocations: Map<string, number>) {
+        attribLocations.forEach((index, name, map) => {
+            this._newAttributes[index] = 1;
+            if (this._enabledAttributes[index] === 0) {
+                this._enabledAttributes[index] = 1;
+                GLDevice.gl.enableVertexAttribArray(index);
+            }
+        });
+    }
+
     /**
      * set attribute pointer for current binding vertex buffer (bound by bindVertexBuffer() call)
      * @param attrib 
@@ -60,10 +70,9 @@ export class GLGeometryBuffers {
             index += attrib.locationOffset;
             this._newAttributes[index] = 1;
             if (this._enabledAttributes[index] === 0) {
-                GLDevice.gl.enableVertexAttribArray(index);
                 this._enabledAttributes[index] = 1;
             }
-
+            GLDevice.gl.enableVertexAttribArray(index);
             GLDevice.gl.vertexAttribPointer(index, attrib.size, attrib.componentType, false, attrib.buffer.stride, attrib.offset);
             
             //if(this._attribDivisors[index] !== attrib.divisor) {
