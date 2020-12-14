@@ -10,7 +10,7 @@ uniform sampler2D gFinalImage;
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gExtraComponents;
-uniform sampler2D ColorBuffer; 
+uniform sampler2D ColorBuffer;
 
 uniform mat4 invView;
 uniform mat4 projection;

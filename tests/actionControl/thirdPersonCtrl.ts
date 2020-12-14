@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition, ActionStateBlendTree, AnimationBlendNode, BlendMethods, SingleParamCondition, TimeUpCondition, AnimationMask, SkinMesh, AnimationLoopMode } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition, ActionStateBlendTree, AnimationBlendNode, BlendMethods, SingleParamCondition, TimeUpCondition, AnimationMask, SkinMesh, AnimationLoopMode, InstancedMesh } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
@@ -74,10 +74,10 @@ window.onload = () => {
     // test box geometry
     createScene(physicsWorld, widgetPhysicsMtl, scene, addPlane, groundPhysicsMtl);
 
-    console.log("loading gltf model...");
+    console.log("loading gltf models...");
     // todo: load gltf character, load skybox
     const gltfPromiseFemale: Promise<GltfAsset> = gltfLoader.load("./models/SCIFI/heroes/cyberGirl/CyberGirl_animation.gltf");
-
+    const gltfPromiseLevel: Promise<GltfAsset> = gltfLoader.load("./models/SCIFI/testlevel/TestLevel.gltf");
     console.log("loading skybox...");
 
     // load skybox textures
@@ -98,11 +98,11 @@ window.onload = () => {
 
     const imagesPromise = Promise.all(imagePromises);
 
-    Promise.all([gltfPromiseFemale, imagesPromise]).then((loaded) => {
+    Promise.all([gltfPromiseFemale, gltfPromiseLevel, imagesPromise]).then((loaded) => {
         const skyboxTexture: TextureCube = new TextureCube();
 
         for (let i = 0; i < 6; i++) {
-            skyboxTexture.images[i] = loaded[1][i];
+            skyboxTexture.images[i] = loaded[2][i];
         }
 
         skyboxTexture.componentType = GLDevice.gl.UNSIGNED_BYTE;
@@ -127,24 +127,6 @@ window.onload = () => {
         scene.attachChild(gltfSceneFemale);
 
         prepareGLTFCharacter(gltfSceneFemale);
-
-        /*
-        const playerMesh = new Mesh();
-        playerMesh.name = "player";
-        playerMesh.geometry = new BoxGeometry(0.5, 1.7, 0.3);
-        playerMesh.castShadow = true;
-        playerMesh.isStatic = false;
-        playerMesh.autoUpdateTransform = true;
-        playerMesh.translation.setComponents(0, 1.5, 0);
-
-        const playerMtl = new StandardPBRMaterial();
-        playerMtl.color = new vec4([1, 1, 1, 1]);
-        playerMtl.metallic = 0.02;
-        playerMtl.roughness = 0.4;
-        playerMesh.materials.push(playerMtl);
-
-        scene.attachChild(playerMesh);
-        */
 
         // and add rigid body for player character
         // use a compound shape from two spheres
@@ -194,6 +176,21 @@ window.onload = () => {
         addActionControlJSON(gltfSceneFemale, animations, actionCtrlBehavior);
 
         tpsBehavior.upperBodyLayer = actionCtrlBehavior.animationLayers.find((layer)=>{return layer.name === "upperBody";});
+
+        // build test level
+        const builderLevel = new GLTFSceneBuilder();
+        // physics world and material
+        builderLevel.physicsWorld = physicsWorld;
+        builderLevel.defaultPhysicsMaterial = groundPhysicsMtl;
+
+        const gltfSceneLevel = builderLevel.build(loaded[1], 0, undefined, true);
+        gltfSceneLevel.name = "Level";
+        gltfSceneLevel.autoUpdateTransform = true;
+        scene.attachChild(gltfSceneLevel);
+        prepareGLTFLevel(gltfSceneLevel);
+        // update once for static objects
+        scene.updateWorldTransform(false, true);
+        InstancedMesh.updateInstancedMeshes(gltfSceneLevel);
 
         window.onmousedown = (ev: MouseEvent) => {
             // fpsBehavior.onMouseDown(ev);
@@ -309,6 +306,21 @@ window.onload = () => {
 
         for (const child of gltfNode.children) {
             prepareGLTFCharacter(child);
+        }
+    }
+
+    function prepareGLTFLevel(gltfNode: Object3D) {
+        gltfNode.isStatic = true;
+        gltfNode.autoUpdateTransform = false;
+
+        if (gltfNode instanceof Mesh) {
+            gltfNode.castShadow = true;
+            gltfNode.receiveShadow = true;
+            // gltfNode.boundingSphereRenderMode = BoundingRenderModes.normal;
+        }
+
+        for (const child of gltfNode.children) {
+            prepareGLTFLevel(child);
         }
     }
 
@@ -857,6 +869,9 @@ function createScene(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CANNON.Materi
         const sphereShape = new CANNON.Sphere(0.4);
         sphereBody.body.addShape(sphereShape);
     }
+
+    // modified: load gltf level to load lights and static scene
+    return;
 
     // static cylinder
     {
