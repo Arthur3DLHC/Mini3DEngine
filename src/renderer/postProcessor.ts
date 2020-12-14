@@ -597,8 +597,8 @@ export class PostProcessor {
         const gl = GLDevice.gl;
         
         GLDevice.renderTarget = this._ssrFBO;
-        gl.viewport(0, 0, this._ssaoTexture.width, this._ssaoTexture.height);
-        gl.scissor(0, 0, this._ssaoTexture.width, this._ssaoTexture.height);
+        gl.viewport(0, 0, this._ssrTexture.width, this._ssrTexture.height);
+        gl.scissor(0, 0, this._ssrTexture.width, this._ssrTexture.height);
 
         GLDevice.clearColor = new vec4([0, 0, 0, 0]);
         GLDevice.clear(true, false, false);
