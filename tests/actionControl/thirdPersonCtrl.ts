@@ -81,6 +81,7 @@ window.onload = () => {
     console.log("loading skybox...");
 
     // load skybox textures
+    /*
     const envmapUrls: string[] = [
         "./textures/skyboxes/ballroom/px.png",
         "./textures/skyboxes/ballroom/nx.png",
@@ -88,6 +89,14 @@ window.onload = () => {
         "./textures/skyboxes/ballroom/ny.png",
         "./textures/skyboxes/ballroom/pz.png",
         "./textures/skyboxes/ballroom/nz.png",
+    ];*/
+    const envmapUrls: string[] = [
+        "./textures/skyboxes/kloofendal_48d_partly_cloudy_2k/px.png",
+        "./textures/skyboxes/kloofendal_48d_partly_cloudy_2k/nx.png",
+        "./textures/skyboxes/kloofendal_48d_partly_cloudy_2k/py.png",
+        "./textures/skyboxes/kloofendal_48d_partly_cloudy_2k/ny.png",
+        "./textures/skyboxes/kloofendal_48d_partly_cloudy_2k/pz.png",
+        "./textures/skyboxes/kloofendal_48d_partly_cloudy_2k/nz.png",
     ];
     const imagePromises: (Promise<HTMLImageElement|ImageData>)[] = [];
 
