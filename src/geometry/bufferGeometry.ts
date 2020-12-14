@@ -69,8 +69,10 @@ export class BufferGeometry {
             if (attr.buffer.data === null || attr.buffer.glBuffer === null) {
                 throw new Error("Vertex buffer is empty or not created");
             }
-            GLGeometryBuffers.bindVertexBuffer(attr.buffer);
-            GLGeometryBuffers.setVertexAttribute(attr, attribLocations);
+            if (attribLocations.has(attr.name)) {
+                GLGeometryBuffers.bindVertexBuffer(attr.buffer);
+                GLGeometryBuffers.setVertexAttribute(attr, attribLocations);
+            }
         }
         GLGeometryBuffers.disableUnusedAttributes();
 

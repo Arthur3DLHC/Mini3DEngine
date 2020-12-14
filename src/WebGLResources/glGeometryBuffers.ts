@@ -44,7 +44,8 @@ export class GLGeometryBuffers {
         // clear newattribs
         for (let i = 0; i < this._newAttributes.length; i++) {
             this._newAttributes[i] = 0;
-            this._attribDivisors[i] = 0;
+            // do not clear divisors, or will not call gl.vertexAttribDivisor later
+            // this._attribDivisors[i] = 0;
         }
     }
 
