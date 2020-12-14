@@ -66,10 +66,10 @@ export class GLGeometryBuffers {
 
             GLDevice.gl.vertexAttribPointer(index, attrib.size, attrib.componentType, false, attrib.buffer.stride, attrib.offset);
             
-            if(this._attribDivisors[index] !== attrib.divisor) {
+            //if(this._attribDivisors[index] !== attrib.divisor) {
                 GLDevice.gl.vertexAttribDivisor(index, attrib.divisor);
                 this._attribDivisors[index] = attrib.divisor;
-            }
+            //}
         }
     }
 
