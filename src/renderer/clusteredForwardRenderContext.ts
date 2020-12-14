@@ -792,8 +792,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 this._buffer.addArray(skinMesh.jointMatrices[i].values);
             }
             this._ubObject.setUniform("matBones", this._tmpData, this._buffer.length);
-        }
-        else if(item.object instanceof InstancedMesh) {
+        } else if(item.object instanceof InstancedMesh) {
             // this is important ! for instanced meshes, must pass in identity !!
             matWorld = mat4.identity;
             matWorldPrev = mat4.identity;

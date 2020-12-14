@@ -686,7 +686,7 @@ export class ClusteredForwardRenderer {
         GLTextures.setTextureAt(this._irradianceProbeArrayUnit, this._irradianceProbesArray);
     }
 
-    private bindTexturesPerMaterial(material: Material | null, useSkin: boolean) {
+    private bindTexturesPerMaterial(material: Material | null) {
         // todo: skinning
         let samplerUniforms = this._samplerUniformsStdPBR;
         // if (useSkin) {
@@ -1006,7 +1006,7 @@ export class ClusteredForwardRenderer {
                 }
                 */
 
-                const isSkin = item.object instanceof SkinMesh;
+                // const isSkin = item.object instanceof SkinMesh;
 
                 // item may be animated
                 //if (this._currentObject !== item.object) {
@@ -1031,7 +1031,7 @@ export class ClusteredForwardRenderer {
                         }
                     }
                     this._renderContext.fillUniformBuffersPerMaterial(item.material);
-                    this.bindTexturesPerMaterial(item.material, isSkin);
+                    this.bindTexturesPerMaterial(item.material);
 
                     // todo: set sampler index for sampler uniform locations of program
                 }

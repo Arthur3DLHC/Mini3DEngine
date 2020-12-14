@@ -365,7 +365,7 @@ export class GLTFSceneBuilder {
                     break;
                 case "cylinder":
                     body = new RigidBody(node, this.physicsWorld, {mass: 0, material: physicsMaterial});
-                    const cylinderShape = new CANNON.Cylinder(scale[0], scale[0], scale[1], 8);
+                    const cylinderShape = new CANNON.Cylinder(scale[0], scale[0], scale[1] * 2, 8);
                     body.body.addShape(cylinderShape);
                     break;
                 default:
