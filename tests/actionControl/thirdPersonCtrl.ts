@@ -194,11 +194,11 @@ window.onload = () => {
 
         const gltfSceneLevel = builderLevel.build(loaded[1], 0, undefined, true);
         gltfSceneLevel.name = "Level";
-        gltfSceneLevel.autoUpdateTransform = true;
+        gltfSceneLevel.autoUpdateTransform = false;
         scene.attachChild(gltfSceneLevel);
         prepareGLTFLevel(gltfSceneLevel);
         // update once for static objects
-        scene.updateWorldTransform(false, true);
+        gltfSceneLevel.updateWorldTransform(false, true);
         InstancedMesh.updateInstancedMeshes(gltfSceneLevel);
 
         window.onmousedown = (ev: MouseEvent) => {
@@ -305,6 +305,7 @@ window.onload = () => {
 
     function prepareGLTFCharacter(gltfNode: Object3D) {
         // gltfNode.isStatic = true;
+        gltfNode.isStatic = false;
         gltfNode.autoUpdateTransform = true;
         
         if (gltfNode instanceof Mesh) {
@@ -321,6 +322,7 @@ window.onload = () => {
     function prepareGLTFLevel(gltfNode: Object3D) {
         gltfNode.isStatic = true;
         gltfNode.autoUpdateTransform = false;
+        gltfNode.updateLocalTransform();
 
         if (gltfNode instanceof Mesh) {
             gltfNode.castShadow = true;

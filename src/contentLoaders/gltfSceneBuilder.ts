@@ -303,14 +303,18 @@ export class GLTFSceneBuilder {
 
     /**
      * process physics colliders
+     * fix me: now use the local SRT, so the colliders can't have hierarchical structure
+     * is it better to extract SRT from global transform matrix?
      * @param nodeDef 
      * @param gltf 
      */
     private processCollider(nodeDef: Node, gltf: GltfAsset): Object3D {
-        // nodeDef must have srt
-        if (nodeDef.scale === undefined || nodeDef.rotation === undefined || nodeDef.translation === undefined) {
-            throw new Error("physics collider does not have scale, rotation or translation: " + nodeDef.name || "");
+        // nodeDef may not have S, R or T if they are default
+        let scale: number[] = [1, 1, 1];
+        if (nodeDef.scale !== undefined) {
+            scale = nodeDef.scale;
         }
+
         const node = new Object3D();
         if (this.physicsWorld !== null && this.defaultPhysicsMaterial !== null) {
             let physicsMaterial: CANNON.Material = this.defaultPhysicsMaterial;
@@ -351,17 +355,17 @@ export class GLTFSceneBuilder {
                 case "box":
                     body = new RigidBody(node, this.physicsWorld, {mass: 0, material: physicsMaterial});
                     // the param is half extends, == the scale in blender
-                    const boxShape = new CANNON.Box(new CANNON.Vec3(nodeDef.scale[0], nodeDef.scale[1], nodeDef.scale[2]));
+                    const boxShape = new CANNON.Box(new CANNON.Vec3(scale[0], scale[1], scale[2]));
                     body.body.addShape(boxShape);
                     break;
                 case "sphere":
                     body = new RigidBody(node, this.physicsWorld, {mass: 0, material: physicsMaterial});
-                    const sphereShape = new CANNON.Sphere(nodeDef.scale[0]);
+                    const sphereShape = new CANNON.Sphere(scale[0]);
                     body.body.addShape(sphereShape);
                     break;
                 case "cylinder":
                     body = new RigidBody(node, this.physicsWorld, {mass: 0, material: physicsMaterial});
-                    const cylinderShape = new CANNON.Cylinder(nodeDef.scale[0], nodeDef.scale[0], nodeDef.scale[1], 8);
+                    const cylinderShape = new CANNON.Cylinder(scale[0], scale[0], scale[1], 8);
                     body.body.addShape(cylinderShape);
                     break;
                 default:
@@ -373,8 +377,12 @@ export class GLTFSceneBuilder {
                 this.physicsWorld.world.addBody(body.body);
                 node.behaviors.push(body);
 
-                body.setPosition(new vec3([nodeDef.translation[0], nodeDef.translation[1], nodeDef.translation[2]]));
-                body.setRotation(new quat([nodeDef.rotation[0], nodeDef.rotation[1], nodeDef.rotation[2], nodeDef.rotation[3]]));
+                if (nodeDef.translation !== undefined) {
+                    body.setPosition(new vec3([nodeDef.translation[0], nodeDef.translation[1], nodeDef.translation[2]]));
+                }
+                if (nodeDef.rotation !== undefined) {
+                    body.setRotation(new quat([nodeDef.rotation[0], nodeDef.rotation[1], nodeDef.rotation[2], nodeDef.rotation[3]]));
+                }
             }
         }
         
