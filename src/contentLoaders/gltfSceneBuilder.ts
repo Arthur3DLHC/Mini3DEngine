@@ -365,7 +365,14 @@ export class GLTFSceneBuilder {
                     break;
                 case "cylinder":
                     body = new RigidBody(node, this.physicsWorld, {mass: 0, material: physicsMaterial});
-                    const cylinderShape = new CANNON.Cylinder(scale[0] * 2, scale[0] * 2, scale[1] * 2, 8);
+                    const cylinderShape = new CANNON.Cylinder(scale[0], scale[0], scale[1] * 2, 16);
+                    // the cylinder in cannon.js is horizontal, but in blender is vertical
+                    // according to the project owner, we could use transformAllPoints() to rotate it.
+                    // https://github.com/schteppe/cannon.js/issues/58
+                    const axisAlignQuat = new CANNON.Quaternion();
+                    axisAlignQuat.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI * 0.5);
+                    const axisAlignTrans = new CANNON.Vec3(0, 0, 0);
+                    cylinderShape.transformAllPoints(axisAlignTrans, axisAlignQuat);
                     body.body.addShape(cylinderShape);
                     break;
                 default:
