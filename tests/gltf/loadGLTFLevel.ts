@@ -16,8 +16,8 @@ window.onload = () => {
         return;
     }
 
-    canvas.width = Math.max(1280, window.innerWidth - 50);
-    canvas.height = Math.max(720, window.innerHeight - 50);
+    // canvas.width = Math.max(1280, window.innerWidth - 50);
+    // canvas.height = Math.max(720, window.innerHeight - 50);
 
     GLDevice.initialize(canvas);
 
