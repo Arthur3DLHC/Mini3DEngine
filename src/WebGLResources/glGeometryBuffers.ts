@@ -70,9 +70,10 @@ export class GLGeometryBuffers {
             index += attrib.locationOffset;
             this._newAttributes[index] = 1;
             if (this._enabledAttributes[index] === 0) {
+                GLDevice.gl.enableVertexAttribArray(index);
                 this._enabledAttributes[index] = 1;
             }
-            GLDevice.gl.enableVertexAttribArray(index);
+            
             GLDevice.gl.vertexAttribPointer(index, attrib.size, attrib.componentType, false, attrib.buffer.stride, attrib.offset);
             
             //if(this._attribDivisors[index] !== attrib.divisor) {
