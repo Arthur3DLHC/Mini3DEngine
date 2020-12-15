@@ -676,6 +676,7 @@ TODO:       主要类结构
             户外阴影方案
                 Cascaded shadow map? 
                 或类似的简化方案：指定一个平行光作为日光，近景用跟随相机走的动态 shadowmap，远景过度到静态 shadowmap
+                    可以考虑此光源只渲染动态物体 shadowmap？然后和静态 shadowmap 同时判断
 
             考虑技能特效等怎么实现；
                 刀光、击中特效等
