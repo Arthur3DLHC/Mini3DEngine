@@ -505,8 +505,8 @@ TODO:       主要类结构
                     被混合的动画需要能时间同步
                     测试二维方向动画混合节点；
 
-                弹簧控制器
-                    用于R摇
+            弹簧控制器
+                用于R摇
 
             尝试一下简版次表面效果
                 gltf-Model-Viewer中的方法
@@ -600,8 +600,6 @@ TODO:       主要类结构
                     根据文件扩展名放到不同的 promise 列表里？
 
             优化 tsm 库？
-
-        大场景相关
         
             particle system; sprite;
                 使用 GPU 计算 particle: transform feedback
@@ -609,6 +607,8 @@ TODO:       主要类结构
                 粒子物理：可以通过深度图获得场景位置，在 GPU 计算碰撞？https://nullprogram.com/webgl-particles/
                 使用一个默认的粒子系统 shader ？以及对应的粒子系统材质类？
                 粒子光照；sample shadow maps;
+
+        大场景相关
 
         物理系统
             带物理的第一人称控制：https://github.com/mrdoob/three.js/blob/master/examples/js/controls/PointerLockControls.js
@@ -684,6 +684,8 @@ TODO:       主要类结构
                     √ 通过 json 定义动画关键帧实现？
                         每个特效是一个单独的 gltf 文件；另附加一个 json 文件，记录该 gltf 中节点材质颜色和 UV 动画关键帧；
                     × 或者能否通过 blender 对象的自定义属性记录？需要支持关键帧数组；
+
+            运行中创建和移除对象的机制
 
             ECS 架构
                 从 GLTF 加载组件信息？
