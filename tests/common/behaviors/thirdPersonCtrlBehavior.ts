@@ -2,6 +2,7 @@ import quat from "../../../lib/tsm/quat.js";
 import vec2 from "../../../lib/tsm/vec2.js";
 import vec3 from "../../../lib/tsm/vec3.js";
 import { Behavior, Camera, Clock, KeyCodes, Object3D, RigidBody } from "../../../src/mini3DEngine.js";
+import { MouseLookModes } from "./mouseLookModes.js";
 
 /**
  * third person shooter control, with physics bodys
@@ -51,6 +52,8 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     public allowJump: boolean = false;
 
     public pointerLock: boolean = false;
+
+    public turnMode: MouseLookModes = MouseLookModes.PointerLock;
 
     public keyForward: string = "w";
     public keyBackward: string = "s";
@@ -121,7 +124,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
         if (ev.button !== 0) {
             return;
         }
-        this._dragging = true;
+        if(this.turnMode === MouseLookModes.Drag) this._dragging = true;
         // this._oldMousePos.x = ev.clientX;
         // this._oldMousePos.y = ev.clientY;
     }
@@ -131,7 +134,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     }
 
     public onMouseMove(ev: MouseEvent) {
-        if (this.pointerLock || this._dragging) {
+        if ((this.turnMode === MouseLookModes.PointerLock && this.pointerLock) || (this.turnMode === MouseLookModes.Drag && this._dragging)) {
             this._deltaRot.x += ev.movementX * this.mouseSensitivity;
             this._deltaRot.y += ev.movementY * this.mouseSensitivity;
         }
