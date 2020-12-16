@@ -40,7 +40,7 @@ export class SSAOParams {
             data[i * 3 + 2] = 0;        // rotate along z axis, so z is zero
         }
 
-        console.info("SSAO noise:" + data);
+        // console.info("SSAO noise:" + data);
 
         this.noiseTexture.image = data;
 
@@ -100,6 +100,6 @@ export class SSAOParams {
             this.kernels[i * 3 + 2] = sample.z;
         }
 
-        console.info("SSAO Kernels:" + this.kernels);
+        // console.info("SSAO Kernels:" + this.kernels);
     }
 }

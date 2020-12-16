@@ -602,6 +602,10 @@ TODO:       主要类结构
                     根据文件扩展名放到不同的 promise 列表里？
 
             优化 tsm 库？
+
+            加载时间慢问题
+                清理一些 console 输出
+                输出一些计时信息？
         
             particle system; sprite;
                 使用 GPU 计算 particle: transform feedback
