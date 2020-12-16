@@ -15,8 +15,8 @@
                 {
                     "color" : [
                         1,
-                        0.9908081293106079,
-                        0.6709774136543274
+                        0.8701183199882507,
+                        0.7514373064041138
                     ],
                     "intensity" : 2,
                     "type" : "directional",
@@ -24,7 +24,7 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 512,
-                        "shadowBias" : -0.05000000074505806,
+                        "shadowBias" : -0.009999999776482582,
                         "shadowDistance" : 50,
                         "radius" : 15
                     }
