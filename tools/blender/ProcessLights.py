@@ -6,10 +6,13 @@ import bpy
 for light in bpy.data.lights:
     print("processing light: " + light.name)
     light["castShadow"] = light.use_shadow
-    light["shadowMapSize"] = light.shadow_buffer_size
-    light["shadowBias"] = light.shadow_buffer_bias
+    # light["shadowMapSize"] = light.shadow_buffer_size
+    light["shadowBias"] = -light.shadow_buffer_bias
     if light.type == "SUN":
         light["shadowDistance"] = light.shadow_cascade_max_distance
+        # light["shadowBias"] = -light.shadow_buffer_bias * 0.01
+    elif light.type == "SPOT":
+        light["shadowBias"] = -light.shadow_buffer_bias * 0.005
         
     
 # for lightprobes, the data object can not hold custom properties

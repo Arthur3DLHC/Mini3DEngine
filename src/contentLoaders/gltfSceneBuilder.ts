@@ -556,14 +556,14 @@ export class GLTFSceneBuilder {
             const extras = lightDef.extras;
             // light.castShadow = extras.castShadow !== undefined ? extras.castShadow : false;
             light.castShadow = (extras.castShadow === 1);
-            if (light.shadow !== null && extras.shadowMapSize !== undefined) {
-                // 由于 blender 中的数值和引擎不对应，这里暂时没有设置
-                // if (extras.shadowMapSize !== undefined) {
-                //     light.shadow.mapSize = extras.shadowMapSize;
-                // }
-                // if (extras.shadowBias !== undefined) {
-                //     light.shadow.bias = extras.shadowBias;
-                // }
+            if (light.shadow !== null) {
+                if (extras.shadowMapSize !== undefined) {
+                     light.shadow.mapSize.x = extras.shadowMapSize;
+                     light.shadow.mapSize.y = extras.shadowMapSize;
+                }
+                if (extras.shadowBias !== undefined) {
+                    light.shadow.bias = extras.shadowBias;
+                }
             }
         }
         return light;

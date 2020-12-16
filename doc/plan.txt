@@ -508,6 +508,8 @@ TODO:       主要类结构
             弹簧控制器
                 用于R摇
 
+            18+ alert
+
             尝试一下简版次表面效果
                 gltf-Model-Viewer中的方法
                 https://www.alanzucconi.com/2017/08/30/fast-subsurface-scattering-2/
@@ -628,6 +630,10 @@ TODO:       主要类结构
 
                 Action: 日式城堡，室外+室内，宽阔一些 或横板？夜间；无月光；雾；Local point lights：灯烛，火把；
 
+            调整blender python脚本：光源的 ShadowmapSize 和 ShadowBias 与 Blender 不对应问题
+                ShadowmapSize: 考虑在custom props 由手动输入
+                ShadowBias: 对 blender 中的值使用一个经验缩放比率？
+            
             制作类 DOOM 室内场景的物理碰撞体；
             将角色（hero, monster）放入室内场景；
 

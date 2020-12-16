@@ -15,8 +15,8 @@
                 {
                     "color" : [
                         1,
-                        1,
-                        1
+                        0.9908081293106079,
+                        0.6709774136543274
                     ],
                     "intensity" : 2,
                     "type" : "directional",
@@ -24,7 +24,7 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 512,
-                        "shadowBias" : 0.10000000149011612,
+                        "shadowBias" : -0.05000000074505806,
                         "shadowDistance" : 50,
                         "radius" : 15
                     }
@@ -254,7 +254,7 @@
             "name" : "Cylinder",
             "translation" : [
                 6,
-                1,
+                0.5,
                 -6
             ]
         },
@@ -523,7 +523,6 @@
             }
         },
         {
-            "doubleSided" : true,
             "emissiveFactor" : [
                 0,
                 0,
@@ -841,12 +840,12 @@
             "count" : 192,
             "max" : [
                 2,
-                0,
+                0.5,
                 2
             ],
             "min" : [
                 -2,
-                -1,
+                -0.5,
                 -2
             ],
             "type" : "VEC3"
