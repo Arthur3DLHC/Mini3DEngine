@@ -496,6 +496,8 @@ TODO:       主要类结构
                 动画状态机；
                     调试动画状态机；
                     通过 JSON 创建状态机；
+                    walk/jog切换？
+                    切换状态时的过渡？
                 更多 make 动画？
                 优化动画性能：不每帧更新包围球？预处理 SkinMesh 时计算一个最大包围球？
                     经过实测，是否更新包围球对性能影响不大
@@ -530,8 +532,7 @@ TODO:       主要类结构
                     或者单写一个半透明的 shader？
                     应该根据不透明度决定用多少 diffuse probe 和 reflection probe
 
-            绘制光源和 envProbe 的调试图元
-                差光源的；
+            绘制光源的调试图元
 
             平行光的处理
                 如果平行光指定了半径和距离，则以外的部分不应产生光照？
@@ -671,12 +672,9 @@ TODO:       主要类结构
 
             Clustered 光源、envmap、irradiance volume
                 当视场角等投影参数变化时，更新 Cluster 的逻辑；
-                    或者改为在 clip space 做 cluster 剔除
+                    或者改为在 clip space 做 cluster 剔除? 但是包围球等会变成非均匀缩放，太复杂
                 继续优化 CPU 端的 Cluster 检测？
                 * 当只有一个 irrprobe 影响像素时，blend weight 需要特殊处理，否则光照会有硬边
-
-            xx 非 Cluster 时也做一下光源等的视见体剔除，以加快 reflect probe 和 irradiance probe 的生成速度?
-                暂时没有必要，因为 env probe 的贴图尺寸都很小；可能做了还没有不做快
 
             户外阴影方案
                 Cascaded shadow map? 
