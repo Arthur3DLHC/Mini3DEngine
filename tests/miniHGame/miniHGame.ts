@@ -12,6 +12,12 @@ import { MakePoseState } from "./actionStates/makePoseState.js";
  */
 
 window.onload = () => {
+
+    const isOver18 = confirm("Are you over 18 years old?");
+    if (!isOver18) {
+        return;
+    }
+
     const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
     if (!canvas) {
         console.error("Canvas not found");

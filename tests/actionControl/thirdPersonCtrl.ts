@@ -14,6 +14,8 @@ window.onload = () => {
         return;
     }
 
+    const showMature = confirm("Show mature contents?");
+
     GLDevice.initialize(canvas);
 
     // todo: pointer lock
@@ -136,6 +138,10 @@ window.onload = () => {
         scene.attachChild(gltfSceneFemale);
 
         prepareGLTFCharacter(gltfSceneFemale);
+
+        if (showMature) {
+            setMatureSkinForCharacter(gltfSceneFemale);
+        }
 
         // and add rigid body for player character
         // use a compound shape from two spheres
@@ -316,6 +322,26 @@ window.onload = () => {
 
         for (const child of gltfNode.children) {
             prepareGLTFCharacter(child);
+        }
+    }
+
+    function setMatureSkinForCharacter(gltfNode: Object3D) {
+        if (gltfNode instanceof Mesh) {
+            const mesh = gltfNode as Mesh;
+            const skinMtl = mesh.materials.find((mtl)=>{return mtl.name === "Material.Skin.001"});
+            if (skinMtl !== undefined && skinMtl instanceof StandardPBRMaterial) {
+                const pbrSkinMtl = skinMtl as StandardPBRMaterial;
+                // load texture?
+                const texturePromise: Promise<Texture> = textureLoader.loadPromise("./models/SCIFI/heroes/cyberGirl/SkinBaseColor_NSFW.png");
+                texturePromise.then((skinTex) => {
+                    pbrSkinMtl.colorMap = skinTex;
+                });
+                return;
+            }
+        }
+
+        for (const child of gltfNode.children) {
+            setMatureSkinForCharacter(child);
         }
     }
 
