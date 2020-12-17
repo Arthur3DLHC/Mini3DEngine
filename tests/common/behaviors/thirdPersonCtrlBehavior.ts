@@ -319,7 +319,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
         this._camera.rotation.multiplyVec3(this.cameraHorizontalOffset, this._cameraGlobalOffset);
         
         // move up to shoulder
-        this._cameraGlobalOffset.y = this.cameraVerticalOffset;
+        this._cameraGlobalOffset.y += this.cameraVerticalOffset;
 
         this.owner.translation.copy(this._camera.translation);
         this._camera.translation.add(this._cameraGlobalOffset);
