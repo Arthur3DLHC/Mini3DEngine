@@ -508,8 +508,6 @@ TODO:       主要类结构
             弹簧控制器
                 用于R摇
 
-            18+ alert
-
             尝试一下简版次表面效果
                 gltf-Model-Viewer中的方法
                 https://www.alanzucconi.com/2017/08/30/fast-subsurface-scattering-2/
@@ -532,11 +530,6 @@ TODO:       主要类结构
                     或者单写一个半透明的 shader？
                     应该根据不透明度决定用多少 diffuse probe 和 reflection probe
 
-            优化 shader 效率？
-                目标 60 fps on GTX1660
-                找到瓶颈在哪
-                    pbr shader? ssao? ssr?
-
             绘制光源和 envProbe 的调试图元
                 差光源的；
 
@@ -556,12 +549,10 @@ TODO:       主要类结构
                     ##不是很紧急
                     比较复杂，需要生成速度图
                 调查另一种屏幕空间反射 shader 是否性能更好一些？
-                Hierarchical-ZBuffer?
 
             更多的后期特效：
-                光晕
-                Height fog；包含 noise?
-                FXAA
+                Height fog；
+                    包含 noise?
                 转场特效：渐入渐出，黑屏白屏；
                     能否集成在 tonemapping 里？就不用再多一次绘制和一个RT了
                     是否应该放在UI里？因为希望UI一起渐入渐出；
@@ -680,6 +671,7 @@ TODO:       主要类结构
 
             Clustered 光源、envmap、irradiance volume
                 当视场角等投影参数变化时，更新 Cluster 的逻辑；
+                    或者改为在 clip space 做 cluster 剔除
                 继续优化 CPU 端的 Cluster 检测？
                 * 当只有一个 irrprobe 影响像素时，blend weight 需要特殊处理，否则光照会有硬边
 
