@@ -12,7 +12,7 @@ for light in bpy.data.lights:
         light["shadowDistance"] = light.shadow_cascade_max_distance
         # light["shadowBias"] = -light.shadow_buffer_bias * 0.01
     elif light.type == "SPOT":
-        light["shadowBias"] = -light.shadow_buffer_bias * 0.005
+        light["shadowBias"] = -light.shadow_buffer_bias * 0.05
         
     
 # for lightprobes, the data object can not hold custom properties

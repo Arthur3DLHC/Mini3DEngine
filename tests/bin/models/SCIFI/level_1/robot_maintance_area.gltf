@@ -29,7 +29,7 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 256,
-                        "shadowBias" : -0.0005
+                        "shadowBias" : -0.0004999999888241291
                     }
                 },
                 {
@@ -49,7 +49,7 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 256,
-                        "shadowBias" : -0.0005
+                        "shadowBias" : -0.0004999999888241291
                     }
                 },
                 {
@@ -69,7 +69,7 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 256,
-                        "shadowBias" : -0.0005
+                        "shadowBias" : -0.0004999999888241291
                     }
                 },
                 {
@@ -89,7 +89,7 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 256,
-                        "shadowBias" : -0.0005
+                        "shadowBias" : -0.0004999999888241291
                     }
                 },
                 {
@@ -109,7 +109,7 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 256,
-                        "shadowBias" : -0.0005
+                        "shadowBias" : -0.0004999999888241291
                     }
                 },
                 {
@@ -129,7 +129,7 @@
                     "extras" : {
                         "castShadow" : 0,
                         "shadowMapSize" : 256,
-                        "shadowBias" : -0.0005
+                        "shadowBias" : -0.05
                     }
                 },
                 {
@@ -149,7 +149,7 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 256,
-                        "shadowBias" : -0.0005
+                        "shadowBias" : -0.0004999999888241291
                     }
                 },
                 {
@@ -169,7 +169,7 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 256,
-                        "shadowBias" : -0.0005
+                        "shadowBias" : -0.0004999999888241291
                     }
                 },
                 {
@@ -189,7 +189,7 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 256,
-                        "shadowBias" : -0.0005
+                        "shadowBias" : -0.0004999999888241291
                     }
                 },
                 {
@@ -209,7 +209,7 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 256,
-                        "shadowBias" : -0.0005
+                        "shadowBias" : -0.0004999999888241291
                     }
                 },
                 {
@@ -229,7 +229,7 @@
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 256,
-                        "shadowBias" : -0.0005
+                        "shadowBias" : -0.0004999999888241291
                     }
                 }
             ]
@@ -240,10 +240,14 @@
         {
             "extras" : {
                 "glTF2ExportSettings" : {
+                    "export_animations" : 0,
                     "export_apply" : 1,
+                    "export_colors" : 0,
                     "export_extras" : 1,
                     "export_format" : "GLTF_SEPARATE",
                     "export_lights" : 1,
+                    "export_morph" : 0,
+                    "export_skins" : 0,
                     "use_selection" : 1
                 }
             },
