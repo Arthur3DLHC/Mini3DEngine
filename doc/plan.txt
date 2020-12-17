@@ -630,6 +630,8 @@ TODO:       主要类结构
                 ShadowmapSize: 考虑在custom props 由手动输入
                 ShadowBias: 对 blender 中的值使用一个经验缩放比率？
             
+            playground 环境反射球问题；irradiance probe 问题；
+
             制作类 DOOM 室内场景的物理碰撞体；
             将角色（hero, monster）放入室内场景；
 

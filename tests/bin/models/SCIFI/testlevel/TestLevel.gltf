@@ -15,8 +15,8 @@
                 {
                     "color" : [
                         1,
-                        0.8701183199882507,
-                        0.7514373064041138
+                        0.96,
+                        0.85
                     ],
                     "intensity" : 2,
                     "type" : "directional",
@@ -152,6 +152,7 @@
                 "clippingStart" : 0.800000011920929,
                 "clippingEnd" : 20,
                 "influenceDist" : 20.19999885559082,
+                "visibleRange" : 30,
                 "extType" : "environmentProbe"
             },
             "name" : "ReflectionCubemap",
