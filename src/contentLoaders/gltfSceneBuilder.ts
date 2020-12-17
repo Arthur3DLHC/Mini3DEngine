@@ -947,6 +947,7 @@ export class GLTFSceneBuilder {
         const mtl = new StandardPBRMaterial();
         if (gltf.gltf.materials !== undefined) {
             const mtlDef = gltf.gltf.materials[mtlId];
+            mtl.name = mtlDef.name || "unnamed";
 
             // todo: alpha blend mode, alpha clip, double sided?
             if (mtlDef.alphaMode !== undefined) {
