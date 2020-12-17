@@ -730,7 +730,36 @@
                 530,
                 531,
                 532,
-                533
+                533,
+                534,
+                535,
+                536,
+                537,
+                538,
+                539,
+                540,
+                541,
+                542,
+                543,
+                544,
+                545,
+                546,
+                547,
+                548,
+                549,
+                550,
+                551,
+                552,
+                553,
+                554,
+                555,
+                556,
+                557,
+                558,
+                559,
+                560,
+                561,
+                562
             ]
         }
     ],
@@ -7940,6 +7969,511 @@
                 -7.582050800323486,
                 3.817438840866089,
                 -10.682218551635742
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider",
+            "scale" : [
+                12,
+                1,
+                18
+            ],
+            "translation" : [
+                0,
+                -1,
+                -16
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.001",
+            "scale" : [
+                1,
+                2,
+                18
+            ],
+            "translation" : [
+                -12,
+                2,
+                -16
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.002",
+            "scale" : [
+                1,
+                2,
+                18
+            ],
+            "translation" : [
+                12,
+                2,
+                -16
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.003",
+            "scale" : [
+                12,
+                2,
+                1
+            ],
+            "translation" : [
+                0,
+                2,
+                1
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.004",
+            "scale" : [
+                12,
+                2,
+                1
+            ],
+            "translation" : [
+                0,
+                2,
+                -34
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.005",
+            "scale" : [
+                5,
+                2,
+                1
+            ],
+            "translation" : [
+                -6,
+                2,
+                -5
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.006",
+            "scale" : [
+                5,
+                2,
+                0.5
+            ],
+            "translation" : [
+                6,
+                2,
+                -5.5
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.007",
+            "scale" : [
+                0.25,
+                2,
+                1
+            ],
+            "translation" : [
+                5,
+                2,
+                -4
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.008",
+            "scale" : [
+                0.25,
+                2,
+                1
+            ],
+            "translation" : [
+                5,
+                2,
+                0
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.009",
+            "scale" : [
+                0.25,
+                2,
+                1
+            ],
+            "translation" : [
+                -5,
+                2,
+                -4
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.010",
+            "scale" : [
+                0.25,
+                2,
+                1
+            ],
+            "translation" : [
+                -5,
+                2,
+                0
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.011",
+            "scale" : [
+                2.5,
+                2,
+                0.5
+            ],
+            "translation" : [
+                3.5,
+                2,
+                -10.5
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.012",
+            "scale" : [
+                2.5,
+                2,
+                0.5
+            ],
+            "translation" : [
+                -3.5,
+                2,
+                -10.5
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.013",
+            "scale" : [
+                3,
+                2,
+                0.5
+            ],
+            "translation" : [
+                3,
+                2,
+                -21.5
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.014",
+            "scale" : [
+                2,
+                2,
+                0.5
+            ],
+            "translation" : [
+                -4,
+                2,
+                -21.5
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.015",
+            "scale" : [
+                0.5,
+                2,
+                5
+            ],
+            "translation" : [
+                -6.5,
+                2,
+                -16
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.016",
+            "scale" : [
+                0.5,
+                2,
+                5
+            ],
+            "translation" : [
+                6.5,
+                2,
+                -16
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.017",
+            "scale" : [
+                0.5,
+                2,
+                2
+            ],
+            "translation" : [
+                1.5,
+                2,
+                -13
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.018",
+            "scale" : [
+                0.5,
+                2,
+                2
+            ],
+            "translation" : [
+                1.5,
+                2,
+                -19
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.019",
+            "scale" : [
+                2.5,
+                2,
+                0.5
+            ],
+            "translation" : [
+                3.5,
+                2,
+                -26.5
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.020",
+            "scale" : [
+                2.5,
+                2,
+                0.5
+            ],
+            "translation" : [
+                -3.5,
+                2,
+                -26.5
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.021",
+            "scale" : [
+                0.5,
+                2,
+                3
+            ],
+            "translation" : [
+                -6.5,
+                2,
+                -30
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.022",
+            "scale" : [
+                0.5,
+                2,
+                3
+            ],
+            "translation" : [
+                6.5,
+                2,
+                -30
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.023",
+            "scale" : [
+                0.5,
+                2,
+                3
+            ],
+            "translation" : [
+                2.5,
+                2,
+                -30
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.024",
+            "scale" : [
+                0.5,
+                2,
+                3
+            ],
+            "translation" : [
+                -2.5,
+                2,
+                -30
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.025",
+            "scale" : [
+                12,
+                1,
+                14
+            ],
+            "translation" : [
+                0,
+                5,
+                -12
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.026",
+            "scale" : [
+                7,
+                1,
+                4
+            ],
+            "translation" : [
+                0,
+                5,
+                -30
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.027",
+            "rotation" : [
+                0.2902282774448395,
+                0,
+                0,
+                0.9569574594497681
+            ],
+            "scale" : [
+                1,
+                0.5,
+                4
+            ],
+            "translation" : [
+                10,
+                1.5499999523162842,
+                -30
+            ]
+        },
+        {
+            "extras" : {
+                "extType" : "collider",
+                "colliderShape" : "box"
+            },
+            "name" : "Collider.028",
+            "rotation" : [
+                0.2902282774448395,
+                0,
+                0,
+                0.9569574594497681
+            ],
+            "scale" : [
+                1,
+                0.5,
+                4
+            ],
+            "translation" : [
+                -10,
+                1.5499999523162842,
+                -30
             ]
         }
     ],

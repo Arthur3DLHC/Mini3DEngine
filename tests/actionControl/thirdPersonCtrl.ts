@@ -79,7 +79,8 @@ window.onload = () => {
     console.log("loading gltf models...");
     // todo: load gltf character, load skybox
     const gltfPromiseFemale: Promise<GltfAsset> = gltfLoader.load("./models/SCIFI/heroes/cyberGirl/CyberGirl_animation.gltf");
-    const gltfPromiseLevel: Promise<GltfAsset> = gltfLoader.load("./models/SCIFI/testlevel/TestLevel.gltf");
+    // const gltfPromiseLevel: Promise<GltfAsset> = gltfLoader.load("./models/SCIFI/testlevel/TestLevel.gltf");
+    const gltfPromiseLevel: Promise<GltfAsset> = gltfLoader.load("./models/SCIFI/level_1/robot_maintance_area.gltf");
     console.log("loading skybox...");
 
     // load skybox textures
@@ -135,6 +136,7 @@ window.onload = () => {
         const gltfSceneFemale = builderFemale.build(loaded[0], 0, animations);
         gltfSceneFemale.name = "Female";
         gltfSceneFemale.autoUpdateTransform = true;
+        gltfSceneFemale.translation.y = 1;  // for robot maintance area level
         scene.attachChild(gltfSceneFemale);
 
         prepareGLTFCharacter(gltfSceneFemale);
