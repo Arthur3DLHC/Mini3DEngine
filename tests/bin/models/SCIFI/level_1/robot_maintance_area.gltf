@@ -28,8 +28,8 @@
                     "name" : "Point.001",
                     "extras" : {
                         "castShadow" : 1,
-                        "shadowMapSize" : 512,
-                        "shadowBias" : 0.009999999776482582
+                        "shadowMapSize" : 256,
+                        "shadowBias" : -0.0005
                     }
                 },
                 {
@@ -48,8 +48,8 @@
                     "name" : "Point.003",
                     "extras" : {
                         "castShadow" : 1,
-                        "shadowMapSize" : 512,
-                        "shadowBias" : 1
+                        "shadowMapSize" : 256,
+                        "shadowBias" : -0.0005
                     }
                 },
                 {
@@ -68,8 +68,8 @@
                     "name" : "Point.004",
                     "extras" : {
                         "castShadow" : 1,
-                        "shadowMapSize" : 512,
-                        "shadowBias" : 1
+                        "shadowMapSize" : 256,
+                        "shadowBias" : -0.0005
                     }
                 },
                 {
@@ -88,8 +88,8 @@
                     "name" : "Point.002",
                     "extras" : {
                         "castShadow" : 1,
-                        "shadowMapSize" : 512,
-                        "shadowBias" : 0.009999999776482582
+                        "shadowMapSize" : 256,
+                        "shadowBias" : -0.0005
                     }
                 },
                 {
@@ -108,8 +108,8 @@
                     "name" : "Point.005",
                     "extras" : {
                         "castShadow" : 1,
-                        "shadowMapSize" : 512,
-                        "shadowBias" : 0.009999999776482582
+                        "shadowMapSize" : 256,
+                        "shadowBias" : -0.0005
                     }
                 },
                 {
@@ -128,8 +128,8 @@
                     "name" : "Point.006",
                     "extras" : {
                         "castShadow" : 0,
-                        "shadowMapSize" : 512,
-                        "shadowBias" : 1
+                        "shadowMapSize" : 256,
+                        "shadowBias" : -0.0005
                     }
                 },
                 {
@@ -148,8 +148,8 @@
                     "name" : "Point.007",
                     "extras" : {
                         "castShadow" : 1,
-                        "shadowMapSize" : 512,
-                        "shadowBias" : 0.009999999776482582
+                        "shadowMapSize" : 256,
+                        "shadowBias" : -0.0005
                     }
                 },
                 {
@@ -168,8 +168,8 @@
                     "name" : "Point.008",
                     "extras" : {
                         "castShadow" : 1,
-                        "shadowMapSize" : 512,
-                        "shadowBias" : 0.009999999776482582
+                        "shadowMapSize" : 256,
+                        "shadowBias" : -0.0005
                     }
                 },
                 {
@@ -188,8 +188,8 @@
                     "name" : "Point.009",
                     "extras" : {
                         "castShadow" : 1,
-                        "shadowMapSize" : 512,
-                        "shadowBias" : 1
+                        "shadowMapSize" : 256,
+                        "shadowBias" : -0.0005
                     }
                 },
                 {
@@ -208,8 +208,8 @@
                     "name" : "Point.010",
                     "extras" : {
                         "castShadow" : 1,
-                        "shadowMapSize" : 512,
-                        "shadowBias" : 1
+                        "shadowMapSize" : 256,
+                        "shadowBias" : -0.0005
                     }
                 },
                 {
@@ -228,8 +228,8 @@
                     "name" : "Point.011",
                     "extras" : {
                         "castShadow" : 1,
-                        "shadowMapSize" : 512,
-                        "shadowBias" : 0.009999999776482582
+                        "shadowMapSize" : 256,
+                        "shadowBias" : -0.0005
                     }
                 }
             ]
