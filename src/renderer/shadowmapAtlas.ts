@@ -84,9 +84,13 @@ export class ShadowmapAtlas {
         // todo: calculate default counts
         //                 columns x rows
         this._shadowmaps512 = new shadowMapList(8 * 2, 0);
-        this._shadowmaps256 = new shadowMapList(16 * 4, 1024);
-        this._shadowmaps128 = new shadowMapList(32 * 8, 2048);
-        this._shadowmaps64 = new shadowMapList(64 * 16, 3072);
+        this._shadowmaps256 = new shadowMapList(16 * 8, 1024);
+        this._shadowmaps128 = new shadowMapList(32 * 8, 3072);
+
+        // this._shadowmaps512 = new shadowMapList(8 * 2, 0);
+        // this._shadowmaps256 = new shadowMapList(16 * 4, 1024);
+        // this._shadowmaps128 = new shadowMapList(32 * 8, 2048);
+        // this._shadowmaps64 = new shadowMapList(64 * 16, 3072);
     }
 
     public texture: Texture2D | null;
@@ -94,7 +98,7 @@ export class ShadowmapAtlas {
     private _shadowmaps512: shadowMapList;
     private _shadowmaps256: shadowMapList;
     private _shadowmaps128: shadowMapList;
-    private _shadowmaps64: shadowMapList;
+    // private _shadowmaps64: shadowMapList;
 
     public alloc(shadow: LightShadow) {
         if (!this.texture) {
@@ -121,9 +125,11 @@ export class ShadowmapAtlas {
             return this._shadowmaps256;
         } else if (width === 128 && height === 128) {
             return this._shadowmaps128;
-        } else if (width === 64 && height === 64) {
-            return this._shadowmaps64;
-        } else {
+        }
+        // else if (width === 64 && height === 64) {
+        //     return this._shadowmaps64;
+        // } 
+        else {
             throw new Error("unsupport shadowmap size: " + width + " x " + height);
         }
     }
