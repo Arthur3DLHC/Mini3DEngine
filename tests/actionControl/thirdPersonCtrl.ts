@@ -37,6 +37,11 @@ window.onload = () => {
     let lastUpdateFPSTime = 0;
     let curFPS = 0;
 
+    /** save notebook GPU */
+    const halfFPSMode = true;
+
+    let skipThisFrame = false;
+
     const physicsWorld = new PhysicsWorld({ numIterations: 10 });
     const world = physicsWorld.world;
     world.gravity.set(0.0, -9.0, 0.0);
@@ -259,21 +264,24 @@ window.onload = () => {
     }
 
     function gameLoop(now: number) {
-        Clock.instance.update(now);
-        physicsWorld.step();
-        scene.updateBehavior();
-        scene.updateWorldTransform(false, true);
-        SkinMesh.updateSkinMeshes(scene);
+        if (!skipThisFrame || !halfFPSMode) {
+            Clock.instance.update(now);
+            physicsWorld.step();
+            scene.updateBehavior();
+            scene.updateWorldTransform(false, true);
+            SkinMesh.updateSkinMeshes(scene);
 
-        renderer.render(scene);
+            renderer.render(scene);
 
-        if (now - lastUpdateFPSTime > 1000) {
-            infoPanel.innerHTML = curFPS.toString();
-            lastUpdateFPSTime = now;
-            curFPS = 0;
+            if (now - lastUpdateFPSTime > 1000) {
+                infoPanel.innerHTML = curFPS.toString();
+                lastUpdateFPSTime = now;
+                curFPS = 0;
+            }
+
+            curFPS++;
         }
-
-        curFPS++;
+        skipThisFrame = !skipThisFrame;
 
         requestAnimationFrame(gameLoop);
     }
