@@ -231,6 +231,26 @@
                         "shadowMapSize" : 256,
                         "shadowBias" : -0.0004999999888241291
                     }
+                },
+                {
+                    "color" : [
+                        0.013335035182535648,
+                        1,
+                        0.010409506037831306
+                    ],
+                    "intensity" : 10,
+                    "spot" : {
+                        "innerConeAngle" : 1.1868238485082188,
+                        "outerConeAngle" : 1.3962633609771729
+                    },
+                    "type" : "spot",
+                    "range" : 5,
+                    "name" : "Point.012",
+                    "extras" : {
+                        "castShadow" : 1,
+                        "shadowMapSize" : 256,
+                        "shadowBias" : -0.0004999999888241291
+                    }
                 }
             ]
         }
@@ -645,9 +665,7 @@
                 443,
                 445,
                 447,
-                448,
                 449,
-                450,
                 451,
                 452,
                 453,
@@ -771,7 +789,11 @@
                 571,
                 572,
                 573,
-                574
+                574,
+                575,
+                576,
+                577,
+                578
             ]
         }
     ],
@@ -6850,6 +6872,62 @@
             ]
         },
         {
+            "extensions" : {
+                "KHR_lights_punctual" : {
+                    "light" : 7
+                }
+            },
+            "name" : "Point.032_Orientation",
+            "rotation" : [
+                -0.7071067690849304,
+                0,
+                0,
+                0.7071067690849304
+            ]
+        },
+        {
+            "children" : [
+                448
+            ],
+            "name" : "Point.032",
+            "translation" : [
+                0,
+                3.398465633392334,
+                -30
+            ]
+        },
+        {
+            "extensions" : {
+                "KHR_lights_punctual" : {
+                    "light" : 11
+                }
+            },
+            "name" : "Point.033_Orientation",
+            "rotation" : [
+                -0.7071067690849304,
+                0,
+                0,
+                0.7071067690849304
+            ]
+        },
+        {
+            "children" : [
+                450
+            ],
+            "name" : "Point.033",
+            "rotation" : [
+                -0.6509648561477661,
+                0,
+                0,
+                0.7591078877449036
+            ],
+            "translation" : [
+                0,
+                2.5,
+                -26.71068572998047
+            ]
+        },
+        {
             "mesh" : 102,
             "name" : "Cube",
             "translation" : [
@@ -8747,7 +8825,7 @@
                     0.3493264615535736,
                     1
                 ],
-                "metallicFactor" : 0.6968085169792175,
+                "metallicFactor" : 0.5053191184997559,
                 "roughnessFactor" : 0.4426861107349396
             }
         },

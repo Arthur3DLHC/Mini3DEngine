@@ -148,7 +148,6 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     }
 
     public onMouseWheel(ev: WheelEvent) {
-        ev.preventDefault();
         // todo: change camera offset distance
         this.cameraHorizontalOffsetScale += ev.deltaY / 500;
         this.cameraHorizontalOffsetScale = Math.max(this.minCameraHorizontalOffsetScale, Math.min(this.cameraHorizontalOffsetScale, this.maxCameraHorizontalOffsetScale));

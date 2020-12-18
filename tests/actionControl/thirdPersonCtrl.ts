@@ -235,6 +235,7 @@ window.onload = () => {
         }
 
         window.onwheel = (ev: WheelEvent) => {
+            ev.preventDefault();
             if (tpsBehavior !== null) tpsBehavior.onMouseWheel(ev);
         }
 
