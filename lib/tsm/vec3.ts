@@ -173,6 +173,7 @@ export default class vec3 {
         return this
     }
 
+    /** scale in place */
     scale(value: number): vec3 {
         // if (!dest) { dest = this }
 

@@ -63,6 +63,9 @@ window.onload = () => {
     const gltfLoader = new GLTFLoader(loadingManager);
 
     const renderer = new ClusteredForwardRenderer();
+    renderer.postprocessor.bloom.intensity = 0.5;
+    renderer.postprocessor.bloom.radius = 0.5;
+
     const scene = new Scene();
     const camera = new PerspectiveCamera();
     camera.aspect = canvas.width / canvas.height;
@@ -136,7 +139,7 @@ window.onload = () => {
         const gltfSceneFemale = builderFemale.build(loaded[0], 0, animations);
         gltfSceneFemale.name = "Female";
         gltfSceneFemale.autoUpdateTransform = true;
-        gltfSceneFemale.translation.y = 1;  // for robot maintance area level
+        gltfSceneFemale.translation.y = 1.5;  // for robot maintance area level
         scene.attachChild(gltfSceneFemale);
 
         prepareGLTFCharacter(gltfSceneFemale);
@@ -183,6 +186,7 @@ window.onload = () => {
         gltfSceneFemale.behaviors.push(tpsBehavior);
         tpsBehavior.cameraVerticalOffset = 1.6;
         tpsBehavior.cameraHorizontalOffset = new vec3([0.4, 0, 1.5]);
+        tpsBehavior.cameraHorizontalOffsetScale = 0.5;
         tpsBehavior.moveSpeed = 2;
         tpsBehavior.aimMoveSpeed = 0.6;
         tpsBehavior.pointerLock = false;
@@ -211,9 +215,7 @@ window.onload = () => {
 
         window.onmousedown = (ev: MouseEvent) => {
             // fpsBehavior.onMouseDown(ev);
-            if (tpsBehavior !== null) {
-                tpsBehavior.onMouseDown(ev);
-            }
+            if (tpsBehavior !== null) tpsBehavior.onMouseDown(ev);
         }
 
         window.onmouseup = (ev: MouseEvent) => {
@@ -224,6 +226,10 @@ window.onload = () => {
         window.onmousemove = (ev: MouseEvent) => {
             // fpsBehavior.onMouseMove(ev);
             if (tpsBehavior !== null) tpsBehavior.onMouseMove(ev);
+        }
+
+        window.onwheel = (ev: WheelEvent) => {
+            if (tpsBehavior !== null) tpsBehavior.onMouseWheel(ev);
         }
 
         window.onkeydown = (ev: KeyboardEvent) => {

@@ -28,6 +28,7 @@ export class ThirdPersonShooterBehavior extends ThirdPersonCtrlBehavior {
     }
 
     public onMouseUp(ev: MouseEvent) {
+        super.onMouseUp(ev);
         if (ev.button === 0) {
             this._isShooting = false;
         }

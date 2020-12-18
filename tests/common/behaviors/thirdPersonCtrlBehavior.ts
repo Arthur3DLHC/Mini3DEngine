@@ -83,6 +83,13 @@ export class ThirdPersonCtrlBehavior extends Behavior {
      */
     public cameraHorizontalOffset: vec3 = new vec3([0.5, 0.0, 0.5]);
 
+    /** the scale of camera horizontal offset */
+    public cameraHorizontalOffsetScale: number = 1;
+
+    /** limits of camera horizontal offset scale */
+    public minCameraHorizontalOffsetScale: number = 0.5;
+    public maxCameraHorizontalOffsetScale: number = 2;
+
     /**
      * camera vertical offset from rigid body pivot
      */
@@ -138,6 +145,13 @@ export class ThirdPersonCtrlBehavior extends Behavior {
             this._deltaRot.x += ev.movementX * this.mouseSensitivity;
             this._deltaRot.y += ev.movementY * this.mouseSensitivity;
         }
+    }
+
+    public onMouseWheel(ev: WheelEvent) {
+        ev.preventDefault();
+        // todo: change camera offset distance
+        this.cameraHorizontalOffsetScale += ev.deltaY / 500;
+        this.cameraHorizontalOffsetScale = Math.max(this.minCameraHorizontalOffsetScale, Math.min(this.cameraHorizontalOffsetScale, this.maxCameraHorizontalOffsetScale));
     }
 
     public onKeyDown(ev: KeyboardEvent) {
@@ -318,6 +332,8 @@ export class ThirdPersonCtrlBehavior extends Behavior {
         // rotate about origin point [0,0,0], under the foot
         this._camera.rotation.multiplyVec3(this.cameraHorizontalOffset, this._cameraGlobalOffset);
         
+        this._cameraGlobalOffset.scale(this.cameraHorizontalOffsetScale);
+
         // move up to shoulder
         this._cameraGlobalOffset.y += this.cameraVerticalOffset;
 
