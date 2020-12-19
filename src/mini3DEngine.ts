@@ -41,6 +41,7 @@ export * from "./physics/rigidBody.js";
 export * from "./renderer/postprocess/bloomParams.js";
 export * from "./renderer/postprocess/ssaoParams.js";
 export * from "./renderer/postprocess/ssrParams.js";
+export * from "./renderer/postprocess/ssr2Params.js";
 export * from "./renderer/boundingRenderModes.js";
 export * from "./renderer/clusteredForwardRenderer.js";
 export * from "./renderer/debugRenderer.js";
