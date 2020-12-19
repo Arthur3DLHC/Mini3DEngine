@@ -596,10 +596,6 @@ TODO:       主要类结构
                     根据文件扩展名放到不同的 promise 列表里？
 
             优化 tsm 库？
-
-            加载时间慢问题
-                清理一些 console 输出
-                输出一些计时信息？
         
             particle system; sprite;
                 使用 GPU 计算 particle: transform feedback
@@ -630,12 +626,14 @@ TODO:       主要类结构
 
             调整blender python脚本：光源的 ShadowmapSize 和 ShadowBias 与 Blender 不对应问题
                 ShadowmapSize: 考虑在custom props 由手动输入
+                    脚本中判断如果没有这个属性就加个默认值？
                 ShadowBias: 对 blender 中的值使用一个经验缩放比率？
             
-            playground 环境反射球问题；irradiance probe 问题；
+            playground 环境反射球范围问题；irradiance probe 有黑问题；
 
             制作类 DOOM 室内场景的物理碰撞体；
             将角色（hero, monster）放入室内场景；
+            放置一些可以Hover和选中交互的物体
 
             经测试，需要注意：
                 1、blender 中的细节物体必须 apply 所有修改器后再复制，否则无法共享网格数据，导致无法 instancing
@@ -655,6 +653,7 @@ TODO:       主要类结构
                     Bounding box of instances?
                     需要在 Blender 中手动对 Instancing 的物体分组，每个组使用一个统一的包围盒？
                         每一组的 instancing 物体放到一个父物体下？
+                        或者手动地将一组物体从一个模板物体 Alt-D 克隆出来？
                     或者在加载 gltf 后按照一定的 BVH 自动对 Instancing 的物体分块？
                         四叉树或八叉树，或最简单的 Cell
                         将生成 instancing 网格的操作放在这一步，而不是加载 gltf 时？
