@@ -1,8 +1,7 @@
 /*
- * from http://imanolfotia.com/blog/update/2017/03/11/ScreenSpaceReflections.html
+ * from https://github.com/BabylonJS/Babylon.js/blob/master/src/Shaders/screenSpaceReflection.fragment.fx
  * seems simpler than claygl version
- * not modified yet
- * todo: compare to babylon.js ssr shader
+ * modified to fit my post process samplers layout
  */
 export default /** glsl */`
 
