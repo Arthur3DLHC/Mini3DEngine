@@ -15,19 +15,20 @@ export default /** glsl */`
 
 #include <uniforms_view>
 #include <samplers_postprocess>     // s_sceneColor contains prev frame image
+#include <function_depth>
 
 in vec2 ex_texcoord;
 layout(location = 0) out vec4 o_color;
 
 // use const first to debug, then use uniforms later
-const float threshold = 1.2;
+const float threshold = 0.6; //1.2;
 const float step = 0.1;
 const float minRayStep = 0.1;
 const int maxSteps = 30;
 const int numBinarySearchSteps = 5;
 const float reflectionSpecularFalloffExponent = 3.0;
-
-const minGlossiness = 0.1;
+const float roughnessFactor = 1.0;
+const float minGlossiness = 0.1;
 
 // Structs
 struct ReflectionInfo {
@@ -62,30 +63,30 @@ ReflectionInfo smoothReflectionInfo(vec3 dir, vec3 hitCoord)
 		projectedCoord.xy = 0.5 * projectedCoord.xy + vec2(0.5);
  
          // view space z
-        sampledDepth = perspectiveDepthToViewZ(texture(s_sceneDepth, hitPixel).r, u_view.zRange.x, u_view.zRange.y);
+        sampledDepth = perspectiveDepthToViewZ(texture(s_sceneDepth, projectedCoord.xy).r, u_view.zRange.x, u_view.zRange.y);
 
-        // sampledDepth = (view * texture2D(positionSampler, projectedCoord.xy)).z;
+        // sampledDepth = (view * texture(positionSampler, projectedCoord.xy)).z;
 
         // hitCoord is in view space
-        float depth = sampledDepth - hitCoord.z;
+        float depth = hitCoord.z - sampledDepth;
 
         dir *= 0.5;
         if(depth > 0.0)
-            hitCoord -= dir;
-        else
             hitCoord += dir;
+        else
+            hitCoord -= dir;
 
-        info.color += texture2D(s_sceneColor, projectedCoord.xy).rgb;
+        info.color += texture(s_sceneColor, projectedCoord.xy).rgb;
     }
 
-    projectedCoord = projection * vec4(hitCoord, 1.0);
+    projectedCoord = u_view.matProj * vec4(hitCoord, 1.0);
     projectedCoord.xy /= projectedCoord.w;
 	projectedCoord.xy = 0.5 * projectedCoord.xy + vec2(0.5);
  
     // Merge colors
     info.coords = vec4(projectedCoord.xy, sampledDepth, 1.0);
-    info.color += texture2D(s_sceneColor, projectedCoord.xy).rgb;
-    info.color /= float(SMOOTH_STEPS + 1);
+    info.color += texture(s_sceneColor, projectedCoord.xy).rgb;
+    info.color /= float(numBinarySearchSteps + 1);
     return info;
 }
 
@@ -110,19 +111,19 @@ ReflectionInfo getReflectionInfo(vec3 dir, vec3 hitCoord)
 	    projectedCoord.xy = 0.5 * projectedCoord.xy + vec2(0.5);
 
         // view space z
-        sampledDepth = perspectiveDepthToViewZ(texture(s_sceneDepth, hitPixel).r, u_view.zRange.x, u_view.zRange.y);
+        sampledDepth = perspectiveDepthToViewZ(texture(s_sceneDepth, projectedCoord.xy).r, u_view.zRange.x, u_view.zRange.y);
 
-        // sampledDepth = (view * texture2D(positionSampler, projectedCoord.xy)).z;
+        // sampledDepth = (view * texture(positionSampler, projectedCoord.xy)).z;
  
         // hitCoord is in view space
-        float depth = sampledDepth - hitCoord.z;
+        float depth = hitCoord.z - sampledDepth;
 
-        if(((depth - dir.z) < threshold) && depth <= 0.0)
+        if(((dir.z - depth) < threshold) && depth <= 0.0)
         {
             #ifdef ENABLE_SMOOTH_REFLECTIONS
                 return smoothReflectionInfo(dir, hitCoord);
             #else
-                info.color = texture2D(s_sceneColor, projectedCoord.xy).rgb;
+                info.color = texture(s_sceneColor, projectedCoord.xy).rgb;
                 info.coords = vec4(projectedCoord.xy, sampledDepth, 0.0);
                 return info;
             #endif
@@ -130,7 +131,7 @@ ReflectionInfo getReflectionInfo(vec3 dir, vec3 hitCoord)
     }
     
     // not hit? should discard?
-    info.color = texture2D(s_sceneColor, projectedCoord.xy).rgb;
+    info.color = texture(s_sceneColor, projectedCoord.xy).rgb;
     info.coords = vec4(projectedCoord.xy, sampledDepth, 0.0);
     return info;
 }
@@ -149,7 +150,7 @@ void main()
 
     float g = 1.0 - roughness;
     if (g <= minGlossiness) {
-        discard;
+        // discard;
     }
  
     vec3 normal = getSceneNormal(ex_texcoord);
@@ -160,12 +161,22 @@ void main()
     // position in view
     vec3 position = hPos.xyz / hPos.w;
 
+    // float sampledDepth = perspectiveDepthToViewZ(texture(s_sceneDepth, ex_texcoord).r, u_view.zRange.x, u_view.zRange.y);
+
+    //o_color = vec4(position.z - sampledDepth, 0.0, 0.0, 1.0);
+    //return;
+
     vec3 reflected = normalize(reflect(normalize(position), normalize(normal)));
+
+    // o_color = vec4(reflected * 2.0 - 1.0, 1.0);
+    // return;
 
     vec3 jitt = mix(vec3(0.0), hash(position), roughness) * roughnessFactor;
     
-    ReflectionInfo info = getReflectionInfo(jitt + reflected, position);
-    // ReflectionInfo info = getReflectionInfo(reflected, position); // For debug: no roughness
+    // ReflectionInfo info = getReflectionInfo(jitt + reflected, position);
+    ReflectionInfo info = getReflectionInfo(reflected, position); // For debug: no roughness
+    o_color = vec4(info.color, 1.0);
+    return;
 
     vec2 dCoords = smoothstep(0.2, 0.6, abs(vec2(0.5, 0.5) - info.coords.xy));
     float screenEdgefactor = clamp(1.0 - (dCoords.x + dCoords.y), 0.0, 1.0);

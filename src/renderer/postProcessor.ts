@@ -3,6 +3,7 @@ import fullscreen_rect_vs from "./shaders/fullscreen_rect_vs.glsl.js";
 import postprocess_ssao_fs from "./shaders/postprocess_ssao_fs.glsl.js";
 import postprocess_ssao_blur_fs from "./shaders/postprocess_ssao_blur_fs.glsl.js";
 import postprocess_ssr_fs from "./shaders/postprocess_ssr_fs.glsl.js";
+import postprocess_ssr2_fs from "./shaders/postprocess_ssr2_fs.glsl.js";
 import postprocess_composite_fs from "./shaders/postprocess_composite_fs.glsl.js";
 import postprocess_fog_fs from "./shaders/postprocess_fog_fs.glsl.js";
 import postprocess_fxaa_fs from "./shaders/postprocess_fxaa_fs.glsl.js";
@@ -58,6 +59,9 @@ export class PostProcessor {
         if (GLPrograms.shaderCodes["postprocess_ssr_fs"] === undefined) {
             GLPrograms.shaderCodes["postprocess_ssr_fs"] = postprocess_ssr_fs;
         }
+        if (GLPrograms.shaderCodes["postprocess_ssr2_fs"] === undefined) {
+            GLPrograms.shaderCodes["postprocess_ssr2_fs"] = postprocess_ssr2_fs;
+        }
         if (GLPrograms.shaderCodes["postprocess_brightpass_fs"] === undefined) {
             GLPrograms.shaderCodes["postprocess_brightpass_fs"] = postprocess_brightpass_fs;
         }
@@ -108,6 +112,11 @@ export class PostProcessor {
         this._ssrProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssr_fs"]);
         this._ssrProgram.build();
 
+        this._ssr2Program = new ShaderProgram();
+        this._ssr2Program.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
+        this._ssr2Program.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssr2_fs"]);
+        this._ssr2Program.build();
+
         this._fogProgram = new ShaderProgram();
         this._fogProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
         this._fogProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_fog_fs"]);
@@ -150,6 +159,7 @@ export class PostProcessor {
         context.bindUniformBlocks(this._ssaoProgram);
         context.bindUniformBlocks(this._ssaoBlurProgram);
         context.bindUniformBlocks(this._ssrProgram);
+        context.bindUniformBlocks(this._ssr2Program);
         context.bindUniformBlocks(this._fogProgram);
         context.bindUniformBlocks(this._fxaaProgram);
         context.bindUniformBlocks(this._brightpassProgram);
@@ -289,6 +299,7 @@ export class PostProcessor {
         if (this._ssaoProgram) { this._ssaoProgram.release(); }
         if (this._ssaoBlurProgram) { this._ssaoBlurProgram.release(); }
         if (this._ssrProgram) { this._ssrProgram.release(); }
+        if (this._ssr2Program) { this._ssr2Program.release(); }
         if (this._fogProgram) { this._fogProgram.release(); }
         if (this._fxaaProgram) { this._fxaaProgram.release(); }
         if (this._brightpassProgram) { this._brightpassProgram.release(); }
@@ -332,6 +343,7 @@ export class PostProcessor {
     private _ssaoProgram: ShaderProgram;
     private _ssaoBlurProgram: ShaderProgram;
     private _ssrProgram: ShaderProgram;
+    private _ssr2Program: ShaderProgram;
     private _fogProgram: ShaderProgram;
     private _fxaaProgram: ShaderProgram;
     private _brightpassProgram: ShaderProgram;
@@ -438,7 +450,8 @@ export class PostProcessor {
         }
 
         if (this.ssr.enable) {
-            this.generateSSR();
+            // this.generateSSR();
+            this.generateSSR2();
         }
 
         this.composite();
@@ -635,6 +648,35 @@ export class PostProcessor {
         GLTextures.setTextureAt(this._sceneColorTexUnit, null);
 
         // throw new Error("Method not implemented.");
+    }
+
+    private generateSSR2() {
+        const gl = GLDevice.gl;
+
+        GLDevice.renderTarget = this._ssrFBO;
+        gl.viewport(0, 0, this._ssrTexture.width, this._ssrTexture.height);
+        gl.scissor(0, 0, this._ssrTexture.width, this._ssrTexture.height);
+
+        GLDevice.clearColor = new vec4([0, 0, 0, 0]);
+        GLDevice.clear(true, false, false);
+
+        // render states
+        this._renderStates.apply();
+
+        GLPrograms.useProgram(this._ssr2Program);
+        
+        // texture samplers
+        // prev frame image
+        GLTextures.setTextureAt(this._sceneColorTexUnit, this._prevFrame);
+        gl.uniform1i(this._ssr2Program.getUniformLocation("s_sceneColor"), this._sceneColorTexUnit);
+        gl.uniform1i(this._ssr2Program.getUniformLocation("s_sceneDepth"), this._sceneDepthTexUnit);
+        gl.uniform1i(this._ssr2Program.getUniformLocation("s_sceneNormal"), this._sceneNormalTexUnit);
+        gl.uniform1i(this._ssr2Program.getUniformLocation("s_sceneSpecRough"), this._sceneSpecRoughTexUnit);
+
+        // todo: uniforms
+        this._rectGeom.draw(0, Infinity, this._ssr2Program.attributes);
+        // clear textures
+        GLTextures.setTextureAt(this._sceneColorTexUnit, null);
     }
 
     private composite() {
