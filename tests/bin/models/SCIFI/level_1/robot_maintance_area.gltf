@@ -58,16 +58,16 @@
                         1,
                         0.010409506037831306
                     ],
-                    "intensity" : 10,
+                    "intensity" : 5,
                     "spot" : {
-                        "innerConeAngle" : 1.1868238485082188,
-                        "outerConeAngle" : 1.3962633609771729
+                        "innerConeAngle" : 0.8901179370451118,
+                        "outerConeAngle" : 1.0471975803375244
                     },
                     "type" : "spot",
                     "range" : 5,
                     "name" : "Point.004",
                     "extras" : {
-                        "castShadow" : 1,
+                        "castShadow" : 0,
                         "shadowMapSize" : 256,
                         "shadowBias" : -0.0004999999888241291
                     }
@@ -238,16 +238,16 @@
                         1,
                         0.010409506037831306
                     ],
-                    "intensity" : 10,
+                    "intensity" : 5,
                     "spot" : {
-                        "innerConeAngle" : 1.1868238485082188,
-                        "outerConeAngle" : 1.3962633609771729
+                        "innerConeAngle" : 0.8901179370451118,
+                        "outerConeAngle" : 1.0471975803375244
                     },
                     "type" : "spot",
                     "range" : 5,
                     "name" : "Point.012",
                     "extras" : {
-                        "castShadow" : 1,
+                        "castShadow" : 0,
                         "shadowMapSize" : 256,
                         "shadowBias" : -0.0004999999888241291
                     }
@@ -667,9 +667,7 @@
                 447,
                 449,
                 451,
-                452,
                 453,
-                454,
                 455,
                 456,
                 457,
@@ -793,7 +791,11 @@
                 575,
                 576,
                 577,
-                578
+                578,
+                579,
+                580,
+                581,
+                582
             ]
         }
     ],
@@ -6925,6 +6927,68 @@
                 0,
                 2.5,
                 -26.71068572998047
+            ]
+        },
+        {
+            "extensions" : {
+                "KHR_lights_punctual" : {
+                    "light" : 2
+                }
+            },
+            "name" : "Point.034_Orientation",
+            "rotation" : [
+                -0.7071067690849304,
+                0,
+                0,
+                0.7071067690849304
+            ]
+        },
+        {
+            "children" : [
+                452
+            ],
+            "name" : "Point.034",
+            "rotation" : [
+                0,
+                0.7591078877449036,
+                0.6509648561477661,
+                -3.318166008625667e-08
+            ],
+            "translation" : [
+                0,
+                2.5,
+                -5.425663471221924
+            ]
+        },
+        {
+            "extensions" : {
+                "KHR_lights_punctual" : {
+                    "light" : 2
+                }
+            },
+            "name" : "Point.035_Orientation",
+            "rotation" : [
+                -0.7071067690849304,
+                0,
+                0,
+                0.7071067690849304
+            ]
+        },
+        {
+            "children" : [
+                454
+            ],
+            "name" : "Point.035",
+            "rotation" : [
+                0,
+                0.7591078877449036,
+                0.6509648561477661,
+                -3.318166008625667e-08
+            ],
+            "translation" : [
+                -1,
+                2.5,
+                -21.425662994384766
             ]
         },
         {
