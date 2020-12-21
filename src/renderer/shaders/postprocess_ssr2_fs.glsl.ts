@@ -21,9 +21,9 @@ in vec2 ex_texcoord;
 layout(location = 0) out vec4 o_color;
 
 // use const first to debug, then use uniforms later
-const float threshold = 0.3; //1.2;
-const float step = 0.2;
-const float minRayStep = 0.1;
+const float threshold = 0.4; //1.2;
+const float step = 0.15;
+// const float minRayStep = 0.1;
 const int maxSteps = 40;
 const int numBinarySearchSteps = 5;
 const float reflectionSpecularFalloffExponent = 3.0;
