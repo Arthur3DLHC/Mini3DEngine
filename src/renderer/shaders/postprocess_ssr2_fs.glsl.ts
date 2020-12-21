@@ -21,14 +21,15 @@ in vec2 ex_texcoord;
 layout(location = 0) out vec4 o_color;
 
 // use const first to debug, then use uniforms later
-const float threshold = 0.6; //1.2;
+const float threshold = 0.3; //1.2;
 const float step = 0.2;
 const float minRayStep = 0.1;
-const int maxSteps = 30;
+const int maxSteps = 40;
 const int numBinarySearchSteps = 5;
 const float reflectionSpecularFalloffExponent = 3.0;
 const float roughnessFactor = 1.0;
 const float minGlossiness = 0.1;
+const float strength = 1.0;
 
 // Structs
 struct ReflectionInfo {
@@ -155,6 +156,9 @@ void main()
     }
  
     vec3 normal = getSceneNormal(ex_texcoord);
+    // normal = normalize((u_view.matInvView * vec4(normal, 0.0)).xyz);
+    // o_color = vec4(normal * 0.5 + vec3(0.5, 0.5, 0.5), 1.0);
+    // return;
     
     vec4 projectedPos = vec4(ex_texcoord * 2.0 - 1.0, texture(s_sceneDepth, ex_texcoord).r * 2.0 - 1.0, 1.0);
     vec4 hPos = u_view.matInvProj * projectedPos;
@@ -188,7 +192,7 @@ void main()
     // vec3 fresnel = fresnelSchlick(max(dot(normalize(normal), normalize(position)), 0.0), F0);
 
     // Apply
-    float reflectionMultiplier = clamp(screenEdgefactor * reflected.z, 0.0, 0.9); 
+    float reflectionMultiplier = clamp(-reflected.z * screenEdgefactor * strength, 0.0, 0.9); 
     // float reflectionMultiplier = clamp(pow(spec * strength, reflectionSpecularFalloffExponent) * screenEdgefactor * reflected.z, 0.0, 0.9);
     // float albedoMultiplier = 1.0 - reflectionMultiplier;
     
@@ -197,6 +201,4 @@ void main()
 
     o_color = vec4(SSR, reflectionMultiplier);
 }
-
-
 `;

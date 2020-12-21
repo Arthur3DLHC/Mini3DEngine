@@ -52,7 +52,8 @@ vec3 getViewPosition(vec2 screenPosition, float depth, float viewZ) {
 }
 
 vec3 getViewNormal(vec2 screenPosition) {
-    return getSceneNormal(screenPosition);
+    vec3 normal = getSceneNormal(screenPosition);
+    return normal;
 }
 
 void main(void) {

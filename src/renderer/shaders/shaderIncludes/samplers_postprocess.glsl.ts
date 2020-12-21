@@ -9,6 +9,8 @@ uniform sampler2D s_sceneSpecRough;     // rgb: specular color (for metals) a: r
 
 // get view space normal
 vec3 getSceneNormal(vec2 screenUV) {
+    return texture(s_sceneNormal, screenUV).xyz;
+
     // normal tex format is RG_F16, no need to * 2 - 1
     vec2 xy = texture(s_sceneNormal, screenUV).rg;
     // DO NOT normalize xy

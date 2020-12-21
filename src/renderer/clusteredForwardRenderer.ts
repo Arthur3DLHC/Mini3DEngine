@@ -139,8 +139,8 @@ export class ClusteredForwardRenderer {
         // main output
         // todo: handle size change
 
-
-        this._sceneNormalTexture = new Texture2D(GLDevice.canvas.width, GLDevice.canvas.height, 1, 1, gl.RG, gl.HALF_FLOAT);
+        // can not use RG16F to store the view space normal, because the normal z may be negative near the edge of the view
+        this._sceneNormalTexture = new Texture2D(GLDevice.canvas.width, GLDevice.canvas.height, 1, 1, gl.RGBA, gl.HALF_FLOAT);
         this._sceneNormalTexture.create();
 
         this._sceneSpecularRoughnessTexture = new Texture2D(GLDevice.canvas.width, GLDevice.canvas.height, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE);

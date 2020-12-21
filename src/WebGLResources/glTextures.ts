@@ -27,6 +27,7 @@ export class GLTextures {
                 if (type === gl.FLOAT) internalFormat = gl.RGB32F;
                 if (type === gl.HALF_FLOAT) internalFormat = gl.RGB16F;
                 if (type === gl.UNSIGNED_BYTE) internalFormat = gl.RGB8;
+                if (type === gl.UNSIGNED_INT_2_10_10_10_REV) internalFormat = gl.RGB10_A2;
                 break;
             case gl.RGBA:
                 if (type === gl.FLOAT) internalFormat = gl.RGBA32F;

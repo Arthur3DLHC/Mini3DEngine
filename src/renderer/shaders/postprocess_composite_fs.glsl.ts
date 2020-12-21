@@ -40,6 +40,10 @@ in vec2 ex_texcoord;
 layout(location = 0) out vec4 o_color;
 
 void main(void) {
+
+    // o_color = texture(s_reflTex, ex_texcoord);
+    // return;
+
     // hardcode the gaussian blur weights for left top 3x3 kernels of a 5x5 kernel matrix
     // because the weights are symmertrical
         mat3 kernel = mat3(
@@ -145,8 +149,8 @@ void main(void) {
     // calculate world space reflection vector
     // vec3 v = normalize((u_view.matInvView * vec4(viewPos.xyz, 0.0)).xyz);    // world space
     vec3 v = normalize(u_view.position - worldPos); // world space view vector
-    vec3 n = getSceneNormal(ex_texcoord);       // view space, need to transform to world space
-    n = (u_view.matInvView * vec4(n, 0.0)).xyz;
+    vec3 n = getSceneNormal(ex_texcoord);           // view space
+    n = (u_view.matInvView * vec4(n, 0.0)).xyz;     // transform to world space
     vec3 reflV = reflect(-v, n);
     float NdotV = dot(n, v);
     // calculate fresnel factor by f0, v and n

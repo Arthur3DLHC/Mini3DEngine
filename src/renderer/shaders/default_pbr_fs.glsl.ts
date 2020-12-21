@@ -360,7 +360,8 @@ void main(void)
 
     o.color = vec4(color, getOpacity());
     // o.color = vec4(curvature, curvature, curvature, getOpacity());
-    o.normal = (u_view.matView * vec4(n, 0)).xyz;  // output view normal
+    o.normal = normalize((u_view.matView * vec4(n, 0)).xyz);  // output view normal
+    // o.normal = normalize(n);  // output world normal
     o.roughness = roughness;
     o.specular = f0;
 

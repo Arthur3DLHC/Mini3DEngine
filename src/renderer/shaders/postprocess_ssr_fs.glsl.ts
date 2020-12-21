@@ -231,6 +231,7 @@ float calculateAlpha(
 void main(void) {
     // vec4 normalAndGloss = texture2D(, ex_texcoord);
     vec3 normal = getSceneNormal(ex_texcoord);
+    // normal = (u_view.matView * vec4(normal, 0.0)).xyz;
     float rough = texture(s_sceneSpecRough, ex_texcoord).a;
 
     // Is empty
@@ -268,6 +269,7 @@ void main(void) {
     float alpha = calculateAlpha(iterationCount, reflectivity, hitPixel, hitPoint, dist, rayDir) * float(intersect);
     // float alpha = 1.0;
     vec3 hitNormal = getSceneNormal(hitPixel);
+    // hitNormal = (u_view.matView * vec4(hitNormal, 0.0)).xyz;
 
     // Ignore the pixel not face the ray
     // TODO fadeout ?
