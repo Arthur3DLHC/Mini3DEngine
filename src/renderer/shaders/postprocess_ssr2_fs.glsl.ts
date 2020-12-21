@@ -22,7 +22,7 @@ layout(location = 0) out vec4 o_color;
 
 // use const first to debug, then use uniforms later
 const float threshold = 0.6; //1.2;
-const float step = 0.1;
+const float step = 0.2;
 const float minRayStep = 0.1;
 const int maxSteps = 30;
 const int numBinarySearchSteps = 5;
@@ -131,6 +131,7 @@ ReflectionInfo getReflectionInfo(vec3 dir, vec3 hitCoord)
     }
     
     // not hit? should discard?
+    discard;
     info.color = texture(s_sceneColor, projectedCoord.xy).rgb;
     info.coords = vec4(projectedCoord.xy, sampledDepth, 0.0);
     return info;
@@ -150,7 +151,7 @@ void main()
 
     float g = 1.0 - roughness;
     if (g <= minGlossiness) {
-        // discard;
+        discard;
     }
  
     vec3 normal = getSceneNormal(ex_texcoord);
@@ -175,8 +176,8 @@ void main()
     
     // ReflectionInfo info = getReflectionInfo(jitt + reflected, position);
     ReflectionInfo info = getReflectionInfo(reflected, position); // For debug: no roughness
-    o_color = vec4(info.color, 1.0);
-    return;
+    // o_color = vec4(info.color, 1.0);
+    // return;
 
     vec2 dCoords = smoothstep(0.2, 0.6, abs(vec2(0.5, 0.5) - info.coords.xy));
     float screenEdgefactor = clamp(1.0 - (dCoords.x + dCoords.y), 0.0, 1.0);
