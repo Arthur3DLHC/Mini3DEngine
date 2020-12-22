@@ -33,6 +33,27 @@ export default /** glsl */`
     void outputFinal(FinalOutput o)
     {
         o_color = o.color;
+
+        // == (still not enough precision, discarded.)
+        // test use RG16F normal rt
+        // because the normal.z may be negative near the side of the view,
+        // 
+        // < ----------------------> view -z axis
+        //  \
+        //   \
+        //    \
+        //     \ *     / n
+        //      \  *  /
+        //       \   *
+        //        \    *
+        // so can not use sqrt(1 - x * x - y * y) to calculate
+        // solution:
+        // add a offset to x and y to mark as the z is negative
+        // when reading, if x and y > some threshold, offset them back and set z to negative
+        
+        //if(o.normal.z < 0.0) {
+        //    o.normal.xy += vec2(10.0);     // from [-1,1] to [9,11]
+        //}
         o_normal = vec4(o.normal, 1.0);
         o_specularRoughness = vec4(o.specular, o.roughness);
     }
