@@ -39,6 +39,7 @@ import vec2 from "../../lib/tsm/vec2.js";
 import { FogParams } from "./postprocess/fogParams.js";
 import { Camera } from "../scene/cameras/camera.js";
 import { FXAAParams } from "./postprocess/fxaaParams.js";
+import { SSR2Params } from "./postprocess/ssr2Params.js";
 
 /**
  * all post processes supported
@@ -290,6 +291,7 @@ export class PostProcessor {
 
         this._ssao = new SSAOParams();
         this._ssr = new SSRParams();
+        this._ssr2 = new SSR2Params();
         this._bloom = new BloomParams();
         this._fog = new FogParams();
         this._fxaa = new FXAAParams();
@@ -328,12 +330,14 @@ export class PostProcessor {
 
     public get ssao(): SSAOParams {return this._ssao;}
     public get ssr(): SSRParams {return this._ssr;}
+    public get ssr2(): SSR2Params {return this._ssr2;}
     public get bloom(): BloomParams {return this._bloom;}
     public get fog(): FogParams {return this._fog;}
     public get fxaa(): FXAAParams {return this._fxaa;}
 
     private _ssao: SSAOParams;
     private _ssr: SSRParams;
+    private _ssr2: SSR2Params;
     private _bloom: BloomParams;
     private _fog: FogParams;
     private _fxaa: FXAAParams;
@@ -663,17 +667,28 @@ export class PostProcessor {
         // render states
         this._renderStates.apply();
 
-        GLPrograms.useProgram(this._ssr2Program);
+        const prog = this._ssr2Program;
+        GLPrograms.useProgram(prog);
         
         // texture samplers
         // prev frame image
         GLTextures.setTextureAt(this._sceneColorTexUnit, this._prevFrame);
-        gl.uniform1i(this._ssr2Program.getUniformLocation("s_sceneColor"), this._sceneColorTexUnit);
-        gl.uniform1i(this._ssr2Program.getUniformLocation("s_sceneDepth"), this._sceneDepthTexUnit);
-        gl.uniform1i(this._ssr2Program.getUniformLocation("s_sceneNormal"), this._sceneNormalTexUnit);
-        gl.uniform1i(this._ssr2Program.getUniformLocation("s_sceneSpecRough"), this._sceneSpecRoughTexUnit);
+        gl.uniform1i(prog.getUniformLocation("s_sceneColor"), this._sceneColorTexUnit);
+        gl.uniform1i(prog.getUniformLocation("s_sceneDepth"), this._sceneDepthTexUnit);
+        gl.uniform1i(prog.getUniformLocation("s_sceneNormal"), this._sceneNormalTexUnit);
+        gl.uniform1i(prog.getUniformLocation("s_sceneSpecRough"), this._sceneSpecRoughTexUnit);
 
         // todo: uniforms
+        const ssr2 = this._ssr2;
+        gl.uniform1f(prog.getUniformLocation("step"), ssr2.stepLength);
+        gl.uniform1i(prog.getUniformLocation("maxSteps"), ssr2.maxSteps);
+        gl.uniform1i(prog.getUniformLocation("numBinarySearchSteps"), ssr2.binarySeachSteps);
+        gl.uniform1f(prog.getUniformLocation("threshold"), ssr2.depthThreshold);
+        gl.uniform1f(prog.getUniformLocation("strength"), ssr2.strength);
+        gl.uniform1f(prog.getUniformLocation("roughnessFactor"), ssr2.roughnessFactor);
+        gl.uniform1f(prog.getUniformLocation("minGlossiness"), ssr2.glossinessThreshold);
+        gl.uniform1f(prog.getUniformLocation("reflectionSpecularFalloffExponent"), ssr2.reflectionSpecularFalloffExponent);
+
         this._rectGeom.draw(0, Infinity, this._ssr2Program.attributes);
         // clear textures
         GLTextures.setTextureAt(this._sceneColorTexUnit, null);
@@ -712,8 +727,11 @@ export class PostProcessor {
         // uniforms
         const texelW = 1.0 / this._ssrTexture.width;
         const texelH = 1.0 / this._ssrTexture.height;
-        gl.uniform2f(this._compositeProgram.getUniformLocation("u_offset"), this.ssr.blurSize * texelW, this.ssr.blurSize * texelH);
-        gl.uniform1f(this._compositeProgram.getUniformLocation("u_ssrAmount"), this.ssr.enable ? 1.0 : 0.0);
+
+        const ssrp = this.ssr2;
+
+        gl.uniform2f(this._compositeProgram.getUniformLocation("u_offset"), ssrp.blurSize * texelW, this.ssr.blurSize * texelH);
+        gl.uniform1f(this._compositeProgram.getUniformLocation("u_ssrAmount"), ssrp.enable ? 1.0 : 0.0);
         gl.uniform1f(this._compositeProgram.getUniformLocation("u_aoAmount"), this.ssao.enable ? 1.0 : 0.0);    //NOTE: affect specular ao only
 
         this._rectGeom.draw(0, Infinity, this._compositeProgram.attributes);

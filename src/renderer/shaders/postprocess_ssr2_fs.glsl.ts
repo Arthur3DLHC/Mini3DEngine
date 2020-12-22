@@ -21,15 +21,15 @@ in vec2 ex_texcoord;
 layout(location = 0) out vec4 o_color;
 
 // use const first to debug, then use uniforms later
-const float threshold = 0.4; //1.2;
-const float step = 0.15;
+uniform float threshold;// = 0.4; //1.2;
+uniform float step;// = 0.15;
 // const float minRayStep = 0.1;
-const int maxSteps = 40;
-const int numBinarySearchSteps = 5;
-const float reflectionSpecularFalloffExponent = 3.0;
-const float roughnessFactor = 1.0;
-const float minGlossiness = 0.1;
-const float strength = 1.0;
+uniform int maxSteps;// = 40;
+uniform int numBinarySearchSteps;// = 5;
+uniform float reflectionSpecularFalloffExponent;// = 3.0;
+uniform float roughnessFactor;// = 1.0;
+uniform float minGlossiness;// = 0.1;
+uniform float strength;// = 1.0;
 
 // Structs
 struct ReflectionInfo {
