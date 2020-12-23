@@ -777,7 +777,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         let matWorld = item.object.worldTransform;
         let matWorldPrev = item.object.worldTransformPrev
         // object properties
-        // this._tmpColor.x = item.object.tag;
+        this._tmpColor.x = item.object.tag;
         this._tmpColor.y = 0;           // num skin joints
         this._tmpColor.z = 0;           // use instancing
         this._tmpColor.w = 0;
@@ -807,10 +807,11 @@ export class ClusteredForwardRenderContext extends RenderContext {
         // todo: object skin transforms, if skinmesh
     }
 
-    public fillUniformBuffersPerObjectByValues(matWorld: mat4, matWorldPrev: mat4, color: vec4, numSkinJoints:number, instancing: boolean, custom: number = 0) {
+    public fillUniformBuffersPerObjectByValues(matWorld: mat4, matWorldPrev: mat4, color: vec4, tag: number, numSkinJoints:number, instancing: boolean, custom: number = 0) {
         this._ubObject.setMat4("matWorld", matWorld);
         this._ubObject.setMat4("matWorldPrev", matWorldPrev);
         this._ubObject.setVec4("color", color);
+        this._tmpColor.x = tag;
         this._tmpColor.y = numSkinJoints;
         this._tmpColor.z = instancing ? 1: 0;
         this._tmpColor.w = custom;

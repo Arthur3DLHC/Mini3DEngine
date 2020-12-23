@@ -10,6 +10,7 @@ export default /** glsl */`
         float roughness;            // for screen space reflection
         vec3 specular;             // F. Note: metals have specular color.
         vec3 normal;                // output to thin G-Buffer
+        float tag;                  // tag associated to usedata
         // 使用 depth texture 反算线性深度？就不用输出depth了？
     };
 
@@ -22,6 +23,7 @@ export default /** glsl */`
         o.roughness = 0.5;
         o.specular = vec3(0.02);
         o.normal = vec3(0,0,1);
+        o.tag = -1.0;
         return o;
     }
 
@@ -54,7 +56,7 @@ export default /** glsl */`
         //if(o.normal.z < 0.0) {
         //    o.normal.xy += vec2(10.0);     // from [-1,1] to [9,11]
         //}
-        o_normal = vec4(o.normal, 1.0);
+        o_normal = vec4(o.normal, o.tag);
         o_specularRoughness = vec4(o.specular, o.roughness);
     }
 `;

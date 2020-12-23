@@ -364,6 +364,7 @@ void main(void)
     // o.normal = normalize(n);  // output world normal
     o.roughness = roughness;
     o.specular = f0;
+    o.tag = getObjectTag();
 
     outputFinal(o);
 }

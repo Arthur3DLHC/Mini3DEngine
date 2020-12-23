@@ -12,6 +12,7 @@ export class Object3D {
     public constructor() {
         this.name = "";
         this.visible = true;
+        this.tag = -1;
         this.color = new vec4([1,1,1,1]);
         this._active = true;
         this.isStatic = false;
@@ -36,11 +37,12 @@ export class Object3D {
         // this._curFrameNumber = -1;
     }
 
-    // todo: need an id?
-
     public name : string;
 
     public visible: boolean;
+
+    /** tag associated with user data */
+    public tag: number;
 
     /**
      * every object can have a color itself

@@ -26,4 +26,15 @@ vec3 getSceneNormal(vec2 screenUV) {
     float z = sqrt(1.0 - dot(xy, xy));
     return vec3(xy, z * zSign);
 }
+
+float getSceneTag(vec2 screenUV) {
+    return texture(s_sceneNormal, screenUV).w;
+}
+
+void getSceneNormalAndTag(vec2 screenUV, vec3 normal, float tag) {
+    vec4 tex = texture(s_sceneNormal, screenUV);
+    normal = tex.xyz;
+    tag = tex.w;
+}
+
 `;

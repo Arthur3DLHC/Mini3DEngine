@@ -30,6 +30,7 @@ void main(void) {
     o.normal = vec3(0.0, 0.0, 1.0);
     o.specular = vec3(0.0);
     o.roughness = 1.0;
+    o.tag = getObjectTag();
 
     outputFinal(o);
 }

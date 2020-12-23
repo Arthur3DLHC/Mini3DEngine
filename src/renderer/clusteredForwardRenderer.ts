@@ -1195,14 +1195,14 @@ export class ClusteredForwardRenderer {
                     const instMesh = item.object as InstancedMesh;
 
                     // let this._boundingBoxTransform only contains local transform of bounding box
-                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, 0, true);
+                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, item.object.tag, 0, true);
                 
                     this._occlusionBoxGeom.drawInstaces(0, Infinity, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
 
                 } else {
                     mat4.product(item.object.worldTransform, this._boundingBoxTransform, this._boundingBoxTransform);
 
-                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, 0, false);
+                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, item.object.tag, 0, false);
                 
                     this._occlusionBoxGeom.draw(0, Infinity, GLPrograms.currProgram.attributes);
                 }
@@ -1268,14 +1268,14 @@ export class ClusteredForwardRenderer {
                     const instMesh = item.object as InstancedMesh;
 
                     // let this._boundingBoxTransform only contains local transform of bounding box
-                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, boxColor, 0, true);
+                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, boxColor, item.object.tag, 0, true);
                 
                     this._boundingBoxWireframeGeom.drawInstaces(0, Infinity, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
 
                 } else {
                     mat4.product(item.object.worldTransform, this._boundingBoxTransform, this._boundingBoxTransform);
 
-                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, boxColor, 0, false);
+                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, boxColor, item.object.tag, 0, false);
                 
                     this._boundingBoxWireframeGeom.draw(0, Infinity, GLPrograms.currProgram.attributes);
                 }
@@ -1345,7 +1345,7 @@ export class ClusteredForwardRenderer {
 
                     mat4.product(sphereLocalTranMat, sphereLocalScaleMat, this._boundingBoxTransform);
 
-                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, 0, false);
+                    this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, skinMesh.tag, 0, false);
                     this._boundingSphereWireframeGeom.draw(0, Infinity, GLPrograms.currProgram.attributes);
                 } else {
                     const boundingSphere = item.geometry.boundingSphere;
@@ -1363,7 +1363,7 @@ export class ClusteredForwardRenderer {
                         const instMesh = item.object as InstancedMesh;
 
                         // let this._boundingBoxTransform only contains local transform of bounding sphere
-                        this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, 0, true);
+                        this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, instMesh.tag, 0, true);
 
                         this._boundingSphereWireframeGeom.drawInstaces(0, Infinity, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
 
@@ -1371,7 +1371,7 @@ export class ClusteredForwardRenderer {
 
                         mat4.product(item.object.worldTransform, this._boundingBoxTransform, this._boundingBoxTransform);
 
-                        this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, 0, false);
+                        this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, item.object.tag, 0, false);
 
                         this._boundingSphereWireframeGeom.draw(0, Infinity, GLPrograms.currProgram.attributes);
                     }
@@ -1421,7 +1421,7 @@ export class ClusteredForwardRenderer {
             0,              0,              1,  0,
             w + l,          h + b,          0,  1,
         ]);
-        this._renderContext.fillUniformBuffersPerObjectByValues(this._rectTransform, this._rectTransform, color, 0, false);
+        this._renderContext.fillUniformBuffersPerObjectByValues(this._rectTransform, this._rectTransform, color, -1, 0, false);
 
         // set material uniform block and texture
         this._renderContext.ubMaterialPBR.setFloat("colorMapAmount", textureAmount);
@@ -1491,7 +1491,7 @@ export class ClusteredForwardRenderer {
         // todo: check skybox LDR / HDR
 
         this._renderContext.fillUniformBuffersPerObjectByValues(this._skyboxTransform, this._skyboxTransform,
-            new vec4([intensity,intensity,intensity,intensity]), 0, false, cubemap.isHDR ? 1 : 0);
+            new vec4([intensity,intensity,intensity,intensity]), -1, 0, false, cubemap.isHDR ? 1 : 0);
 
         GLTextures.setTextureAt(this._numReservedTextures, cubemap, GLDevice.gl.TEXTURE_CUBE_MAP);
         let location = this._skyboxProgram.getUniformLocation("s_skybox");
