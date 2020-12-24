@@ -40,6 +40,7 @@ import { FogParams } from "./postprocess/fogParams.js";
 import { Camera } from "../scene/cameras/camera.js";
 import { FXAAParams } from "./postprocess/fxaaParams.js";
 import { SSR2Params } from "./postprocess/ssr2Params.js";
+import { SilhouetteParams } from "./postprocess/silhouetteParams.js";
 
 /**
  * all post processes supported
@@ -292,6 +293,7 @@ export class PostProcessor {
         this._ssao = new SSAOParams();
         this._ssr = new SSRParams();
         this._ssr2 = new SSR2Params();
+        this._silhouette = new SilhouetteParams();
         this._bloom = new BloomParams();
         this._fog = new FogParams();
         this._fxaa = new FXAAParams();
@@ -331,6 +333,7 @@ export class PostProcessor {
     public get ssao(): SSAOParams {return this._ssao;}
     public get ssr(): SSRParams {return this._ssr;}
     public get ssr2(): SSR2Params {return this._ssr2;}
+    public get silhouette(): SilhouetteParams {return this._silhouette;}
     public get bloom(): BloomParams {return this._bloom;}
     public get fog(): FogParams {return this._fog;}
     public get fxaa(): FXAAParams {return this._fxaa;}
@@ -338,6 +341,7 @@ export class PostProcessor {
     private _ssao: SSAOParams;
     private _ssr: SSRParams;
     private _ssr2: SSR2Params;
+    private _silhouette: SilhouetteParams;
     private _bloom: BloomParams;
     private _fog: FogParams;
     private _fxaa: FXAAParams;
