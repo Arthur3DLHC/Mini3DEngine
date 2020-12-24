@@ -502,6 +502,10 @@ export class PostProcessor {
         }
         this.applyToneMapping();
 
+        if (this.silhouette.enable) {
+            this.applySilhouette();
+        }
+
         // fxaa only works after tone mapping
         if (this.fxaa.enable) {
             this.applyFXAA();
@@ -909,6 +913,10 @@ export class PostProcessor {
         for(let i = 0; i < this._numBloomLevels; i++) {
             GLTextures.setTextureAt(this._customTexStartUnit + i, null);
         }
+    }
+
+    applySilhouette() {
+        throw new Error("Method not implemented.");
     }
 
     private applyFXAA() {
