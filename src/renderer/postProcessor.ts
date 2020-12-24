@@ -4,6 +4,7 @@ import postprocess_ssao_fs from "./shaders/postprocess_ssao_fs.glsl.js";
 import postprocess_ssao_blur_fs from "./shaders/postprocess_ssao_blur_fs.glsl.js";
 import postprocess_ssr_fs from "./shaders/postprocess_ssr_fs.glsl.js";
 import postprocess_ssr2_fs from "./shaders/postprocess_ssr2_fs.glsl.js";
+import postprocess_silhouette_fs from "./shaders/postprocess_silhouette_fs.glsl.js";
 import postprocess_composite_fs from "./shaders/postprocess_composite_fs.glsl.js";
 import postprocess_fog_fs from "./shaders/postprocess_fog_fs.glsl.js";
 import postprocess_fxaa_fs from "./shaders/postprocess_fxaa_fs.glsl.js";
@@ -49,48 +50,53 @@ export class PostProcessor {
 
     public constructor(context: ClusteredForwardRenderContext, sceneDepthTex: Texture2D, sceneNormalTex: Texture2D, specRoughTex: Texture2D, envmapArrayUnit: number, specDFGUnit: number) {
         // register shader codes
-        if (GLPrograms.shaderCodes["fullscreen_rect_vs"] === undefined) {
-            GLPrograms.shaderCodes["fullscreen_rect_vs"] = fullscreen_rect_vs;
+        const shaderCodes = GLPrograms.shaderCodes;
+        
+        if (shaderCodes["fullscreen_rect_vs"] === undefined) {
+            shaderCodes["fullscreen_rect_vs"] = fullscreen_rect_vs;
         }
-        if (GLPrograms.shaderCodes["postprocess_ssao_fs"] === undefined) {
-            GLPrograms.shaderCodes["postprocess_ssao_fs"] = postprocess_ssao_fs;
+        if (shaderCodes["postprocess_ssao_fs"] === undefined) {
+            shaderCodes["postprocess_ssao_fs"] = postprocess_ssao_fs;
         }
-        if (GLPrograms.shaderCodes["postprocess_ssao_blur_fs"] === undefined) {
-            GLPrograms.shaderCodes["postprocess_ssao_blur_fs"] = postprocess_ssao_blur_fs;
+        if (shaderCodes["postprocess_ssao_blur_fs"] === undefined) {
+            shaderCodes["postprocess_ssao_blur_fs"] = postprocess_ssao_blur_fs;
         }
-        if (GLPrograms.shaderCodes["postprocess_ssr_fs"] === undefined) {
-            GLPrograms.shaderCodes["postprocess_ssr_fs"] = postprocess_ssr_fs;
+        if (shaderCodes["postprocess_ssr_fs"] === undefined) {
+            shaderCodes["postprocess_ssr_fs"] = postprocess_ssr_fs;
         }
-        if (GLPrograms.shaderCodes["postprocess_ssr2_fs"] === undefined) {
-            GLPrograms.shaderCodes["postprocess_ssr2_fs"] = postprocess_ssr2_fs;
+        if (shaderCodes["postprocess_ssr2_fs"] === undefined) {
+            shaderCodes["postprocess_ssr2_fs"] = postprocess_ssr2_fs;
         }
-        if (GLPrograms.shaderCodes["postprocess_brightpass_fs"] === undefined) {
-            GLPrograms.shaderCodes["postprocess_brightpass_fs"] = postprocess_brightpass_fs;
+        if (shaderCodes["postprocess_silhouette_fs"] === undefined) {
+            shaderCodes["postprocess_silhouette_fs"] = postprocess_silhouette_fs;
         }
-        if (GLPrograms.shaderCodes["postprocess_blur_fs"] === undefined) {
-            GLPrograms.shaderCodes["postprocess_blur_fs"] = postprocess_blur_fs;
+        if (shaderCodes["postprocess_brightpass_fs"] === undefined) {
+            shaderCodes["postprocess_brightpass_fs"] = postprocess_brightpass_fs;
         }
-        if (GLPrograms.shaderCodes["postprocess_composite_fs"] === undefined) {
-            GLPrograms.shaderCodes["postprocess_composite_fs"] = postprocess_composite_fs;
+        if (shaderCodes["postprocess_blur_fs"] === undefined) {
+            shaderCodes["postprocess_blur_fs"] = postprocess_blur_fs;
         }
-        if (GLPrograms.shaderCodes["postprocess_fog_fs"] === undefined) {
-            GLPrograms.shaderCodes["postprocess_fog_fs"] = postprocess_fog_fs;
+        if (shaderCodes["postprocess_composite_fs"] === undefined) {
+            shaderCodes["postprocess_composite_fs"] = postprocess_composite_fs;
         }
-        if (GLPrograms.shaderCodes["postprocess_tonemapping_fs"] === undefined) {
-            GLPrograms.shaderCodes["postprocess_tonemapping_fs"] = postprocess_tonemapping_fs;
+        if (shaderCodes["postprocess_fog_fs"] === undefined) {
+            shaderCodes["postprocess_fog_fs"] = postprocess_fog_fs;
         }
-        if (GLPrograms.shaderCodes["postprocess_bloom_composite_fs"] === undefined) {
-            GLPrograms.shaderCodes["postprocess_bloom_composite_fs"] = postprocess_bloom_composite_fs;
+        if (shaderCodes["postprocess_tonemapping_fs"] === undefined) {
+            shaderCodes["postprocess_tonemapping_fs"] = postprocess_tonemapping_fs;
         }
-        if (GLPrograms.shaderCodes["postprocess_fxaa_fs"] === undefined) {
-            GLPrograms.shaderCodes["postprocess_fxaa_fs"] = postprocess_fxaa_fs;
+        if (shaderCodes["postprocess_bloom_composite_fs"] === undefined) {
+            shaderCodes["postprocess_bloom_composite_fs"] = postprocess_bloom_composite_fs;
         }
-        if (GLPrograms.shaderCodes["postprocess_fxaa_vs"] === undefined) {
-            GLPrograms.shaderCodes["postprocess_fxaa_vs"] = postprocess_fxaa_vs;
+        if (shaderCodes["postprocess_fxaa_fs"] === undefined) {
+            shaderCodes["postprocess_fxaa_fs"] = postprocess_fxaa_fs;
+        }
+        if (shaderCodes["postprocess_fxaa_vs"] === undefined) {
+            shaderCodes["postprocess_fxaa_vs"] = postprocess_fxaa_vs;
         }
 
-        if (GLPrograms.shaderCodes["samplers_postprocess"] === undefined) {
-            GLPrograms.shaderCodes["samplers_postprocess"] = samplers_postprocess;
+        if (shaderCodes["samplers_postprocess"] === undefined) {
+            shaderCodes["samplers_postprocess"] = samplers_postprocess;
         }
 
         this._envMapArrayUnit = envmapArrayUnit;
@@ -98,60 +104,65 @@ export class PostProcessor {
 
         // create shaders
         this._ssaoProgram = new ShaderProgram();
-        this._ssaoProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
+        this._ssaoProgram.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["fullscreen_rect_vs"]);
         this._ssaoProgram.fragmentShaderCode = GLPrograms.processSourceCode(
             "#define NUM_KERNELS " + SSAOParams.numKernels + "\n"
-            + GLPrograms.shaderCodes["postprocess_ssao_fs"]);
+            + shaderCodes["postprocess_ssao_fs"]);
         this._ssaoProgram.build();
 
         this._ssaoBlurProgram = new ShaderProgram();
-        this._ssaoBlurProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
-        this._ssaoBlurProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssao_blur_fs"]);
+        this._ssaoBlurProgram.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["fullscreen_rect_vs"]);
+        this._ssaoBlurProgram.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["postprocess_ssao_blur_fs"]);
         this._ssaoBlurProgram.build();
 
         this._ssrProgram = new ShaderProgram();
-        this._ssrProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
-        this._ssrProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssr_fs"]);
+        this._ssrProgram.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["fullscreen_rect_vs"]);
+        this._ssrProgram.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["postprocess_ssr_fs"]);
         this._ssrProgram.build();
 
         this._ssr2Program = new ShaderProgram();
-        this._ssr2Program.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
-        this._ssr2Program.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_ssr2_fs"]);
+        this._ssr2Program.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["fullscreen_rect_vs"]);
+        this._ssr2Program.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["postprocess_ssr2_fs"]);
         this._ssr2Program.build();
 
+        this._silhouetteProgram = new ShaderProgram();
+        this._silhouetteProgram.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["fullscreen_rect_vs"]);
+        this._silhouetteProgram.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["postprocess_silhouette_fs"]);
+        this._silhouetteProgram.build();
+
         this._fogProgram = new ShaderProgram();
-        this._fogProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
-        this._fogProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_fog_fs"]);
+        this._fogProgram.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["fullscreen_rect_vs"]);
+        this._fogProgram.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["postprocess_fog_fs"]);
         this._fogProgram.build();
 
         this._fxaaProgram = new ShaderProgram();
-        this._fxaaProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_fxaa_vs"]);
-        this._fxaaProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_fxaa_fs"]);
+        this._fxaaProgram.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["postprocess_fxaa_vs"]);
+        this._fxaaProgram.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["postprocess_fxaa_fs"]);
         this._fxaaProgram.build();
 
         this._brightpassProgram = new ShaderProgram();
-        this._brightpassProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
-        this._brightpassProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_brightpass_fs"]);
+        this._brightpassProgram.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["fullscreen_rect_vs"]);
+        this._brightpassProgram.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["postprocess_brightpass_fs"]);
         this._brightpassProgram.build();
 
         this._gaussianBlurProgram = new ShaderProgram();
-        this._gaussianBlurProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
-        this._gaussianBlurProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_blur_fs"]);
+        this._gaussianBlurProgram.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["fullscreen_rect_vs"]);
+        this._gaussianBlurProgram.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["postprocess_blur_fs"]);
         this._gaussianBlurProgram.build();
 
         this._compositeProgram = new ShaderProgram();
-        this._compositeProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
-        this._compositeProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_composite_fs"]);
+        this._compositeProgram.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["fullscreen_rect_vs"]);
+        this._compositeProgram.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["postprocess_composite_fs"]);
         this._compositeProgram.build();
 
         this._toneMappingProgram = new ShaderProgram();
-        this._toneMappingProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
-        this._toneMappingProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_tonemapping_fs"]);
+        this._toneMappingProgram.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["fullscreen_rect_vs"]);
+        this._toneMappingProgram.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["postprocess_tonemapping_fs"]);
         this._toneMappingProgram.build();
 
         this._bloomCompositeProgram = new ShaderProgram();
-        this._bloomCompositeProgram.vertexShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["fullscreen_rect_vs"]);
-        this._bloomCompositeProgram.fragmentShaderCode = GLPrograms.processSourceCode(GLPrograms.shaderCodes["postprocess_bloom_composite_fs"]);
+        this._bloomCompositeProgram.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["fullscreen_rect_vs"]);
+        this._bloomCompositeProgram.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["postprocess_bloom_composite_fs"]);
         this._bloomCompositeProgram.build();
 
         // don't foget to bind the uniform blocks used.
@@ -162,6 +173,7 @@ export class PostProcessor {
         context.bindUniformBlocks(this._ssaoBlurProgram);
         context.bindUniformBlocks(this._ssrProgram);
         context.bindUniformBlocks(this._ssr2Program);
+        context.bindUniformBlocks(this._silhouetteProgram);
         context.bindUniformBlocks(this._fogProgram);
         context.bindUniformBlocks(this._fxaaProgram);
         context.bindUniformBlocks(this._brightpassProgram);
@@ -304,6 +316,7 @@ export class PostProcessor {
         if (this._ssaoBlurProgram) { this._ssaoBlurProgram.release(); }
         if (this._ssrProgram) { this._ssrProgram.release(); }
         if (this._ssr2Program) { this._ssr2Program.release(); }
+        if (this._silhouetteProgram) {this._silhouetteProgram.release(); }
         if (this._fogProgram) { this._fogProgram.release(); }
         if (this._fxaaProgram) { this._fxaaProgram.release(); }
         if (this._brightpassProgram) { this._brightpassProgram.release(); }
@@ -352,6 +365,7 @@ export class PostProcessor {
     private _ssaoBlurProgram: ShaderProgram;
     private _ssrProgram: ShaderProgram;
     private _ssr2Program: ShaderProgram;
+    private _silhouetteProgram: ShaderProgram;
     private _fogProgram: ShaderProgram;
     private _fxaaProgram: ShaderProgram;
     private _brightpassProgram: ShaderProgram;
