@@ -190,7 +190,7 @@ window.onload = () => {
         // todo: use third person controller
         tpsBehavior = new ThirdPersonShooterBehavior(gltfSceneFemale, playerBody, camera, actionCtrlBehavior);
         gltfSceneFemale.behaviors.push(tpsBehavior);
-        tpsBehavior.cameraVerticalOffset = 1.6;
+        tpsBehavior.cameraVerticalOffset = 1.5;
         tpsBehavior.cameraHorizontalOffset = new vec3([0.4, 0, 1.5]);
         tpsBehavior.cameraHorizontalOffsetScale = 0.5;
         tpsBehavior.moveSpeed = 2;
