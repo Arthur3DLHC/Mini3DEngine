@@ -4,7 +4,7 @@
 export default /** glsl */`
 uniform sampler2D s_sceneColor;
 uniform sampler2D s_sceneDepth;
-uniform sampler2D s_sceneNormal;        // view space normal
+uniform sampler2D s_sceneNormal;        // rgb: view space normal. a: object tag
 uniform sampler2D s_sceneSpecRough;     // rgb: specular color (for metals) a: roughness
 
 // get view space normal
