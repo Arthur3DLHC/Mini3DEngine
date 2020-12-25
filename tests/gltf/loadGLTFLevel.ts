@@ -19,6 +19,10 @@ window.onload = () => {
     // canvas.width = Math.max(1280, window.innerWidth - 50);
     // canvas.height = Math.max(720, window.innerHeight - 50);
 
+    const crosshair = document.getElementById("crosshair") as HTMLCanvasElement;
+    crosshair.style.left = ((canvas.width - 4) / 2).toString();
+    crosshair.style.top = ((canvas.height - 4) / 2).toString(); 
+
     GLDevice.initialize(canvas);
 
     const loadingManager = new LoadingManager();
