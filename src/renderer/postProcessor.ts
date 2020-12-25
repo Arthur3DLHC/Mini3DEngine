@@ -297,6 +297,7 @@ export class PostProcessor {
         // alpha blend mode for fog
         // srcColor * scrAlpha + destColor * (1 - srcAlpha)
         this._fogBlendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
+        this._silhouetteBlendState = RenderStateCache.instance.getBlendState(true, GLDevice.gl.FUNC_ADD, GLDevice.gl.SRC_ALPHA, GLDevice.gl.ONE_MINUS_SRC_ALPHA);
 
         this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
 
@@ -419,6 +420,7 @@ export class PostProcessor {
     private _ssaoBlurBlendState: BlendState;
     private _compositeBlendState: BlendState;
     private _fogBlendState: BlendState;
+    private _silhouetteBlendState: BlendState;
     // glow pass can use _compositeBlendState also.
 
     private _rectGeom: PlaneGeometry;
@@ -916,7 +918,26 @@ export class PostProcessor {
     }
 
     applySilhouette() {
-        throw new Error("Method not implemented.");
+        const gl = GLDevice.gl;
+        GLDevice.renderTarget = null;
+        gl.viewport(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+        gl.scissor(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
+        this._renderStates.apply();
+        GLRenderStates.setBlendState(this._silhouetteBlendState);
+
+        GLPrograms.useProgram(this._silhouetteProgram);
+
+        // calculate pixel size
+        const texelW = 1.0 / this._sceneNormalTexture.width;
+        const texelH = 1.0 / this._sceneNormalTexture.height;
+
+        gl.uniform2f(this._silhouetteProgram.getUniformLocation("u_unitOffset"), texelW, texelH);
+        gl.uniform4fv(this._silhouetteProgram.getUniformLocation("u_silhouetteColors"), this.silhouette._silhouetteColors);
+        gl.uniform1i(this._silhouetteProgram.getUniformLocation("u_selectMode"), this.silhouette.selectMode);
+        gl.uniform1f(this._silhouetteProgram.getUniformLocation("u_tagRef"), this.silhouette.tagRef);
+        gl.uniform2f(this._silhouetteProgram.getUniformLocation("u_positionRef"), this.silhouette.cursor.x * texelW, this.silhouette.cursor.y * texelH);
+
+        this._rectGeom.draw(0, Infinity, this._silhouetteProgram.attributes);
     }
 
     private applyFXAA() {
