@@ -30,6 +30,9 @@ window.onload = () => {
         alert("Your browser doesn\'t seem to support Pointer Lock API");
     }
 
+    // todo: add a crosshair at center of canvas
+    
+
     let tpsBehavior: ThirdPersonShooterBehavior | null = null;
 
     const infoPanel: HTMLDivElement = document.getElementById("infoPanel") as HTMLDivElement;
