@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition, ActionStateBlendTree, AnimationBlendNode, BlendMethods, SingleParamCondition, TimeUpCondition, AnimationMask, SkinMesh, AnimationLoopMode, InstancedMesh } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition, ActionStateBlendTree, AnimationBlendNode, BlendMethods, SingleParamCondition, TimeUpCondition, AnimationMask, SkinMesh, AnimationLoopMode, InstancedMesh, SilhouetteSelectMode } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
@@ -6,6 +6,7 @@ import { SceneHelper } from "../common/sceneHelper.js";
 import quat from "../../lib/tsm/quat.js";
 import { ThirdPersonCtrlBehavior } from "../common/behaviors/thirdPersonCtrlBehavior.js";
 import { ThirdPersonShooterBehavior } from "./thirdPersonShooterBehavior.js";
+import vec2 from "../../lib/tsm/vec2.js";
 
 window.onload = () => {
     const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
@@ -77,6 +78,12 @@ window.onload = () => {
     renderer.postprocessor.bloom.intensity = 0.3;
     renderer.postprocessor.bloom.radius = 0.2;
     renderer.postprocessor.bloom.threshold = 1.5;
+    renderer.postprocessor.silhouette.enable = true;
+    renderer.postprocessor.silhouette.selectMode = SilhouetteSelectMode.ByCursor;
+    renderer.postprocessor.silhouette.cursor = new vec2([canvas.width / 2, canvas.height / 2]);
+    renderer.postprocessor.silhouette.setSilhouetteColor(1, new vec4([1, 0, 0, 1]));
+    renderer.postprocessor.silhouette.setSilhouetteColor(2, new vec4([0, 1, 0, 1]));
+    renderer.postprocessor.silhouette.setSilhouetteColor(3, new vec4([0, 0, 1, 1]));
 
     const scene = new Scene();
     const camera = new PerspectiveCamera();
@@ -89,7 +96,7 @@ window.onload = () => {
 
     // add some objects to scene
     // test box geometry
-    createScene(physicsWorld, widgetPhysicsMtl, scene, addPlane, groundPhysicsMtl);
+    addTestDynamicObjects(physicsWorld, widgetPhysicsMtl, scene, addPlane, groundPhysicsMtl);
 
     console.log("loading gltf models...");
     // todo: load gltf character, load skybox
@@ -844,10 +851,11 @@ function getAnimationByName(animations: AnimationAction[], animName: string) {
     return anim;
 }
 
-function createScene(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CANNON.Material, scene: Scene, addPlane: (name: string, width: number, height: number, position: vec3, rotation: quat, wallColor: vec4, metallic: number, roughness: number, scene: Scene, world: PhysicsWorld, physicsMtl: CANNON.Material, textureUrl?: string | undefined) => void, groundPhysicsMtl: CANNON.Material) {
+function addTestDynamicObjects(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CANNON.Material, scene: Scene, addPlane: (name: string, width: number, height: number, position: vec3, rotation: quat, wallColor: vec4, metallic: number, roughness: number, scene: Scene, world: PhysicsWorld, physicsMtl: CANNON.Material, textureUrl?: string | undefined) => void, groundPhysicsMtl: CANNON.Material) {
     {
         const boxMesh = new Mesh();
         boxMesh.name = "box01";
+        boxMesh.tag = 1;
         boxMesh.geometry = new BoxGeometry(0.25, 0.25, 0.25);
         boxMesh.castShadow = true;
         boxMesh.isStatic = false;
@@ -879,6 +887,7 @@ function createScene(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CANNON.Materi
     // dynamic sphere small
     {
         const sphereMesh = new Mesh();
+        sphereMesh.tag = 2;
         sphereMesh.name = "sphere.Dynamic";
         // sphereMesh.localTransform.fromTranslation(new vec3([0, 0, 0.75]));
         sphereMesh.geometry = new SphereGeometry(0.2, 16, 8);
@@ -909,6 +918,7 @@ function createScene(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CANNON.Materi
     // dynamic sphere big
     {
         const sphereMesh = new Mesh();
+        sphereMesh.tag = 3;
         sphereMesh.name = "sphere.Static";
         // sphereMesh.localTransform.fromTranslation(new vec3([-0.75, -1.2, 0]));
         sphereMesh.geometry = new SphereGeometry(0.4, 16, 8);
