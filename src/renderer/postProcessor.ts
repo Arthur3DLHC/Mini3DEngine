@@ -504,13 +504,14 @@ export class PostProcessor {
         }
         this.applyToneMapping();
 
-        if (this.silhouette.enable) {
-            this.applySilhouette();
-        }
-
         // fxaa only works after tone mapping
         if (this.fxaa.enable) {
             this.applyFXAA();
+        }
+
+        // must apply after fxaa, or will be overlapped by fxaa rt
+        if (this.silhouette.enable) {
+            this.applySilhouette();
         }
     }
     
@@ -927,17 +928,24 @@ export class PostProcessor {
 
         GLPrograms.useProgram(this._silhouetteProgram);
 
+        this.setTexture(this._silhouetteProgram.getUniformLocation("s_sceneNormal"), this._sceneNormalTexUnit, this._sceneNormalTexture);
+
+        // gl.uniform1i(this._silhouetteProgram.getUniformLocation("s_sceneNormal"), this._sceneNormalTexUnit);
+
         // calculate pixel size
         const texelW = 1.0 / this._sceneNormalTexture.width;
         const texelH = 1.0 / this._sceneNormalTexture.height;
 
-        gl.uniform2f(this._silhouetteProgram.getUniformLocation("u_unitOffset"), texelW, texelH);
+        gl.uniform2f(this._silhouetteProgram.getUniformLocation("u_unitOffset"), this.silhouette.width * texelW, this.silhouette.width * texelH);
         gl.uniform4fv(this._silhouetteProgram.getUniformLocation("u_silhouetteColors"), this.silhouette._silhouetteColors);
         gl.uniform1i(this._silhouetteProgram.getUniformLocation("u_selectMode"), this.silhouette.selectMode);
         gl.uniform1f(this._silhouetteProgram.getUniformLocation("u_tagRef"), this.silhouette.tagRef);
         gl.uniform2f(this._silhouetteProgram.getUniformLocation("u_positionRef"), this.silhouette.cursor.x * texelW, this.silhouette.cursor.y * texelH);
 
         this._rectGeom.draw(0, Infinity, this._silhouetteProgram.attributes);
+
+        GLTextures.setTextureAt(this._sceneNormalTexUnit, null);
+
     }
 
     private applyFXAA() {

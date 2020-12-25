@@ -18,6 +18,7 @@ export class SilhouetteParams {
     public selectMode: SilhouetteSelectMode = SilhouetteSelectMode.ByTag;
     public tagRef: number = -1;
     public cursor: vec2 = new vec2([0.5, 0.5]);
+    public width: number = 1;
 
     public static readonly maxSilhouetteColors = 32;
 

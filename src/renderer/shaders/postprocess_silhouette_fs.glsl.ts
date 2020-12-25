@@ -16,6 +16,8 @@ uniform float                   u_tagRef;           // object tag may be object 
                                                     // when hover, output object feature to tag RT?
 uniform vec2                    u_positionRef;      // xy ranges [0, 1], normalized cursor position
 
+// todo: max distance?
+
 in vec2                         ex_texcoord;
 layout(location = 0) out vec4   o_color;
 
@@ -29,24 +31,33 @@ void main(void) {
 
     float pixelTag = getSceneTag(ex_texcoord);
 
-    // debug show tag and color
-    int debugIdx = clamp(int(pixelTag), 0, MAX_NUM_TAG_COLORS - 1);
-    o_color = u_silhouetteColors[debugIdx];
-    return;
 
-    // empty
-    // if(pixelTag == -1.0) {
+    //if(pixelTag < 0.0)
     //    discard;
-    //}
+
+    // debug show tag and color
+    // int debugIdx = clamp(int(pixelTag), 0, MAX_NUM_TAG_COLORS - 1);
+    // o_color = u_silhouetteColors[debugIdx];
+    // return;
 
     float tagRef = u_tagRef;
     if (u_selectMode == 2) {
         tagRef = getSceneTag(u_positionRef);
     }
 
-    // we only need outline, so skip interior pixels
-    if(abs(pixelTag - tagRef) < 0.001)
+    if (tagRef < -0.9) {
         discard;
+    }
+
+    // we only need outline, so skip interior pixels
+    if(abs(pixelTag - tagRef) < 0.001) {
+        discard;
+        // o_color = vec4(1.0, 0.0, 0.0, 0.5);
+        // return;
+    }
+
+    // o_color = vec4(1.0, 0.0, 0.0, 0.5);
+    // return;
 
     // sample 5x5 area around cur pixel, if any == tagRef, should be outline
     float sumOutline = 0.0;
@@ -57,15 +68,19 @@ void main(void) {
         }
     }
 
+    // o_color = vec4(1.0, 0.0, 0.0, sumOutline);
+    // return;
+
     // or discard
     if(sumOutline < 0.001)
         discard;
 
-    sumOutline *= 0.04;     // 1.0 / 25.0
+    sumOutline *= 0.08;     // 2.0 / 25.0
 
     // get color
-    int tagIdx = int(round(pixelTag));
+    int tagIdx = int(tagRef);
     tagIdx = clamp(tagIdx, 0, MAX_NUM_TAG_COLORS - 1);
-    o_color = u_silhouetteColors[tagIdx] * sumOutline;
+    o_color = u_silhouetteColors[tagIdx];
+    o_color.a *= sumOutline;
 }
 `;
