@@ -44,8 +44,8 @@ void main(void) {
     // sample 5x5 area around cur pixel, if any == tagRef, should be outline
     float sumOutline = 0.0;
 
-    for (float i = -2; i < 2.5; i++) {
-        for (float j = -2; j < 2.5; j++) {
+    for (float i = -2.0; i < 2.5; i++) {
+        for (float j = -2.0; j < 2.5; j++) {
             sumOutline += outlineAmount(ex_texcoord + vec2(i, j) * u_unitOffset, tagRef);
         }
     }
