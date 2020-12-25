@@ -21,16 +21,23 @@ layout(location = 0) out vec4   o_color;
 
 float outlineAmount(vec2 uv, float tagRef) {
     float pixelTag = getSceneTag(uv);
+    if(pixelTag == -1.0) return 0.0;
     return abs(pixelTag - tagRef) < 0.001 ? 1.0 : 0.0;
 }
 
 void main(void) {
 
     float pixelTag = getSceneTag(ex_texcoord);
+
+    // debug show tag and color
+    int debugIdx = clamp(int(pixelTag), 0, MAX_NUM_TAG_COLORS - 1);
+    o_color = u_silhouetteColors[debugIdx];
+    return;
+
     // empty
-    if(pixelTag == -1.0) {
-        discard;
-    }
+    // if(pixelTag == -1.0) {
+    //    discard;
+    //}
 
     float tagRef = u_tagRef;
     if (u_selectMode == 2) {
