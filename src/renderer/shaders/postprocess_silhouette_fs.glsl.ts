@@ -40,6 +40,9 @@ void main(void) {
     // o_color = u_silhouetteColors[debugIdx];
     // return;
 
+    // todo: use 1 number to contain both tag and object ID?
+    // tag * 10000 + id?
+
     float tagRef = u_tagRef;
     if (u_selectMode == 2) {
         tagRef = getSceneTag(u_positionRef);
