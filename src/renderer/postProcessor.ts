@@ -929,6 +929,7 @@ export class PostProcessor {
         GLPrograms.useProgram(this._silhouetteProgram);
 
         this.setTexture(this._silhouetteProgram.getUniformLocation("s_sceneNormal"), this._sceneNormalTexUnit, this._sceneNormalTexture);
+        this.setTexture(this._silhouetteProgram.getUniformLocation("s_sceneDepth"), this._sceneDepthTexUnit, this._sceneDepthTexture);
 
         // gl.uniform1i(this._silhouetteProgram.getUniformLocation("s_sceneNormal"), this._sceneNormalTexUnit);
 
@@ -941,10 +942,12 @@ export class PostProcessor {
         gl.uniform1i(this._silhouetteProgram.getUniformLocation("u_selectMode"), this.silhouette.selectMode);
         gl.uniform1f(this._silhouetteProgram.getUniformLocation("u_tagRef"), this.silhouette.tagRef);
         gl.uniform2f(this._silhouetteProgram.getUniformLocation("u_positionRef"), this.silhouette.cursor.x * texelW, this.silhouette.cursor.y * texelH);
+        gl.uniform1f(this._silhouetteProgram.getUniformLocation("u_maxDistance"), this.silhouette.maxDistance);
 
         this._rectGeom.draw(0, Infinity, this._silhouetteProgram.attributes);
 
         GLTextures.setTextureAt(this._sceneNormalTexUnit, null);
+        GLTextures.setTextureAt(this._sceneDepthTexUnit, null);
 
     }
 

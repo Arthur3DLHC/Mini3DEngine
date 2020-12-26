@@ -2,7 +2,9 @@
  * edge detect shader
  */
 export default /** glsl */`
+#include <uniforms_view>
 #include <samplers_postprocess>
+#include <function_depth>
 
 #define MAX_NUM_TAG_COLORS      32
 
@@ -15,8 +17,7 @@ uniform int                     u_selectMode;       // 0 - outline around every 
 uniform float                   u_tagRef;           // object tag may be object id, or object feature (locked, opened, dangerous...)?
                                                     // when hover, output object feature to tag RT?
 uniform vec2                    u_positionRef;      // xy ranges [0, 1], normalized cursor position
-
-// todo: max distance?
+uniform float                   u_maxDistance;      // max distance to display silhouette
 
 in vec2                         ex_texcoord;
 layout(location = 0) out vec4   o_color;
@@ -30,7 +31,6 @@ float outlineAmount(vec2 uv, float tagRef) {
 void main(void) {
 
     float pixelTag = getSceneTag(ex_texcoord);
-
 
     //if(pixelTag < 0.0)
     //    discard;
@@ -61,12 +61,19 @@ void main(void) {
 
     // sample 5x5 area around cur pixel, if any == tagRef, should be outline
     float sumOutline = 0.0;
+    float minDist = 10000.0;
 
     for (float i = -2.0; i < 2.5; i++) {
         for (float j = -2.0; j < 2.5; j++) {
-            sumOutline += outlineAmount(ex_texcoord + vec2(i, j) * u_unitOffset, tagRef);
+            vec2 sampUV = ex_texcoord + vec2(i, j) * u_unitOffset;
+            sumOutline += outlineAmount(sampUV, tagRef);
+            float fragDepth = texture(s_sceneDepth, sampUV).r;
+            minDist = min(abs(perspectiveDepthToViewZ(fragDepth, u_view.zRange.x, u_view.zRange.y)), minDist);
         }
     }
+
+    if (minDist > u_maxDistance)
+        discard;
 
     // o_color = vec4(1.0, 0.0, 0.0, sumOutline);
     // return;

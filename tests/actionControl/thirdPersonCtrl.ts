@@ -79,6 +79,7 @@ window.onload = () => {
     renderer.postprocessor.bloom.radius = 0.2;
     renderer.postprocessor.bloom.threshold = 1.5;
     renderer.postprocessor.silhouette.enable = true;
+    renderer.postprocessor.silhouette.maxDistance = 3.0;
     renderer.postprocessor.silhouette.width = 2.0;
     renderer.postprocessor.silhouette.selectMode = SilhouetteSelectMode.ByCursor;
     renderer.postprocessor.silhouette.cursor = new vec2([canvas.width / 2, canvas.height / 2]);
