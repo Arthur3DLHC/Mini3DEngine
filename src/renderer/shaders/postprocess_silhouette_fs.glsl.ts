@@ -4,7 +4,7 @@
 export default /** glsl */`
 #include <uniforms_view>
 #include <samplers_postprocess>
-#include <function_depth>
+// #include <function_depth>
 
 #define MAX_NUM_TAG_COLORS      32
 
@@ -13,32 +13,30 @@ export default /** glsl */`
 uniform vec2                    u_unitOffset;       // horiz (blurRadius * texelSize, 0.0) or vertical (0.0, blurRadius * texelSize)
 
 uniform vec4                    u_silhouetteColors[MAX_NUM_TAG_COLORS]; // allow different object tag has different colors
-uniform int                     u_selectMode;       // 0 - outline around every object, 1 - outline object with tag == u_tagRef, 2 - outline object with tag == texture(s_source, u_cursorPosition).r
-uniform float                   u_tagRef;           // object tag may be object id, or object feature (locked, opened, dangerous...)?
+uniform int                     u_selectMode;       // 0 - outline around every object, 1 - outline object with tag == u_categoryRef, 2 - outline object with tag == texture(s_source, u_cursorPosition).r
+uniform float                   u_categoryRef;
                                                     // when hover, output object feature to tag RT?
 uniform vec2                    u_positionRef;      // xy ranges [0, 1], normalized cursor position
-uniform float                   u_maxDistance;      // max distance to display silhouette
+// uniform float                   u_maxDistance;      // max distance to display silhouette
 
 in vec2                         ex_texcoord;
 layout(location = 0) out vec4   o_color;
 
-void categoryIdFromTag(float tag, int category, int id) {
-    category = round(tag / 1000);
-    id = round(tag % 1000);
+int categoryFromTag(float tag) {
+    return int(tag) / 1000;
 }
 
-float outlineAmount(vec2 uv, float tagRef) {
+float outlineAmount(vec2 uv, int categoryRef) {
     float pixelTag = getSceneTag(uv);
-    if(pixelTag == -1.0) return 0.0;
-    return abs(pixelTag - tagRef) < 0.001 ? 1.0 : 0.0;
+    if(pixelTag < -0.5) return 0.0;
+    int pixelCategory = categoryFromTag(pixelTag);
+    return pixelCategory == categoryRef ? 1.0 : 0.0;
 }
 
 void main(void) {
 
     float pixelTag = getSceneTag(ex_texcoord);
-    int pixelCategory = -1;
-    int pixelId = 0;
-    categoryIdFromTag(pixelTag, pixelCategory, pixelId);
+    int pixelCategory = categoryFromTag(pixelTag);
 
     //if(pixelTag < 0.0)
     //    discard;
@@ -51,22 +49,19 @@ void main(void) {
     // todo: use 1 number to contain both tag and object ID?
     // tag * 10000 + id?
 
-    float tagRef = u_tagRef;
+    int categoryRef = int(u_categoryRef);
 
     if (u_selectMode == 2) {
-        tagRef = getSceneTag(u_positionRef);
+        categoryRef = categoryFromTag(getSceneTag(u_positionRef));
     }
 
-    int categoryRef = -1;
-    int idRef = -1;
-    categoryIdFromTag(tagRef);
-
-    if (tagRef < -0.9) {
+    if (categoryRef < 0) {
         discard;
     }
 
     // we only need outline, so skip interior pixels
-    if(abs(pixelTag - tagRef) < 0.001) {
+    // if(abs(pixelTag - categoryRef) < 0.001) {
+    if(pixelCategory - categoryRef == 0) {
         discard;
         // o_color = vec4(1.0, 0.0, 0.0, 0.5);
         // return;
@@ -75,21 +70,21 @@ void main(void) {
     // o_color = vec4(1.0, 0.0, 0.0, 0.5);
     // return;
 
-    // sample 5x5 area around cur pixel, if any == tagRef, should be outline
+    // sample 5x5 area around cur pixel, if any == categoryRef, should be outline
     float sumOutline = 0.0;
-    float minDist = 10000.0;
+    // float minDist = 10000.0;
 
     for (float i = -2.0; i < 2.5; i++) {
         for (float j = -2.0; j < 2.5; j++) {
             vec2 sampUV = ex_texcoord + vec2(i, j) * u_unitOffset;
-            sumOutline += outlineAmount(sampUV, tagRef);
-            float fragDepth = texture(s_sceneDepth, sampUV).r;
-            minDist = min(abs(perspectiveDepthToViewZ(fragDepth, u_view.zRange.x, u_view.zRange.y)), minDist);
+            sumOutline += outlineAmount(sampUV, categoryRef);
+            // float fragDepth = texture(s_sceneDepth, sampUV).r;
+            // minDist = min(abs(perspectiveDepthToViewZ(fragDepth, u_view.zRange.x, u_view.zRange.y)), minDist);
         }
     }
 
-    if (minDist > u_maxDistance)
-        discard;
+    // if (minDist > u_maxDistance)
+    //    discard;
 
     // o_color = vec4(1.0, 0.0, 0.0, sumOutline);
     // return;
@@ -101,8 +96,7 @@ void main(void) {
     sumOutline *= 0.08;     // 2.0 / 25.0
 
     // get color
-    int tagIdx = int(tagRef);
-    tagIdx = clamp(tagIdx, 0, MAX_NUM_TAG_COLORS - 1);
+    int tagIdx = clamp(categoryRef, 0, MAX_NUM_TAG_COLORS - 1);
     o_color = u_silhouetteColors[tagIdx];
     o_color.a *= sumOutline;
 }
