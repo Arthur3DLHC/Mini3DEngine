@@ -74,10 +74,7 @@ export class ActionTransition {
 
         this.conditions = [];
 
-        if (transDef.duration !== undefined) {
-            this.duration = transDef.duration;
-        }
-        this._timeLeft = this.duration;
+        this._timeLeft = this.duration = transDef.duration | 0;
 
         // read conditions
         for (const conditionDef of transDef.conditions) {
