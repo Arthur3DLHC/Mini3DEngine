@@ -1,3 +1,4 @@
+import { Clock } from "../../scene/clock.js";
 import { ActionCondition } from "./actionCondition.js";
 import { ActionState } from "./actionState.js";
 import { SingleParamCondition } from "./singleParamCondition.js";
@@ -11,11 +12,14 @@ export class ActionTransition {
 
     public conditions: ActionCondition[] = [];
     public targetState: ActionState | null = null;
+    public duration: number = 0;
 
     /**
      * the state this condition belongs to
      */
     private _state: ActionState;
+
+    private _timeLeft: number = 0;
 
     public checkTransit() {
         // state is not in machine yet?
@@ -29,18 +33,31 @@ export class ActionTransition {
             }
         }
 
+        if (this.duration > 0) {
+            this._timeLeft -= Clock.instance.elapsedTime;
+            if (this._timeLeft < 0) {
+                this._state.machine.nextState = null;
+                this._state.machine.curState = this.targetState;
+            } else {
+                this._state.machine.nextState = this.targetState;
+            }
+        } else {
+            this._state.machine.curState = this.targetState;
+            this._state.machine.nextState = null;
+        }
+
         // todo: transit duration?
         // todo: 
         //      fade out animation of old state, and
         //      fade in animation of new state ?
         //      state machine should update both 2 state's animation?
-        this._state.machine.curState = this.targetState;
     }
 
     public resetConditions() {
         for (const condition of this.conditions) {
             condition.reset();
         }
+        this._timeLeft = this.duration;
     }
 
     public fromJSON(transDef: any, states: Map<string, ActionState>, customConditionCreation?: (conditionDef: any)=>ActionCondition) {

@@ -23,6 +23,8 @@ export class ActionState {
 
     public transitions: ActionTransition[] = [];
 
+    public canCheckTransitions: boolean = true;
+
     /**
      * subclass can update animations, check conditions in this method
      * when some conditions true, change to another state
@@ -30,8 +32,10 @@ export class ActionState {
     public update() {
         // check the current select action request
         // need to add another behavior to record current select action request?
-        for (const transition of this.transitions) {
-            transition.checkTransit();
+        if (this.canCheckTransitions) {
+            for (const transition of this.transitions) {
+                transition.checkTransit();
+            }
         }
     }
 
@@ -39,6 +43,7 @@ export class ActionState {
      * subclass can play animation, sound and so on in this method
      */
     public enter() {
+        this.canCheckTransitions = true;
         for (const transition of this.transitions) {
             transition.resetConditions();
         }

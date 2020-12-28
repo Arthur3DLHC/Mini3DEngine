@@ -30,6 +30,15 @@ export class ActionStateMachine {
         }
     }
 
+    private _nextState: ActionState | null = null;
+    public get nextState(): ActionState | null {return this._nextState;}
+    public set nextState(state: ActionState | null) {
+        this._nextState = state;
+        if (state != null) {
+            state.canCheckTransitions = false;
+        }
+    }
+
     private _actionCtrl: ActionControlBehavior;
 
     public get actionCtrl(): ActionControlBehavior {
@@ -50,9 +59,19 @@ export class ActionStateMachine {
         // todo: state animation fade-in and fade-out
         // what if two animations are transitioning, and there is another state transition happened?
         // if we don't let new state transition happen when there is a transition transiting, then this problem will be solved?
+        // what is the simplest way to do this?
         if (this._curState !== null) {
             this._curState.update();
         }
+
+        // nextState.canCheckTransitions will always be false now.
+        // it will change to true after the state becomes curState
+
+        if (this._nextState !== null) {
+            this._nextState.update();
+        }
+
+        // fix me: where to update the weights of curState and nextState?
     }
 
     public fromJSON(json: any, animations: AnimationAction[], customStateCreation?: (stateDef: any)=> ActionState, customConditionCreation?: (conditionDef: any)=>ActionCondition) {
