@@ -594,6 +594,8 @@ window.onload = () => {
                 "moveSpeed": 0,
                 "strafeSpeed": 0,
                 "shoot": 0,
+                "gotHit": 0,
+                "down": 0,
             },
             "animationLayers": [
                 {

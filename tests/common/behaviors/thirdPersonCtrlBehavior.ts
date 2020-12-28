@@ -76,6 +76,10 @@ export class ThirdPersonCtrlBehavior extends Behavior {
 
     // corresponding action states and conditions
 
+    // todo: hit by monsters, down, dead...
+    // hit recover time...
+    // use a 'cur state recover time' variable?
+
     // todo: interaction with scene objects: use, climb ladders...
 
     /**
