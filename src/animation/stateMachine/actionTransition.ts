@@ -29,6 +29,11 @@ export class ActionTransition {
             }
         }
 
+        // todo: transit duration?
+        // todo: 
+        //      fade out animation of old state, and
+        //      fade in animation of new state ?
+        //      state machine should update both 2 state's animation?
         this._state.machine.curState = this.targetState;
     }
 

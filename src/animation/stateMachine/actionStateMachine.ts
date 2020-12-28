@@ -47,6 +47,9 @@ export class ActionStateMachine {
     }
 
     public update() {
+        // todo: state animation fade-in and fade-out
+        // what if two animations are transitioning, and there is another state transition happened?
+        // if we don't let new state transition happen when there is a transition transiting, then this problem will be solved?
         if (this._curState !== null) {
             this._curState.update();
         }
