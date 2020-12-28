@@ -22,6 +22,11 @@ uniform float                   u_maxDistance;      // max distance to display s
 in vec2                         ex_texcoord;
 layout(location = 0) out vec4   o_color;
 
+void categoryIdFromTag(float tag, int category, int id) {
+    category = round(tag / 1000);
+    id = round(tag % 1000);
+}
+
 float outlineAmount(vec2 uv, float tagRef) {
     float pixelTag = getSceneTag(uv);
     if(pixelTag == -1.0) return 0.0;
@@ -31,6 +36,9 @@ float outlineAmount(vec2 uv, float tagRef) {
 void main(void) {
 
     float pixelTag = getSceneTag(ex_texcoord);
+    int pixelCategory = -1;
+    int pixelId = 0;
+    categoryIdFromTag(pixelTag, pixelCategory, pixelId);
 
     //if(pixelTag < 0.0)
     //    discard;
@@ -44,9 +52,14 @@ void main(void) {
     // tag * 10000 + id?
 
     float tagRef = u_tagRef;
+
     if (u_selectMode == 2) {
         tagRef = getSceneTag(u_positionRef);
     }
+
+    int categoryRef = -1;
+    int idRef = -1;
+    categoryIdFromTag(tagRef);
 
     if (tagRef < -0.9) {
         discard;

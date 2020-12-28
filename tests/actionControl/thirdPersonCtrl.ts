@@ -857,7 +857,7 @@ function addTestDynamicObjects(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CAN
     {
         const boxMesh = new Mesh();
         boxMesh.name = "box01";
-        boxMesh.tag = 1;
+        boxMesh.category = 1;
         boxMesh.geometry = new BoxGeometry(0.25, 0.25, 0.25);
         boxMesh.castShadow = true;
         boxMesh.isStatic = false;
@@ -889,7 +889,7 @@ function addTestDynamicObjects(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CAN
     // dynamic sphere small
     {
         const sphereMesh = new Mesh();
-        sphereMesh.tag = 2;
+        sphereMesh.category = 2;
         sphereMesh.name = "sphere.Dynamic";
         // sphereMesh.localTransform.fromTranslation(new vec3([0, 0, 0.75]));
         sphereMesh.geometry = new SphereGeometry(0.2, 16, 8);
@@ -920,7 +920,7 @@ function addTestDynamicObjects(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CAN
     // dynamic sphere big
     {
         const sphereMesh = new Mesh();
-        sphereMesh.tag = 3;
+        sphereMesh.category = 3;
         sphereMesh.name = "sphere.Static";
         // sphereMesh.localTransform.fromTranslation(new vec3([-0.75, -1.2, 0]));
         sphereMesh.geometry = new SphereGeometry(0.4, 16, 8);

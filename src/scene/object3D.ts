@@ -12,7 +12,8 @@ export class Object3D {
     public constructor() {
         this.name = "";
         this.visible = true;
-        this.tag = -1;
+        this.category = -1;
+        this.id = 0;
         this.color = new vec4([1,1,1,1]);
         this._active = true;
         this.isStatic = false;
@@ -41,8 +42,30 @@ export class Object3D {
 
     public visible: boolean;
 
-    /** tag associated with user data */
-    public tag: number;
+    /**
+     * category associated with game logic user data
+     * category and id
+     * user can define some object categories such as useable, pickable, locked, dangerous and so on
+     * then can assign a color for each category in silhouette postprocess
+     * default value: -1: not pickable, not usable, and do not have silhouette
+     */
+    public category: number;
+
+    /**
+     * id associated with game logic
+     * must > zero
+     * default value: 0: not pickable, not interactive
+     * not all object3D need an id. only the objects need to be interactive in the game level need one
+     * there are at most 1000 interactive objects (with id) in a game level allowed
+     */
+    public id: number;
+
+    /**
+     * tag passed into shader. internal use only
+     */
+    public get tag(): number {
+        return this.category * 1000 + this.id;
+    }
 
     /**
      * every object can have a color itself
