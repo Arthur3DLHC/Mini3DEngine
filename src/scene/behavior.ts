@@ -13,6 +13,10 @@ export class Behavior {
         return this._owner;
     }
 
+    public start() {
+        // subclass can find required components and objects now.
+    }
+
     public update() {
         // subclass do things.
         // can use Clock.instance to get curr and elapsed time;

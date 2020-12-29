@@ -45,6 +45,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     public mouseSensitivity: number = 0.002;
     public smoothMouse: boolean = true;
     public smoothness: number = 0.25;
+    
     public moveSpeed: number = 1.0;
     public aimMoveSpeed: number = 0.5;
     public jumpSpeed: number = 1.0;
