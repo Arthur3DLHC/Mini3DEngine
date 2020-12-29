@@ -1,3 +1,4 @@
+import vec3 from "../../../lib/tsm/vec3.js";
 import { ActionControlBehavior, Behavior, Clock, Object3D, RigidBody } from "../../../src/mini3DEngine.js";
 
 export enum MonsterState {
@@ -82,7 +83,19 @@ export class MonsterCtrlBehavior extends Behavior {
         }
     }
 
-    private think() {
+    public moveTo(dest: vec3) {
 
+    }
+
+    public attack() {
+
+    }
+
+    public onAttacked() {
+
+    }
+
+    public rest() {
+        
     }
 }
