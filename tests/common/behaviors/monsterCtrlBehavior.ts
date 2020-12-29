@@ -5,7 +5,7 @@ export enum MonsterState {
     Idle,
     Moving,
     Attacking,
-    GotHit,
+    Attacked,
     Down,
 }
 
@@ -54,10 +54,13 @@ export class MonsterCtrlBehavior extends Behavior {
     // ref objects
     // enemy (player) object?
     private _player: Object3D | null = null;
+    private _destination: vec3 = new vec3();
 
-    private _lastThinkTime: number = 0;
+    // private _lastThinkTime: number = 0;
     // cur state?
     private _curState: MonsterState = MonsterState.Idle;
+    /** recover time left for states like attacking, attacked, down */
+    private _recoverTimeLeft: number = 0;
 
     public start() {
 
@@ -71,31 +74,58 @@ export class MonsterCtrlBehavior extends Behavior {
         // }
         switch(this._curState) {
             case MonsterState.Idle:
+                // set actionCtrl params
+                // if player in sight, move ?
                 break;
             case MonsterState.Moving:
+                // set actionCtrl params
+                // turn toward destination position
+                // move toward destination position
+                // if approached destination position, idle or attack ?
+                // refers to cur behavior is patrolling or chasing?
                 break;
             case MonsterState.Attacking:
+                // set actionCtrl params
+                // recover time left
                 break;
-            case MonsterState.GotHit:
+            case MonsterState.Attacked:
+                // set actionCtrl params
+                // recover time left
                 break;
             case MonsterState.Down:
+                // set actionCtrl params
                 break;
         }
     }
 
     public moveTo(dest: vec3) {
-
+        if (this._curState === MonsterState.Idle || this._curState === MonsterState.Moving) {
+            dest.copy(this._destination);
+            this._curState = MonsterState.Moving;
+        }
     }
 
     public attack() {
-
+        // attack toward current orientation ?
+        // if facing player and close enough, player take damage ?
+        if (this._curState === MonsterState.Idle || this._curState === MonsterState.Moving) {
+            this._curState = MonsterState.Attacking;
+            this._recoverTimeLeft = 1.5;
+            // todo: select attack action randomly
+        }
     }
 
     public onAttacked() {
-
+        if (this._curState === MonsterState.Idle || this._curState === MonsterState.Moving || this._curState === MonsterState.Attacking) {
+            this._curState = MonsterState.Attacked;
+            this._recoverTimeLeft = 1.0;
+            // if hp < 0, down
+        }
     }
 
     public rest() {
-        
+        if (this._curState === MonsterState.Idle || this._curState === MonsterState.Moving) {
+            this._curState = MonsterState.Idle;
+        }
     }
 }
