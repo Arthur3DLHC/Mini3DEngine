@@ -31399,8 +31399,8 @@
         },
         {
             "mimeType" : "image/png",
-            "name" : "SkinBaseColor",
-            "uri" : "SkinBaseColor.png"
+            "name" : "SkinBaseColor_Clothes",
+            "uri" : "SkinBaseColor_Clothes.png"
         }
     ],
     "skins" : [
@@ -31743,7 +31743,7 @@
             "min" : [
                 -0.7945343852043152,
                 0.01994829997420311,
-                -0.1475389301776886
+                -0.14794588088989258
             ],
             "type" : "VEC3"
         },
