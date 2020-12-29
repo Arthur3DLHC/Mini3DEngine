@@ -1,14 +1,23 @@
-import { ActionControlBehavior, Behavior, Object3D, RigidBody } from "../../../src/mini3DEngine.js";
+import { ActionControlBehavior, Behavior, Clock, Object3D, RigidBody } from "../../../src/mini3DEngine.js";
+
+export enum MonsterState {
+    Idle,
+    Moving,
+    Attacking,
+    GotHit,
+    Down,
+}
 
 /**
  * general monster control
  */
 export class MonsterCtrlBehavior extends Behavior {
-    public constructor(owner: Object3D, body: RigidBody, actionCtrl: ActionControlBehavior) {
+    public constructor(owner: Object3D, body: RigidBody, actionCtrl: ActionControlBehavior, player: Object3D) {
         super(owner);
         this._body = body;
         this._veloctity = this._body.body.velocity;
         this._actionCtrl = actionCtrl;
+        this._player = player;
     }
 
     // movement properties ?
@@ -18,6 +27,9 @@ export class MonsterCtrlBehavior extends Behavior {
     public turnSpeed: number = 3.14;
 
     public allowJump: boolean = false;
+
+    public senseRange: number = 3.0;
+    public meleeAttackRange: number = 1.0;
 
     // orientation ?
     // look orientation and move orientation
@@ -42,13 +54,35 @@ export class MonsterCtrlBehavior extends Behavior {
     // enemy (player) object?
     private _player: Object3D | null = null;
 
+    private _lastThinkTime: number = 0;
     // cur state?
+    private _curState: MonsterState = MonsterState.Idle;
 
     public start() {
 
     }
 
     public update() {
+        // const curTime = Clock.instance.curTime;
+        // if (curTime - this._lastThinkTime > this.thinkInterval) {
+        //     this.think();
+        //     this._lastThinkTime = curTime;
+        // }
+        switch(this._curState) {
+            case MonsterState.Idle:
+                break;
+            case MonsterState.Moving:
+                break;
+            case MonsterState.Attacking:
+                break;
+            case MonsterState.GotHit:
+                break;
+            case MonsterState.Down:
+                break;
+        }
+    }
+
+    private think() {
 
     }
 }
