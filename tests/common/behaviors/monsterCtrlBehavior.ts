@@ -30,7 +30,14 @@ export class MonsterCtrlBehavior extends Behavior {
     public allowJump: boolean = false;
 
     public senseRange: number = 3.0;
-    public meleeAttackRange: number = 1.0;
+    /** in radians */
+    public senseHalfFOV: number = Math.PI;
+    public meleeAttackRange: number = 1.0;              // simple judgement? not using physics collision detection ?
+    /** in radians */
+    public meleeAttackHalfFOV: number = Math.PI / 4.0;      // should vary according to the melee attack action ?
+
+    public attackingActions: number = 1;
+    public attackedActions: number = 1;
 
     // orientation ?
     // look orientation and move orientation
@@ -62,6 +69,9 @@ export class MonsterCtrlBehavior extends Behavior {
     /** recover time left for states like attacking, attacked, down */
     private _recoverTimeLeft: number = 0;
 
+    private static _tmpMyPosition: vec3 = new vec3();
+    private static _tmpPlayerPosition: vec3 = new vec3();
+
     public start() {
 
     }
@@ -72,6 +82,7 @@ export class MonsterCtrlBehavior extends Behavior {
         //     this.think();
         //     this._lastThinkTime = curTime;
         // }
+        let curAction: number = 0;
         switch(this._curState) {
             case MonsterState.Idle:
                 // set actionCtrl params
@@ -96,6 +107,7 @@ export class MonsterCtrlBehavior extends Behavior {
                 // set actionCtrl params
                 break;
         }
+        this._actionCtrl.actionParams.set("curAction", curAction);
     }
 
     public moveTo(dest: vec3) {
@@ -127,5 +139,28 @@ export class MonsterCtrlBehavior extends Behavior {
         if (this._curState === MonsterState.Idle || this._curState === MonsterState.Moving) {
             this._curState = MonsterState.Idle;
         }
+    }
+
+    private playerInSight(): boolean {
+        if (this._player === null) {
+            return false;
+        }
+
+        // distance
+        this.owner.worldTransform.getTranslation(MonsterCtrlBehavior._tmpMyPosition);
+        this._player.worldTransform.getTranslation(MonsterCtrlBehavior._tmpPlayerPosition);
+
+        if (vec3.squaredDistance(MonsterCtrlBehavior._tmpMyPosition, MonsterCtrlBehavior._tmpPlayerPosition) > this.senseRange * this.senseRange) {
+            return false;
+        }
+
+        // orientation ? sense player by vision, sound or smell ?
+        if (this.senseHalfFOV < Math.PI) {
+            // todo: compare cos and dotproduct ?
+            const cosFOV = Math.cos(this.senseHalfFOV);
+
+        }
+
+        return true;
     }
 }
