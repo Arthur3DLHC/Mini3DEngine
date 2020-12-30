@@ -181,8 +181,8 @@ window.onload = () => {
 
     function gameLoop(now: number) {
         Clock.instance.update(now);
-        scene.updateBehavior();
-        scene.updateWorldTransform(false, true);
+        scene.update();
+
         renderer.render(scene);
 
         if (now - lastUpdateFPSTime > 1000) {

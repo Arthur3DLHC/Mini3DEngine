@@ -113,9 +113,8 @@ window.onload = () => {
 
     function gameLoop(now: number) {
         Clock.instance.update(now);
-        scene.updateBehavior();
-        scene.updateWorldTransform(false, true);
-        SkinMesh.updateSkinMeshes(scene);
+        scene.update();
+
         renderer.render(scene);
 
         if (now - lastUpdateFPSTime > 1000) {
@@ -197,6 +196,7 @@ window.onload = () => {
 
         prepareGLTFScene(gltfScene);
 
+        scene.updateLocalTransform(true, false);
         scene.updateWorldTransform(false, true);
         InstancedMesh.updateInstancedMeshes(gltfScene);
 

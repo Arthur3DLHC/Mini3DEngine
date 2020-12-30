@@ -313,14 +313,8 @@ window.onload = () => {
     
     function gameLoop(now: number) {
         Clock.instance.update(now);
-        scene.updateBehavior();
+        scene.update();
 
-        // not used anymore
-        // actionSelectorFemale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
-        // actionSelectorMale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
-
-        scene.updateWorldTransform(false, true);
-        SkinMesh.updateSkinMeshes(scene);
         renderer.render(scene);
 
         if (now - lastUpdateFPSTime > 1000) {
@@ -352,7 +346,7 @@ window.onload = () => {
     function prepareGLTFScene(gltfNode: Object3D, maleActionPoses: Map<string, Object3D>, femaleActionPoses: Map<string, Object3D>) {
         gltfNode.isStatic = true;
         gltfNode.autoUpdateTransform = false;
-        gltfNode.updateLocalTransform();
+        gltfNode.updateLocalTransform(true, false);
         
         if (gltfNode instanceof Mesh) {
             gltfNode.castShadow = true;

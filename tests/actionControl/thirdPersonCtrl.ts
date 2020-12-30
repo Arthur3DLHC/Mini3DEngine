@@ -45,7 +45,7 @@ window.onload = () => {
     let curFPS = 0;
 
     /** save notebook GPU */
-    const halfFPSMode = true;
+    const halfFPSMode = false;
 
     let skipThisFrame = false;
 
@@ -231,6 +231,7 @@ window.onload = () => {
         scene.attachChild(gltfSceneLevel);
         prepareGLTFLevel(gltfSceneLevel);
         // update once for static objects
+        scene.updateLocalTransform(true, true);
         scene.updateWorldTransform(false, true);
         InstancedMesh.updateInstancedMeshes(gltfSceneLevel);
 
@@ -283,9 +284,8 @@ window.onload = () => {
         if (!skipThisFrame || !halfFPSMode) {
             Clock.instance.update(now);
             physicsWorld.step();
-            scene.updateBehavior();
-            scene.updateWorldTransform(false, true);
-            SkinMesh.updateSkinMeshes(scene);
+
+            scene.update();
 
             renderer.render(scene);
 
@@ -381,7 +381,7 @@ window.onload = () => {
     function prepareGLTFLevel(gltfNode: Object3D) {
         gltfNode.isStatic = true;
         gltfNode.autoUpdateTransform = false;
-        gltfNode.updateLocalTransform();
+        gltfNode.updateLocalTransform(true, false);
 
         if (gltfNode instanceof Mesh) {
             gltfNode.castShadow = true;

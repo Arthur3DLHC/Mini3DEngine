@@ -6,6 +6,7 @@ import { Behavior } from "./behavior.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import quat from "../../lib/tsm/quat.js";
 import { BoundingRenderModes } from "../renderer/boundingRenderModes.js";
+import { BaseConstraint } from "../animation/constraint/baseConstraint.js";
 
 export class Object3D {
     // base class of all render objects
@@ -19,6 +20,8 @@ export class Object3D {
         this.isStatic = false;
         this.autoUpdateTransform = false;
         this.behaviors = [];
+        this.constraintsLocal = [];
+        this.constraintsWorld = [];
         this.parent = null;
         this._children = [];
         this.localTransform = mat4.identity.copy();
@@ -118,6 +121,11 @@ export class Object3D {
     public boundingSphereRenderMode: BoundingRenderModes;
 
     public behaviors: Behavior[];
+
+    /** local space constraints */
+    public constraintsLocal: BaseConstraint[];
+    /** world space constraints */
+    public constraintsWorld: BaseConstraint[];
 
     public parent: Object3D | null;
     
@@ -222,9 +230,32 @@ export class Object3D {
         }
     }
 
-    public updateLocalTransform() {
-        this.localTransform.compose(this.translation, this.rotation, this.scale);
+    public updateConstraint(localSpace: boolean) {
+        if (localSpace) {
+            for (const constraint of this.constraintsLocal) {
+                constraint.update();
+            }
+        } else {
+            for (const constraint of this.constraintsWorld) {
+                constraint.update();
+            }
+        }
+
+        for (const child of this.children) {
+            child.updateConstraint(localSpace);
+        }
+    }
+
+    public updateLocalTransform(forceUpdate: boolean, updateChildren: boolean) {
+        if (this.autoUpdateTransform || forceUpdate) {
+            this.localTransform.compose(this.translation, this.rotation, this.scale);
+        }
         // todo: mark local transform dirty?
+        if (updateChildren) {
+            for (const child of this._children) {
+                child.updateLocalTransform(forceUpdate, updateChildren);
+            }
+        }
     }
 
     public updateWorldTransform(updateParents: boolean, updateChildren: boolean) {
@@ -234,12 +265,12 @@ export class Object3D {
         }
 
         if( updateParents && this.parent) {
-            this.parent.updateWorldTransform(true, false);
+            this.parent.updateWorldTransform(updateParents, false);
         }
 
-        if (this.autoUpdateTransform) {
-            this.updateLocalTransform();
-        }
+        // if (this.autoUpdateTransform) {
+        //     this.updateLocalTransform();
+        // }
 
         // record prev transform
         this.worldTransform.copy(this.worldTransformPrev);
@@ -256,7 +287,7 @@ export class Object3D {
 
         if( updateChildren ) {
             for (const child of this._children) {
-                child.updateWorldTransform(false, true);
+                child.updateWorldTransform(false, updateChildren);
             }
             // for (const key in this._children) {
             //     if (this._children.hasOwnProperty(key)) {

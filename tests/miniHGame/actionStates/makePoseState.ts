@@ -23,7 +23,7 @@ export class MakePoseState extends ActionStateSingleAnim {
         // put the owner to location
         this._location.translation.copy(this._owner.translation);
         this._location.rotation.copy(this._owner.rotation);
-        this._owner.updateLocalTransform();
+        this._owner.updateLocalTransform(true, false);
 
         if (this.onEnter !== null) {
             this.onEnter(this);

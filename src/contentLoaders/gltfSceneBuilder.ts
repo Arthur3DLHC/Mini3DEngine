@@ -472,7 +472,7 @@ export class GLTFSceneBuilder {
                         envProbe.translation.z = envProbe.translation.z * 2.0 - 1.0;
 
                         // fix me: how to set the affect radius of envprobe?
-                        envProbe.updateLocalTransform();
+                        envProbe.updateLocalTransform(true, false);
                         ret.attachChild(envProbe);
                     }
                 }
@@ -593,7 +593,7 @@ export class GLTFSceneBuilder {
                 }
             }
 
-            node.updateLocalTransform();
+            node.updateLocalTransform(true, false);
         }
     }
 

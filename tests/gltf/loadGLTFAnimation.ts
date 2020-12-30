@@ -114,8 +114,8 @@ window.onload = () => {
         //     curActionMale.update(Clock.instance.curTime, Clock.instance.elapsedTime);
         // }
 
-        scene.updateWorldTransform(false, true);
-        SkinMesh.updateSkinMeshes(scene);
+        scene.update();
+
         renderer.render(scene);
 
         if (now - lastUpdateFPSTime > 1000) {
