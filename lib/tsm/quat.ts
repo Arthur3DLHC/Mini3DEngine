@@ -660,4 +660,39 @@ export default class quat {
 
         return dest;
     }
+
+    /**
+     * Unity-like lookat vector rotation
+     * https://gamedev.net/forums/topic/613595-quaternion-lookrotationlookat-up/4876373/
+     */
+    static fromLookRotation(lookDir: vec3, upDir?: vec3, dest?: quat): quat {
+        if (upDir === undefined) {
+            upDir = new vec3([0, 1, 0]);
+        }
+
+        let forward = lookDir; var up = upDir;
+        let right = vec3.cross(up, forward);
+
+        const m00 = right.x;
+        const m01 = up.x;
+        const m02 = forward.x;
+        const m10 = right.y;
+        const m11 = up.y;
+        const m12 = forward.y;
+        const m20 = right.z;
+        const m21 = up.z;
+        const m22 = forward.z;
+
+        if (dest === undefined) {
+            dest = new quat();
+        }
+
+        dest.w = Math.sqrt(1.0 + m00 + m11 + m22) * 0.5;
+        const w4_recip = 1.0 / (4.0 * dest.w);
+        dest.x = (m21 - m12) * w4_recip;
+        dest.y = (m02 - m20) * w4_recip;
+        dest.z = (m10 - m01) * w4_recip;
+
+        return dest;
+    }
 }

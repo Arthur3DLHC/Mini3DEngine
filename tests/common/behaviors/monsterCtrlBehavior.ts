@@ -1,3 +1,5 @@
+import mat4 from "../../../lib/tsm/mat4.js";
+import quat from "../../../lib/tsm/quat.js";
 import vec3 from "../../../lib/tsm/vec3.js";
 import { ActionControlBehavior, Behavior, Clock, Object3D, RigidBody } from "../../../src/mini3DEngine.js";
 
@@ -107,7 +109,6 @@ export class MonsterCtrlBehavior extends Behavior {
 
         switch(this._curState) {
             case MonsterState.Idle:
-                // set actionCtrl params
                 // this._curAction = 0;
                 // if player in attack range, attack ?
                 if(this.playerInMeleeAttackRange()) {
@@ -115,13 +116,22 @@ export class MonsterCtrlBehavior extends Behavior {
                 } else if(this.playerInSight()) {
                     // if player in sight, move ?
                     this.moveTo(MonsterCtrlBehavior._tmpPlayerPosition);
+                } else {
+                    // if idled for a well, move to an random destination?
                 }
                 break;
             case MonsterState.Moving:
-                // set actionCtrl params
                 // upate destination position
-                // turn toward destination position
+                // always player cur position for now?
+                MonsterCtrlBehavior._tmpPlayerPosition.copy(this._destination);
+
+                // turn toward destination dir?
+                // calculate dest yaw?
+                // or use quaternions? how?
+                
+
                 // move toward cur facing dir
+
                 // if approached destination position, idle or attack ?
                 // refers to cur behavior is patrolling or chasing?
                 break;
