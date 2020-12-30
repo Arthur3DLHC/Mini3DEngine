@@ -22,6 +22,7 @@ export class Scene extends Object3D {
     public update() {
         this.updateBehavior();
         this.updateLocalTransform(false, true);
+        // todo: optimize? should put all constraints in a global list then iterate through them? don't traverse whole tree?
         this.updateConstraint(true);
         this.updateWorldTransform(false, true);
         this.updateConstraint(false);
