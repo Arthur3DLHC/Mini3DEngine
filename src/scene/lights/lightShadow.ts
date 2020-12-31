@@ -17,8 +17,8 @@ export class LightShadow {
         this.shadowMap = null;
         this.moved = true;
         this.cached = false;
-        this._matView = mat4.identity.copy();
-        this._matProj = mat4.identity.copy();
+        this._matView = mat4.identity.copyTo();
+        this._matProj = mat4.identity.copyTo();
         this.frustums = [new Frustum()];
     }
     

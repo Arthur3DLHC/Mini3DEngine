@@ -181,7 +181,7 @@ export default class vec4 {
         this.w = 0
     }
 
-    copy(dest?: vec4): vec4 {
+    copyTo(dest?: vec4): vec4 {
         if (!dest) { dest = new vec4() }
 
         dest.x = this.x

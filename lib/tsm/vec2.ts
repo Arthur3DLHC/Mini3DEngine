@@ -61,7 +61,7 @@ export default class vec2 {
         this.y = 0
     }
 
-    copy(dest?: vec2): vec2 {
+    copyTo(dest?: vec2): vec2 {
         if (!dest) { dest = new vec2() }
 
         dest.x = this.x

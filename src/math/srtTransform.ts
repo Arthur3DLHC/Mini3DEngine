@@ -12,15 +12,15 @@ export class SRTTransform {
 
     // todo: rotate order?
 
-    public transform: mat4 = mat4.identity.copy();
+    public transform: mat4 = mat4.identity.copyTo();
 
     private static _degreeToRad = Math.PI / 180.0;
-    private static _matScale = mat4.identity.copy();
-    private static _matRotX = mat4.identity.copy();
-    private static _matRotY = mat4.identity.copy();
-    private static _matRotZ = mat4.identity.copy();
-    private static _matRot = mat4.identity.copy();
-    private static _matTran = mat4.identity.copy();
+    private static _matScale = mat4.identity.copyTo();
+    private static _matRotX = mat4.identity.copyTo();
+    private static _matRotY = mat4.identity.copyTo();
+    private static _matRotZ = mat4.identity.copyTo();
+    private static _matRot = mat4.identity.copyTo();
+    private static _matTran = mat4.identity.copyTo();
 
     public update() {
         SRTTransform._matScale.fromScaling(this.scaling);

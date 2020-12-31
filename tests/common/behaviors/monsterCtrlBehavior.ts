@@ -80,10 +80,26 @@ export class MonsterCtrlBehavior extends Behavior {
 
     private static _tmpMyPosition: vec3 = new vec3();
     private static _tmpPlayerPosition: vec3 = new vec3();
-    // private static _tmpDir: vec3 = new vec3();
+    private static _tmpDir: vec3 = new vec3();
+
+    private static readonly _upDir = new vec3([0, 1, 0]);
 
     public start() {
+        // todo: init facing dir according to the world transform of owner object?
 
+        // the precedure of add a monster:
+        // load all monster prefabs (json)
+        // load monster agent from level gltf
+        //  get prefab accroding to monster prefab key;
+        //  load from monster gltf accroding to the model res key defined in prefab;
+        //  add components of prefab to monster object; set properties of these components
+        // add monster object to scene
+        // update local and world transforms of all objects in the scene for the first time
+        // call start() for all behaviors of all objects
+
+        // so the worldTransform of owner should have been updated already now
+        this.owner.worldTransform.multiplyVec3(new vec3([0, 0, -1]), this._facingDir);
+        this._facingDir.normalize();
     }
 
     public update() {
@@ -94,11 +110,11 @@ export class MonsterCtrlBehavior extends Behavior {
         // }
 
         // facing dir
-        this._facingDir.setComponents(0, 0, 0);
-        let facingYaw = this.yaw + Math.PI * 0.5;
-        this._facingDir.x = Math.cos(facingYaw);
-        this._facingDir.z = -Math.sin(facingYaw);
-
+        // 
+        // this._facingDir.setComponents(0, 0, 0);
+        // let facingYaw = this.yaw + Math.PI * 0.5;
+        // this._facingDir.x = Math.cos(facingYaw);
+        // this._facingDir.z = -Math.sin(facingYaw);
         if (this._player !== null) {
             this.owner.worldTransform.getTranslation(MonsterCtrlBehavior._tmpMyPosition);
             this._player.worldTransform.getTranslation(MonsterCtrlBehavior._tmpPlayerPosition);
@@ -123,12 +139,12 @@ export class MonsterCtrlBehavior extends Behavior {
             case MonsterState.Moving:
                 // upate destination position
                 // always player cur position for now?
-                MonsterCtrlBehavior._tmpPlayerPosition.copy(this._destination);
+                MonsterCtrlBehavior._tmpPlayerPosition.copyTo(this._destination);
 
                 // turn toward destination dir?
                 // calculate dest yaw?
                 // or use quaternions? how?
-                
+                this.turnToFaceDestination();
 
                 // move toward cur facing dir
 
@@ -153,7 +169,7 @@ export class MonsterCtrlBehavior extends Behavior {
 
     public moveTo(dest: vec3) {
         if (this._curState === MonsterState.Idle || this._curState === MonsterState.Moving) {
-            dest.copy(this._destination);
+            dest.copyTo(this._destination);
             this._curState = MonsterState.Moving;
             this._actionCtrl.actionParams.set("curAction", MonsterState.Moving);
         }
@@ -228,5 +244,17 @@ export class MonsterCtrlBehavior extends Behavior {
         const cosFacing = vec3.dot(this._facingDir, targetDir);
         // facing angle < half fov
         return cosFacing > cosFOV;
+    }
+
+    /** turn a bit to face destination direction */
+    private turnToFaceDestination() {
+        // rotate facing dir
+        this._destinationDir.copyTo(MonsterCtrlBehavior._tmpDir);
+        MonsterCtrlBehavior._tmpDir.scale(this.turnSpeed * Clock.instance.elapsedTime);
+        this._facingDir.add(MonsterCtrlBehavior._tmpDir);
+        this._facingDir.normalize();
+
+        // set rotation of owner
+        quat.fromLookRotation(this._facingDir, MonsterCtrlBehavior._upDir, this.owner.rotation);
     }
 }

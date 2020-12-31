@@ -77,11 +77,11 @@ window.onload = () => {
     // add instances
     for (let i = 0; i < boxMesh.maxInstanceCount; i++) {
         // rotation
-        const matRot: mat4 = mat4.identity.copy();
+        const matRot: mat4 = mat4.identity.copyTo();
         matRot.fromYRotation(i * 0.03);
 
         // translation: 10 x 10
-        const matTran: mat4 = mat4.identity.copy();
+        const matTran: mat4 = mat4.identity.copyTo();
         matTran.fromTranslation(new vec3([Math.floor(i / 10), 1, i % 10]));
 
         // update instance matrix
@@ -111,11 +111,11 @@ window.onload = () => {
 
     for (let i = 0; i < cylinderMesh.maxInstanceCount; i++) {
         // rotation
-        const matRot: mat4 = mat4.identity.copy();
+        const matRot: mat4 = mat4.identity.copyTo();
         matRot.fromZRotation(i * 0.03);
 
         // translation: 10 x 10
-        const matTran: mat4 = mat4.identity.copy();
+        const matTran: mat4 = mat4.identity.copyTo();
         matTran.fromTranslation(new vec3([Math.floor(i / 10), 3, i % 10]));
 
         // update instance matrix
@@ -223,7 +223,7 @@ window.onload = () => {
         planeMesh.isStatic = true;
         planeMesh.autoUpdateTransform = false;
         const planeMtl = new StandardPBRMaterial();
-        planeMtl.color = wallColor.copy();
+        planeMtl.color = wallColor.copyTo();
         planeMtl.metallic = metallic;// 0.05;
         planeMtl.roughness = roughness;// 0.8;
     

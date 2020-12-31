@@ -336,7 +336,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         let outerConeCos = 0;
         let innerConeCos = 0;
 
-        let matWorld: mat4 = light.worldTransform.copy();
+        let matWorld: mat4 = light.worldTransform.copyTo();
         let matShadow: mat4 = new mat4();
         // if light do not cast shadow, use a zero matrix
         // matShadow.setIdentity();
@@ -371,13 +371,13 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
                 // todo: need to scale rect to [0, 1]
                 const normRect = new vec4();
-                matWorld.setRow(1, mapRects[0].copy(normRect).multiply(invSize));
-                matWorld.setRow(2, mapRects[1].copy(normRect).multiply(invSize));
-                matWorld.setRow(3, mapRects[2].copy(normRect).multiply(invSize));
+                matWorld.setRow(1, mapRects[0].copyTo(normRect).multiply(invSize));
+                matWorld.setRow(2, mapRects[1].copyTo(normRect).multiply(invSize));
+                matWorld.setRow(3, mapRects[2].copyTo(normRect).multiply(invSize));
 
-                matShadow.setRow(0, mapRects[3].copy(normRect).multiply(invSize));
-                matShadow.setRow(1, mapRects[4].copy(normRect).multiply(invSize));
-                matShadow.setRow(2, mapRects[5].copy(normRect).multiply(invSize));
+                matShadow.setRow(0, mapRects[3].copyTo(normRect).multiply(invSize));
+                matShadow.setRow(1, mapRects[4].copyTo(normRect).multiply(invSize));
+                matShadow.setRow(2, mapRects[5].copyTo(normRect).multiply(invSize));
                 // shadowmap bias
                 normRect.x = light.shadow.bias;
                 normRect.y = 0; normRect.z = 0; normRect.w = 1;
@@ -388,7 +388,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 let matBias = new mat4();
                 matBias.fromTranslation(new vec3([0, 0, light.shadow.bias]));
                 // todo: shadowmap atlas rect as viewport matrix
-                const normRect = mapRects[0].copy();
+                const normRect = mapRects[0].copyTo();
                 normRect.multiply(invSize);
                 const l = normRect.x;
                 const b = normRect.y;
@@ -441,8 +441,8 @@ export class ClusteredForwardRenderContext extends RenderContext {
                                     irrprobes: boolean = true,
                                     useClusters: boolean = false) {
 
-        let invView: mat4 = camera.viewTransform.copy();
-        let invProj: mat4 = camera.projTransform.copy();
+        let invView: mat4 = camera.viewTransform.copyTo();
+        let invProj: mat4 = camera.projTransform.copyTo();
         invView.inverse();
         invProj.inverse();
 
@@ -565,7 +565,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 const top = perspCamera.near * tanHalfFov;
                 const bottom = -top;
                 this._clusterGrid.setFrustumParams(left, right, bottom, top, camera.near, camera.far);
-                perspCamera.viewTransform.copy(this._clusterGrid.viewTransform);
+                perspCamera.viewTransform.copyTo(this._clusterGrid.viewTransform);
                 // this._clusterGrid.viewTransform = perspCamera.viewTransform;
 
                 this.fillItemsToCluster(lights, decals, envprobes, irrprobes);
@@ -757,7 +757,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         if (light.shadow && light.castShadow) {
             // todo: need special logic for point lights.
             if (light.type === LightType.Point) {
-                const matView = TextureCube.getFaceViewMatrix(viewIdx).copy();
+                const matView = TextureCube.getFaceViewMatrix(viewIdx).copyTo();
                 // need to translate to light local space first
                 const matWorldToLight: mat4 = new mat4();
                 matWorldToLight.fromTranslation(light.worldTransform.getTranslation().scale(-1));

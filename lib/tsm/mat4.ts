@@ -37,7 +37,7 @@ export default class mat4 {
         }
     }
 
-    copy(dest?: mat4): mat4 {
+    copyTo(dest?: mat4): mat4 {
         if (!dest) { dest = new mat4() }
 
         for (let i = 0; i < 16; i++) {

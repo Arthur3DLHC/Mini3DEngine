@@ -28,13 +28,13 @@ export class PointLightShadow extends LightShadow {
         const matProj = mat4.perspective(90, 1, 0.01, pointLight.range > 0 ? pointLight.range : 100);
         if (! matProj.equals(this._matProj)) {
             this.moved = true;
-            matProj.copy(this._matProj);
+            matProj.copyTo(this._matProj);
         }
 
         if (this.moved) {
             // todo: update point light's 6 frustums
-            const matViewProj = mat4.identity.copy();
-            const matView = mat4.identity.copy();
+            const matViewProj = mat4.identity.copyTo();
+            const matView = mat4.identity.copyTo();
             
             for (let i = 0; i < 6; i++) {
                 // calc viewproj matrix

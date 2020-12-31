@@ -209,7 +209,7 @@ export class ClusterGrid {
 
             // todo: optimize - too much temp newed matrices
             // the viewproj transform of spotLight
-            const matLightView = spotLight.worldTransform.copy();
+            const matLightView = spotLight.worldTransform.copyTo();
             matLightView.inverse();
             const matLightProj = mat4.perspective(Math.min(spotLight.outerConeAngle * 2, 3.10) * 180.0 / Math.PI, 1, 0.01, spotLight.range > 0 ? spotLight.range : 100);
 
@@ -217,7 +217,7 @@ export class ClusterGrid {
             mat4.product(matLightProj, matLightView, matLightViewProj);
 
             // from view space to light proj space
-            const matInvView = this.viewTransform.copy(this._tmpInvViewTransform);
+            const matInvView = this.viewTransform.copyTo(this._tmpInvViewTransform);
             matInvView.inverse();
 
             const matFrustum = new mat4();
@@ -268,7 +268,7 @@ export class ClusterGrid {
                 // todo: check light frustum
                 // todo: optimize - too much temp newed matrices
                 // the viewproj transform of spotLight
-                const matLightView = dirLight.worldTransform.copy();
+                const matLightView = dirLight.worldTransform.copyTo();
                 matLightView.inverse();
                 //const matLightProj = mat4.perspective(Math.min(spotLight.outerConeAngle * 2, 3.10) * 180.0 / Math.PI, 1, 0.01, spotLight.range > 0 ? spotLight.range : 100);
                 const matLightProj = mat4.orthographic(-dirLight.radius, dirLight.radius, -dirLight.radius, dirLight.radius, 0.01, dirLight.range);
@@ -277,7 +277,7 @@ export class ClusterGrid {
                 mat4.product(matLightProj, matLightView, matLightViewProj);
 
                 // from view space to light proj space
-                const matInvView = this.viewTransform.copy(this._tmpInvViewTransform);
+                const matInvView = this.viewTransform.copyTo(this._tmpInvViewTransform);
                 matInvView.inverse();
 
                 const matFrustum = new mat4();

@@ -196,7 +196,7 @@ function addPlane(name: string, matPlaneTran: mat4, matPlaneRot: mat4, wallColor
     planeMesh.isStatic = true;
     planeMesh.autoUpdateTransform = false;
     const planeMtl = new StandardPBRMaterial();
-    planeMtl.color = wallColor.copy();
+    planeMtl.color = wallColor.copyTo();
     planeMtl.metallic = 0.05;
     planeMtl.roughness = 0.8;
     planeMesh.materials.push(planeMtl);

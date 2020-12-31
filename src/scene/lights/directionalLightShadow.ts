@@ -21,7 +21,7 @@ export class DirectionalLightShadow extends LightShadow {
         if (! this._light.worldTransform.equals(this._light.worldTransformPrev)) {
             this.moved = true;
         }
-        this._light.worldTransform.copy(this._matView);
+        this._light.worldTransform.copyTo(this._matView);
         this._matView.inverse();
 
         const dirLight = this._light as DirectionalLight;
@@ -36,7 +36,7 @@ export class DirectionalLightShadow extends LightShadow {
         const matProj = mat4.orthographic(-r, r, -r, r, 0.01, d);
         if (! matProj.equals(this._matProj)) {
             this.moved = true;
-            matProj.copy(this._matProj);
+            matProj.copyTo(this._matProj);
         }
         if (this.moved) {
             const viewProj = new mat4();

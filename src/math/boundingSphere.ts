@@ -8,12 +8,12 @@ import { BoundingBox } from "./boundingBox.js";
 export class BoundingSphere {
 
     public constructor(center: vec3 = vec3.zero, radius: number = 0) {
-        this.center = center.copy();
+        this.center = center.copyTo();
         this.radius = radius;
     }
 
     public copyFrom(other: BoundingSphere): BoundingSphere {
-        other.center.copy(this.center);
+        other.center.copyTo(this.center);
         this.radius = other.radius;
         return this;
     }
@@ -43,7 +43,7 @@ export class BoundingSphere {
     public enlarge(sphere: BoundingSphere) {
         // center may change
         // from this center to new sphere center
-        const offset: vec3 = sphere.center.copy()
+        const offset: vec3 = sphere.center.copyTo()
         offset.subtract(this.center);
         const dist: number = offset.length();
         const r1 = this.radius;
@@ -53,7 +53,7 @@ export class BoundingSphere {
         }
         if (dist + r1 <= r2) {
             this.radius = r2;
-            sphere.center.copy(this.center);
+            sphere.center.copyTo(this.center);
             return;
         }
         let d = dist + r1 + r2;

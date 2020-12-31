@@ -11,9 +11,9 @@ export class SceneHelper {
         probe.probeType = probeType;
         const probesrt = new SRTTransform();
         probesrt.scaling.x = size; probesrt.scaling.y = size; probesrt.scaling.z = size;
-        position.copy(probesrt.translation);
+        position.copyTo(probesrt.translation);
         probesrt.update();
-        probesrt.transform.copy(probe.localTransform);
+        probesrt.transform.copyTo(probe.localTransform);
     
         scene.attachChild(probe);
     }

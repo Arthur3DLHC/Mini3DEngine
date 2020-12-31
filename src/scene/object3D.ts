@@ -24,11 +24,11 @@ export class Object3D {
         this.constraintsWorld = [];
         this.parent = null;
         this._children = [];
-        this.localTransform = mat4.identity.copy();
-        this.worldTransform = mat4.identity.copy();
-        this.worldTransformPrev = mat4.identity.copy();
+        this.localTransform = mat4.identity.copyTo();
+        this.worldTransform = mat4.identity.copyTo();
+        this.worldTransformPrev = mat4.identity.copyTo();
         this.translation = new vec3([0,0,0]);
-        this.rotation = quat.identity.copy();
+        this.rotation = quat.identity.copyTo();
         this.scale = new vec3([1,1,1]);
         this._moved = false;
         this.castShadow = false;
@@ -276,12 +276,12 @@ export class Object3D {
         // }
 
         // record prev transform
-        this.worldTransform.copy(this.worldTransformPrev);
+        this.worldTransform.copyTo(this.worldTransformPrev);
 
         if (this.parent) {
             mat4.product(this.parent.worldTransform, this.localTransform, this.worldTransform);
         } else {
-            this.localTransform.copy(this.worldTransform);
+            this.localTransform.copyTo(this.worldTransform);
         }
 
         this._moved = ! this.worldTransformPrev.equals(this.worldTransform);

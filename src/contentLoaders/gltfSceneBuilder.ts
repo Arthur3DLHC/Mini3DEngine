@@ -444,7 +444,7 @@ export class GLTFSceneBuilder {
             // put the envprobe on the center of every cell
             // irradiane volume radius is 1 in blender, so the box size is 2?
             const cellSize = new vec3([1.0 / resX, 1.0 / resY, 1.0 / resZ]);
-            const halfCellSize = cellSize.copy();
+            const halfCellSize = cellSize.copyTo();
             halfCellSize.scale(0.5);
             for (let k = 0; k < resZ; k++) {
                 for (let j = 0; j < resY; j++) {
@@ -458,7 +458,7 @@ export class GLTFSceneBuilder {
                         // if (extras.influenceDist !== undefined) {
                         //    envProbe.localRange.xyz = [extras.influenceDist, extras.influenceDist, extras.influenceDist];
                         //} else {
-                            cellSize.copy(envProbe.localRange);
+                            cellSize.copyTo(envProbe.localRange);
                             envProbe.localRange.scale(2);   // default irradiance volume size is 2 in blender
                         //}
 
@@ -701,7 +701,7 @@ export class GLTFSceneBuilder {
                 for(let e = 0; e < 16; e++) values[e] = elemArray[e];
                 const matrix = new mat4(values);
                 mesh.inverseBindMatrices.push(matrix);
-                mesh.jointMatrices.push(mat4.identity.copy());
+                mesh.jointMatrices.push(mat4.identity.copyTo());
             }
         } else {
             console.warn("No inverseBindMatrices in gltf file");

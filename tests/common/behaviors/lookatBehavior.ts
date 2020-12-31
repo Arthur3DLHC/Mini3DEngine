@@ -18,16 +18,16 @@ export class LookatBehavior extends Behavior {
         // calculate a view matrix
         // fix me: should calculate local transform matrix to parent world transform.
         const lookat: mat4 = mat4.lookAt(this.position, this.target, this.up);
-        this.owner.localTransform = lookat.copy();
+        this.owner.localTransform = lookat.copyTo();
         this.owner.localTransform.inverse();
         return;
         // invert fast?
-        const rot = lookat.copy();
+        const rot = lookat.copyTo();
         // set owner's world matrix?
         const t = rot.row(3);
         rot.setRow(3, new vec4([0, 0, 0, 1]));
         rot.transpose();
-        const trans = mat4.identity.copy();
+        const trans = mat4.identity.copyTo();
         trans.fromTranslation(new vec3([-t.x, -t.y, -t.z]));
         mat4.product(rot, trans, this.owner.localTransform);
     }

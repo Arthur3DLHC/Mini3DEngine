@@ -313,7 +313,7 @@ window.onload = () => {
         planeMesh.rotation = rotation;
         planeMesh.autoUpdateTransform = true;
         const planeMtl = new StandardPBRMaterial();
-        planeMtl.color = wallColor.copy();
+        planeMtl.color = wallColor.copyTo();
         planeMtl.metallic = metallic;// 0.05;
         planeMtl.roughness = roughness;// 0.8;
     

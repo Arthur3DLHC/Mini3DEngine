@@ -56,7 +56,7 @@ export class Plane {
     }
 
     public setFromNormalAndPoint(normal: vec3, point: vec3): Plane {
-        this.normal = normal.copy();
+        this.normal = normal.copyTo();
         this.normal.normalize();
         this.constant = - vec3.dot( this.normal, point );
         return this;
@@ -98,7 +98,7 @@ export class Plane {
         
         // inverse
         const inversedMatrix = Plane._tmpMatrix;
-        transformation.copy(inversedMatrix);
+        transformation.copyTo(inversedMatrix);
         inversedMatrix.inverse();
         const m = inversedMatrix.values;
         const x = this.normal.x;

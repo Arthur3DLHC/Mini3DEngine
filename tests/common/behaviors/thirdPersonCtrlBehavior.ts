@@ -341,7 +341,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
         // move up to shoulder
         this._cameraGlobalOffset.y += this.cameraVerticalOffset;
 
-        this.owner.translation.copy(this._camera.translation);
+        this.owner.translation.copyTo(this._camera.translation);
         this._camera.translation.add(this._cameraGlobalOffset);
 
         // todo: camera collision with scene

@@ -93,7 +93,7 @@ export default class vec3 {
         this.z = 0
     }
 
-    copy(dest?: vec3): vec3 {
+    copyTo(dest?: vec3): vec3 {
         if (!dest) { dest = new vec3() }
 
         dest.x = this.x
@@ -141,6 +141,7 @@ export default class vec3 {
         return (x * x + y * y + z * z)
     }
 
+    /** add in place */
     add(vector: vec3): vec3 {
         this.x += vector.x
         this.y += vector.y

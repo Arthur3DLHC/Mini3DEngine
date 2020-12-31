@@ -32,7 +32,7 @@ export default class mat2 {
         }
     }
 
-    copy(dest?: mat2): mat2 {
+    copyTo(dest?: mat2): mat2 {
         if (!dest) { dest = new mat2() }
 
         for (let i = 0; i < 4; i++) {

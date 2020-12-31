@@ -25,11 +25,11 @@ export class Camera extends Object3D {
     public clearDepth: boolean = true;
     public clearStencil: boolean = true;
 
-    public viewTransform: mat4 = mat4.identity.copy();
-    public projTransform: mat4 = mat4.identity.copy();
+    public viewTransform: mat4 = mat4.identity.copyTo();
+    public projTransform: mat4 = mat4.identity.copyTo();
 
-    public viewTransformPrev: mat4 = mat4.identity.copy();
-    public projTransformPrev: mat4 = mat4.identity.copy();
+    public viewTransformPrev: mat4 = mat4.identity.copyTo();
+    public projTransformPrev: mat4 = mat4.identity.copyTo();
     
     public get position(): vec3{
         return this.worldTransform.getTranslation(this._tmpPosition);
@@ -42,7 +42,7 @@ export class Camera extends Object3D {
      */
     public updateViewProjTransform() {
         this.viewTransformPrev = this.viewTransform;
-        this.viewTransform = this.worldTransform.copy();
+        this.viewTransform = this.worldTransform.copyTo();
         this.viewTransform.inverse();
         // mat4.invert(this.viewTransform, this.worldTransform);
         // todo: subclasses update proj transform

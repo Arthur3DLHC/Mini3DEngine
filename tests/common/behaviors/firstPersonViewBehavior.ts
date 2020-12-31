@@ -37,8 +37,8 @@ export class FirstPersonViewBehavior extends Behavior {
         this._dragging = false;
         // this._oldMousePos = new vec2();
         this._deltaRot = new vec2();
-        this._matRotYaw = mat4.identity.copy();
-        this._matRotPitch = mat4.identity.copy();
+        this._matRotYaw = mat4.identity.copyTo();
+        this._matRotPitch = mat4.identity.copyTo();
     }
 
     public mouseSensitivity: number;

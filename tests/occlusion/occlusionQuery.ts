@@ -128,10 +128,10 @@ window.onload = () => {
     instMesh.materials.push(instMtl);
 
     for (let i = 0; i < instMesh.maxInstanceCount; i++) {
-        const matRot: mat4 = mat4.identity.copy();
+        const matRot: mat4 = mat4.identity.copyTo();
         matRot.fromZRotation(i * 0.03);
 
-        const matTran: mat4 = mat4.identity.copy();
+        const matTran: mat4 = mat4.identity.copyTo();
         const r = Math.floor(i / 10);
         const c = i % 10;
         matTran.fromTranslation(new vec3([r * 0.5, 0.5, c * 0.5 - 5]));
@@ -258,7 +258,7 @@ window.onload = () => {
         planeMesh.isStatic = true;
         planeMesh.autoUpdateTransform = false;
         const planeMtl = new StandardPBRMaterial();
-        planeMtl.color = wallColor.copy();
+        planeMtl.color = wallColor.copyTo();
         planeMtl.metallic = metallic;// 0.05;
         planeMtl.roughness = roughness;// 0.8;
     

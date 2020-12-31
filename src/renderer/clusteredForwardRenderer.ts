@@ -128,10 +128,10 @@ export class ClusteredForwardRenderer {
         this._rectTransform = new mat4();
 
         this._skyboxGeom = new BoxGeometry(2, 2, 2);
-        this._skyboxTransform = mat4.identity.copy();
+        this._skyboxTransform = mat4.identity.copyTo();
 
         this._occlusionBoxGeom = new BoxGeometry(1, 1, 1);
-        this._boundingBoxTransform = mat4.identity.copy();
+        this._boundingBoxTransform = mat4.identity.copyTo();
 
         this._boundingBoxWireframeGeom = new BoxWireframeGeometry(1, 1, 1);
         this._boundingSphereWireframeGeom = new SphereWireframeGeometry(1, 64);
@@ -1184,7 +1184,7 @@ export class ClusteredForwardRenderer {
                 const boundingBox = item.geometry.boundingBox;
                 boxLocalTranMat.fromTranslation(boundingBox.center);
 
-                boundingBox.maxPoint.copy(boxScale);
+                boundingBox.maxPoint.copyTo(boxScale);
                 boxScale.subtract(boundingBox.minPoint);
 
                 boxLocalScaleMat.fromScaling(boxScale);
@@ -1239,7 +1239,7 @@ export class ClusteredForwardRenderer {
         let boxScale = new vec3();
         const boxLocalTranMat = new mat4();
         const boxLocalScaleMat = new mat4();
-        const boxColor = vec4.one.copy();
+        const boxColor = vec4.one.copyTo();
 
         for (let i = 0; i < renderList.ItemCount; i++) {
             const item = renderList.getItemAt(i);
@@ -1254,7 +1254,7 @@ export class ClusteredForwardRenderer {
                 const boundingBox = item.geometry.boundingBox;
                 boxLocalTranMat.fromTranslation(boundingBox.center);
 
-                boundingBox.maxPoint.copy(boxScale);
+                boundingBox.maxPoint.copyTo(boxScale);
                 boxScale.subtract(boundingBox.minPoint);
 
                 boxLocalScaleMat.fromScaling(boxScale);
@@ -1286,7 +1286,7 @@ export class ClusteredForwardRenderer {
     getBoundingColorFor(object: Object3D, mode: BoundingRenderModes, outColor: vec4) {
         switch(mode) {
             case BoundingRenderModes.normal:
-                vec4.one.copy(outColor);
+                vec4.one.copyTo(outColor);
                 break;
             case BoundingRenderModes.occlusionResult:
                 if (object.occlusionQueryResult) {
@@ -1296,7 +1296,7 @@ export class ClusteredForwardRenderer {
                 }
                 break;
             case BoundingRenderModes.collisionResult:
-                vec4.one.copy(outColor);
+                vec4.one.copyTo(outColor);
                 break;
         }
     }

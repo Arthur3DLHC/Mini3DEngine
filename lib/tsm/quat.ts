@@ -108,7 +108,7 @@ export default class quat {
         }
     }
 
-    copy(dest?: quat): quat {
+    copyTo(dest?: quat): quat {
         if (!dest) { dest = new quat() }
 
         for (let i = 0; i < 4; i++) {
@@ -446,7 +446,7 @@ export default class quat {
         }
 
         let cos = quat.dot(q1, q2)
-        const q2a = q2.copy()
+        const q2a = q2.copyTo()
 
         if (cos < 0.0) {
             q2a.inverse()

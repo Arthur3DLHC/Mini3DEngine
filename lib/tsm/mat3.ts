@@ -35,7 +35,7 @@ export default class mat3 {
         }
     }
 
-    copy(dest?: mat3): mat3 {
+    copyTo(dest?: mat3): mat3 {
         if (!dest) { dest = new mat3() }
 
         for (let i = 0; i < 9; i++) {

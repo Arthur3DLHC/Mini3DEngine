@@ -7,7 +7,7 @@ export class FogParams {
     public constructor() {
         this.enable = false;
         this.density = 1;
-        this.color = vec3.one.copy()
+        this.color = vec3.one.copyTo()
         // this.halfSpace = false;
         this.height = 0;
         this.heightFalloff = 1;

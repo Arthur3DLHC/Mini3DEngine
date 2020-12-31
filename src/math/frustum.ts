@@ -71,10 +71,10 @@ export class Frustum {
         // guess and test:
         // if transform the plane normal from local to world, use the M.inverse().transpose() matrix
         // so, if transform from world to local, use M.inverse().inverse().transpose() = M.transpose() ?
-        const matNormal = transform.copy();
+        const matNormal = transform.copyTo();
         matNormal.transpose();
 
-        const matPosition = transform.copy();
+        const matPosition = transform.copyTo();
         matPosition.inverse();
 
         const normal = new vec3();
@@ -85,7 +85,7 @@ export class Frustum {
         for (let i = 0; i < this.planes.length; i++) {
             const plane = this.planes[i];
             matNormal.multiplyVec3Normal(plane.normal, normal);
-            plane.normal.copy(coplanarPoint);
+            plane.normal.copyTo(coplanarPoint);
             coplanarPoint.scale(-plane.constant);
             matPosition.multiplyVec3(coplanarPoint, coplanarPoint);
 

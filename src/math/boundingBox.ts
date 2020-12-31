@@ -10,10 +10,10 @@ export class BoundingBox {
         this.minPoint = new vec3([Infinity, Infinity, Infinity]);
         this.maxPoint = new vec3([-Infinity, -Infinity, -Infinity]);
         if (minPt) {
-            minPt.copy(this.minPoint);
+            minPt.copyTo(this.minPoint);
         }
         if (maxPt) {
-            maxPt.copy(this.maxPoint);
+            maxPt.copyTo(this.maxPoint);
         }
     }
     public minPoint: vec3;
