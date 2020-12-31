@@ -230,25 +230,28 @@ export class Object3D {
         }
     }
 
-    public updateConstraint(localSpace: boolean) {
-        if (localSpace) {
-            for (const constraint of this.constraintsLocal) {
-                constraint.update();
-            }
-        } else {
-            for (const constraint of this.constraintsWorld) {
-                constraint.update();
-            }
-        }
+    // public updateConstraint(localSpace: boolean) {
+    //     if (localSpace) {
+    //         for (const constraint of this.constraintsLocal) {
+    //             constraint.update();
+    //         }
+    //     } else {
+    //         for (const constraint of this.constraintsWorld) {
+    //             constraint.update();
+    //         }
+    //     }
 
-        for (const child of this.children) {
-            child.updateConstraint(localSpace);
-        }
-    }
+    //     for (const child of this.children) {
+    //         child.updateConstraint(localSpace);
+    //     }
+    // }
 
     public updateLocalTransform(forceUpdate: boolean, updateChildren: boolean) {
         if (this.autoUpdateTransform || forceUpdate) {
             this.localTransform.compose(this.translation, this.rotation, this.scale);
+        }
+        for (const constraint of this.constraintsLocal) {
+            constraint.addToUpdateList();
         }
         // todo: mark local transform dirty?
         if (updateChildren) {
@@ -284,6 +287,10 @@ export class Object3D {
         this._moved = ! this.worldTransformPrev.equals(this.worldTransform);
 
         this.onWorldTransformUpdated();
+
+        for (const constraint of this.constraintsWorld) {
+            constraint.addToUpdateList();
+        }
 
         if( updateChildren ) {
             for (const child of this._children) {

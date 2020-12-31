@@ -9,6 +9,20 @@ export class BaseConstraint {
     private _owner: Object3D;
 
     /**
+     * internal use
+     * will be filled when updating objects in scene
+     */
+    public static updateList: BaseConstraint[] = [];
+
+    public static updateConstraints() {
+        for (const constraint of BaseConstraint.updateList) {
+            constraint.update();
+        }
+    }
+
+    public addToUpdateList() {BaseConstraint.updateList.push(this);}
+
+    /**
      * update function. apply constraint to owner transform
      * NOTE: should modify the localtransform or worldTransform matrix directly
      * for local space constraints, update localTransform matrix;

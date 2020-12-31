@@ -33,9 +33,9 @@ window.onload = () => {
 
     // todo: keep crosshair at center of canvas
     // todo: show / hide crosshair?
-    const crosshair = document.getElementById("crosshair") as HTMLCanvasElement;
-    crosshair.style.left = ((canvas.width - 4) / 2).toString();
-    crosshair.style.top = ((canvas.height - 4) / 2).toString(); 
+    const crosshair = document.getElementById("crosshair") as HTMLDivElement;
+    crosshair.style.left = String((canvas.width - 4) / 2) + "px";
+    crosshair.style.top = String((canvas.height - 4) / 2) + "px"; 
 
     let tpsBehavior: ThirdPersonShooterBehavior | null = null;
 
