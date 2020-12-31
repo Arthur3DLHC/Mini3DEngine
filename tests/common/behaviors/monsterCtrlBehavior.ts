@@ -119,6 +119,7 @@ export class MonsterCtrlBehavior extends Behavior {
             this.owner.worldTransform.getTranslation(MonsterCtrlBehavior._tmpMyPosition);
             this._player.worldTransform.getTranslation(MonsterCtrlBehavior._tmpPlayerPosition);
 
+            // set player direction as destination direction
             vec3.direction(MonsterCtrlBehavior._tmpMyPosition, MonsterCtrlBehavior._tmpPlayerPosition, this._destinationDir);
             this._distToPlayer = vec3.distance(MonsterCtrlBehavior._tmpMyPosition, MonsterCtrlBehavior._tmpPlayerPosition);
         }
@@ -147,18 +148,35 @@ export class MonsterCtrlBehavior extends Behavior {
                 this.turnToFaceDestination();
 
                 // move toward cur facing dir
+                this._veloctity.x = this._facingDir.x * this.moveSpeed;
+                this._veloctity.z = this._facingDir.z * this.moveSpeed;
 
                 // if approached destination position, idle or attack ?
                 // refers to cur behavior is patrolling or chasing?
+                // what if player dead? change state to idle?
+                if (this.playerInMeleeAttackRange()) {
+                    this.attack();
+                }
                 break;
             case MonsterState.Attacking:
-                // set actionCtrl params
                 // recover time left
+                this._recoverTimeLeft -= Clock.instance.elapsedTime;
+                if (this._recoverTimeLeft < 0.0) {
+                    // attack again or rest?
+                    if (this.playerInMeleeAttackRange()) {
+                        this.attack();
+                    } else {
+                        this.rest();
+                    }
+                }
                 break;
             case MonsterState.Attacked:
-                // set actionCtrl params
                 // recover time left
+                this._recoverTimeLeft -= Clock.instance.elapsedTime;
                 // if recovered (and player in sense range?), move toward player
+                if (this._recoverTimeLeft < 0.0) {
+                    this.rest();
+                }
                 break;
             case MonsterState.Down:
                 // set actionCtrl params
@@ -198,6 +216,7 @@ export class MonsterCtrlBehavior extends Behavior {
     public rest() {
         if (this._curState === MonsterState.Idle || this._curState === MonsterState.Moving) {
             this._curState = MonsterState.Idle;
+            this._actionCtrl.actionParams.set("curAction", MonsterState.Idle);
         }
     }
 
