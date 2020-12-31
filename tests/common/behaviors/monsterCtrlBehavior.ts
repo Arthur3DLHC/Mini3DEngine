@@ -98,8 +98,8 @@ export class MonsterCtrlBehavior extends Behavior {
         // call start() for all behaviors of all objects
 
         // so the worldTransform of owner should have been updated already now
-        this.owner.worldTransform.multiplyVec3(new vec3([0, 0, -1]), this._facingDir);
-        this._facingDir.normalize();
+        this.owner.worldTransform.multiplyVec3Normal(new vec3([0, 0, -1]), this._facingDir);
+        // this._facingDir.normalize();
     }
 
     public update() {
