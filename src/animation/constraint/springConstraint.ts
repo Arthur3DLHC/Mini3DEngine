@@ -7,7 +7,12 @@ import { BaseConstraint } from "./baseConstraint.js";
  * spring constraint
  */
 export class SpringConstraint extends BaseConstraint {
-    public enable: boolean = true;
+    public set enable(val: boolean) {
+        super.enable = val;
+        if (!val) {
+            this._started = false;
+        }
+    }
     /** spring effect on rotation or translation? */
     public rotation: boolean = true;
     /** length form spring head to tail */
@@ -39,9 +44,12 @@ export class SpringConstraint extends BaseConstraint {
 
     private static _tmpVec: vec3 = new vec3();
 
+    private _started: boolean = false;
+
     // private static _localEndPoint: vec3 = new vec3();
     // private static _localUpDir: vec3 = new vec3([0, 1, 0]);
 
+    // fix me: when to call start()
     public start() {
         this.calcExpectPoints();
         this._expectHeadPosition.copyTo(this._curHeadPosition);
@@ -49,11 +57,15 @@ export class SpringConstraint extends BaseConstraint {
         SpringConstraint._tmpVec.reset();
         this._headSpeed.reset();
         this._tailSpeed.reset();
+        this._started = true;
     }
 
     public update() {
         // this constraint will work after owner.worldTransform matrix updated,
         // and before children update
+        if (!this._started) {
+            this.start();
+        }
 
         // get the expected head and tail position of the bone
         this.calcExpectPoints();

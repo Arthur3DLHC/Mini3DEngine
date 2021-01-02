@@ -8,6 +8,11 @@ export class BaseConstraint {
     public get owner() {return this._owner;}
     private _owner: Object3D;
 
+    public get enable(): boolean { return this._enable; }
+    public set enable(val: boolean) { this._enable = val; }
+
+    protected _enable: boolean = true;
+
     /**
      * internal use
      * will be filled when updating objects in scene
@@ -21,6 +26,11 @@ export class BaseConstraint {
     // }
 
     // public addToUpdateList() {BaseConstraint.updateList.push(this);}
+
+    /**
+     * initialize the constraint state
+     */
+    public start() {}
 
     /**
      * update function. apply constraint to owner transform

@@ -215,6 +215,21 @@ export class Object3D {
         }
     }
 
+    /**
+     * start all behaviors
+     * should call this after the first time the worldTransform has been updated?
+     */
+    public start() {
+        for (const behavior of this.behaviors) {
+            behavior.start()
+        }
+
+        // update children?
+        for (const child of this._children) {
+            child.start();
+        }
+    }
+
     // 每次更新应该先更新 behavior，再更新 transform，最后更新 visual
     // Fix me: 是应该分三次递归调用，还是一次递归调用中每对象分别调用？
     public updateBehavior() {
@@ -252,7 +267,7 @@ export class Object3D {
         }
         // after local transform?
         for (const constraint of this.constraintsLocal) {
-            constraint.update();
+            if(constraint.enable) constraint.update();
         }
         // todo: mark local transform dirty?
         if (updateChildren) {
@@ -285,14 +300,14 @@ export class Object3D {
             this.localTransform.copyTo(this.worldTransform);
         }
 
+        // update constraints, after world transform updated, and before children update.
+        for (const constraint of this.constraintsWorld) {
+            if (constraint.enable) constraint.update();
+        }
+
         this._moved = ! this.worldTransformPrev.equals(this.worldTransform);
 
         this.onWorldTransformUpdated();
-
-        // update constraints, after world transform updated, and before children update.
-        for (const constraint of this.constraintsWorld) {
-            constraint.update();
-        }
 
         if( updateChildren ) {
             for (const child of this._children) {
