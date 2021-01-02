@@ -3,7 +3,6 @@ import vec4 from "../../lib/tsm/vec4.js";
 import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { TextureCube } from "../WebGLResources/textures/textureCube.js";
 import { SkinMesh } from "./skinMesh.js";
-import { BaseConstraint } from "../animation/constraint/baseConstraint.js";
 
 export class Scene extends Object3D {
     // todo: skybox?
@@ -23,13 +22,13 @@ export class Scene extends Object3D {
     public update() {
         this.updateBehavior();
         
-        BaseConstraint.updateList.length = 0;
+        // BaseConstraint.updateList.length = 0;
         this.updateLocalTransform(false, true);
-        BaseConstraint.updateConstraints();
+        // BaseConstraint.updateConstraints();
 
-        BaseConstraint.updateList.length = 0;
+        // BaseConstraint.updateList.length = 0;
         this.updateWorldTransform(false, true);
-        BaseConstraint.updateConstraints();
+        // BaseConstraint.updateConstraints();
 
         SkinMesh.updateSkinMeshes(this);
     }

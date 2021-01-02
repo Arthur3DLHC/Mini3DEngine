@@ -876,17 +876,24 @@ export default class mat4 {
         ])
     }
 
-    static lookAt(position: vec3, target: vec3, up: vec3 = vec3.up): mat4 {
-        if (position.equals(target)) {
-            return this.identity
+    static lookAt(position: vec3, target: vec3, up: vec3 = vec3.up, dest?: mat4): mat4 {
+        if (dest === undefined) {
+            dest = new mat4();
         }
 
-        const z = vec3.difference(position, target).normalize()
+        if (position.equals(target)) {
+            mat4.identity.copyTo(dest);
+            return dest;
+        }
 
-        const x = vec3.cross(up, z).normalize()
-        const y = vec3.cross(z, x).normalize()
+        const tmpVec: vec3 = new vec3();
 
-        return new mat4([
+        const z = vec3.difference(position, target, tmpVec).normalize();
+
+        const x = vec3.cross(up, z, tmpVec).normalize();
+        const y = vec3.cross(z, x, tmpVec).normalize();
+
+        return dest.init([
             x.x,
             y.x,
             z.x,
@@ -906,7 +913,29 @@ export default class mat4 {
             -vec3.dot(y, position),
             -vec3.dot(z, position),
             1,
-        ])
+        ]);
+
+        // return new mat4([
+        //     x.x,
+        //     y.x,
+        //     z.x,
+        //     0,
+
+        //     x.y,
+        //     y.y,
+        //     z.y,
+        //     0,
+
+        //     x.z,
+        //     y.z,
+        //     z.z,
+        //     0,
+
+        //     -vec3.dot(x, position),
+        //     -vec3.dot(y, position),
+        //     -vec3.dot(z, position),
+        //     1,
+        // ])
     }
 
     static product(m1: mat4, m2: mat4, result?: mat4): mat4 {

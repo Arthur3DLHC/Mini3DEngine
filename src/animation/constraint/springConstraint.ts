@@ -1,3 +1,4 @@
+import mat4 from "../../../lib/tsm/mat4.js";
 import vec3 from "../../../lib/tsm/vec3.js";
 import { Clock } from "../../scene/clock.js";
 import { BaseConstraint } from "./baseConstraint.js";
@@ -18,61 +19,80 @@ export class SpringConstraint extends BaseConstraint {
     /** gravity */
     public gravity: number = 0.0;
 
-    public localEndPoint: vec3 = new vec3([0, 0, 0.1]);
+    public localTailPosition: vec3 = new vec3([0, 0, 0.1]);
     public localUpDir: vec3 = new vec3([0, 1, 0]);
 
-    private _curStartPoint: vec3 = new vec3();
-    private _curEndPoint: vec3 = new vec3();
+    /** 'head' is the 'root' of the bone */
+    private _curHeadPosition: vec3 = new vec3();
+    /** 'tail' is the 'end' or 'tip' of the bone */
+    private _curTailPosition: vec3 = new vec3();
 
-    private _wishStartPoint: vec3 = new vec3();
-    private _wishEndPoint: vec3 = new vec3();
+    /** 'head' is the 'root' of the bone */
+    private _expectHeadPosition: vec3 = new vec3();
+    /** 'tail' is the 'end' or 'tip' of the bone */
+    private _expectTailPosition: vec3 = new vec3();
 
-    private _curStartSpeed: vec3 = new vec3();
-    private _curEndSpeed: vec3 = new vec3();
+    /** 'head' is the 'root' of the bone */
+    private _headSpeed: vec3 = new vec3();
+    /** 'tail' is the 'end' or 'tip' of the bone */
+    private _tailSpeed: vec3 = new vec3();
 
-    private static _tmpOffset: vec3 = new vec3();
+    private static _tmpVec: vec3 = new vec3();
 
     // private static _localEndPoint: vec3 = new vec3();
     // private static _localUpDir: vec3 = new vec3([0, 1, 0]);
 
-    public init() {
-        this.calcWishPoints();
-        this._wishStartPoint.copyTo(this._curStartPoint);
-        this._wishEndPoint.copyTo(this._curEndPoint);
-        SpringConstraint._tmpOffset.reset();
-        this._curStartSpeed.reset();
-        this._curEndSpeed.reset();
+    public start() {
+        this.calcExpectPoints();
+        this._expectHeadPosition.copyTo(this._curHeadPosition);
+        this._expectTailPosition.copyTo(this._curTailPosition);
+        SpringConstraint._tmpVec.reset();
+        this._headSpeed.reset();
+        this._tailSpeed.reset();
     }
 
-    // fix me: are constraints behaviors?
     public update() {
-        // this constraint will work after owner.worldTransform matrix updated
+        // this constraint will work after owner.worldTransform matrix updated,
+        // and before children update
 
-        // get the start point and end point of the bone
-        this.calcWishPoints();
+        // get the expected head and tail position of the bone
+        this.calcExpectPoints();
 
-        // move cur start and end point toward them
-        this._wishEndPoint.copyTo(SpringConstraint._tmpOffset);
-        SpringConstraint._tmpOffset.subtract(this._curEndPoint);
-        SpringConstraint._tmpOffset.scale(this.stiffness);
-        this._curEndSpeed.add(SpringConstraint._tmpOffset);
-        this._curEndSpeed.scale(this.damp);
+        const elapsedTime = Clock.instance.elapsedTime;
 
-        // fix me: multiply by elapsed time?
-        this._curEndSpeed.copyTo(SpringConstraint._tmpOffset);
-        SpringConstraint._tmpOffset.scale(Clock.instance.elapsedTime);
+        // move cur head and tail position toward them
 
-        this._curEndPoint.add(SpringConstraint._tmpOffset);
+        // alias
+        const accel = SpringConstraint._tmpVec;
 
-        // todo: look from withstartpoint to curendpoint
+        this._expectTailPosition.copyTo(accel);
+        accel.subtract(this._curTailPosition);
+        // fix me: multiply accel by elapsed time?
+        accel.scale(this.stiffness * elapsedTime);
+        this._tailSpeed.add(accel);
+        this._tailSpeed.scale(this.damp);
+
+        // fix me: multiply position by elapsed time?
+        const offset = SpringConstraint._tmpVec;
+
+        this._tailSpeed.copyTo(offset);
+        offset.scale(Clock.instance.elapsedTime);
+
+        this._curTailPosition.add(offset);
+
+        // todo: look from expect head to cur tail
+        // calculate worldTransform
+        // will not affect local rotation scale translation?
+        const boneUpWorld = SpringConstraint._tmpVec;
+        this.owner.worldTransform.multiplyVec3Normal(this.localUpDir, boneUpWorld);
+
+        mat4.lookAt(this._expectHeadPosition, this._curTailPosition, boneUpWorld, this.owner.worldTransform);
     }
 
-    private calcWishPoints() {
-        this.owner.worldTransform.getTranslation(this._wishStartPoint);
+    private calcExpectPoints() {
+        // worldTransform has been updated already
+        this.owner.worldTransform.getTranslation(this._expectHeadPosition);
         // fix me: which axis is the bone alonging in blender?
-        // SpringConstraint._localEndPoint.x = 0;
-        // SpringConstraint._localEndPoint.y = 0;
-        // SpringConstraint._localEndPoint.z = this.springLength;
-        this.owner.worldTransform.multiplyVec3(this.localEndPoint, this._wishEndPoint);
+        this.owner.worldTransform.multiplyVec3(this.localTailPosition, this._expectTailPosition);
     }
 }

@@ -250,8 +250,9 @@ export class Object3D {
         if (this.autoUpdateTransform || forceUpdate) {
             this.localTransform.compose(this.translation, this.rotation, this.scale);
         }
+        // after local transform?
         for (const constraint of this.constraintsLocal) {
-            constraint.addToUpdateList();
+            constraint.update();
         }
         // todo: mark local transform dirty?
         if (updateChildren) {
@@ -288,8 +289,9 @@ export class Object3D {
 
         this.onWorldTransformUpdated();
 
+        // update constraints, after world transform updated, and before children update.
         for (const constraint of this.constraintsWorld) {
-            constraint.addToUpdateList();
+            constraint.update();
         }
 
         if( updateChildren ) {
