@@ -85,7 +85,7 @@ export class GLTFSceneBuilder {
 
     public physicsMaterials: Map<string, CANNON.Material> | null = null;
 
-    public processConstraint: null | ((node: Object3D, nodeDef: Node) => void) = null;
+    public processConstraints: null | ((node: Object3D, nodeDef: Node) => void) = null;
 
     /**
      * build scene hierarchy from gltf asset. NOTE: don't call this before all binary datas has been loaded.
@@ -286,8 +286,8 @@ export class GLTFSceneBuilder {
         // a mesh node can also have constraint?
         // a node can have multiple constraints?
         if (nodeDef.extras !== undefined) {
-            if (nodeDef.extras.constraints > 0 && this.processConstraint !== null) {
-                this.processConstraint(node, nodeDef);
+            if (nodeDef.extras.constraints > 0 && this.processConstraints !== null) {
+                this.processConstraints(node, nodeDef);
             }
         }
 
