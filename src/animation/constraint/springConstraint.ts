@@ -24,7 +24,9 @@ export class SpringConstraint extends BaseConstraint {
     /** gravity */
     public gravity: number = 0.0;
 
+    /** the bone default tail axis is +y in blender; swap y-z here ? */
     public localTailPosition: vec3 = new vec3([0, 0, 0.1]);
+    /** the bone default up axis is +z in blender; swap y-z here ? */
     public localUpDir: vec3 = new vec3([0, 1, 0]);
 
     /** 'head' is the 'root' of the bone */
