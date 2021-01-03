@@ -273,7 +273,7 @@ export class GLTFSceneBuilder {
                 } else if (nodeDef.extras.extType == "gameObject" && this.processPrefab !== null) {
                     // todo: object prefab key?
                     // define components in prefab json file,
-                    // then add the prefab file path to object in blender
+                    // then add the prefab key as object custrom property in blender
                     // can only set no mesh node as gameobject?
                     node = this.processPrefab(nodeDef);
                 } else {
