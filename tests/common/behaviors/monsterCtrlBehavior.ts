@@ -206,10 +206,12 @@ export class MonsterCtrlBehavior extends Behavior {
 
     public onAttacked() {
         if (this._curState !== MonsterState.Down) {
+            // todo: calculate damage and hp left.
+            // if hp < 0, down; else attacked
+            // the down animation will be played once and keep the pose at last frame;
             this._curState = MonsterState.Attacked;
             this._actionCtrl.actionParams.set("curAction", MonsterState.Attacked);
             this._recoverTimeLeft = 1.0;
-            // todo: if hp < 0, down
         }
     }
 

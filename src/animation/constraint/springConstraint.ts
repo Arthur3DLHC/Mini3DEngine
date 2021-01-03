@@ -62,7 +62,8 @@ export class SpringConstraint extends BaseConstraint {
 
     public update() {
         // this constraint will work after owner.worldTransform matrix updated,
-        // and before children update
+        // and before children update.
+        // so if a chain of bones all have spring constraint, they can be affected from parent to child one by one.
         if (!this._started) {
             this.start();
         }

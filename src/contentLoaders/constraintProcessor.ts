@@ -7,7 +7,7 @@ export class ConstraintProcessor {
      * default constraints processing function
      * registered to GltfSceneBuilder.processConstraints
      */
-    public processConstraints(node: Object3D, nodeDef: Node) {
+    public processConstraintsGltf(node: Object3D, nodeDef: Node) {
         const ext = nodeDef.extras;
         if (ext.springConstraint !== undefined) {
             // springConstraint object
