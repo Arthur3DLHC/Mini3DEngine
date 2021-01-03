@@ -85,6 +85,8 @@ export class GLTFSceneBuilder {
 
     public physicsMaterials: Map<string, CANNON.Material> | null = null;
 
+    public processConstraint: null | ((node: Object3D, nodeDef: Node) => void) = null;
+
     /**
      * build scene hierarchy from gltf asset. NOTE: don't call this before all binary datas has been loaded.
      * @param gltf the GlTf asset data
@@ -268,14 +270,24 @@ export class GLTFSceneBuilder {
                     node = this.processCollider(nodeDef, gltf);
                 } else {
                     // todo: other extra object types
-                    // todo: object prefab?
+                    // todo: object prefab key?
                     // define components in prefab json file,
                     // then add the prefab file path to object in blender
+                    // can only set no mesh node as gameobject?
                     node = new Object3D();
                 }
             }
             else {
                 node = new Object3D();
+            }
+        }
+
+        // todo: if node extras has constraints, parse it?
+        // a mesh node can also have constraint?
+        // a node can have multiple constraints?
+        if (nodeDef.extras !== undefined) {
+            if (nodeDef.extras.constraints > 0 && this.processConstraint !== null) {
+                this.processConstraint(node, nodeDef);
             }
         }
 
