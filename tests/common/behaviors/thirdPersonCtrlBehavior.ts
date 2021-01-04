@@ -15,6 +15,9 @@ import { MouseLookModes } from "./mouseLookModes.js";
  *  and fix the rotation.
  */
 export class ThirdPersonCtrlBehavior extends Behavior {
+    public get typeName(): string {
+        return "ThirdPersonCtrlBehavior";
+    }
     public constructor(owner: Object3D, body: RigidBody, camera: Camera) {
         super(owner);
         this._body = body;

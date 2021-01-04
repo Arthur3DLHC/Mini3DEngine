@@ -3,7 +3,7 @@ import { Object3D } from "./object3D.js";
 /**
  * base class for behaviors
  */
-export class Behavior {
+export abstract class Behavior {
     public constructor(owner: Object3D) {
         this._owner = owner;
     }
@@ -12,6 +12,9 @@ export class Behavior {
     public get owner(): Object3D {
         return this._owner;
     }
+
+    /** subclasses must return its own type name */
+    public abstract get typeName(): string;
 
     public start() {
         // subclass can find required components and objects now.

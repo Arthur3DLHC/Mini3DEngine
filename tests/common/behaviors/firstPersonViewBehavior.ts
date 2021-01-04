@@ -7,6 +7,9 @@ import mat4 from "../../../lib/tsm/mat4.js";
  * unreal like first-person view controller, no physics. only for nevagating 3D scenes
  */
 export class FirstPersonViewBehavior extends Behavior {
+    public get typeName(): string {
+        return "FirstPersonViewBehavior";
+    }
     public constructor(owner: Object3D) {
         super(owner);
         this.mouseSensitivity = 0.002;

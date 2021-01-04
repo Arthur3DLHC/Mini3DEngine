@@ -6,6 +6,9 @@ import { PhysicsWorld } from "./physicsWorld.js";
  * base physics behavior
  */
 export class PhysicsBehavior extends Behavior {
+    public get typeName(): string {
+        return "PhysicsBehavior";
+    }
     public constructor(owner: Object3D, physicsWorld: PhysicsWorld) {
         super(owner);
         this._world = physicsWorld;

@@ -15,6 +15,9 @@ export enum MonsterState {
  * general monster control
  */
 export class MonsterCtrlBehavior extends Behavior {
+    public get typeName(): string {
+        return "MonsterCtrlBehavior";
+    }
     public constructor(owner: Object3D, body: RigidBody, actionCtrl: ActionControlBehavior, player: Object3D) {
         super(owner);
         this._body = body;

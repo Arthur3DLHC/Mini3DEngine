@@ -4,6 +4,9 @@ import mat4 from "../../../lib/tsm/mat4.js";
 import vec4 from "../../../lib/tsm/vec4.js";
 
 export class LookatBehavior extends Behavior {
+    public get typeName(): string {
+        return "LookatBehavior";
+    }
     public constructor(owner: Object3D) {
         super(owner);
         this.position = new vec3();

@@ -10,6 +10,9 @@ import { ActionStateMachine } from "./stateMachine/actionStateMachine.js";
  * hold the action state machine, and the parameters driving the machine
  */
 export class ActionControlBehavior extends Behavior {
+    public get typeName(): string {
+        return "ActionControlBehavior";
+    }
     public constructor(owner: Object3D, anims: AnimationAction[]) {
         super(owner);
         // this._stateMachine = new ActionStateMachine(this);

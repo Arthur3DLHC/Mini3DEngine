@@ -7,6 +7,9 @@ import { PhysicsBehavior } from "./physicsBehavior.js";
 import { PhysicsWorld } from "./physicsWorld.js";
 
 export class RigidBody extends PhysicsBehavior {
+    public get typename(): string {
+        return "RigidBody";
+    }
     public constructor(owner: Object3D, physicsWorld: PhysicsWorld, option?: CANNON.IBodyOptions) {
         super(owner, physicsWorld);
         

@@ -2,6 +2,9 @@ import { ActionControlBehavior, AnimationLayer, Camera, Object3D, RigidBody } fr
 import { ThirdPersonCtrlBehavior } from "../common/behaviors/thirdPersonCtrlBehavior.js";
 
 export class ThirdPersonShooterBehavior extends ThirdPersonCtrlBehavior {
+    public get typeName(): string {
+        return "ThirdPersonShooterBehavior";
+    }
     public constructor(owner: Object3D, body: RigidBody, camera: Camera, actionCtrl: ActionControlBehavior) {
         super(owner, body, camera);
         this._actionCtrl = actionCtrl;

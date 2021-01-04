@@ -1,3 +1,4 @@
+import { BehaviorFactory } from "../scene/behaviorFactory.js";
 import { Object3D } from "../scene/object3D.js";
 import { Node } from "./gltf.js";
 import { GltfAsset } from "./gltfAsset.js";
@@ -13,6 +14,11 @@ export class PrefabManager {
      * fill this map after all gltf assets loaded?
      */
     public gltfAssets: Map<string, GltfAsset> = new Map<string, GltfAsset>();
+
+    /** 
+     * the behavior factory that the app will use
+     */
+    public behaviorFactory: BehaviorFactory | null = null;
 
     // create object from prefab
     public createFromPrefab(key: string): Object3D {
@@ -38,7 +44,7 @@ export class PrefabManager {
         const ret = this.createFromPrefab(nodeDef.extras.prefab);
         // todo: apply properties of behaviors.
         // the behavior property format in gltf extras:
-        // "behavior_property": value
+        // "behavior.property": value
         // fix me: how to find a behavior object by its type?
         return ret;
     }

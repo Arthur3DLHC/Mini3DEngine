@@ -12,5 +12,8 @@ export const MakePoses = {
 };
 
 export class MakePoseBehavior extends Behavior {
+    public get typeName(): string {
+        return "MakePoseBehavior";
+    }
     public curPose: string = MakePoses.IDLE;
 }
