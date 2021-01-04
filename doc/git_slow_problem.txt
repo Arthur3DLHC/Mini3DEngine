@@ -1,0 +1,29 @@
+解决访问github慢问题：
+https://sobaigu.com/git-set-proxy-for-github.html
+
+Git设置或取消代理方式连接网络，只需要执行以下命令：
+
+（假设代理服务器软件的端口为 1080）
+
+#设置使用http/https本地代理
+git config --global https.proxy http://127.0.0.1:1080
+git config --global https.proxy https://127.0.0.1:1080
+#取消http/https本地代理
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+
+以上方式如果还不能解决，可以再次尝试设置sock5代理：
+
+git config --global http.proxy 'socks5://127.0.0.1:1080'
+git config --global https.proxy 'socks5://127.0.0.1:1080'
+
+如果只针对GitHub设置代理，则用如下命令：（LHC 实测有效）
+
+#只对github.com
+git config --global http.https://github.com.proxy socks5://127.0.0.1:1080
+
+对于使用 ssh:// 协议的，可以配置socks5代理，在 ~/.ssh/config 文件内容后面添加几行：
+
+Host github.com
+User git
+ProxyCommand connect -S 127.0.0.1:1080 %h %p
