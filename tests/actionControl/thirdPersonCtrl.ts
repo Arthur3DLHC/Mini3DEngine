@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition, ActionStateBlendTree, AnimationBlendNode, BlendMethods, SingleParamCondition, TimeUpCondition, AnimationMask, SkinMesh, AnimationLoopMode, InstancedMesh, SilhouetteSelectMode } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition, ActionStateBlendTree, AnimationBlendNode, BlendMethods, SingleParamCondition, TimeUpCondition, AnimationMask, SkinMesh, AnimationLoopMode, InstancedMesh, SilhouetteSelectMode, ConstraintProcessor } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
@@ -148,13 +148,17 @@ window.onload = () => {
         skyboxTexture.width = skyboxTexture.images[0].width;
         skyboxTexture.height = skyboxTexture.images[0].height;
         skyboxTexture.mipLevels = 1;
-        skyboxTexture.samplerState = new SamplerState();
+        skyboxTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE);
         skyboxTexture.upload();
         scene.background = skyboxTexture;
         scene.backgroundIntensity = 1;
         scene.irradianceIntensity = 1;
 
         const builderFemale = new GLTFSceneBuilder();
+        const constraintProcssor = new ConstraintProcessor();
+
+        builderFemale.processConstraints = constraintProcssor.processConstraintsGltf;
+
         const animations: AnimationAction[] = [];
 
         const gltfSceneFemale = builderFemale.build(loaded[0], 0, animations);
@@ -389,7 +393,7 @@ window.onload = () => {
             // gltfNode.boundingSphereRenderMode = BoundingRenderModes.normal;
         } else if (gltfNode instanceof EnvironmentProbe) {
             const envProbe = gltfNode as EnvironmentProbe;
-            // envProbe.debugDraw = true;
+            envProbe.debugDraw = true;
         }
 
         for (const child of gltfNode.children) {

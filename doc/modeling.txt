@@ -24,6 +24,10 @@
             2) 在 NLA 面板将 action push down 为 NLA Track，命名；设置其 Action Clip 的帧数
             3) 注意在点击 NLA Track 的五角星进入 solo 模式时，要在 Dope Sheet 的 Action Editor 里选择相应的 Action 进行编辑，不要错用其他 Action
 
+    骨骼约束
+        如果要在骨头上加约束自定义属性，需要在 Edit mode 下加，否则不会导出成 gltf 中的 extras
+            原因：blender 的骨骼有两套骨架数据：编辑骨架和姿势骨架。blender 的导出插件使用的是编辑骨架
+
 关卡模型制作注意事项：
 
     模型制作

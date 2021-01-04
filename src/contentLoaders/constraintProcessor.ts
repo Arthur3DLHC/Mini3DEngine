@@ -13,6 +13,7 @@ export class ConstraintProcessor {
             // springConstraint object
             const spring = new SpringConstraint(node);
             spring.enable = true;
+
             // properties
             if (ext.spring_rotation !== undefined) spring.rotation = ext.spring_rotation;
             if (ext.spring_stiff !== undefined) spring.stiffness = ext.spring_stiff;

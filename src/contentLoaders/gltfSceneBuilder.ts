@@ -290,7 +290,8 @@ export class GLTFSceneBuilder {
         // a mesh node can also have constraint?
         // a node can have multiple constraints?
         if (nodeDef.extras !== undefined) {
-            if (nodeDef.extras.constraints > 0 && this.processConstraints !== null) {
+            // if (nodeDef.extras.constraints > 0 && this.processConstraints !== null) {
+             if (this.processConstraints !== null) {
                 this.processConstraints(node, nodeDef);
             }
         }
