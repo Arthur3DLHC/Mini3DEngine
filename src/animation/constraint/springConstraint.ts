@@ -19,15 +19,15 @@ export class SpringConstraint extends BaseConstraint {
     /** length form spring head to tail */
     // public springLength: number = 0.1;
     /** bouncy */
-    public stiffness: number = 0.5;
+    public stiffness: number = 1;
     /** speed */
-    public damp: number = 1.0;
+    public damp: number = 0.5;
     /** gravity */
     public gravity: number = 0.0;
 
-    /** the bone default tail axis is +y in blender; swap y-z here ? */
+    /** the bone default tail axis is +y in blender; swap y-z and nagate */
     public localTailPosition: vec3 = new vec3([0, 0, -0.1]);
-    /** the bone default up axis is +z in blender; swap y-z here ? */
+    /** the bone default up axis is +z in blender; swap y-z here */
     public localUpDir: vec3 = new vec3([0, 1, 0]);
 
     /** 'head' is the 'root' of the bone */
@@ -77,24 +77,27 @@ export class SpringConstraint extends BaseConstraint {
         const elapsedTime = Math.min(0.1, Clock.instance.elapsedTime);
 
         // move cur head and tail position toward them
+        // https://github.com/artellblender/springbones/blob/master/spring_bones.py
+        // note: the head and tail have different meaning in reference code:
+        // head = cur tail posiiton
+        // tail = expected tail position
 
         // alias
         const accel = SpringConstraint._tmpVec;
 
         this._expectTailPosition.copyTo(accel);
         accel.subtract(this._curTailPosition);
-        // fix me: multiply accel by elapsed time?
-        accel.scale(this.stiffness * elapsedTime);
+        accel.scale(this.stiffness);
+
         this._tailSpeed.add(accel);
         this._tailSpeed.scale(this.damp);
 
-        // fix me: multiply position by elapsed time?
-        const offset = SpringConstraint._tmpVec;
+        // const offset = SpringConstraint._tmpVec;
 
-        this._tailSpeed.copyTo(offset);
-        offset.scale(elapsedTime);
+        // this._tailSpeed.copyTo(offset);
+        // offset.scale(elapsedTime);
 
-        this._curTailPosition.add(offset);
+        this._curTailPosition.add(this._tailSpeed);
 
         // todo: look from expect head to cur tail
         // calculate worldTransform
