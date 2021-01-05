@@ -15,7 +15,13 @@ export class SpringConstraint extends BaseConstraint {
         }
     }
     /** spring effect on rotation or translation? */
-    public rotation: boolean = true;
+    public get rotation(): boolean {return this._rotation;}
+    public set rotation(val: boolean) {
+        if (this._rotation !== val) {
+            this._rotation = val;
+            this._started = false;  // need to reset
+        }
+    }
     /** length form spring head to tail */
     // public springLength: number = 0.1;
     /** bouncy */
@@ -30,10 +36,15 @@ export class SpringConstraint extends BaseConstraint {
     /** the bone default up axis is +z in blender; swap y-z here */
     public localUpDir: vec3 = new vec3([0, 1, 0]);
 
-    /** 'head' is the 'root' of the bone */
-    private _curHeadPosition: vec3 = new vec3();
-    /** 'tail' is the 'end' or 'tip' of the bone */
-    private _curTailPosition: vec3 = new vec3();
+    private _rotation: boolean = true;
+    // private _curHeadPosition: vec3 = new vec3();
+
+    /** 
+     * cur head (translation mode) or tail (rotation mode) position
+     * 'head' is the 'root' of the bone
+     * 'tail' is the 'end' or 'tip' of the bone
+     */
+    private _curPosition: vec3 = new vec3();
 
     /** 'head' is the 'root' of the bone */
     private _expectHeadPosition: vec3 = new vec3();
@@ -41,9 +52,14 @@ export class SpringConstraint extends BaseConstraint {
     private _expectTailPosition: vec3 = new vec3();
 
     /** 'head' is the 'root' of the bone */
-    private _headSpeed: vec3 = new vec3();
-    /** 'tail' is the 'end' or 'tip' of the bone */
-    private _tailSpeed: vec3 = new vec3();
+    // private _headSpeed: vec3 = new vec3();
+
+    /** 
+     * cur head (translation mode) or tail (rotation mode) speed
+     * 'head' is the 'root' of the bone
+     * 'tail' is the 'end' or 'tip' of the bone
+     */
+    private _curSpeed: vec3 = new vec3();
 
     private static _tmpVec: vec3 = new vec3();
 
@@ -55,11 +71,13 @@ export class SpringConstraint extends BaseConstraint {
     // fix me: when to call start()
     public start() {
         this.calcExpectPoints();
-        this._expectHeadPosition.copyTo(this._curHeadPosition);
-        this._expectTailPosition.copyTo(this._curTailPosition);
+        if (this.rotation) {
+            this._expectTailPosition.copyTo(this._curPosition);
+        } else {
+            this._expectHeadPosition.copyTo(this._curPosition);
+        }
         SpringConstraint._tmpVec.reset();
-        this._headSpeed.reset();
-        this._tailSpeed.reset();
+        this._curSpeed.reset();
         this._started = true;
     }
 
@@ -74,7 +92,7 @@ export class SpringConstraint extends BaseConstraint {
         // get the expected head and tail position of the bone
         this.calcExpectPoints();
 
-        const elapsedTime = Math.min(0.1, Clock.instance.elapsedTime);
+        // const elapsedTime = Math.min(0.1, Clock.instance.elapsedTime);
 
         // move cur head and tail position toward them
         // https://github.com/artellblender/springbones/blob/master/spring_bones.py
@@ -86,27 +104,31 @@ export class SpringConstraint extends BaseConstraint {
         const accel = SpringConstraint._tmpVec;
 
         this._expectTailPosition.copyTo(accel);
-        accel.subtract(this._curTailPosition);
+        accel.subtract(this._curPosition);
         accel.scale(this.stiffness);
 
-        this._tailSpeed.add(accel);
-        this._tailSpeed.scale(this.damp);
+        this._curSpeed.add(accel);
+        this._curSpeed.scale(this.damp);
 
         // const offset = SpringConstraint._tmpVec;
 
         // this._tailSpeed.copyTo(offset);
         // offset.scale(elapsedTime);
 
-        this._curTailPosition.add(this._tailSpeed);
+        this._curPosition.add(this._curSpeed);
 
-        // todo: look from expect head to cur tail
-        // calculate worldTransform
-        // will not affect local rotation scale translation?
-        const boneUpWorld = SpringConstraint._tmpVec;
-        this.owner.worldTransform.multiplyVec3Normal(this.localUpDir, boneUpWorld);
+        if (this.rotation) {
+            // todo: look from expect head to cur tail
+            // calculate worldTransform
+            // will not affect local rotation scale translation?
+            const boneUpWorld = SpringConstraint._tmpVec;
+            this.owner.worldTransform.multiplyVec3Normal(this.localUpDir, boneUpWorld);
 
-        mat4.lookAtInverse(this._expectHeadPosition, this._curTailPosition, boneUpWorld, this.owner.worldTransform);
-
+            mat4.lookAtInverse(this._expectHeadPosition, this._curPosition, boneUpWorld, this.owner.worldTransform);
+        } else {
+            // set translation?
+            this.owner.worldTransform.setTranslation(this._curPosition);
+        }
     }
 
     private calcExpectPoints() {
