@@ -701,8 +701,16 @@ TODO:       主要类结构
 
             ECS 架构
                 从 GLTF 加载组件信息？
-                    读取 object 的自定义属性：组件列表和组件属性？或者 prefab 名称？
-                    使用 json 定义 object prefab 对象；
+                    使用 blender 的空物体作为 gameObject；
+                    记录一个 prefabKey 自定义属性；
+                    可以用名为 "组件名称.属性" 的自定义属性记录组件的属性；
+                    定义一个 GameObjectCreator 接口:
+                        GameObjectCreator.createGameObject(prefabKey: string): Object3D
+                        将此接口的实现类实例给 gltfSceneBuilder
+                        将创建游戏中所有 gameObject 所需的资源列表传入 GameObjectCreator;
+                        createGameObject() 函数的实现由游戏逻辑自己完成；
+                            可以先根据 prefabKey 硬编码
+                            以后再考虑用 json 定义 object prefab 对象，Behavior 列表；
 
             Volume Rendering?
                 带高度渐变的全局雾；
