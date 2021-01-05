@@ -25,7 +25,7 @@ export class SpringConstraint extends BaseConstraint {
     /** length form spring head to tail */
     // public springLength: number = 0.1;
     /** bouncy */
-    public stiffness: number = 1;
+    public stiffness: number = 0.7;
     /** speed */
     public damp: number = 0.5;
     /** gravity */
