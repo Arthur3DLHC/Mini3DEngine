@@ -26,7 +26,7 @@ export class SpringConstraint extends BaseConstraint {
     public gravity: number = 0.0;
 
     /** the bone default tail axis is +y in blender; swap y-z here ? */
-    public localTailPosition: vec3 = new vec3([0, 0, 0.1]);
+    public localTailPosition: vec3 = new vec3([0, 0, -0.1]);
     /** the bone default up axis is +z in blender; swap y-z here ? */
     public localUpDir: vec3 = new vec3([0, 1, 0]);
 
@@ -84,7 +84,7 @@ export class SpringConstraint extends BaseConstraint {
         this._expectTailPosition.copyTo(accel);
         accel.subtract(this._curTailPosition);
         // fix me: multiply accel by elapsed time?
-        accel.scale(this.stiffness);
+        accel.scale(this.stiffness * elapsedTime);
         this._tailSpeed.add(accel);
         this._tailSpeed.scale(this.damp);
 
@@ -92,7 +92,7 @@ export class SpringConstraint extends BaseConstraint {
         const offset = SpringConstraint._tmpVec;
 
         this._tailSpeed.copyTo(offset);
-        // offset.scale(elapsedTime);
+        offset.scale(elapsedTime);
 
         this._curTailPosition.add(offset);
 
