@@ -97,7 +97,8 @@ export class AnimationBlendNode {
 
     public clearAnimationTargetChannelValues() {
         // fix me: how to clear?
-        if (this.animation !== null) {
+        // don't touch the joints if my weight is zero
+        if (this.animation !== null && this.actualWeight > 0.001) {
             this.animation.weight = 0;
             this.animation.applyMode = AnimationApplyMode.replace;
             this.animation.mask = this.tree.machine.animationLayer.mask;

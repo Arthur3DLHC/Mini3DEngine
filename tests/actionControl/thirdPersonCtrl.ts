@@ -393,7 +393,7 @@ window.onload = () => {
             // gltfNode.boundingSphereRenderMode = BoundingRenderModes.normal;
         } else if (gltfNode instanceof EnvironmentProbe) {
             const envProbe = gltfNode as EnvironmentProbe;
-            envProbe.debugDraw = true;
+            // envProbe.debugDraw = true;
         }
 
         for (const child of gltfNode.children) {

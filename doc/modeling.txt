@@ -23,6 +23,7 @@
             1) 在 Dope Sheet 的 Action Editor 新建 action，命名
             2) 在 NLA 面板将 action push down 为 NLA Track，命名；设置其 Action Clip 的帧数
             3) 注意在点击 NLA Track 的五角星进入 solo 模式时，要在 Dope Sheet 的 Action Editor 里选择相应的 Action 进行编辑，不要错用其他 Action
+        5、注意尽量保证要混合到一起的几个动画所涉及的对象或骨头相同；否则混合时容易出现缩放清零
 
     骨骼约束
         如果要在骨头上加 Engine 中的弹簧等约束自定义属性，需要在 Edit mode 下加，否则不会导出成 gltf 中的 extras
