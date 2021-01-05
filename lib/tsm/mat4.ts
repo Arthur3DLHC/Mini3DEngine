@@ -886,12 +886,12 @@ export default class mat4 {
             return dest;
         }
 
-        const tmpVec: vec3 = new vec3();
+        // const tmpVec: vec3 = new vec3();
 
-        const z = vec3.difference(position, target, tmpVec).normalize();
+        const z = vec3.difference(position, target).normalize();
 
-        const x = vec3.cross(up, z, tmpVec).normalize();
-        const y = vec3.cross(z, x, tmpVec).normalize();
+        const x = vec3.cross(up, z).normalize();
+        const y = vec3.cross(z, x).normalize();
 
         return dest.init([
             x.x,
