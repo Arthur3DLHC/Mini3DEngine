@@ -886,8 +886,6 @@ export default class mat4 {
             return dest;
         }
 
-        // const tmpVec: vec3 = new vec3();
-
         const z = vec3.difference(position, target).normalize();
 
         const x = vec3.cross(up, z).normalize();
@@ -936,6 +934,44 @@ export default class mat4 {
         //     -vec3.dot(z, position),
         //     1,
         // ])
+    }
+
+    static lookAtInverse(position: vec3, target: vec3, up: vec3 = vec3.up, dest?: mat4): mat4 {
+        if (dest === undefined) {
+            dest = new mat4();
+        }
+
+        if (position.equals(target)) {
+            mat4.identity.copyTo(dest);
+            return dest;
+        }
+
+        const z = vec3.difference(position, target).normalize();
+
+        const x = vec3.cross(up, z).normalize();
+        const y = vec3.cross(z, x).normalize();
+
+        return dest.init([
+            x.x,
+            x.y,
+            x.z,
+            0,
+
+            y.x,
+            y.y,
+            y.z,
+            0,
+
+            z.x,
+            z.y,
+            z.z,
+            0,
+
+            position.x,
+            position.y,
+            position.z,
+            1,
+        ]);
     }
 
     static product(m1: mat4, m2: mat4, result?: mat4): mat4 {

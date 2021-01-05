@@ -302,7 +302,10 @@ export class Object3D {
 
         // update constraints, after world transform updated, and before children update.
         for (const constraint of this.constraintsWorld) {
-            if (constraint.enable) constraint.update();
+            if (constraint.enable)
+            {
+                constraint.update();
+            }
         }
 
         this._moved = ! this.worldTransformPrev.equals(this.worldTransform);

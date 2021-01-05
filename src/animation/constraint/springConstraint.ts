@@ -7,6 +7,7 @@ import { BaseConstraint } from "./baseConstraint.js";
  * spring constraint
  */
 export class SpringConstraint extends BaseConstraint {
+    public get enable(): boolean { return super.enable; }
     public set enable(val: boolean) {
         super.enable = val;
         if (!val) {
@@ -73,7 +74,7 @@ export class SpringConstraint extends BaseConstraint {
         // get the expected head and tail position of the bone
         this.calcExpectPoints();
 
-        const elapsedTime = Clock.instance.elapsedTime;
+        const elapsedTime = Math.min(0.1, Clock.instance.elapsedTime);
 
         // move cur head and tail position toward them
 
@@ -83,7 +84,7 @@ export class SpringConstraint extends BaseConstraint {
         this._expectTailPosition.copyTo(accel);
         accel.subtract(this._curTailPosition);
         // fix me: multiply accel by elapsed time?
-        accel.scale(this.stiffness * elapsedTime);
+        accel.scale(this.stiffness);
         this._tailSpeed.add(accel);
         this._tailSpeed.scale(this.damp);
 
@@ -91,7 +92,7 @@ export class SpringConstraint extends BaseConstraint {
         const offset = SpringConstraint._tmpVec;
 
         this._tailSpeed.copyTo(offset);
-        offset.scale(Clock.instance.elapsedTime);
+        // offset.scale(elapsedTime);
 
         this._curTailPosition.add(offset);
 
@@ -101,7 +102,8 @@ export class SpringConstraint extends BaseConstraint {
         const boneUpWorld = SpringConstraint._tmpVec;
         this.owner.worldTransform.multiplyVec3Normal(this.localUpDir, boneUpWorld);
 
-        mat4.lookAt(this._expectHeadPosition, this._curTailPosition, boneUpWorld, this.owner.worldTransform);
+        mat4.lookAtInverse(this._expectHeadPosition, this._curTailPosition, boneUpWorld, this.owner.worldTransform);
+
     }
 
     private calcExpectPoints() {
