@@ -4,9 +4,11 @@ import { FirstPersonViewBehavior } from "./firstPersonViewBehavior.js";
 import { MonsterCtrlBehavior } from "./monsterCtrlBehavior.js";
 import { ThirdPersonCtrlBehavior } from "./thirdPersonCtrlBehavior.js";
 
-export class CommonBehaviorFactory implements BehaviorFactory {
+export class CommonBehaviorFactory extends BehaviorFactory {
 
     createBehavior(behaviorType: string, owner: Object3D, options: any): Behavior {
+        // todo: make the constructor of behaviors only have one param: owner
+        // find other behaviors in Behavior.start() function
         switch(behaviorType) {
             case "AutoRotateBehavior":
                 break;
