@@ -7,6 +7,9 @@ import vec3 from "../../lib/tsm/vec3.js";
 import quat from "../../lib/tsm/quat.js";
 import { BoundingRenderModes } from "../renderer/boundingRenderModes.js";
 import { BaseConstraint } from "../animation/constraint/baseConstraint.js";
+import { TimeUpCondition } from "../animation/stateMachine/timeUpCondition.js";
+
+type Constructor<T> = new (...args: any[]) => T;
 
 export class Object3D {
     // base class of all render objects
@@ -230,6 +233,14 @@ export class Object3D {
         }
     }
 
+    public getBehaviorByTypeName(typeName: string): Behavior | undefined {
+        return this.behaviors.find((b) => {return b.typeName === typeName;});
+    }
+
+    public getBehaviorByType<T extends Behavior>(behType: Constructor<T>): Behavior | undefined {
+        return this.behaviors.find((b) => {return b instanceof behType;});
+    }
+
     // 每次更新应该先更新 behavior，再更新 transform，最后更新 visual
     // Fix me: 是应该分三次递归调用，还是一次递归调用中每对象分别调用？
     public updateBehavior() {
@@ -262,6 +273,10 @@ export class Object3D {
     // }
 
     public updateLocalTransform(forceUpdate: boolean, updateChildren: boolean) {
+        if (this._active === false) {
+            return;
+        }
+
         if (this.autoUpdateTransform || forceUpdate) {
             this.localTransform.compose(this.translation, this.rotation, this.scale);
         }
