@@ -112,6 +112,36 @@ export class PlayerPrefab extends BasePrefab {
 
         tpsBehavior.upperBodyLayer = actionCtrlBehavior.animationLayers.find((layer)=>{return layer.name === "upperBody";});
 
+        window.onmousedown = (ev: MouseEvent) => {
+            // fpsBehavior.onMouseDown(ev);
+            if (tpsBehavior !== null) tpsBehavior.onMouseDown(ev);
+        }
+
+        window.onmouseup = (ev: MouseEvent) => {
+            // fpsBehavior.onMouseUp(ev);
+            if (tpsBehavior !== null) tpsBehavior.onMouseUp(ev);
+        }
+
+        window.onmousemove = (ev: MouseEvent) => {
+            // fpsBehavior.onMouseMove(ev);
+            if (tpsBehavior !== null) tpsBehavior.onMouseMove(ev);
+        }
+
+        window.onwheel = (ev: WheelEvent) => {
+            ev.preventDefault();
+            if (tpsBehavior !== null) tpsBehavior.onMouseWheel(ev);
+        }
+
+        window.onkeydown = (ev: KeyboardEvent) => {
+            // fpsBehavior.onKeyDown(ev);
+            if (tpsBehavior !== null) tpsBehavior.onKeyDown(ev);
+        }
+
+        window.onkeyup = (ev: KeyboardEvent) => {
+            // fpsBehavior.onKeyUp(ev);
+            if (tpsBehavior !== null) tpsBehavior.onKeyUp(ev);
+        }
+
         return gltfSceneFemale;
     }
     

@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition, ActionStateBlendTree, AnimationBlendNode, BlendMethods, SingleParamCondition, TimeUpCondition, AnimationMask, SkinMesh, AnimationLoopMode, InstancedMesh, SilhouetteSelectMode, ConstraintProcessor } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, PhysicsWorld, RigidBody, GltfAsset, GLTFLoader, GLTFSceneBuilder, AnimationAction, Object3D, ActionControlBehavior, AnimationLayer, ActionStateMachine, ActionStateSingleAnim, ActionTransition, ActionCondition, ActionStateBlendTree, AnimationBlendNode, BlendMethods, SingleParamCondition, TimeUpCondition, AnimationMask, SkinMesh, AnimationLoopMode, InstancedMesh, SilhouetteSelectMode, ConstraintProcessor, GameObjectCreator } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
@@ -6,6 +6,7 @@ import { SceneHelper } from "../common/sceneHelper.js";
 import quat from "../../lib/tsm/quat.js";
 import vec2 from "../../lib/tsm/vec2.js";
 import { TPSPlayerBehavior } from "./tpsPlayerBehavior.js";
+import { SciFiGameObjCreator } from "./scifiGameObjCreator.js";
 
 window.onload = () => {
     const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
@@ -100,8 +101,9 @@ window.onload = () => {
     addTestDynamicObjects(physicsWorld, widgetPhysicsMtl, scene, addPlane, groundPhysicsMtl);
 
     console.log("loading gltf models...");
+    const gltfCharacterPromises: Promise<GltfAsset>[] = [];
     // todo: load gltf character, load skybox
-    const gltfPromiseFemale: Promise<GltfAsset> = gltfLoader.load("./models/SCIFI/heroes/cyberGirl/CyberGirl_animation.gltf");
+    gltfCharacterPromises.push(gltfLoader.load("./models/SCIFI/heroes/cyberGirl/CyberGirl_animation.gltf"));
     // const gltfPromiseLevel: Promise<GltfAsset> = gltfLoader.load("./models/SCIFI/testlevel/TestLevel.gltf");
     const gltfPromiseLevel: Promise<GltfAsset> = gltfLoader.load("./models/SCIFI/level_1/robot_maintance_area.gltf");
     console.log("loading skybox...");
@@ -131,9 +133,10 @@ window.onload = () => {
         imagePromises.push(imgPromise);
     }
 
+    const charactersPromise = Promise.all(gltfCharacterPromises);
     const imagesPromise = Promise.all(imagePromises);
 
-    Promise.all([gltfPromiseFemale, gltfPromiseLevel, imagesPromise]).then((loaded) => {
+    Promise.all([charactersPromise, gltfPromiseLevel, imagesPromise]).then((loaded) => {
         const skyboxTexture: TextureCube = new TextureCube();
 
         for (let i = 0; i < 6; i++) {
@@ -160,7 +163,12 @@ window.onload = () => {
 
         const animations: AnimationAction[] = [];
 
-        const gltfSceneFemale = builderFemale.build(loaded[0], 0, animations);
+        const gltfAssets: Map<string, GltfAsset> = new Map<string, GltfAsset>();
+        gltfAssets.set("playerFemale", loaded[0][0]);
+
+
+
+        const gltfSceneFemale = builderFemale.build(loaded[0][0], 0, animations);
         gltfSceneFemale.name = "Female";
         gltfSceneFemale.autoUpdateTransform = true;
         gltfSceneFemale.translation.y = 1.5;  // for robot maintance area level
@@ -224,10 +232,14 @@ window.onload = () => {
 
         // build test level
         const builderLevel = new GLTFSceneBuilder();
+
+        // todo: put player and monster prefabs in level in blender and export gltf
+        const gameObjectCreator: SciFiGameObjCreator = new SciFiGameObjCreator(physicsWorld, camera, scene, textureLoader);
         // physics world and material
         builderLevel.physicsWorld = physicsWorld;
         builderLevel.defaultPhysicsMaterial = groundPhysicsMtl;
-
+        builderLevel.gameObjectCreator = gameObjectCreator;
+        
         const gltfSceneLevel = builderLevel.build(loaded[1], 0, undefined, true);
         gltfSceneLevel.name = "Level";
         gltfSceneLevel.autoUpdateTransform = false;
