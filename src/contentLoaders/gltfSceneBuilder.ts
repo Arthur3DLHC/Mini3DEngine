@@ -78,6 +78,8 @@ export class GLTFSceneBuilder {
      */
     public setLightsStatic: boolean = true;
 
+    // fix me: hold ref to scene here?
+
     /** if not null, the collider rigid bodies will be created and added to this world */
     public physicsWorld: PhysicsWorld | null = null;
 
@@ -135,7 +137,10 @@ export class GLTFSceneBuilder {
         const nodes: Object3D[] = [];
 
         for (const nodeDef of gltf.gltf.nodes) {
-            nodes.push(this.processNode(nodeDef, gltf, instancing));
+            const node = this.processNode(nodeDef, gltf, instancing);
+            // if is gameobject, will be null
+            if(node !== null)
+                nodes.push(node);
         }
 
         // sceneDef.nodes is array of root node indices in the scene
@@ -229,10 +234,18 @@ export class GLTFSceneBuilder {
             }
         }
     }
-
-    private processNode(nodeDef: Node, gltf: GltfAsset, instancing: boolean): Object3D {
+    
+    /**
+     * 
+     * @param nodeDef 
+     * @param gltf 
+     * @param instancing
+     * @returns Object3D created accroding to nodeDef, or null if nodeDef is a GameObject (will be add to scene, not level) 
+     */
+    private processNode(nodeDef: Node, gltf: GltfAsset, instancing: boolean): Object3D | null {
 
         let node: Object3D;
+        let isGameObject: boolean = false;
         if (nodeDef.mesh !== undefined) {
             if (this._meshReferences[nodeDef.mesh] > 1) {
                 // todo: handle instancing; create a new instance referencing same geometry;
@@ -278,6 +291,7 @@ export class GLTFSceneBuilder {
                     // define components in prefab json file,
                     // then add the prefab key as object custrom property in blender
                     // can only set no mesh node as gameobject?
+                    isGameObject = true;
                     node = this.gameObjectCreator.createGameObject(nodeDef.extras.prefabKey, nodeDef.extras);
                 } else {
                     // todo: other extra object types
@@ -305,6 +319,7 @@ export class GLTFSceneBuilder {
 
         this.processNodeTransform(nodeDef, node);
 
+        if(isGameObject) return null;
         return node;
 
         //if (nodeDef.children !== undefined) {
