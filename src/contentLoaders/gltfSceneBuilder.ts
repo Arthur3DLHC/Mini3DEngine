@@ -36,6 +36,7 @@ import { EnvironmentProbe, EnvironmentProbeType } from "../scene/environmentProb
 import { DirectionalLightShadow } from "../scene/lights/directionalLightShadow.js";
 import { RigidBody } from "../physics/rigidBody.js";
 import { PhysicsWorld } from "../physics/physicsWorld.js";
+import { GameObjectCreator } from "./gameObjectCreator.js";
 
 export class GLTFSceneBuilder {
     public constructor() {
@@ -87,7 +88,9 @@ export class GLTFSceneBuilder {
 
     public processConstraints: null | ((node: Object3D, nodeDef: Node) => void) = null;
 
-    public processPrefab: ((nodeDef: Node) => Object3D) | null = null;
+    public gameObjectCreator: GameObjectCreator | null = null;
+
+    // public processPrefab: ((nodeDef: Node) => Object3D) | null = null;
 
     /**
      * build scene hierarchy from gltf asset. NOTE: don't call this before all binary datas has been loaded.
@@ -270,12 +273,12 @@ export class GLTFSceneBuilder {
                     node = this.processEnvironmentProbe(nodeDef, gltf);
                 } else if (this.isPhysicsCollider(nodeDef)) {
                     node = this.processCollider(nodeDef, gltf);
-                } else if (nodeDef.extras.extType == "gameObject" && this.processPrefab !== null) {
+                } else if (nodeDef.extras.extType == "gameObject" && this.gameObjectCreator !== null) {
                     // todo: object prefab key?
                     // define components in prefab json file,
                     // then add the prefab key as object custrom property in blender
                     // can only set no mesh node as gameobject?
-                    node = this.processPrefab(nodeDef);
+                    node = this.gameObjectCreator.createGameObject(nodeDef.extras.prefabKey, nodeDef.extras);
                 } else {
                     // todo: other extra object types
                     node = new Object3D();
