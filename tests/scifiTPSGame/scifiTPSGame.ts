@@ -235,10 +235,12 @@ window.onload = () => {
 
         // todo: put player and monster prefabs in level in blender and export gltf
         const gameObjectCreator: SciFiGameObjCreator = new SciFiGameObjCreator(physicsWorld, camera, scene, textureLoader);
+        gameObjectCreator.gltfAssets = gltfAssets;
+
         // physics world and material
+        builderLevel.gameObjectCreator = gameObjectCreator;
         builderLevel.physicsWorld = physicsWorld;
         builderLevel.defaultPhysicsMaterial = groundPhysicsMtl;
-        builderLevel.gameObjectCreator = gameObjectCreator;
         
         const gltfSceneLevel = builderLevel.build(loaded[1], 0, undefined, true);
         gltfSceneLevel.name = "Level";
