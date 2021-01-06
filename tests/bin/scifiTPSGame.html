@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>Sci-fi TPS Demo</title>
+    <link rel="stylesheet" type="text/css" href="tests.css">
+    <script src="js/lib/cannon/cannon.js"></script>
+</head>
+<body>
+    <div>
+        <div id="infoPanel" class="infoPanel">FPS: 0</div>
+        <div id="ctrlPanel" class="controlPanel">
+            <div class="controlPanelTitle">Control Panel</div>
+        </div>
+        <div id="crosshair" style="position: absolute; left: 638px; top: 358px; z-index: 1; width: 4px; height: 4px; color: white; background: white"></div>
+        <canvas id="mainCanvas" width="1280" height="720"></canvas>
+        <!-- <canvas id="mainCanvas" width="854" height="480"></canvas> -->
+    </div>
+    <script type="module" src="js/tests/scifiTPSGame/scifiTPSGame.js"></script>
+</body>
+</html>
