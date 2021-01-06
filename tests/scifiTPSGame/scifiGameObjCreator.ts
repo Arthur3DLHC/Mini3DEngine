@@ -51,6 +51,7 @@ export class SciFiGameObjCreator extends GameObjectCreator {
             throw new Error("Need physics world to create player");
         }
         const playerPrefab: PlayerPrefab = new PlayerPrefab(this.gltfAssets, this.physicsWorld, this.scene, this.camera, this.textureLoader, this.playerPhysicsMtl);
+        playerPrefab.showMature = this.showMature;
         return playerPrefab.createPlayer(componentProps);
     }
 

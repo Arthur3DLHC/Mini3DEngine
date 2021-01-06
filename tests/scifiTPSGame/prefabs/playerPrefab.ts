@@ -1,5 +1,5 @@
 import vec3 from "../../../lib/tsm/vec3.js";
-import { ActionControlBehavior, AnimationAction, Camera, ConstraintProcessor, GltfAsset, GLTFSceneBuilder, Object3D, PerspectiveCamera, PhysicsWorld, RigidBody, Scene, TextureLoader } from "../../../src/mini3DEngine.js";
+import { ActionControlBehavior, ActionStateBlendTree, ActionStateMachine, ActionTransition, AnimationAction, AnimationBlendNode, AnimationLayer, AnimationLoopMode, AnimationMask, BlendMethods, Camera, ConstraintProcessor, GltfAsset, GLTFSceneBuilder, Object3D, PerspectiveCamera, PhysicsWorld, RigidBody, Scene, SingleParamCondition, TextureLoader, TimeUpCondition } from "../../../src/mini3DEngine.js";
 import { TPSPlayerBehavior } from "../tpsPlayerBehavior.js";
 import { BasePrefab } from "./basePrefab.js";
 
@@ -398,5 +398,192 @@ export class PlayerPrefab extends BasePrefab {
         };
 
         actionCtrlBehavior.fromJSON(actionCtrlDef);
+    }
+
+    private addActionControl(actor: Object3D, animations: AnimationAction[], actionCtrlBehavior: ActionControlBehavior)  {
+        actor.behaviors.push(actionCtrlBehavior);
+
+        // 0 - not aiming; 1 - aiming
+        actionCtrlBehavior.actionParams.set("aiming", 0.0);
+        // -1 - aim down; 0 - aim strait; 1 - aim up
+        actionCtrlBehavior.actionParams.set("aimPitch", 0.0);
+        // -1 - move backward (aiming only); 0 - idle; 1 - move forward
+        actionCtrlBehavior.actionParams.set("moveSpeed", 0.0);
+        // 0 - not shooting; 1 - shooting
+        actionCtrlBehavior.actionParams.set("shoot", 0.0);
+
+        const baseLayer = new AnimationLayer();
+        actionCtrlBehavior.animationLayers.push(baseLayer);
+        baseLayer.name = "baseLayer";
+        baseLayer.blendWeight = 1;
+
+        // state machine
+        baseLayer.stateMachine = new ActionStateMachine(actionCtrlBehavior, baseLayer);
+
+        // use only 1 blendtree?
+        const blendTree = new ActionStateBlendTree("tpsTree", baseLayer.stateMachine);
+        baseLayer.stateMachine.addState(blendTree);
+
+        // root node
+        //      |- aiming
+        //      |   |- aiming idle
+        //      |   |- aiming move forward
+        //      |   |- aiming move backward
+        //      |
+        //      |- not aiming
+        //          |- idle
+        //          |- walk
+        //          |- jog
+        blendTree.rootNode = new AnimationBlendNode(blendTree, ["aiming"], BlendMethods.Simple1D, undefined, 1);
+
+        // aiming == 1
+        const aimingNode = new AnimationBlendNode(blendTree, ["moveSpeed"], BlendMethods.Simple1D, [1], 0);
+        blendTree.rootNode.addChild(aimingNode);
+        
+        // moveSpeed == -1
+        const aimingBackwardNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [-1], 0, this.getAnimationByName(animations, "Female.Aim.Walk.Backward"));
+        aimingNode.addChild(aimingBackwardNode);
+
+        // moveSpeed == 0
+        const aimingIdleNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [0], 1,  this.getAnimationByName(animations, "Female.Aim.Middle"));
+        aimingNode.addChild(aimingIdleNode);
+
+        // moveSpeed == 1
+        const aimingForwardNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [1], 0, this.getAnimationByName(animations, "Female.Aim.Walk.Forward"));
+        aimingNode.addChild(aimingForwardNode);
+
+        // aiming == 0
+        const notAimingNode = new AnimationBlendNode(blendTree, ["moveSpeed"], BlendMethods.Simple1D, [0], 1);
+        blendTree.rootNode.addChild(notAimingNode);
+
+        // moveSpeed == 0
+        const idleNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [0], 1, this.getAnimationByName(animations, "Female.Idle"));
+        notAimingNode.addChild(idleNode);
+
+        // moveSpeed == 0.5
+        // const walkNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [0.5], 0, getAnimationByName(animations, "Female.Walk"));
+        // notAimingNode.addChild(walkNode);
+
+        // moveSpeed == 1
+        const jogNode = new AnimationBlendNode(blendTree, undefined, BlendMethods.Direct, [1], 0, this.getAnimationByName(animations, "Female.Jog"));
+        notAimingNode.addChild(jogNode);
+
+        baseLayer.stateMachine.curState = blendTree;
+
+        /*
+        // not aiming state
+        const move = new ActionStateSingleAnim("idle", baseLayer.stateMachine);
+        baseLayer.stateMachine.addState(move);
+        move.animation = getAnimationByName(animations, "Female.Idle");
+        
+        const idle_aim = new ActionTransition(move);
+        move.transitions.push(idle_aim);
+
+        // aim state (a blend tree?)
+        */
+
+        const upperBodyLayer = new AnimationLayer();
+        actionCtrlBehavior.animationLayers.push(upperBodyLayer);
+        upperBodyLayer.name = "upperBody";
+        upperBodyLayer.blendWeight = 0;
+
+        // mask
+        upperBodyLayer.mask = new AnimationMask();
+
+        let maskRootName = "spine.001";
+        let upperBodyRootJoint = actor.getChildByName(maskRootName, true);
+        if (upperBodyRootJoint === null) {
+            throw new Error("Mask root joint not found: " + maskRootName);
+        }
+        this.addJointHierarchyToLayerMask(upperBodyRootJoint, upperBodyLayer.mask);
+
+        // for the convenience of making rig animation,
+        // the parent of spine.002 is spine.IK, not spine.001. It use a copylocatoin constraint to spine.001 instead.
+        // so here we need to add spine.IK and all it's children to the mask too
+        maskRootName = "spine.IK";
+        upperBodyRootJoint = actor.getChildByName(maskRootName, true);
+        if (upperBodyRootJoint === null) {
+            throw new Error("Mask root joint not found: " + maskRootName);
+        }
+        this.addJointHierarchyToLayerMask(upperBodyRootJoint, upperBodyLayer.mask);
+
+        // state machine
+        upperBodyLayer.stateMachine = new ActionStateMachine(actionCtrlBehavior, upperBodyLayer);
+
+        // 2 states
+        // aim state (blend tree)
+        const aimBlendTree = new ActionStateBlendTree("upperAimTree", upperBodyLayer.stateMachine);
+        upperBodyLayer.stateMachine.addState(aimBlendTree);
+
+        // root node
+        //      | -aim down
+        //      | -aim straight
+        //      | -aim up
+        aimBlendTree.rootNode = new AnimationBlendNode(aimBlendTree, ["aimPitch"], BlendMethods.Simple1D, undefined, 1);
+
+        // aimPitch == -1
+        const aimDownNode = new AnimationBlendNode(aimBlendTree, undefined, BlendMethods.Direct, [-1], 0, this.getAnimationByName(animations, "Female.Aim.Down"));
+        aimBlendTree.rootNode.addChild(aimDownNode);
+
+        // aimPitch == 0
+        const aimStraightNode = new AnimationBlendNode(aimBlendTree, undefined, BlendMethods.Direct, [0], 1, this.getAnimationByName(animations, "Female.Aim.Middle"));
+        aimBlendTree.rootNode.addChild(aimStraightNode);
+
+        // aimPitch == 1
+        const aimUpNode = new AnimationBlendNode(aimBlendTree, undefined, BlendMethods.Direct, [1], 0, this.getAnimationByName(animations, "Female.Aim.Up"));
+        aimBlendTree.rootNode.addChild(aimUpNode);
+
+        // shoot state (blend tree)
+        const shootBlendTree = new ActionStateBlendTree("upperShootTree", upperBodyLayer.stateMachine);
+        upperBodyLayer.stateMachine.addState(shootBlendTree);
+
+        // fix me: model animations not done
+        // root node
+        //      | -shoot down
+        //      | -shoot straight
+        //      | -shoot up
+
+        shootBlendTree.rootNode = new AnimationBlendNode(shootBlendTree, ["aimPitch"], BlendMethods.Simple1D, undefined, 0);
+
+        // aimPitch == -1
+        let shootAnim = this.getAnimationByName(animations, "Female.Shoot.Down");
+        shootAnim.LoopMode = AnimationLoopMode.Once;
+        const shootDownNode = new AnimationBlendNode(shootBlendTree, undefined, BlendMethods.Direct, [-1], 0, shootAnim);
+        shootBlendTree.rootNode.addChild(shootDownNode);
+
+        // aimPitch == 0
+        shootAnim = this.getAnimationByName(animations, "Female.Shoot.Middle");
+        shootAnim.LoopMode = AnimationLoopMode.Once;
+        const shootStraitNode = new AnimationBlendNode(shootBlendTree, undefined, BlendMethods.Direct, [0], 1, shootAnim);
+        shootBlendTree.rootNode.addChild(shootStraitNode);
+
+        // aimPitch == 1
+        shootAnim = this.getAnimationByName(animations, "Female.Shoot.Up");
+        shootAnim.LoopMode = AnimationLoopMode.Once;
+        const shootUpNode = new AnimationBlendNode(shootBlendTree, undefined, BlendMethods.Direct, [1], 0, shootAnim);
+        shootBlendTree.rootNode.addChild(shootUpNode);
+
+        // the weight of this layer will be zero in other states
+
+        // todo: state transitions and conditions
+        // add a general condition class?
+        // evaluate condition according to the params on actionControlBehavior?
+
+        // aim to shoot
+        // use SingleParamCondition
+        const aim_shoot = new ActionTransition(aimBlendTree);
+        aimBlendTree.transitions.push(aim_shoot);
+        aim_shoot.targetState = shootBlendTree;
+        aim_shoot.conditions.push(new SingleParamCondition(actionCtrlBehavior, "shoot", "===", 1));
+
+        // shoot to aim (timeup?)
+        const shoot_aim = new ActionTransition(shootBlendTree);
+        shootBlendTree.transitions.push(shoot_aim);
+        shoot_aim.targetState = aimBlendTree;
+        shoot_aim.conditions.push(new TimeUpCondition(0.5));
+
+        upperBodyLayer.stateMachine.curState = aimBlendTree;
+
+        return actionCtrlBehavior;
     }
 }

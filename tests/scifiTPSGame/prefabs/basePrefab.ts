@@ -1,4 +1,4 @@
-import { Mesh, Object3D, StandardPBRMaterial, Texture, TextureLoader } from "../../../src/mini3DEngine.js";
+import { AnimationAction, AnimationMask, Mesh, Object3D, StandardPBRMaterial, Texture, TextureLoader } from "../../../src/mini3DEngine.js";
 
 export class BasePrefab {
     protected prepareGLTFCharacter(gltfNode: Object3D) {
@@ -35,5 +35,20 @@ export class BasePrefab {
         for (const child of gltfNode.children) {
             this.setMatureSkinForCharacter(child, textureLoader);
         }
+    }
+
+    protected addJointHierarchyToLayerMask(rootJoint: Object3D, mask: AnimationMask) {
+        mask.joints.push(rootJoint);
+        for (const child of rootJoint.children) {
+            this.addJointHierarchyToLayerMask(child, mask);
+        }
+    }
+    
+    protected getAnimationByName(animations: AnimationAction[], animName: string) {
+        const anim = animations.find((anim: AnimationAction) => { return anim.name === animName; });
+        if (anim === undefined) {
+            throw new Error("Animation not found: " + animName);
+        }
+        return anim;
     }
 }
