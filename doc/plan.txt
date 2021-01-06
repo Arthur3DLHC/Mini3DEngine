@@ -490,6 +490,26 @@ TODO:       主要类结构
                 补充材质属性到 gltf 的 extra 中
                     次表面反射参数；高光强度；
 
+            约束
+                * 弹簧约束
+                    用于R摇
+                    在 blender 中给应用弹簧约束的骨头加自定义属性；
+                    从 gltf 创建场景时的解析；插入自定义解析回调？
+                    实现弹簧约束类；参考springBone.py
+                    在 blender 中骨头是以 y 轴正向为尾端所指方向，以 z 轴正向为上
+                    导出成 gltf 后是以 z 轴负向为尾端方向，以 y 轴正向为上
+
+
+            物理系统
+                带物理的第一人称控制：https://github.com/mrdoob/three.js/blob/master/examples/js/controls/PointerLockControls.js
+                场景物理对象的加载：参考 https://doc.babylonjs.com/how_to/using_the_physics_engine
+                从 gltf 读取物理碰撞体到 cannon.js:
+                    尽量只使用 box, sphere, cylinder 等简单物体；
+                    在 Blender 中使用单位尺寸的物体；通过缩放控制形状和尺寸；给一个自定义属性表明是物理碰撞体，以及形状类别
+                    在 gltfSceneBuilder 中，当读取到此类物体时，设置其为不可见，并创建为物理碰撞体类型对象
+                    写一个物理场景生成器，遍历 scene 的节点，当节点是物理碰撞体时，根据其形状和变换信息，生成 Cannon.js 刚体对象
+                    做一个简单场景测试物理碰撞物体的加载；
+
 -------------------------- 进行到这里了 ---------------------------
 
             动画控制
@@ -510,13 +530,6 @@ TODO:       主要类结构
                     怎样和动画状态机协同工作？
                     被混合的动画需要能时间同步
                     测试二维方向动画混合节点；
-
-            * 弹簧约束
-                用于R摇
-                在 blender 中给应用弹簧约束的骨头加自定义属性；
-                从 gltf 创建场景时的解析；插入自定义解析回调？
-                实现弹簧约束类；参考springBone.py
-                fix me: 在blender中骨头沿哪个轴？以哪个轴为上方向？
 
             尝试一下简版次表面效果
                 gltf-Model-Viewer中的方法
@@ -551,6 +564,7 @@ TODO:       主要类结构
                     取四点PCF，然后做线性插值？
 
             屏幕空间反射问题
+                根据表面粗糙度调整 jitter，反射光线发散程度；
                 使用上一帧画面导致反射滞后现象
                     ##不是很紧急
                     比较复杂，需要生成速度图
@@ -568,6 +582,7 @@ TODO:       主要类结构
             屏幕像素级点选和 Hover 效果
                 用于实现射击、对象交互
                 点选时将 object ID 绘制到一个FBO，然后 blit 选取范围到内存 FBO，CPU 读取出此 ID
+                    能否通过延迟几帧再读回的方法避免显卡 flush 所有渲染命令？
                 Hover效果：
                     只高亮 Hover 物体，不用读取其ID
                     每帧绘制 object ID 到 FBO；借助未使用的法线 RT 的 A 通道？
@@ -611,16 +626,6 @@ TODO:       主要类结构
 
         大场景相关
 
-            物理系统
-                带物理的第一人称控制：https://github.com/mrdoob/three.js/blob/master/examples/js/controls/PointerLockControls.js
-                场景物理对象的加载：参考 https://doc.babylonjs.com/how_to/using_the_physics_engine
-                从 gltf 读取物理碰撞体到 cannon.js:
-                    尽量只使用 box, sphere, cylinder 等简单物体；
-                    在 Blender 中使用单位尺寸的物体；通过缩放控制形状和尺寸；给一个自定义属性表明是物理碰撞体，以及形状类别
-                    在 gltfSceneBuilder 中，当读取到此类物体时，设置其为不可见，并创建为物理碰撞体类型对象
-                    写一个物理场景生成器，遍历 scene 的节点，当节点是物理碰撞体时，根据其形状和变换信息，生成 Cannon.js 刚体对象
-                    做一个简单场景测试物理碰撞物体的加载；
-
             制作模块化的大一点的场景；
                 FPS：模块化类 DOOM 室内场景, 狭窄一些；Local point lights; 
                     导出，测试 clustered, instancing, occlusion culling 等
@@ -634,7 +639,7 @@ TODO:       主要类结构
                     脚本中判断如果没有这个属性就加个默认值？
                 ShadowBias: 对 blender 中的值使用一个经验缩放比率？
             
-            playground 环境反射球范围问题；irradiance probe 有黑问题；
+            playground 环境反射球范围问题；irradiance probe 有的是黑色问题；
 
             制作类 DOOM 室内场景的物理碰撞体；
             将角色（hero, monster）放入室内场景；
@@ -683,6 +688,7 @@ TODO:       主要类结构
                     或者改为在 clip space 做 cluster 剔除? 但是包围球等会变成非均匀缩放，太复杂
                 继续优化 CPU 端的 Cluster 检测？
                 * 当只有一个 irrprobe 影响像素时，blend weight 需要特殊处理，否则光照会有硬边
+                * 在出了 reflection probe 范围之后反而有 reflection 问题
 
             户外阴影方案
                 Cascaded shadow map? 
