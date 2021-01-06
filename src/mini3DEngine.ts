@@ -18,6 +18,7 @@ export * from "./animation/animationAction.js";
 export * from "./contentLoaders/baseLoader.js";
 export * from "./contentLoaders/cache.js";
 export * from "./contentLoaders/constraintProcessor.js";
+export * from "./contentLoaders/gameObjectCreator.js";
 export * from "./contentLoaders/gltfAsset.js";
 export * from "./contentLoaders/GLTFLoader.js";
 export * from "./contentLoaders/gltfSceneBuilder.js";
