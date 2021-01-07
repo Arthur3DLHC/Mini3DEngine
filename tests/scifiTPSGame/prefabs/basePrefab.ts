@@ -1,3 +1,5 @@
+import quat from "../../../lib/tsm/quat.js";
+import vec3 from "../../../lib/tsm/vec3.js";
 import { AnimationAction, AnimationMask, GltfAsset, Mesh, Object3D, PhysicsWorld, Scene, StandardPBRMaterial, Texture, TextureLoader } from "../../../src/mini3DEngine.js";
 
 export abstract class BasePrefab {
@@ -7,7 +9,7 @@ export abstract class BasePrefab {
         this.scene = scene;
     }
 
-    public abstract createGameObject(componentProps: any): Object3D;
+    public abstract createGameObject(componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D;
 
     protected gltfAssets: Map<string, GltfAsset>;
     protected physicsWorld: PhysicsWorld;

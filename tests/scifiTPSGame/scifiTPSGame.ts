@@ -170,7 +170,7 @@ window.onload = () => {
         // todo: test use playerPrefab to create gltfSceneFemale object
         const playerPrefab: PlayerPrefab = new PlayerPrefab(gltfAssets, physicsWorld, scene, camera, textureLoader, playerPhysicsMtl);
         playerPrefab.showMature = showMature;
-        const gltfSceneFemale = playerPrefab.createGameObject({});
+        const gltfSceneFemale = playerPrefab.createGameObject({}, new vec3([0, 1.5, 0]), new quat(), new vec3([1,1,1]));
 
         tpsBehavior = gltfSceneFemale.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
 

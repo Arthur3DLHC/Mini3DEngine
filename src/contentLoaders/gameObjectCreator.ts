@@ -1,3 +1,5 @@
+import quat from "../../lib/tsm/quat.js";
+import vec3 from "../../lib/tsm/vec3.js";
 import { PhysicsWorld } from "../physics/physicsWorld.js";
 import { Object3D } from "../scene/object3D.js";
 import { GltfAsset } from "./gltfAsset.js";
@@ -15,5 +17,5 @@ export abstract class GameObjectCreator {
      * @param prefabKey 
      * @param componentProps component propertys. in "componentName.propertyName": value format
      */
-    public abstract createGameObject(prefabKey: string, componentProps: any): Object3D;
+    public abstract createGameObject(prefabKey: string, componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D;
 }

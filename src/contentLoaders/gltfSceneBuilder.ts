@@ -291,8 +291,21 @@ export class GLTFSceneBuilder {
                     // define components in prefab json file,
                     // then add the prefab key as object custrom property in blender
                     // can only set no mesh node as gameobject?
+                    let position: vec3 = new vec3();
+                    let rotation: quat = new quat();
+                    let scale: vec3 = new vec3([1,1,1]);
+                    if (nodeDef.translation !== undefined) {
+                        position.setComponents(nodeDef.translation[0], nodeDef.translation[1], nodeDef.translation[2]);
+                    }
+                    if (nodeDef.rotation !== undefined) {
+                        rotation.setComponents(nodeDef.rotation[0], nodeDef.rotation[1], nodeDef.rotation[2], nodeDef.rotation[3]);
+                    }
+                    if (nodeDef.scale !== undefined) {
+                        scale.setComponents(nodeDef.scale[0], nodeDef.scale[1], nodeDef.scale[2]);
+                    }
+
                     isGameObject = true;
-                    node = this.gameObjectCreator.createGameObject(nodeDef.extras.prefabKey, nodeDef.extras);
+                    node = this.gameObjectCreator.createGameObject(nodeDef.extras.prefabKey, nodeDef.extras, position, rotation, scale);
                 } else {
                     // todo: other extra object types
                     node = new Object3D();

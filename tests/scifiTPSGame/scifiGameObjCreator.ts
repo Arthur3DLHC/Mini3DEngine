@@ -1,3 +1,5 @@
+import quat from "../../lib/tsm/quat.js";
+import vec3 from "../../lib/tsm/vec3.js";
 import { GameObjectCreator, Object3D, PerspectiveCamera, PhysicsWorld, Scene, TextureLoader } from "../../src/mini3DEngine.js";
 import { PlayerPrefab } from "./prefabs/playerPrefab.js";
 
@@ -36,23 +38,23 @@ export class SciFiGameObjCreator extends GameObjectCreator {
 
     public showMature: boolean = false;
 
-    public createGameObject(prefabKey: string, componentProps: any): Object3D {
+    public createGameObject(prefabKey: string, componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D {
         switch(prefabKey) {
             case "player":
-                return this.createPlayer(componentProps);
+                return this.createPlayer(componentProps, position, rotation, scale);
             case "infectedFemale":
                 return this.createInfectedFemale();
         }
         throw new Error("Unrecogonized prefab: " + prefabKey);
     }
 
-    createPlayer(componentProps: any): Object3D {
+    createPlayer(componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D {
         if (this.physicsWorld === null) {
             throw new Error("Need physics world to create player");
         }
         const playerPrefab: PlayerPrefab = new PlayerPrefab(this.gltfAssets, this.physicsWorld, this.scene, this.camera, this.textureLoader, this.playerPhysicsMtl);
         playerPrefab.showMature = this.showMature;
-        return playerPrefab.createGameObject(componentProps);
+        return playerPrefab.createGameObject(componentProps, position, rotation, scale);
     }
 
     createInfectedFemale(): Object3D {

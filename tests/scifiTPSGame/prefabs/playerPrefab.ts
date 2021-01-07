@@ -1,3 +1,4 @@
+import quat from "../../../lib/tsm/quat.js";
 import vec3 from "../../../lib/tsm/vec3.js";
 import { ActionControlBehavior, ActionStateBlendTree, ActionStateMachine, ActionTransition, AnimationAction, AnimationBlendNode, AnimationLayer, AnimationLoopMode, AnimationMask, BlendMethods, Camera, ConstraintProcessor, GltfAsset, GLTFSceneBuilder, Object3D, PerspectiveCamera, PhysicsWorld, RigidBody, Scene, SingleParamCondition, TextureLoader, TimeUpCondition } from "../../../src/mini3DEngine.js";
 import { TPSPlayerBehavior } from "../tpsPlayerBehavior.js";
@@ -21,7 +22,7 @@ export class PlayerPrefab extends BasePrefab {
     private playerPhysicsMtl: CANNON.Material;
 
 
-    public createGameObject(componentProps: any): Object3D {
+    public createGameObject(componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D {
         if(this.physicsWorld === null){
             throw new Error("physics world not presented.");
         }
@@ -44,7 +45,9 @@ export class PlayerPrefab extends BasePrefab {
         gltfSceneFemale.autoUpdateTransform = true;
 
         // todo: place the player on location of nodeDef？
-        gltfSceneFemale.translation.y = 1.5;  // for robot maintance area level
+        // gltfSceneFemale.translation.y = 1.5;  // for robot maintance area level
+        position.copyTo(gltfSceneFemale.translation);
+        rotation.copyTo(gltfSceneFemale.rotation);
 
         // add to scene, not level
         this.scene.attachChild(gltfSceneFemale);

@@ -1,3 +1,5 @@
+import quat from "../../../lib/tsm/quat.js";
+import vec3 from "../../../lib/tsm/vec3.js";
 import { ActionControlBehavior, AnimationAction, ConstraintProcessor, GltfAsset, GLTFSceneBuilder, Object3D, PhysicsWorld, RigidBody, Scene, TextureLoader } from "../../../src/mini3DEngine.js";
 import { MonsterCtrlBehavior } from "../../common/behaviors/monsterCtrlBehavior.js";
 import { BasePrefab } from "./basePrefab.js";
@@ -13,7 +15,7 @@ export class InfectedFemalePrefab extends BasePrefab {
     /** use same physics material with player? */
     private playerPhysicsMtl: CANNON.Material;
 
-    public createGameObject(componentProps: any): Object3D {
+    public createGameObject(componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D {
         if(this.physicsWorld === null){
             throw new Error("physics world not presented.");
         }
@@ -36,6 +38,8 @@ export class InfectedFemalePrefab extends BasePrefab {
         gltfSceneFemale.autoUpdateTransform = true;
 
         // todo: location and orientation
+        position.copyTo(gltfSceneFemale.translation);
+        rotation.copyTo(gltfSceneFemale.rotation);
 
         this.scene.attachChild(gltfSceneFemale);
         this.prepareGLTFCharacter(gltfSceneFemale);
