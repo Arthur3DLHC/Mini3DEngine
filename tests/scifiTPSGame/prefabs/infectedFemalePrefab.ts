@@ -117,6 +117,101 @@ export class InfectedFemalePrefab extends BasePrefab {
                                         ]
                                     }
                                 ]
+                            },
+                            {
+                                "typeStr": "single",
+                                "name": "walk",
+                                "animation": "Female.Walk",
+                                "animLoopMode": 0,
+                                "transitions": [
+                                    {
+                                        "target": "idle",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 0
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "typeStr": "single",
+                                "name": "attack01",
+                                "animation": "Female.Attack.01",
+                                "animLoopMode": 1,
+                                "transitions": [
+                                    {
+                                        "target": "idle",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 0
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "typeStr": "single",
+                                "name": "attack02",
+                                "animation": "Female.Attack.02",
+                                "animLoopMode": 1,
+                                "transitions": [
+                                    {
+                                        "target": "idle",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 0
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "typeStr": "single",
+                                "name": "attacked",
+                                "animation": "Female.Damage",
+                                "animLoopMode": 1,
+                                "transitions": [
+                                    {
+                                        "target": "idle",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 0
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "typeStr": "single",
+                                "name": "down",
+                                "animation": "Female.Down",
+                                "animLoopMode": 1,
+                                "transitions": [
+                                    {
+                                        "target": "idle",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 0
+                                            }
+                                        ]
+                                    }
+                                ]
                             }
                         ]
                     }
