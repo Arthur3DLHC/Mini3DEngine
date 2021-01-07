@@ -40,7 +40,7 @@ export class PlayerPrefab extends BasePrefab {
         }
 
         const gltfSceneFemale = builderFemale.build(gltfAsset, 0, animations);
-        gltfSceneFemale.name = "Female";
+        gltfSceneFemale.name = "Player";
         gltfSceneFemale.autoUpdateTransform = true;
 
         // todo: place the player on location of nodeDef？
