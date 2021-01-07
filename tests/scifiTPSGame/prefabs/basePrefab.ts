@@ -1,7 +1,20 @@
-import { AnimationAction, AnimationMask, Mesh, Object3D, StandardPBRMaterial, Texture, TextureLoader } from "../../../src/mini3DEngine.js";
+import { AnimationAction, AnimationMask, GltfAsset, Mesh, Object3D, PhysicsWorld, Scene, StandardPBRMaterial, Texture, TextureLoader } from "../../../src/mini3DEngine.js";
 
 export abstract class BasePrefab {
+    public constructor(assets: Map<string, GltfAsset>, physicsWorld: PhysicsWorld, scene: Scene, ) {
+        this.gltfAssets = assets;
+        this.physicsWorld = physicsWorld;
+        this.scene = scene;
+    }
+
     public abstract createGameObject(componentProps: any): Object3D;
+
+    protected gltfAssets: Map<string, GltfAsset>;
+    protected physicsWorld: PhysicsWorld;
+
+    protected scene: Scene;
+
+    public showMature: boolean = false;
 
     protected prepareGLTFCharacter(gltfNode: Object3D) {
         // gltfNode.isStatic = true;

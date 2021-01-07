@@ -8,25 +8,18 @@ import { BasePrefab } from "./basePrefab.js";
  */
 export class PlayerPrefab extends BasePrefab {
     public constructor(assets: Map<string, GltfAsset>, physicsWorld: PhysicsWorld, scene: Scene, camera: PerspectiveCamera, textureLoader: TextureLoader, playerPhysicsMtl: CANNON.Material) {
-        super();
-        this.gltfAssets = assets;
-        this.physicsWorld = physicsWorld;
-        this.scene = scene;
+        super(assets, physicsWorld, scene);
+
         this.camera = camera;
         this.textureLoader = textureLoader;
         this.playerPhysicsMtl = playerPhysicsMtl;
     }
 
-    private gltfAssets: Map<string, GltfAsset>;
-    private physicsWorld: PhysicsWorld;
-
-    private scene: Scene;
     private camera: PerspectiveCamera;
     private textureLoader: TextureLoader;
 
     private playerPhysicsMtl: CANNON.Material;
 
-    public showMature: boolean = false;
 
     public createGameObject(componentProps: any): Object3D {
         if(this.physicsWorld === null){
