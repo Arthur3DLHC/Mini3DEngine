@@ -52,7 +52,7 @@ export class SciFiGameObjCreator extends GameObjectCreator {
         }
         const playerPrefab: PlayerPrefab = new PlayerPrefab(this.gltfAssets, this.physicsWorld, this.scene, this.camera, this.textureLoader, this.playerPhysicsMtl);
         playerPrefab.showMature = this.showMature;
-        return playerPrefab.createPlayer(componentProps);
+        return playerPrefab.createGameObject(componentProps);
     }
 
     createInfectedFemale(): Object3D {

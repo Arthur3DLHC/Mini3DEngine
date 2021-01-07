@@ -1,6 +1,8 @@
 import { AnimationAction, AnimationMask, Mesh, Object3D, StandardPBRMaterial, Texture, TextureLoader } from "../../../src/mini3DEngine.js";
 
-export class BasePrefab {
+export abstract class BasePrefab {
+    public abstract createGameObject(componentProps: any): Object3D;
+
     protected prepareGLTFCharacter(gltfNode: Object3D) {
         // gltfNode.isStatic = true;
         gltfNode.isStatic = false;

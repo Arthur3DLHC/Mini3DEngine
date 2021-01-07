@@ -28,7 +28,7 @@ export class PlayerPrefab extends BasePrefab {
 
     public showMature: boolean = false;
 
-    public createPlayer(componentProps: any): Object3D {
+    public createGameObject(componentProps: any): Object3D {
         if(this.physicsWorld === null){
             throw new Error("physics world not presented.");
         }
