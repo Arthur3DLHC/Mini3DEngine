@@ -363,7 +363,7 @@ export class PlayerPrefab extends BasePrefab {
                                             "weigth": 0,
                                             "weightParamPosition": [-1],
                                             "animation": "Female.Shoot.Down",
-                                            "animLoopMode": 0
+                                            "animLoopMode": 1
                                         },
                                         {
                                             // shoot middle
@@ -371,7 +371,7 @@ export class PlayerPrefab extends BasePrefab {
                                             "weigth": 1,
                                             "weightParamPosition": [0],
                                             "animation": "Female.Shoot.Middle",
-                                            "animLoopMode": 0
+                                            "animLoopMode": 1
                                         },
                                         {
                                             // shoot up
@@ -379,7 +379,7 @@ export class PlayerPrefab extends BasePrefab {
                                             "weigth": 0,
                                             "weightParamPosition": [1],
                                             "animation": "Female.Shoot.Up",
-                                            "animLoopMode": 0
+                                            "animLoopMode": 1
                                         }
                                     ]
                                 }

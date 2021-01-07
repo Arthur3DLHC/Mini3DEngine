@@ -1,7 +1,7 @@
 import mat4 from "../../../lib/tsm/mat4.js";
 import quat from "../../../lib/tsm/quat.js";
 import vec3 from "../../../lib/tsm/vec3.js";
-import { ActionControlBehavior, Behavior, Clock, Object3D, RigidBody } from "../../../src/mini3DEngine.js";
+import { ActionControlBehavior, Behavior, Clock, Object3D, RigidBody, Scene } from "../../../src/mini3DEngine.js";
 
 export enum MonsterState {
     Idle,
@@ -18,12 +18,13 @@ export class MonsterCtrlBehavior extends Behavior {
     public get typeName(): string {
         return "MonsterCtrlBehavior";
     }
-    public constructor(owner: Object3D, body: RigidBody, actionCtrl: ActionControlBehavior, player: Object3D) {
+    public constructor(owner: Object3D, body: RigidBody, actionCtrl: ActionControlBehavior, scene: Scene) {
         super(owner);
         this._body = body;
         this._veloctity = this._body.body.velocity;
         this._actionCtrl = actionCtrl;
-        this._player = player;
+        this._scene = scene;
+        // this._player = player;
     }
 
     // movement properties ?
@@ -65,6 +66,7 @@ export class MonsterCtrlBehavior extends Behavior {
 
     // ref objects
     // enemy (player) object?
+    private _scene: Scene;
     private _player: Object3D | null = null;
     private _destination: vec3 = new vec3();
 
@@ -88,6 +90,11 @@ export class MonsterCtrlBehavior extends Behavior {
     private static readonly _upDir = new vec3([0, 1, 0]);
 
     public start() {
+        this._player = this._scene.getChildByName("Player");
+        if (this._player === null) {
+            throw new Error("Player not found.");
+        }
+
         // todo: init facing dir according to the world transform of owner object?
 
         // the precedure of add a monster:

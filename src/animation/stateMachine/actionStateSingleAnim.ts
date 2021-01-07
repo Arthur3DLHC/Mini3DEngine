@@ -53,5 +53,8 @@ export class ActionStateSingleAnim extends ActionState {
             throw new Error("Animation not found: " + stateDef.animation);
         }
         this.animation = anim;
+        if (stateDef.animLoopMode !== undefined) {
+            this.animation.LoopMode = stateDef.animLoopMode;
+        }
     }
 }

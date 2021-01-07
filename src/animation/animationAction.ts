@@ -4,8 +4,8 @@ import { Object3D } from "../scene/object3D.js";
 import { AnimationMask } from "./animationMask.js";
 
 export enum AnimationLoopMode {
-    Once,
     Repeat,
+    Once,
 };
 
 /**

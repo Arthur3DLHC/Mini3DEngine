@@ -1,4 +1,5 @@
-import { AnimationAction, ConstraintProcessor, GltfAsset, GLTFSceneBuilder, Object3D, PhysicsWorld, Scene, TextureLoader } from "../../../src/mini3DEngine.js";
+import { ActionControlBehavior, AnimationAction, ConstraintProcessor, GltfAsset, GLTFSceneBuilder, Object3D, PhysicsWorld, RigidBody, Scene, TextureLoader } from "../../../src/mini3DEngine.js";
+import { MonsterCtrlBehavior } from "../../common/behaviors/monsterCtrlBehavior.js";
 import { BasePrefab } from "./basePrefab.js";
 
 export class InfectedFemalePrefab extends BasePrefab {
@@ -43,6 +44,84 @@ export class InfectedFemalePrefab extends BasePrefab {
             this.setMatureSkinForCharacter(gltfSceneFemale, this.textureLoader);
         }
 
+        // add rigid body for character
+        // use a compound shape from two spheres
+        // fixed rotation
+        const femaleBody = new RigidBody(gltfSceneFemale, this.physicsWorld, { mass: 5, material: this.playerPhysicsMtl });
+        this.physicsWorld.world.addBody(femaleBody.body);
+
+        // add rigid body last? after third person control
+        gltfSceneFemale.behaviors.push(femaleBody);
+
+        femaleBody.body.fixedRotation = true;
+        femaleBody.affectRotation = false;
+
+        femaleBody.setPosition(gltfSceneFemale.translation);
+        femaleBody.setRotation(gltfSceneFemale.rotation);
+
+        // cannon does not have capsule shape, so use some spheres...
+        const femaleShapeLow = new CANNON.Sphere(0.3);
+        const femaleShapeMedium = new CANNON.Sphere(0.3);
+        const femaleShapeHigh = new CANNON.Sphere(0.3);
+
+        femaleBody.body.addShape(femaleShapeLow, new CANNON.Vec3(0, 0.3, 0));
+        femaleBody.body.addShape(femaleShapeMedium, new CANNON.Vec3(0, 0.85, 0));
+        femaleBody.body.addShape(femaleShapeHigh, new CANNON.Vec3(0, 1.4, 0));
+
+        const actionCtrlBehavior = new ActionControlBehavior(gltfSceneFemale, animations);
+
+        const monsterBehavior = new MonsterCtrlBehavior(gltfSceneFemale, femaleBody, actionCtrlBehavior, this.scene);
+        gltfSceneFemale.behaviors.push(monsterBehavior);
+        // todo: monster ctrl behavior properties
+
+        this.addActionControlJSON(gltfSceneFemale, animations, actionCtrlBehavior);
+
+
         throw new Error("Not implemented");
+    }
+
+    private addActionControlJSON(actor: Object3D, animations: AnimationAction[], actionCtrlBehavior: ActionControlBehavior) {
+        actor.behaviors.push(actionCtrlBehavior);
+
+        const actionCtrlDef: any = {
+            "actionParams": {
+                "curAction": 0
+            },
+            "animationLayers": [
+                {
+                    "name": "baseLayer",
+                    "blendWeight": 1,
+                    "blendMode": 1,
+                    "stateMachine": {
+                        "curState": "idle",
+                        "states": [
+                            {
+                                "typeStr": "single",
+                                "name": "idle",
+                                "animation": "Female.Idle",
+                                "animLoopMode": 0,
+                                "transitions": [
+                                    {
+                                        "target": "walk",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 1
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        };
+
+        actionCtrlBehavior.fromJSON(actionCtrlDef);
+        
+        throw new Error("Method not implemented.");
     }
 }
