@@ -40,7 +40,7 @@ export abstract class BasePrefab {
             const skinMtl = mesh.materials.find((mtl)=>{return mtl.name === "Material.Skin.001"});
             if (skinMtl !== undefined && skinMtl instanceof StandardPBRMaterial) {
                 const pbrSkinMtl = skinMtl as StandardPBRMaterial;
-                // load texture?
+                // todo: how to define dirrerent NSFW textures for different characters?
                 const texturePromise: Promise<Texture> = textureLoader.loadPromise("./models/SCIFI/heroes/cyberGirl/SkinBaseColor_NSFW.png");
                 texturePromise.then((skinTex) => {
                     pbrSkinMtl.colorMap = skinTex;
