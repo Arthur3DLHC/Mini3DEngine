@@ -83,6 +83,11 @@ export class InfectedFemalePrefab extends BasePrefab {
         return gltfSceneFemale;
     }
 
+    // fix me: json is too long. is it better to add states programly?
+    private addActionControl(actor: Object3D, animations: AnimationAction[], actionCtrlBehavior: ActionControlBehavior) {
+        throw new Error("Not implemented");
+    }
+
     private addActionControlJSON(actor: Object3D, animations: AnimationAction[], actionCtrlBehavior: ActionControlBehavior) {
         actor.behaviors.push(actionCtrlBehavior);
 

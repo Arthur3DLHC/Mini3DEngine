@@ -17,6 +17,8 @@ export abstract class BasePrefab {
     protected scene: Scene;
 
     public showMature: boolean = false;
+    /** temperory */
+    public matureSkinUrl: string = ";"
 
     protected prepareGLTFCharacter(gltfNode: Object3D) {
         // gltfNode.isStatic = true;
@@ -41,7 +43,8 @@ export abstract class BasePrefab {
             if (skinMtl !== undefined && skinMtl instanceof StandardPBRMaterial) {
                 const pbrSkinMtl = skinMtl as StandardPBRMaterial;
                 // todo: how to define dirrerent NSFW textures for different characters?
-                const texturePromise: Promise<Texture> = textureLoader.loadPromise("./models/SCIFI/heroes/cyberGirl/SkinBaseColor_NSFW.png");
+                // const texturePromise: Promise<Texture> = textureLoader.loadPromise("./models/SCIFI/heroes/cyberGirl/SkinBaseColor_NSFW.png");
+                const texturePromise: Promise<Texture> = textureLoader.loadPromise(this.matureSkinUrl);
                 texturePromise.then((skinTex) => {
                     pbrSkinMtl.colorMap = skinTex;
                 });

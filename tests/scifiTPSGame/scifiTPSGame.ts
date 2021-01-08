@@ -8,6 +8,7 @@ import vec2 from "../../lib/tsm/vec2.js";
 import { TPSPlayerBehavior } from "./tpsPlayerBehavior.js";
 import { SciFiGameObjCreator } from "./scifiGameObjCreator.js";
 import { PlayerPrefab } from "./prefabs/playerPrefab.js";
+import { InfectedFemalePrefab } from "./prefabs/infectedFemalePrefab.js";
 
 window.onload = () => {
     const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
@@ -102,9 +103,14 @@ window.onload = () => {
     addTestDynamicObjects(physicsWorld, widgetPhysicsMtl, scene, addPlane, groundPhysicsMtl);
 
     console.log("loading gltf models...");
+
+    // character models
+    const characterModelKeys: string[] = ["playerFemale", "infectedFemale"];
     const gltfCharacterPromises: Promise<GltfAsset>[] = [];
-    // todo: load gltf character, load skybox
     gltfCharacterPromises.push(gltfLoader.load("./models/SCIFI/heroes/cyberGirl/CyberGirl_animation.gltf"));
+    gltfCharacterPromises.push(gltfLoader.load("./models/SCIFI/monsters/infected_female/InfectedFemale.gltf"));
+
+    // level model
     // const gltfPromiseLevel: Promise<GltfAsset> = gltfLoader.load("./models/SCIFI/testlevel/TestLevel.gltf");
     const gltfPromiseLevel: Promise<GltfAsset> = gltfLoader.load("./models/SCIFI/level_1/robot_maintance_area.gltf");
     console.log("loading skybox...");
@@ -165,14 +171,22 @@ window.onload = () => {
         const animations: AnimationAction[] = [];
 
         const gltfAssets: Map<string, GltfAsset> = new Map<string, GltfAsset>();
-        gltfAssets.set("playerFemale", loaded[0][0]);
+        for (let i = 0; i < characterModelKeys.length; i++) {
+            gltfAssets.set(characterModelKeys[i], loaded[0][i]);
+        }
 
         // todo: test use playerPrefab to create gltfSceneFemale object
         const playerPrefab: PlayerPrefab = new PlayerPrefab(gltfAssets, physicsWorld, scene, camera, textureLoader, playerPhysicsMtl);
         playerPrefab.showMature = showMature;
-        const gltfSceneFemale = playerPrefab.createGameObject({}, new vec3([0, 1.5, 0]), new quat(), new vec3([1,1,1]));
+        playerPrefab.matureSkinUrl = "./models/SCIFI/heroes/cyberGirl/SkinBaseColor_NSFW.png";
+        const gltfScenePlayer = playerPrefab.createGameObject({}, new vec3([0, 1.5, 0]), new quat(), new vec3([1,1,1]));
 
-        tpsBehavior = gltfSceneFemale.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
+        const infectedFemalePrefab: InfectedFemalePrefab = new InfectedFemalePrefab(gltfAssets, physicsWorld, scene, textureLoader, playerPhysicsMtl);
+        infectedFemalePrefab.showMature = showMature;
+        infectedFemalePrefab.matureSkinUrl = "./models/SCIFI/monsters/infected_female/SkinBaseColor_NSFW.png";
+        const gltfSceneInfectFemale = infectedFemalePrefab.createGameObject({}, new vec3([0, 5.5, 0]), new quat(), new vec3([1,1,1]));
+
+        tpsBehavior = gltfScenePlayer.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
 
         // build test level
         const builderLevel = new GLTFSceneBuilder();
