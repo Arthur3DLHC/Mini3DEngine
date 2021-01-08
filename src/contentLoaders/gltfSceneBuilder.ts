@@ -305,7 +305,7 @@ export class GLTFSceneBuilder {
                     }
 
                     isGameObject = true;
-                    node = this.gameObjectCreator.createGameObject(nodeDef.extras.prefabKey, nodeDef.extras, position, rotation, scale);
+                    node = this.gameObjectCreator.createGameObject(nodeDef.name || "", nodeDef.extras.prefabKey, nodeDef.extras, position, rotation, scale);
                 } else {
                     // todo: other extra object types
                     node = new Object3D();

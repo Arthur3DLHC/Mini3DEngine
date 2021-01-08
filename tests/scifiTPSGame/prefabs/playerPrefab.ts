@@ -22,7 +22,7 @@ export class PlayerPrefab extends BasePrefab {
     private playerPhysicsMtl: CANNON.Material;
 
 
-    public createGameObject(componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D {
+    public createGameObject(name: string, componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D {
         if(this.physicsWorld === null){
             throw new Error("physics world not presented.");
         }
@@ -41,7 +41,7 @@ export class PlayerPrefab extends BasePrefab {
         }
 
         const gltfSceneFemale = builderFemale.build(gltfAsset, 0, animations);
-        gltfSceneFemale.name = "Player";
+        gltfSceneFemale.name = name;
         gltfSceneFemale.autoUpdateTransform = true;
 
         // todo: place the player on location of nodeDef？

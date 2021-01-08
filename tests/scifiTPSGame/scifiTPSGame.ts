@@ -47,7 +47,7 @@ window.onload = () => {
     let curFPS = 0;
 
     /** save notebook GPU */
-    const halfFPSMode = false;
+    const halfFPSMode = showMature;
 
     let skipThisFrame = false;
 
@@ -179,12 +179,15 @@ window.onload = () => {
         const playerPrefab: PlayerPrefab = new PlayerPrefab(gltfAssets, physicsWorld, scene, camera, textureLoader, playerPhysicsMtl);
         playerPrefab.showMature = showMature;
         playerPrefab.matureSkinUrl = "./models/SCIFI/heroes/cyberGirl/SkinBaseColor_NSFW.png";
-        const gltfScenePlayer = playerPrefab.createGameObject({}, new vec3([0, 1.5, 0]), quat.identity.copyTo(), new vec3([1,1,1]));
+        const gltfScenePlayer = playerPrefab.createGameObject("Player", {}, new vec3([0, 1.5, 0]), quat.identity.copyTo(), new vec3([1,1,1]));
 
         const infectedFemalePrefab: InfectedFemalePrefab = new InfectedFemalePrefab(gltfAssets, physicsWorld, scene, textureLoader, playerPhysicsMtl);
         infectedFemalePrefab.showMature = showMature;
         infectedFemalePrefab.matureSkinUrl = "./models/SCIFI/monsters/infected_female/SkinBaseColor_NSFW.png";
-        const gltfSceneInfectFemale = infectedFemalePrefab.createGameObject({}, new vec3([0, 1.5, -2.0]), quat.identity.copyTo(), new vec3([1,1,1]));
+        infectedFemalePrefab.createGameObject("InfectedFemale01", {}, new vec3([0, 1.5, -2.0]), quat.identity.copyTo(), new vec3([1,1,1]));
+        infectedFemalePrefab.createGameObject("InfectedFemale02", {}, new vec3([0, 1.5, -4.0]), quat.identity.copyTo(), new vec3([1,1,1]));
+        infectedFemalePrefab.createGameObject("InfectedFemale03", {}, new vec3([0, 1.5, -6.0]), quat.identity.copyTo(), new vec3([1,1,1]));
+        infectedFemalePrefab.createGameObject("InfectedFemale04", {}, new vec3([0, 1.5, -8.0]), quat.identity.copyTo(), new vec3([1,1,1]));
 
         tpsBehavior = gltfScenePlayer.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
 

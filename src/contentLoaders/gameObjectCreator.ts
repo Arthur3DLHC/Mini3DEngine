@@ -17,5 +17,5 @@ export abstract class GameObjectCreator {
      * @param prefabKey 
      * @param componentProps component propertys. in "componentName.propertyName": value format
      */
-    public abstract createGameObject(prefabKey: string, componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D;
+    public abstract createGameObject(name: string, prefabKey: string, componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D;
 }

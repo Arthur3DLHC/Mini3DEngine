@@ -138,6 +138,8 @@ export class MonsterCtrlBehavior extends Behavior {
             case MonsterState.Idle:
                 // this._curAction = 0;
                 // if player in attack range, attack ?
+                this._veloctity.x = 0;
+                this._veloctity.z = 0;
                 if(this.playerInMeleeAttackRange()) {
                     this.attack();
                 } else if(this.playerInSight()) {
@@ -166,10 +168,14 @@ export class MonsterCtrlBehavior extends Behavior {
                 // what if player dead? change state to idle?
                 if (this.playerInMeleeAttackRange()) {
                     this.attack();
+                } else if (!this.playerInSight()) {
+                    this.rest();
                 }
                 break;
             case MonsterState.Attacking:
                 // recover time left
+                this._veloctity.x = 0;
+                this._veloctity.z = 0;
                 this._recoverTimeLeft -= Clock.instance.elapsedTime;
                 if (this._recoverTimeLeft < 0.0) {
                     // attack again or rest?
@@ -190,6 +196,8 @@ export class MonsterCtrlBehavior extends Behavior {
                 }
                 break;
             case MonsterState.Down:
+                this._veloctity.x = 0;
+                this._veloctity.z = 0;
                 // set actionCtrl params
                 // if already down, can not transit to other states?
                 break;
@@ -243,6 +251,10 @@ export class MonsterCtrlBehavior extends Behavior {
         if (this._distToPlayer > this.senseRange) {
             return false;
         }
+
+        // if (this._distToPlayer < 0.7) {
+        //     return true;
+        // }
 
         // orientation ? sense player by vision, sound or smell ?
         if (this.senseHalfFOV < Math.PI) {

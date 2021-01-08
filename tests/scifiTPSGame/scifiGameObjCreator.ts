@@ -38,23 +38,23 @@ export class SciFiGameObjCreator extends GameObjectCreator {
 
     public showMature: boolean = false;
 
-    public createGameObject(prefabKey: string, componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D {
+    public createGameObject(prefabKey: string, name: string, componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D {
         switch(prefabKey) {
             case "player":
-                return this.createPlayer(componentProps, position, rotation, scale);
+                return this.createPlayer(name, componentProps, position, rotation, scale);
             case "infectedFemale":
                 return this.createInfectedFemale();
         }
         throw new Error("Unrecogonized prefab: " + prefabKey);
     }
 
-    createPlayer(componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D {
+    createPlayer(name: string, componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D {
         if (this.physicsWorld === null) {
             throw new Error("Need physics world to create player");
         }
         const playerPrefab: PlayerPrefab = new PlayerPrefab(this.gltfAssets, this.physicsWorld, this.scene, this.camera, this.textureLoader, this.playerPhysicsMtl);
         playerPrefab.showMature = this.showMature;
-        return playerPrefab.createGameObject(componentProps, position, rotation, scale);
+        return playerPrefab.createGameObject(name, componentProps, position, rotation, scale);
     }
 
     createInfectedFemale(): Object3D {

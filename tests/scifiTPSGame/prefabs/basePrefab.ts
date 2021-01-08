@@ -9,7 +9,7 @@ export abstract class BasePrefab {
         this.scene = scene;
     }
 
-    public abstract createGameObject(componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D;
+    public abstract createGameObject(name: string, componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D;
 
     protected gltfAssets: Map<string, GltfAsset>;
     protected physicsWorld: PhysicsWorld;

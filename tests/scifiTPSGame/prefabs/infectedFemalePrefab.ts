@@ -15,7 +15,7 @@ export class InfectedFemalePrefab extends BasePrefab {
     /** use same physics material with player? */
     private playerPhysicsMtl: CANNON.Material;
 
-    public createGameObject(componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D {
+    public createGameObject(name: string, componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D {
         if(this.physicsWorld === null){
             throw new Error("physics world not presented.");
         }
@@ -34,7 +34,7 @@ export class InfectedFemalePrefab extends BasePrefab {
         }
 
         const gltfSceneFemale = builderFemale.build(gltfAsset, 0, animations);
-        gltfSceneFemale.name = "InfectedFemale";
+        gltfSceneFemale.name = name;
         gltfSceneFemale.autoUpdateTransform = true;
 
         // todo: location and orientation
@@ -78,6 +78,10 @@ export class InfectedFemalePrefab extends BasePrefab {
         gltfSceneFemale.behaviors.push(monsterBehavior);
         // todo: monster ctrl behavior properties
         monsterBehavior.moveSpeed = 0.5;
+        monsterBehavior.attackingActions = 2;
+        monsterBehavior.senseRange = 7;
+        monsterBehavior.meleeAttackRange = 0.9;
+        monsterBehavior.senseHalfFOV = Math.PI * 0.5;
 
         this.addActionControlJSON(gltfSceneFemale, animations, actionCtrlBehavior);
 
