@@ -185,11 +185,13 @@ export class MonsterCtrlBehavior extends Behavior {
                 this._recoverTimeLeft -= Clock.instance.elapsedTime;
                 // if recovered (and player in sense range?), move toward player
                 if (this._recoverTimeLeft < 0.0) {
+                    // move to player?
                     this.rest();
                 }
                 break;
             case MonsterState.Down:
                 // set actionCtrl params
+                // if already down, can not transit to other states?
                 break;
         }
         // this._actionCtrl.actionParams.set("curAction", this._curAction);

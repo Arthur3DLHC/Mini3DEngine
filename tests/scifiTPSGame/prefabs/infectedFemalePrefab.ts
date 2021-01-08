@@ -80,8 +80,7 @@ export class InfectedFemalePrefab extends BasePrefab {
 
         this.addActionControlJSON(gltfSceneFemale, animations, actionCtrlBehavior);
 
-
-        throw new Error("Not implemented");
+        return gltfSceneFemale;
     }
 
     private addActionControlJSON(actor: Object3D, animations: AnimationAction[], actionCtrlBehavior: ActionControlBehavior) {
@@ -115,6 +114,50 @@ export class InfectedFemalePrefab extends BasePrefab {
                                                 "compareValue": 1
                                             }
                                         ]
+                                    },
+                                    {
+                                        "target": "attack01",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 200
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attack02",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 201
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attacked",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 3
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "down",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 4
+                                            }
+                                        ]
                                     }
                                 ]
                             },
@@ -132,6 +175,50 @@ export class InfectedFemalePrefab extends BasePrefab {
                                                 "paramName": "curAction",
                                                 "compareOp": "===",
                                                 "compareValue": 0
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attack01",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 200
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attack02",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 201
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attacked",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 3
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "down",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 4
                                             }
                                         ]
                                     }
@@ -153,6 +240,61 @@ export class InfectedFemalePrefab extends BasePrefab {
                                                 "compareValue": 0
                                             }
                                         ]
+                                    },
+                                    {
+                                        "target": "walk",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 1
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attack01",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 200
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attack02",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 201
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attacked",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 3
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "down",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 4
+                                            }
+                                        ]
                                     }
                                 ]
                             },
@@ -170,6 +312,61 @@ export class InfectedFemalePrefab extends BasePrefab {
                                                 "paramName": "curAction",
                                                 "compareOp": "===",
                                                 "compareValue": 0
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "walk",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 1
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attack01",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 200
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attack02",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 201
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attacked",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 3
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "down",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 4
                                             }
                                         ]
                                     }
@@ -191,6 +388,61 @@ export class InfectedFemalePrefab extends BasePrefab {
                                                 "compareValue": 0
                                             }
                                         ]
+                                    },
+                                    {
+                                        "target": "walk",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 1
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attack01",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 200
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attack02",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 201
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attacked",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 3
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "down",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 4
+                                            }
+                                        ]
                                     }
                                 ]
                             },
@@ -199,19 +451,7 @@ export class InfectedFemalePrefab extends BasePrefab {
                                 "name": "down",
                                 "animation": "Female.Down",
                                 "animLoopMode": 1,
-                                "transitions": [
-                                    {
-                                        "target": "idle",
-                                        "conditions": [
-                                            {
-                                                "typeStr": "singleParam",
-                                                "paramName": "curAction",
-                                                "compareOp": "===",
-                                                "compareValue": 0
-                                            }
-                                        ]
-                                    }
-                                ]
+                                "transitions": []   // if down, can not transit to other states?
                             }
                         ]
                     }
@@ -220,7 +460,5 @@ export class InfectedFemalePrefab extends BasePrefab {
         };
 
         actionCtrlBehavior.fromJSON(actionCtrlDef);
-        
-        throw new Error("Method not implemented.");
     }
 }
