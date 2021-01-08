@@ -175,7 +175,7 @@ window.onload = () => {
             gltfAssets.set(characterModelKeys[i], loaded[0][i]);
         }
 
-        // todo: test use playerPrefab to create gltfSceneFemale object
+        // test use prefabs to create character objects
         const playerPrefab: PlayerPrefab = new PlayerPrefab(gltfAssets, physicsWorld, scene, camera, textureLoader, playerPhysicsMtl);
         playerPrefab.showMature = showMature;
         playerPrefab.matureSkinUrl = "./models/SCIFI/heroes/cyberGirl/SkinBaseColor_NSFW.png";
