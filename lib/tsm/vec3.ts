@@ -292,12 +292,12 @@ export default class vec3 {
         return (x * x + y * y + z * z)
     }
 
-    static direction(vector: vec3, vector2: vec3, dest?: vec3): vec3 {
+    static direction(to: vec3, from: vec3, dest?: vec3): vec3 {
         if (!dest) { dest = new vec3() }
 
-        const x = vector.x - vector2.x
-        const y = vector.y - vector2.y
-        const z = vector.z - vector2.z
+        const x = to.x - from.x
+        const y = to.y - from.y
+        const z = to.z - from.z
 
         let length = Math.sqrt(x * x + y * y + z * z)
 

@@ -130,7 +130,7 @@ export class MonsterCtrlBehavior extends Behavior {
             this._player.worldTransform.getTranslation(MonsterCtrlBehavior._tmpPlayerPosition);
 
             // set player direction as destination direction
-            vec3.direction(MonsterCtrlBehavior._tmpMyPosition, MonsterCtrlBehavior._tmpPlayerPosition, this._destinationDir);
+            vec3.direction(MonsterCtrlBehavior._tmpPlayerPosition, MonsterCtrlBehavior._tmpMyPosition, this._destinationDir);
             this._distToPlayer = vec3.distance(MonsterCtrlBehavior._tmpMyPosition, MonsterCtrlBehavior._tmpPlayerPosition);
         }
 
@@ -173,11 +173,11 @@ export class MonsterCtrlBehavior extends Behavior {
                 this._recoverTimeLeft -= Clock.instance.elapsedTime;
                 if (this._recoverTimeLeft < 0.0) {
                     // attack again or rest?
-                    if (this.playerInMeleeAttackRange()) {
-                        this.attack();
-                    } else {
+                    // if (this.playerInMeleeAttackRange()) {
+                    //     this.attack();
+                    // } else {
                         this.rest();
-                    }
+                    //}
                 }
                 break;
             case MonsterState.Attacked:
@@ -210,7 +210,7 @@ export class MonsterCtrlBehavior extends Behavior {
         // if facing player and close enough, player take damage ?
         // if (this._curState === MonsterState.Idle || this._curState === MonsterState.Moving) {
             this._curState = MonsterState.Attacking;
-            this._recoverTimeLeft = 1.5;
+            this._recoverTimeLeft = 1.75;
             // todo: select attack action randomly
             this._actionCtrl.actionParams.set("curAction", this._curState * 100 + Math.round(Math.random() * (this.attackingActions - 1)));
         // }
@@ -228,7 +228,7 @@ export class MonsterCtrlBehavior extends Behavior {
     }
 
     public rest() {
-        if (this._curState === MonsterState.Idle || this._curState === MonsterState.Moving) {
+        if (this._curState !== MonsterState.Down) {
             this._curState = MonsterState.Idle;
             this._actionCtrl.actionParams.set("curAction", MonsterState.Idle);
         }

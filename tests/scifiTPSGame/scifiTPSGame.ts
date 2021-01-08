@@ -179,12 +179,12 @@ window.onload = () => {
         const playerPrefab: PlayerPrefab = new PlayerPrefab(gltfAssets, physicsWorld, scene, camera, textureLoader, playerPhysicsMtl);
         playerPrefab.showMature = showMature;
         playerPrefab.matureSkinUrl = "./models/SCIFI/heroes/cyberGirl/SkinBaseColor_NSFW.png";
-        const gltfScenePlayer = playerPrefab.createGameObject({}, new vec3([0, 1.5, 0]), new quat(), new vec3([1,1,1]));
+        const gltfScenePlayer = playerPrefab.createGameObject({}, new vec3([0, 1.5, 0]), quat.identity.copyTo(), new vec3([1,1,1]));
 
         const infectedFemalePrefab: InfectedFemalePrefab = new InfectedFemalePrefab(gltfAssets, physicsWorld, scene, textureLoader, playerPhysicsMtl);
         infectedFemalePrefab.showMature = showMature;
         infectedFemalePrefab.matureSkinUrl = "./models/SCIFI/monsters/infected_female/SkinBaseColor_NSFW.png";
-        const gltfSceneInfectFemale = infectedFemalePrefab.createGameObject({}, new vec3([0, 5.5, 0]), new quat(), new vec3([1,1,1]));
+        const gltfSceneInfectFemale = infectedFemalePrefab.createGameObject({}, new vec3([0, 1.5, -2.0]), quat.identity.copyTo(), new vec3([1,1,1]));
 
         tpsBehavior = gltfScenePlayer.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
 
@@ -211,9 +211,13 @@ window.onload = () => {
         scene.updateWorldTransform(false, true);
         InstancedMesh.updateInstancedMeshes(gltfSceneLevel);
 
+
         console.log("start game loop...");
 
         Clock.instance.start();
+
+        scene.start();
+
         requestAnimationFrame(gameLoop);
 
     });

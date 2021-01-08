@@ -77,6 +77,7 @@ export class InfectedFemalePrefab extends BasePrefab {
         const monsterBehavior = new MonsterCtrlBehavior(gltfSceneFemale, femaleBody, actionCtrlBehavior, this.scene);
         gltfSceneFemale.behaviors.push(monsterBehavior);
         // todo: monster ctrl behavior properties
+        monsterBehavior.moveSpeed = 0.5;
 
         this.addActionControlJSON(gltfSceneFemale, animations, actionCtrlBehavior);
 
@@ -90,6 +91,8 @@ export class InfectedFemalePrefab extends BasePrefab {
 
     private addActionControlJSON(actor: Object3D, animations: AnimationAction[], actionCtrlBehavior: ActionControlBehavior) {
         actor.behaviors.push(actionCtrlBehavior);
+
+        // note: actions must not transit to themselves!
 
         const actionCtrlDef: any = {
             "actionParams": {
@@ -258,17 +261,6 @@ export class InfectedFemalePrefab extends BasePrefab {
                                         ]
                                     },
                                     {
-                                        "target": "attack01",
-                                        "conditions": [
-                                            {
-                                                "typeStr": "singleParam",
-                                                "paramName": "curAction",
-                                                "compareOp": "===",
-                                                "compareValue": 200
-                                            }
-                                        ]
-                                    },
-                                    {
                                         "target": "attack02",
                                         "conditions": [
                                             {
@@ -343,17 +335,6 @@ export class InfectedFemalePrefab extends BasePrefab {
                                         ]
                                     },
                                     {
-                                        "target": "attack02",
-                                        "conditions": [
-                                            {
-                                                "typeStr": "singleParam",
-                                                "paramName": "curAction",
-                                                "compareOp": "===",
-                                                "compareValue": 201
-                                            }
-                                        ]
-                                    },
-                                    {
                                         "target": "attacked",
                                         "conditions": [
                                             {
@@ -424,17 +405,6 @@ export class InfectedFemalePrefab extends BasePrefab {
                                                 "paramName": "curAction",
                                                 "compareOp": "===",
                                                 "compareValue": 201
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "target": "attacked",
-                                        "conditions": [
-                                            {
-                                                "typeStr": "singleParam",
-                                                "paramName": "curAction",
-                                                "compareOp": "===",
-                                                "compareValue": 3
                                             }
                                         ]
                                     },
