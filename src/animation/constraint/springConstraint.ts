@@ -117,6 +117,8 @@ export class SpringConstraint extends BaseConstraint {
 
         this._curPosition.add(this._curSpeed);
 
+        // todo: prevent too far or NAN?
+
         if (this.rotation) {
             // todo: look from expect head to cur tail
             // calculate worldTransform
