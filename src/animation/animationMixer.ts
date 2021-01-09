@@ -1,3 +1,5 @@
+import { ObjectPropertiesMixer } from "./objectPropertiesMixer.js";
+
 /**
  * hold the mix agents for animation channel targets
  * mix the animation values here, then apply them to actual target not properties
@@ -17,13 +19,19 @@ export class AnimationMixer {
 
     }
 
-    
+    private _propMixers: ObjectPropertiesMixer[] = [];
 
     public beginMixing() {
-        // init all node target agents' states
+        // clear all node target agents' states
+        for (const mixer of this._propMixers) {
+            mixer.reset();
+        }
     }
 
     public endMixing() {
         // check zero weights, normalize weights, apply to target
+        for (const mixer of this._propMixers) {
+            mixer.apply();
+        }
     }
 }

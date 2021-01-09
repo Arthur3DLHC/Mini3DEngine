@@ -4,6 +4,7 @@ import { AnimationSampler } from "./animationSampler.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import quat from "../../lib/tsm/quat.js";
+import { ObjectPropertiesMixer } from "./objectPropertiesMixer.js";
 
 
 export const AnimTargetPath = {
@@ -49,6 +50,9 @@ export class AnimationChannel {
     public target: Object3D;
     public path: string;
 
+    /** if not null, will apply weighted anim values to it */
+    public targetMixer: ObjectPropertiesMixer | null = null;
+
     public sampler: AnimationSampler;
 
     private _targetVec3: vec3 | undefined;
@@ -58,6 +62,9 @@ export class AnimationChannel {
     // sampler animation and apply to target
     public apply(time: number, weight: number, mode: AnimationApplyMode) {
         const value = this.sampler.evaluate(time, this.path === AnimTargetPath.rotation);
+
+        // todo: check if targetMixer is used.
+
         if (this._targetQuat !== undefined) {
             // use 'nlerp' of quaternion? less accurate, less computation
             // https://keithmaggio.wordpress.com/2011/02/15/math-magician-lerp-slerp-and-nlerp/
