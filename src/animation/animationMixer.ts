@@ -1,3 +1,4 @@
+import { AnimationAction } from "./animationAction.js";
 import { ObjectPropertiesMixer } from "./objectPropertiesMixer.js";
 
 /**
@@ -20,6 +21,17 @@ export class AnimationMixer {
     }
 
     private _propMixers: ObjectPropertiesMixer[] = [];
+
+    public clear() {
+        this._propMixers = [];
+    }
+
+    public bindAnimation(animation: AnimationAction) {
+        for (const channel of animation.channels) {
+            // todo: find or create propMixer for channel
+            // todo: change channel's target to propMixer
+        }
+    }
 
     public beginMixing() {
         // clear all node target agents' states

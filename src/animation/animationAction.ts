@@ -55,6 +55,9 @@ export class AnimationAction {
     public get mask(): AnimationMask | null {return this._mask;}
     public set mask(m: AnimationMask | null) {this._mask = m;}
 
+    /** internal use */
+    public get channels(): AnimationChannel[] {return this._channels;}
+
     private _clip: AnimationClip;
     private _channels: AnimationChannel[];
 
