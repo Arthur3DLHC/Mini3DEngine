@@ -4,7 +4,7 @@ import { AnimationSampler } from "./animationSampler.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import quat from "../../lib/tsm/quat.js";
-import { ObjectPropertiesMixer } from "./objectPropertiesMixer.js";
+import { ObjectPropertiesMixer, QuatPropertyMixer, Vec3PropertyMixer } from "./objectPropertiesMixer.js";
 
 
 export const AnimTargetPath = {
@@ -52,6 +52,8 @@ export class AnimationChannel {
 
     /** if not null, will apply weighted anim values to it */
     public targetMixer: ObjectPropertiesMixer | null = null;
+    public targetVec3Mixer: Vec3PropertyMixer | undefined;
+    public targetQuatMixer: QuatPropertyMixer | undefined;
 
     public sampler: AnimationSampler;
 
@@ -63,33 +65,37 @@ export class AnimationChannel {
     public apply(time: number, weight: number, mode: AnimationApplyMode) {
         const value = this.sampler.evaluate(time, this.path === AnimTargetPath.rotation);
 
-        // todo: check if targetMixer is used.
+        // check if targetMixer is used.
+        if (this.targetMixer !== null) {
+            // todo: check apply mode?
 
-        if (this._targetQuat !== undefined) {
-            // use 'nlerp' of quaternion? less accurate, less computation
-            // https://keithmaggio.wordpress.com/2011/02/15/math-magician-lerp-slerp-and-nlerp/
-            // https://www.gamedev.net/forums/topic/645242-quaternions-and-animation-blending-questions/
-            // NOTE: need to normalize after all quaternions are mixed together
-            if (mode == AnimationApplyMode.replace) {
-                this._targetQuat.x = value[0] * weight;
-                this._targetQuat.y = value[1] * weight;
-                this._targetQuat.z = value[2] * weight;
-                this._targetQuat.w = value[3] * weight;
-            } else {
-                this._targetQuat.x = this._targetQuat.x + value[0] * weight;
-                this._targetQuat.y = this._targetQuat.y + value[1] * weight;
-                this._targetQuat.z = this._targetQuat.z + value[2] * weight;
-                this._targetQuat.w = this._targetQuat.w + value[3] * weight;
-            }
-        } else if (this._targetVec3 !== undefined) {
-            if (mode == AnimationApplyMode.replace) {
-                this._targetVec3.x = value[0] * weight;
-                this._targetVec3.y = value[1] * weight;
-                this._targetVec3.z = value[2] * weight;
-            } else {
-                this._targetVec3.x = this._targetVec3.x + value[0] * weight;
-                this._targetVec3.y = this._targetVec3.y + value[1] * weight;
-                this._targetVec3.z = this._targetVec3.z + value[2] * weight;
+        } else {
+            if (this._targetQuat !== undefined) {
+                // use 'nlerp' of quaternion? less accurate, less computation
+                // https://keithmaggio.wordpress.com/2011/02/15/math-magician-lerp-slerp-and-nlerp/
+                // https://www.gamedev.net/forums/topic/645242-quaternions-and-animation-blending-questions/
+                // NOTE: need to normalize after all quaternions are mixed together
+                if (mode == AnimationApplyMode.replace) {
+                    this._targetQuat.x = value[0] * weight;
+                    this._targetQuat.y = value[1] * weight;
+                    this._targetQuat.z = value[2] * weight;
+                    this._targetQuat.w = value[3] * weight;
+                } else {
+                    this._targetQuat.x = this._targetQuat.x + value[0] * weight;
+                    this._targetQuat.y = this._targetQuat.y + value[1] * weight;
+                    this._targetQuat.z = this._targetQuat.z + value[2] * weight;
+                    this._targetQuat.w = this._targetQuat.w + value[3] * weight;
+                }
+            } else if (this._targetVec3 !== undefined) {
+                if (mode == AnimationApplyMode.replace) {
+                    this._targetVec3.x = value[0] * weight;
+                    this._targetVec3.y = value[1] * weight;
+                    this._targetVec3.z = value[2] * weight;
+                } else {
+                    this._targetVec3.x = this._targetVec3.x + value[0] * weight;
+                    this._targetVec3.y = this._targetVec3.y + value[1] * weight;
+                    this._targetVec3.z = this._targetVec3.z + value[2] * weight;
+                }
             }
         }
     }

@@ -1,4 +1,5 @@
 import { AnimationAction } from "./animationAction.js";
+import { AnimTargetPath } from "./animationChannel.js";
 import { ObjectPropertiesMixer, PropertyMixer } from "./objectPropertiesMixer.js";
 
 /**
@@ -23,6 +24,7 @@ export class AnimationMixer {
 
     public clear() {
         this._propMixers = [];
+        // is that necessary to unbind all animation channels?
     }
 
     public bindAnimation(animation: AnimationAction) {
@@ -32,9 +34,21 @@ export class AnimationMixer {
             let propMixer: ObjectPropertiesMixer | undefined = this._propMixers.find((m)=>{return m.target === channel.target;});
             if (propMixer === undefined) {
                 propMixer = new ObjectPropertiesMixer(channel.target);
+
                 this._propMixers.push(propMixer);
             }
             channel.targetMixer = propMixer;
+            switch (channel.path) {
+                case AnimTargetPath.scale:
+                    channel.targetVec3Mixer = propMixer.scale;
+                    break;
+                case AnimTargetPath.rotation:
+                    channel.targetQuatMixer = propMixer.rotation;
+                    break;
+                case AnimTargetPath.translation:
+                    channel.targetVec3Mixer = propMixer.translation;
+                    break;
+            }
         }
     }
 

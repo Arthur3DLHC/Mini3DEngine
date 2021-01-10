@@ -53,7 +53,13 @@ export class QuatPropertyMixer extends PropertyMixer {
     public apply(targetValue: quat) {
         // mix the result with original value?
         if (this.sumWeight > 0.001) {
-            quat.mix(this.originalValue, this.mixedValue, this.sumWeight, targetValue);
+            // quat.mix(this.originalValue, this.mixedValue, this.sumWeight, targetValue);
+            // use a simple n-lerp?
+            const invWeight = 1.0 - this.sumWeight;
+            targetValue.x = this.originalValue.x * invWeight + this.mixedValue.x * this.sumWeight;
+            targetValue.y = this.originalValue.y * invWeight + this.mixedValue.y * this.sumWeight;
+            targetValue.z = this.originalValue.z * invWeight + this.mixedValue.z * this.sumWeight;
+            targetValue.w = this.originalValue.w * invWeight + this.mixedValue.w * this.sumWeight;
         }
     }
 }
