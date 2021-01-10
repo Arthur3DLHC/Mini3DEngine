@@ -24,6 +24,14 @@ export class Vec3PropertyMixer extends PropertyMixer {
         this.mixedValue.y += val.y * weight;
         this.mixedValue.z += val.z * weight;
     }
+
+    public apply(targetValue: vec3) {
+        // mix the result with original value?
+        if (this.sumWeight > 0.001) {
+            vec3.mix(this.originalValue, this.mixedValue, this.sumWeight, targetValue);
+        }
+        // if sumWeight near zero, don't touch target value? or copy from origin value?
+    }
 }
 
 export class QuatPropertyMixer extends PropertyMixer {
@@ -40,6 +48,13 @@ export class QuatPropertyMixer extends PropertyMixer {
         this.mixedValue.y += val.y * weight;
         this.mixedValue.z += val.z * weight;
         this.mixedValue.w += val.w * weight;
+    }
+
+    public apply(targetValue: quat) {
+        // mix the result with original value?
+        if (this.sumWeight > 0.001) {
+            quat.mix(this.originalValue, this.mixedValue, this.sumWeight, targetValue);
+        }
     }
 }
 
@@ -68,6 +83,8 @@ export class ObjectPropertiesMixer {
     }
 
     public apply() {
-        // if zero weight or unnormalized weight, mix the result with original value?
+        this.translation.apply(this.target.translation);
+        this.rotation.apply(this.target.rotation);
+        this.scale.apply(this.target.scale);
     }
 }

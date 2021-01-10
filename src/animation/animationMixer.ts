@@ -1,5 +1,5 @@
 import { AnimationAction } from "./animationAction.js";
-import { ObjectPropertiesMixer } from "./objectPropertiesMixer.js";
+import { ObjectPropertiesMixer, PropertyMixer } from "./objectPropertiesMixer.js";
 
 /**
  * hold the mix agents for animation channel targets
@@ -29,6 +29,12 @@ export class AnimationMixer {
         for (const channel of animation.channels) {
             // todo: find or create propMixer for channel
             // todo: change channel's target to propMixer
+            let propMixer: ObjectPropertiesMixer | undefined = this._propMixers.find((m)=>{return m.target === channel.target;});
+            if (propMixer === undefined) {
+                propMixer = new ObjectPropertiesMixer(channel.target);
+                this._propMixers.push(propMixer);
+            }
+            channel.targetMixer = propMixer;
         }
     }
 
