@@ -168,7 +168,7 @@ export class MonsterCtrlBehavior extends Behavior {
                 // what if player dead? change state to idle?
                 if (this.playerInMeleeAttackRange()) {
                     this.attack();
-                } else if (!this.playerInSight()) {
+                } else if (this._distToPlayer > this.senseRange) {
                     this.rest();
                 }
                 break;
