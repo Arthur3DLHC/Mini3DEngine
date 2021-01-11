@@ -333,7 +333,7 @@ function addTestDynamicObjects(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CAN
         boxMesh.materials.push(boxMtl);
 
         // physics
-        const boxBody = new RigidBody(boxMesh, physicsWorld, { mass: 0.2, material: widgetPhysicsMtl });
+        const boxBody = new RigidBody(boxMesh, physicsWorld, { mass: 0.2, material: widgetPhysicsMtl, collisionFilterGroup: 2, collisionFilterMask: 3 });
         physicsWorld.world.addBody(boxBody.body);
         boxMesh.behaviors.push(boxBody);
 
@@ -370,7 +370,7 @@ function addTestDynamicObjects(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CAN
         scene.attachChild(sphereMesh);
 
         // physics
-        const sphereBody = new RigidBody(sphereMesh, physicsWorld, { mass: 0.4, material: widgetPhysicsMtl });
+        const sphereBody = new RigidBody(sphereMesh, physicsWorld, { mass: 0.4, material: widgetPhysicsMtl, collisionFilterGroup: 2, collisionFilterMask: 3 });
         physicsWorld.world.addBody(sphereBody.body);
         sphereMesh.behaviors.push(sphereBody);
         sphereBody.setPosition(sphereMesh.translation);
@@ -399,7 +399,7 @@ function addTestDynamicObjects(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CAN
         scene.attachChild(sphereMesh);
 
         // physics
-        const sphereBody = new RigidBody(sphereMesh, physicsWorld, { mass: 0.6, material: widgetPhysicsMtl });
+        const sphereBody = new RigidBody(sphereMesh, physicsWorld, { mass: 0.6, material: widgetPhysicsMtl, collisionFilterGroup: 2, collisionFilterMask: 3 });
         physicsWorld.world.addBody(sphereBody.body);
         sphereMesh.behaviors.push(sphereBody);
         sphereBody.setPosition(sphereMesh.translation);
