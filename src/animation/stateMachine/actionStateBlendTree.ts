@@ -22,8 +22,11 @@ export class ActionStateBlendTree extends ActionState {
         if (this.rootNode !== null && this.machine !== null) {
             this.rootNode.weight = this.machine.animationLayer.blendWeight;
             this.rootNode.updateWeights(this.machine.actionCtrl.actionParams);
+
             // todo: clear all target channel values of animations in node?
-            this.rootNode.clearAnimationTargetChannelValues();
+            // do not need to clear after using the object property mixers
+            // this.rootNode.clearAnimationTargetChannelValues();
+            
             // todo: blend the animations according to the node global weights?
             this.rootNode.updateAnimations();
         }

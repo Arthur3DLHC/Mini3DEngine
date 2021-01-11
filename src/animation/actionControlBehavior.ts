@@ -2,6 +2,7 @@ import { Behavior } from "../scene/behavior.js";
 import { Object3D } from "../scene/object3D.js";
 import { AnimationAction } from "./animationAction.js";
 import { AnimationLayer } from "./animationLayer.js";
+import { AnimationMixer } from "./animationMixer.js";
 import { ActionCondition } from "./stateMachine/actionCondition.js";
 import { ActionState } from "./stateMachine/actionState.js";
 import { ActionStateMachine } from "./stateMachine/actionStateMachine.js";
@@ -19,11 +20,18 @@ export class ActionControlBehavior extends Behavior {
         this._actionParams = new Map<string, number>();
         this._animations = anims;
         this.animationLayers = [];
+
+        // todo: use objectPropertiesMixer for all animations?
+        this._animationMixer = new AnimationMixer();
+        for (const anim of anims) {
+            this._animationMixer.bindAnimation(anim);
+        }
     }
 
     // private _stateMachine: ActionStateMachine;
     private _actionParams: Map<string, number>
     private _animations: AnimationAction[];
+    private _animationMixer: AnimationMixer;
 
     // public get stateMachine(): ActionStateMachine {
     //     return this._stateMachine;
@@ -49,9 +57,14 @@ export class ActionControlBehavior extends Behavior {
     }
 
     public update() {
+        // todo: test use mixer
+        this._animationMixer.beginMixing();
+
+        // todo: remove all clean zero operations in blendtrees;
         for (const layer of this.animationLayers) {
             layer.update();
         }
+        this._animationMixer.endMixing();
     }
 
     public fromJSON(jsonData: any, customStateCreation?: (stateDef: any)=> ActionState, customConditionCreation?: (conditionDef: any)=>ActionCondition) {
