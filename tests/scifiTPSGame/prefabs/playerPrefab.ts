@@ -67,6 +67,8 @@ export class PlayerPrefab extends BasePrefab {
         // add rigid body last? after third person control
         gltfSceneFemale.behaviors.push(playerBody);
 
+        playerBody.body.collisionFilterGroup = 2;
+        playerBody.body.collisionFilterMask = 1 | 2;
         playerBody.body.fixedRotation = true;
         playerBody.affectRotation = false;
 

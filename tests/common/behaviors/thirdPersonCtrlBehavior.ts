@@ -1,7 +1,7 @@
 import quat from "../../../lib/tsm/quat.js";
 import vec2 from "../../../lib/tsm/vec2.js";
 import vec3 from "../../../lib/tsm/vec3.js";
-import { Behavior, Camera, Clock, KeyCodes, Object3D, RigidBody } from "../../../src/mini3DEngine.js";
+import { Behavior, Camera, Clock, KeyCodes, MathConverter, Object3D, RigidBody } from "../../../src/mini3DEngine.js";
 import { MouseLookModes } from "./mouseLookModes.js";
 
 /**
@@ -132,6 +132,11 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     private _canJump: boolean = false;
 
     private _upVec: vec3 = new vec3([0, 1, 0]);
+
+    private static _rayFrom: CANNON.Vec3 = new CANNON.Vec3();
+    private static _rayTo: CANNON.Vec3 = new CANNON.Vec3();
+    private static _ray: CANNON.Vec3 = new CANNON.Vec3();
+    private static _raycastResult: CANNON.RaycastResult = new CANNON.RaycastResult();
 
     // keyboard and mouse events
     public onMouseDown(ev: MouseEvent) {
@@ -348,5 +353,26 @@ export class ThirdPersonCtrlBehavior extends Behavior {
         this._camera.translation.add(this._cameraGlobalOffset);
 
         // todo: camera collision with scene
+        // try use the fastes way
+        const _from = ThirdPersonCtrlBehavior._rayFrom;
+        const _to = ThirdPersonCtrlBehavior._rayTo;
+        const _result = ThirdPersonCtrlBehavior._raycastResult;
+
+        MathConverter.TSMtoCANNONVec3(this.owner.translation, _from);
+        MathConverter.TSMtoCANNONVec3(this._camera.translation, _to);
+
+        _from.y += this.cameraVerticalOffset;
+
+        // const lenthRate = 0.35 / this.cameraHorizontalOffsetScale;
+
+        // _from.x += (_to.x - _from.x) * 0.35;
+        // _from.y += (_to.y - _from.y) * 0.35;
+        // _from.z += (_to.z - _from.z) * 0.35;
+
+        // assum the level's collision filter group is 1 (default value of cannon rigid body)
+        if(this._body.world.world.raycastAny(_from, _to, {collisionFilterGroup: 4, collisisonFilterMask: 1}, _result)) {
+            // modify camera position
+            MathConverter.CannonToTSMVec3(_result.hitPointWorld, this._camera.translation);
+        }
     }
 }

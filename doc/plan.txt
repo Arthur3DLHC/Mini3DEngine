@@ -592,6 +592,7 @@ TODO:       主要类结构
                     TODO: 使用一个数同时记录 object 的 tag 和 id
                         tag 主要用于分类并关联颜色，例如可交互的，锁着的，危险的 等等
                 点选之后的交互；在 CPU 端触发被点选物体的响应
+                    射击部位判定？
 
             相机动画；
                 从 Blender 导出；
@@ -640,6 +641,8 @@ TODO:       主要类结构
                 ShadowmapSize: 考虑在custom props 由手动输入
                     脚本中判断如果没有这个属性就加个默认值？
                 ShadowBias: 对 blender 中的值使用一个经验缩放比率？
+
+            相机碰撞检测；瞄准时相机距离的自动调整？
             
             playground 环境反射球范围问题；irradiance probe 有的是黑色问题；
 

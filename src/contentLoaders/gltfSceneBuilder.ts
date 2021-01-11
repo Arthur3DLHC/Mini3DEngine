@@ -429,6 +429,17 @@ export class GLTFSceneBuilder {
                     break;
             }
             if (body !== null) {
+                if (nodeDef.extras.collisionGroup !== undefined) {
+                    body.body.collisionFilterGroup = nodeDef.extras.collisionGroup;
+                } else {
+                    body.body.collisionFilterGroup = 1;
+                }
+                if (nodeDef.extras.collisionMask !== undefined) {
+                    body.body.collisionFilterMask = nodeDef.extras.collisionMask
+                } else {
+                    body.body.collisionFilterMask = 14;  // 11111110 don't collide with self?
+                }
+
                 this.physicsWorld.world.addBody(body.body);
                 node.behaviors.push(body);
 

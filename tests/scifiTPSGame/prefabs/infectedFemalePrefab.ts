@@ -57,6 +57,8 @@ export class InfectedFemalePrefab extends BasePrefab {
         // add rigid body last? after third person control
         gltfSceneFemale.behaviors.push(femaleBody);
 
+        femaleBody.body.collisionFilterGroup = 2;
+        femaleBody.body.collisionFilterMask = 1 | 2;
         femaleBody.body.fixedRotation = true;
         femaleBody.affectRotation = false;
 
