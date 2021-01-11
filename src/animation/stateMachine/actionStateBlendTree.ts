@@ -25,9 +25,10 @@ export class ActionStateBlendTree extends ActionState {
 
             // todo: clear all target channel values of animations in node?
             // do not need to clear after using the object property mixers
+
             // this.rootNode.clearAnimationTargetChannelValues();
             
-            // todo: blend the animations according to the node global weights?
+            // blend the animations according to the node global weights?
             this.rootNode.updateAnimations();
         }
     }
