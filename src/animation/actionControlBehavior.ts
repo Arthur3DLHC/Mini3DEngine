@@ -58,13 +58,13 @@ export class ActionControlBehavior extends Behavior {
 
     public update() {
         // todo: test use mixer
-        this._animationMixer.beginMixing();
 
         // todo: remove all clean zero operations in blendtrees;
         for (const layer of this.animationLayers) {
+            this._animationMixer.beginMixing();
             layer.update();
+            this._animationMixer.endMixing();
         }
-        this._animationMixer.endMixing();
     }
 
     public fromJSON(jsonData: any, customStateCreation?: (stateDef: any)=> ActionState, customConditionCreation?: (conditionDef: any)=>ActionCondition) {
