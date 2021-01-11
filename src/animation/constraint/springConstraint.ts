@@ -36,6 +36,8 @@ export class SpringConstraint extends BaseConstraint {
     /** the bone default up axis is +z in blender; swap y-z here */
     public localUpDir: vec3 = new vec3([0, 1, 0]);
 
+    public maxDistance: number = 1;
+
     private _rotation: boolean = true;
     // private _curHeadPosition: vec3 = new vec3();
 
@@ -117,7 +119,20 @@ export class SpringConstraint extends BaseConstraint {
 
         this._curPosition.add(this._curSpeed);
 
-        // todo: prevent too far or NAN?
+        // prevent too far or NAN?
+        let error = false;
+        if (isNaN(this._curPosition.x) || isNaN(this._curPosition.y) || isNaN(this._curPosition.z)) {
+            error = true;
+        } else {
+            if( vec3.distance(this._expectTailPosition, this._curPosition) > this.maxDistance ) {
+                error = true;
+            }
+        }
+
+        if (error) {
+            this._expectTailPosition.copyTo(this._curPosition);
+            this._curSpeed.setComponents(0, 0, 0);
+        }
 
         if (this.rotation) {
             // todo: look from expect head to cur tail
