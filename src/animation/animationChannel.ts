@@ -68,6 +68,20 @@ export class AnimationChannel {
         // check if targetMixer is used.
         if (this.targetMixer !== null) {
             // todo: check apply mode?
+            // if replace, is that necessary to use mixers?
+            if (mode === AnimationApplyMode.replace) {
+                if (this.targetVec3Mixer !== undefined) {
+                    this.targetVec3Mixer.mixReplaceArray(value, weight);
+                } else if (this.targetQuatMixer !== undefined) {
+                    this.targetQuatMixer.mixReplaceArray(value, weight);
+                }
+            } else {
+                if (this.targetVec3Mixer !== undefined) {
+                    this.targetVec3Mixer.mixAddtiveArray(value, weight);
+                } else if (this.targetQuatMixer !== undefined) {
+                    this.targetQuatMixer.mixAddtiveArray(value, weight);
+                }
+            }
 
         } else {
             if (this._targetQuat !== undefined) {
