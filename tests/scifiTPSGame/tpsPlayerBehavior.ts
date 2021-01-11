@@ -56,7 +56,7 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
                 strafeBlend *= -Math.sin(localMoveAngle);
 
                 if (this._isMovingBackward) {
-                    console.info("moveBlend: " + moveBlend);
+                    // console.info("moveBlend: " + moveBlend);
                 //     moveBlend = -moveBlend;
                 }
             }

@@ -68,6 +68,11 @@ export class QuatPropertyMixer extends PropertyMixer {
 
     public mixAdditive(val: quat, weight: number) {
         this.sumWeight += weight;
+        // todo: check if quaternions are flipped?
+        if( quat.dot(this.mixedValue, val) < 0 )
+        {
+            weight = -weight;
+        }
         this.mixedValue.x += val.x * weight;
         this.mixedValue.y += val.y * weight;
         this.mixedValue.z += val.z * weight;
@@ -76,6 +81,15 @@ export class QuatPropertyMixer extends PropertyMixer {
 
     public mixAddtiveArray(val: number[], weight: number) {
         super.mixAddtiveArray(val, weight);
+        // todo: check if quaternions are flipped?
+        let dotresult = 0;
+        for (let i = 0; i < 4; i++) {
+            dotresult += this.mixedValue.at(i) * val[i];          
+        }
+        if (dotresult < 0) {
+            weight = -weight;
+        }
+
         this.mixedValue.x += val[0] * weight;
         this.mixedValue.y += val[1] * weight;
         this.mixedValue.z += val[2] * weight;
@@ -93,6 +107,9 @@ export class QuatPropertyMixer extends PropertyMixer {
     public apply(targetValue: quat) {
         // mix the result with original value?
         if (this.sumWeight > 0.001) {
+            // normalize?
+            this.mixedValue.normalize();
+
             // quat.mix(this.originalValue, this.mixedValue, this.sumWeight, targetValue);
             // use a simple n-lerp?
             const invWeight = 1.0 - this.sumWeight;
