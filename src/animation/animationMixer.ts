@@ -37,7 +37,9 @@ export class AnimationMixer {
 
                 this._propMixers.push(propMixer);
             }
+            
             channel.targetMixer = propMixer;
+
             switch (channel.path) {
                 case AnimTargetPath.scale:
                     channel.targetVec3Mixer = propMixer.scale;
