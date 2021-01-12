@@ -62,6 +62,14 @@ export class InfectedFemalePrefab extends BasePrefab {
         femaleBody.body.fixedRotation = true;
         femaleBody.affectRotation = false;
 
+        // read RigidBody properties form component props
+        if (componentProps["RigidBody.collisionFilterGroup"] !== undefined) {
+            femaleBody.body.collisionFilterGroup = componentProps["RigidBody.collisionFilterGroup"];
+        }
+        if (componentProps["RigidBody.collisionFilterMask"] !== undefined) {
+            femaleBody.body.collisionFilterMask = componentProps["RigidBody.collisionFilterMask"];
+        }
+
         femaleBody.setPosition(gltfSceneFemale.translation);
         femaleBody.setRotation(gltfSceneFemale.rotation);
 

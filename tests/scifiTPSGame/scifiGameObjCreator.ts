@@ -1,6 +1,7 @@
 import quat from "../../lib/tsm/quat.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { GameObjectCreator, Object3D, PerspectiveCamera, PhysicsWorld, Scene, TextureLoader } from "../../src/mini3DEngine.js";
+import { InfectedFemalePrefab } from "./prefabs/infectedFemalePrefab.js";
 import { PlayerPrefab } from "./prefabs/playerPrefab.js";
 
 export class SciFiGameObjCreator extends GameObjectCreator {
@@ -43,7 +44,7 @@ export class SciFiGameObjCreator extends GameObjectCreator {
             case "player":
                 return this.createPlayer(name, componentProps, position, rotation, scale);
             case "infectedFemale":
-                return this.createInfectedFemale();
+                return this.createInfectedFemale(name, componentProps, position, rotation, scale);
         }
         throw new Error("Unrecogonized prefab: " + prefabKey);
     }
@@ -52,12 +53,19 @@ export class SciFiGameObjCreator extends GameObjectCreator {
         if (this.physicsWorld === null) {
             throw new Error("Need physics world to create player");
         }
-        const playerPrefab: PlayerPrefab = new PlayerPrefab(this.gltfAssets, this.physicsWorld, this.scene, this.camera, this.textureLoader, this.playerPhysicsMtl);
-        playerPrefab.showMature = this.showMature;
-        return playerPrefab.createGameObject(name, componentProps, position, rotation, scale);
+        const prefab: PlayerPrefab = new PlayerPrefab(this.gltfAssets, this.physicsWorld, this.scene, this.camera, this.textureLoader, this.playerPhysicsMtl);
+        prefab.showMature = this.showMature;
+        prefab.matureSkinUrl = "./models/SCIFI/heroes/cyberGirl/SkinBaseColor_NSFW.png";
+        return prefab.createGameObject(name, componentProps, position, rotation, scale);
     }
 
-    createInfectedFemale(): Object3D {
-        throw new Error("Method not implemented.");
+    createInfectedFemale(name: string, componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D {
+        if (this.physicsWorld === null) {
+            throw new Error("Need physics world to create player");
+        }
+        const prefab: InfectedFemalePrefab = new InfectedFemalePrefab(this.gltfAssets, this.physicsWorld, this.scene, this.textureLoader, this.playerPhysicsMtl);
+        prefab.showMature = this.showMature;
+        prefab.matureSkinUrl = "./models/SCIFI/monsters/infected_female/SkinBaseColor_NSFW.png";
+        return prefab.createGameObject(name, componentProps, position, rotation, scale);
     }
 }
