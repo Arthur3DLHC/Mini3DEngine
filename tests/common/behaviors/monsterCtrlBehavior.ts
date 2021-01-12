@@ -2,6 +2,7 @@ import mat4 from "../../../lib/tsm/mat4.js";
 import quat from "../../../lib/tsm/quat.js";
 import vec3 from "../../../lib/tsm/vec3.js";
 import { ActionControlBehavior, Behavior, Clock, Object3D, RigidBody, Scene } from "../../../src/mini3DEngine.js";
+import { TPSPlayerBehavior } from "../../scifiTPSGame/tpsPlayerBehavior.js";
 
 export enum MonsterState {
     Idle,
@@ -82,6 +83,7 @@ export class MonsterCtrlBehavior extends Behavior {
     // private _curAction: number = 0;
     /** recover time left for states like attacking, attacked, down */
     private _recoverTimeLeft: number = 0;
+    private _hitTimeLeft: number = 0;
 
     private static _tmpMyPosition: vec3 = new vec3();
     private static _tmpPlayerPosition: vec3 = new vec3();
@@ -177,6 +179,14 @@ export class MonsterCtrlBehavior extends Behavior {
                 this._veloctity.x = 0;
                 this._veloctity.z = 0;
                 this._recoverTimeLeft -= Clock.instance.elapsedTime;
+                this._hitTimeLeft -= Clock.instance.elapsedTime;
+                if (this._hitTimeLeft < 0.0 && this._player !== null) {
+                    this._hitTimeLeft = 1000;
+                    const playerCtrl: TPSPlayerBehavior | undefined = this._player.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
+                    if (playerCtrl !== undefined) {
+                        playerCtrl.onAttacked();
+                    }
+                }
                 if (this._recoverTimeLeft < 0.0) {
                     // attack again or rest?
                     // if (this.playerInMeleeAttackRange()) {
@@ -217,13 +227,13 @@ export class MonsterCtrlBehavior extends Behavior {
 
     public attack() {
         // attack toward current orientation ?
+        this._curState = MonsterState.Attacking;
+        this._recoverTimeLeft = 1.75;
+        this._hitTimeLeft = 0.5;
+        // todo: select attack action randomly
+        this._actionCtrl.actionParams.set("curAction", this._curState * 100 + Math.round(Math.random() * (this.attackingActions - 1)));
+
         // if facing player and close enough, player take damage ?
-        // if (this._curState === MonsterState.Idle || this._curState === MonsterState.Moving) {
-            this._curState = MonsterState.Attacking;
-            this._recoverTimeLeft = 1.75;
-            // todo: select attack action randomly
-            this._actionCtrl.actionParams.set("curAction", this._curState * 100 + Math.round(Math.random() * (this.attackingActions - 1)));
-        // }
     }
 
     public onAttacked() {

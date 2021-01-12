@@ -2,6 +2,7 @@ import { ActionControlBehavior, AnimationLayer, Camera, Object3D, RigidBody } fr
 import { ThirdPersonCtrlBehavior } from "../common/behaviors/thirdPersonCtrlBehavior.js";
 
 export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
+
     public get typeName(): string {
         return "TPSPlayerBehavior";
     }
@@ -33,6 +34,12 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
         if (ev.button === 0) {
             this._isShooting = false;
         }
+    }
+
+    public onAttacked() {
+        // todo: change to attacked state?
+        // prevent other actoins for a while?
+        // throw new Error("Method not implemented.");
     }
 
     public update() {
