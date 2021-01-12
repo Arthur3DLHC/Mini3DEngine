@@ -146,8 +146,9 @@ export class GLTFSceneBuilder {
         for (const nodeDef of gltf.gltf.nodes) {
             const node = this.processNode(nodeDef, gltf, instancing);
             // if is gameobject, will be null
-            if(node !== null)
-                nodes.push(node);
+            // if(node !== null)
+            // keep the index right
+            nodes.push(node);
         }
 
         // sceneDef.nodes is array of root node indices in the scene
@@ -233,6 +234,13 @@ export class GLTFSceneBuilder {
         const nodeDef = gltf.gltf.nodes[nodeId];
         const node = nodes[nodeId];
 
+        // skip gameobjects
+        if (nodeDef.extras !== undefined) {
+            if (nodeDef.extras.extType == "gameObject") {
+                return;
+            }
+        }
+
         parentObject.attachChild(node);
 
         if (nodeDef.children !== undefined) {
@@ -249,7 +257,7 @@ export class GLTFSceneBuilder {
      * @param instancing
      * @returns Object3D created accroding to nodeDef, or null if nodeDef is a GameObject (will be add to scene, not level) 
      */
-    private processNode(nodeDef: Node, gltf: GltfAsset, instancing: boolean): Object3D | null {
+    private processNode(nodeDef: Node, gltf: GltfAsset, instancing: boolean): Object3D {
 
         let node: Object3D;
         let isGameObject: boolean = false;
@@ -299,7 +307,7 @@ export class GLTFSceneBuilder {
                     // then add the prefab key as object custrom property in blender
                     // can only set no mesh node as gameobject?
                     let position: vec3 = new vec3();
-                    let rotation: quat = new quat();
+                    let rotation: quat = quat.identity.copyTo();
                     let scale: vec3 = new vec3([1,1,1]);
                     if (nodeDef.translation !== undefined) {
                         position.setComponents(nodeDef.translation[0], nodeDef.translation[1], nodeDef.translation[2]);
@@ -339,7 +347,7 @@ export class GLTFSceneBuilder {
 
         this.processNodeTransform(nodeDef, node);
 
-        if(isGameObject) return null;
+        // if(isGameObject) return null;
         return node;
 
         //if (nodeDef.children !== undefined) {

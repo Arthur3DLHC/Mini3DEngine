@@ -5,7 +5,7 @@ import { InfectedFemalePrefab } from "./prefabs/infectedFemalePrefab.js";
 import { PlayerPrefab } from "./prefabs/playerPrefab.js";
 
 export class SciFiGameObjCreator extends GameObjectCreator {
-    public constructor(physicsWorld: PhysicsWorld, camera: PerspectiveCamera, scene: Scene, textureLoader: TextureLoader) {
+    public constructor(physicsWorld: PhysicsWorld, playerPhysicsMtl: CANNON.Material, groundPhysicsMtl: CANNON.Material, widgetPhysicsMtl: CANNON.Material, camera: PerspectiveCamera, scene: Scene, textureLoader: TextureLoader) {
         super();
 
         this.scene = scene;
@@ -13,6 +13,11 @@ export class SciFiGameObjCreator extends GameObjectCreator {
         this.camera = camera;
         this.textureLoader = textureLoader;
 
+        this.playerPhysicsMtl = playerPhysicsMtl;
+        this.groundPhysicsMtl = groundPhysicsMtl;
+        this.widgetPhysicsMtl = widgetPhysicsMtl;
+
+        /*
         this.playerPhysicsMtl = new CANNON.Material("playerMaterial");
         this.groundPhysicsMtl = new CANNON.Material("groundMaterial");
         this.widgetPhysicsMtl = new CANNON.Material("widgetMaterial");
@@ -27,11 +32,12 @@ export class SciFiGameObjCreator extends GameObjectCreator {
         this.physicsWorld.world.addContactMaterial(player_ground_cm);
         this.physicsWorld.world.addContactMaterial(player_widget_cm);
         this.physicsWorld.world.addContactMaterial(widget_ground_cm);
+        */
     }
 
-    private playerPhysicsMtl: CANNON.Material;
-    private groundPhysicsMtl: CANNON.Material;
-    private widgetPhysicsMtl: CANNON.Material;
+    public playerPhysicsMtl: CANNON.Material;
+    public groundPhysicsMtl: CANNON.Material;
+    public widgetPhysicsMtl: CANNON.Material;
 
     private scene: Scene;
     private camera: PerspectiveCamera;
@@ -39,7 +45,7 @@ export class SciFiGameObjCreator extends GameObjectCreator {
 
     public showMature: boolean = false;
 
-    public createGameObject(prefabKey: string, name: string, componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D {
+    public createGameObject(name: string, prefabKey: string, componentProps: any, position: vec3, rotation: quat, scale: vec3): Object3D {
         switch(prefabKey) {
             case "player":
                 return this.createPlayer(name, componentProps, position, rotation, scale);

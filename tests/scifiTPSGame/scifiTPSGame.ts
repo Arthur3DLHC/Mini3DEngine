@@ -49,6 +49,8 @@ window.onload = () => {
     /** save notebook GPU */
     const halfFPSMode = showMature;
 
+    const addObjectsManually = false;
+
     let skipThisFrame = false;
 
     const physicsWorld = new PhysicsWorld({ numIterations: 10 });
@@ -58,15 +60,16 @@ window.onload = () => {
     world.defaultContactMaterial.contactEquationRelaxation = 3
 
     // use a slippery material between player and ground
+
     const playerPhysicsMtl = new CANNON.Material("playerMaterial");
     const groundPhysicsMtl = new CANNON.Material("groundMaterial");
     const widgetPhysicsMtl = new CANNON.Material("widgetMaterial");
     const player_ground_cm = new CANNON.ContactMaterial(playerPhysicsMtl, groundPhysicsMtl,
-         { friction: 0.0, restitution: 0.3, contactEquationRelaxation: 3, contactEquationStiffness: 1e8, frictionEquationStiffness: 1e8, frictionEquationRelaxation: 3 });
+        { friction: 0.0, restitution: 0.3, contactEquationRelaxation: 3, contactEquationStiffness: 1e8, frictionEquationStiffness: 1e8, frictionEquationRelaxation: 3 });
     const player_widget_cm = new CANNON.ContactMaterial(playerPhysicsMtl, widgetPhysicsMtl,
-         { friction: 0.4, restitution: 0.3, contactEquationRelaxation: 3, contactEquationStiffness: 1e8, frictionEquationStiffness: 1e8, frictionEquationRelaxation: 3 });
+        { friction: 0.4, restitution: 0.3, contactEquationRelaxation: 3, contactEquationStiffness: 1e8, frictionEquationStiffness: 1e8, frictionEquationRelaxation: 3 });
     const widget_ground_cm = new CANNON.ContactMaterial(widgetPhysicsMtl, groundPhysicsMtl,
-         { friction: 0.4, restitution: 0.3, contactEquationRelaxation: 3, contactEquationStiffness: 1e8, frictionEquationStiffness: 1e8, frictionEquationRelaxation: 3 });
+        { friction: 0.4, restitution: 0.3, contactEquationRelaxation: 3, contactEquationStiffness: 1e8, frictionEquationStiffness: 1e8, frictionEquationRelaxation: 3 });
     world.addContactMaterial(player_ground_cm);
     world.addContactMaterial(player_widget_cm);
     world.addContactMaterial(widget_ground_cm);
@@ -98,9 +101,10 @@ window.onload = () => {
 
     scene.attachChild(camera);
 
+    addTestDynamicObjects(physicsWorld, widgetPhysicsMtl, scene, addPlane, groundPhysicsMtl);
+
     // add some objects to scene
     // test box geometry
-    addTestDynamicObjects(physicsWorld, widgetPhysicsMtl, scene, addPlane, groundPhysicsMtl);
 
     console.log("loading gltf models...");
 
@@ -175,32 +179,38 @@ window.onload = () => {
             gltfAssets.set(characterModelKeys[i], loaded[0][i]);
         }
 
-        // test use prefabs to create character objects
-        const playerPrefab: PlayerPrefab = new PlayerPrefab(gltfAssets, physicsWorld, scene, camera, textureLoader, playerPhysicsMtl);
-        playerPrefab.showMature = showMature;
-        playerPrefab.matureSkinUrl = "./models/SCIFI/heroes/cyberGirl/SkinBaseColor_NSFW.png";
-        const gltfScenePlayer = playerPrefab.createGameObject("Player", {}, new vec3([0, 1.5, 0]), quat.identity.copyTo(), new vec3([1,1,1]));
 
-        const infectedFemalePrefab: InfectedFemalePrefab = new InfectedFemalePrefab(gltfAssets, physicsWorld, scene, textureLoader, playerPhysicsMtl);
-        infectedFemalePrefab.showMature = showMature;
-        infectedFemalePrefab.matureSkinUrl = "./models/SCIFI/monsters/infected_female/SkinBaseColor_NSFW.png";
-        infectedFemalePrefab.createGameObject("InfectedFemale01", {}, new vec3([0, 1.5, -2.0]), quat.identity.copyTo(), new vec3([1,1,1]));
-        infectedFemalePrefab.createGameObject("InfectedFemale02", {}, new vec3([0, 1.5, -4.0]), quat.identity.copyTo(), new vec3([1,1,1]));
-        infectedFemalePrefab.createGameObject("InfectedFemale03", {}, new vec3([0, 1.5, -6.0]), quat.identity.copyTo(), new vec3([1,1,1]));
-        infectedFemalePrefab.createGameObject("InfectedFemale04", {}, new vec3([0, 1.5, -8.0]), quat.identity.copyTo(), new vec3([1,1,1]));
+        if (addObjectsManually) {
+            // test use prefabs to create character objects
+            const playerPrefab: PlayerPrefab = new PlayerPrefab(gltfAssets, physicsWorld, scene, camera, textureLoader, playerPhysicsMtl);
+            playerPrefab.showMature = showMature;
+            playerPrefab.matureSkinUrl = "./models/SCIFI/heroes/cyberGirl/SkinBaseColor_NSFW.png";
+            const gltfScenePlayer = playerPrefab.createGameObject("Player", {}, new vec3([0, 1.5, 0]), quat.identity.copyTo(), new vec3([1, 1, 1]));
 
-        tpsBehavior = gltfScenePlayer.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
+            const infectedFemalePrefab: InfectedFemalePrefab = new InfectedFemalePrefab(gltfAssets, physicsWorld, scene, textureLoader, playerPhysicsMtl);
+            infectedFemalePrefab.showMature = showMature;
+            infectedFemalePrefab.matureSkinUrl = "./models/SCIFI/monsters/infected_female/SkinBaseColor_NSFW.png";
+            infectedFemalePrefab.createGameObject("InfectedFemale01", {}, new vec3([0, 1.5, -2.0]), quat.identity.copyTo(), new vec3([1, 1, 1]));
+            infectedFemalePrefab.createGameObject("InfectedFemale02", {}, new vec3([0, 1.5, -4.0]), quat.identity.copyTo(), new vec3([1, 1, 1]));
+            infectedFemalePrefab.createGameObject("InfectedFemale03", {}, new vec3([0, 1.5, -6.0]), quat.identity.copyTo(), new vec3([1, 1, 1]));
+            infectedFemalePrefab.createGameObject("InfectedFemale04", {}, new vec3([0, 1.5, -8.0]), quat.identity.copyTo(), new vec3([1, 1, 1]));
+
+            tpsBehavior = gltfScenePlayer.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
+        }
 
         // build test level
         const builderLevel = new GLTFSceneBuilder();
 
-        // todo: put player and monster prefabs in level in blender and export gltf
-        const gameObjectCreator: SciFiGameObjCreator = new SciFiGameObjCreator(physicsWorld, camera, scene, textureLoader);
-        gameObjectCreator.gltfAssets = gltfAssets;
-        gameObjectCreator.showMature = showMature;
+        if (!addObjectsManually) {
+            // put player and monster prefabs in level in blender and export gltf
+            const gameObjectCreator: SciFiGameObjCreator = new SciFiGameObjCreator(physicsWorld, playerPhysicsMtl, groundPhysicsMtl, widgetPhysicsMtl, camera, scene, textureLoader);
+            gameObjectCreator.gltfAssets = gltfAssets;
+            gameObjectCreator.showMature = showMature;
 
-        // physics world and material
-        // builderLevel.gameObjectCreator = gameObjectCreator;
+            // physics world and material
+            builderLevel.gameObjectCreator = gameObjectCreator;
+        }
+
         builderLevel.physicsWorld = physicsWorld;
         builderLevel.defaultPhysicsMaterial = groundPhysicsMtl;
         
@@ -214,6 +224,14 @@ window.onload = () => {
         scene.updateWorldTransform(false, true);
         InstancedMesh.updateInstancedMeshes(gltfSceneLevel);
 
+        if (!addObjectsManually) {
+            const playerObject = scene.getChildByName("Player");
+            if (playerObject !== null) {
+                tpsBehavior = playerObject.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
+            } else {
+                throw new Error("Player not found");
+            }
+        }
 
         console.log("start game loop...");
 
