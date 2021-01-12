@@ -43,6 +43,8 @@ export class GLTFSceneBuilder {
         this._meshReferences = [];
         this._instancedMeshGroupCounts = [];
         this._instancedMeshGroups = [];
+        this.defaultCollisionGroup = 1;
+        this.defaultCollisionMask = 254;    // 11111110  don't collide with self?
     }
 
     // todo: extension parser?
@@ -87,6 +89,11 @@ export class GLTFSceneBuilder {
     public defaultPhysicsMaterial: CANNON.Material | null = null;
 
     public physicsMaterials: Map<string, CANNON.Material> | null = null;
+
+    /** defualt collision group of static objects in level. = 1 */
+    public defaultCollisionGroup: number | undefined;
+    /** default collision mask of static objects in level. = 11111110b. they do not collide with each other. */
+    public defaultCollisionMask: number | undefined;
 
     public processConstraints: null | ((node: Object3D, nodeDef: Node) => void) = null;
 
@@ -432,12 +439,16 @@ export class GLTFSceneBuilder {
                 if (nodeDef.extras.collisionGroup !== undefined) {
                     body.body.collisionFilterGroup = nodeDef.extras.collisionGroup;
                 } else {
-                    body.body.collisionFilterGroup = 1;
+                    if (this.defaultCollisionGroup !== undefined) {
+                        body.body.collisionFilterGroup = this.defaultCollisionGroup;
+                    }
                 }
                 if (nodeDef.extras.collisionMask !== undefined) {
                     body.body.collisionFilterMask = nodeDef.extras.collisionMask
                 } else {
-                    body.body.collisionFilterMask = 14;  // 11111110 don't collide with self?
+                    if (this.defaultCollisionMask !== undefined) {
+                        body.body.collisionFilterMask = this.defaultCollisionMask;  // 11111110 don't collide with self?
+                    }
                 }
 
                 this.physicsWorld.world.addBody(body.body);
