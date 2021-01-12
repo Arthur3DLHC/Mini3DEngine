@@ -81,6 +81,14 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
         // shooting?
         this._actionCtrl.actionParams.set("shoot", this._isShooting ? 1 : 0);
 
+        // todo: shoot interval? defined by weapon
+        // if time to shoot once, shoot in different ways according to current weapon
+        // pistals, shotguns, machineguns: 
+        //      query pixel object picking; render object IDs to picking FBO
+        //      in the next frame, if there is a query, read back the picking FBO and check if any enemy object picked; damage them; clear the query;
+        // grenades, rockets, plasma:
+        //      create a bullet object use cannon.js physics collision?
+
         // upperbody animaiton layer
         if (this._upperBodyLayer !== undefined) {
             if (this.isAiming) {

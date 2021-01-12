@@ -174,38 +174,6 @@ export class PlayerPrefab extends BasePrefab {
                                     "blendMethod": 0,
                                     "weight": 1,
                                     "children": [
-                                        /*
-                                        {
-                                            // aiming move (front back only)
-                                            "blendParameters": ["moveSpeed"],
-                                            "blendMethod": 0,
-                                            "weigth": 0,
-                                            "weightParamPosition": [1],
-                                            "children": [
-                                                {
-                                                    // aim move backward
-                                                    "blendMethod": 4,
-                                                    "weigth": 0,
-                                                    "weightParamPosition": [-1],
-                                                    "animation": "Female.Aim.Walk.Backward"
-                                                },
-                                                {
-                                                    // aim stand
-                                                    "blendMethod": 4,
-                                                    "weigth": 1,
-                                                    "weightParamPosition": [0],
-                                                    "animation": "Female.Aim.Middle"
-                                                },
-                                                {
-                                                    // aim move forward
-                                                    "blendMethod": 4,
-                                                    "weigth": 0,
-                                                    "weightParamPosition": [1],
-                                                    "animation": "Female.Aim.Walk.Forward"
-                                                },
-                                            ]
-                                        },
-                                        */
                                         {
                                             // aiming move (directional)
                                             "blendParameters": ["strafeSpeed", "moveSpeed"],
