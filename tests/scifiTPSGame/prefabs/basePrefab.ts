@@ -1,6 +1,6 @@
 import quat from "../../../lib/tsm/quat.js";
 import vec3 from "../../../lib/tsm/vec3.js";
-import { AnimationAction, AnimationMask, GltfAsset, Mesh, Object3D, PhysicsWorld, Scene, StandardPBRMaterial, Texture, TextureLoader } from "../../../src/mini3DEngine.js";
+import { AnimationAction, AnimationMask, GltfAsset, Mesh, Object3D, PhysicsWorld, RigidBody, Scene, StandardPBRMaterial, Texture, TextureLoader } from "../../../src/mini3DEngine.js";
 
 export abstract class BasePrefab {
     public constructor(assets: Map<string, GltfAsset>, physicsWorld: PhysicsWorld, scene: Scene, ) {
@@ -70,5 +70,18 @@ export abstract class BasePrefab {
             throw new Error("Animation not found: " + animName);
         }
         return anim;
+    }
+
+    protected setRigidBodyProperties(body: RigidBody, componentProps: any) {
+        // is it necessary to check value types?
+        if (componentProps["RigidBody.mass"] !== undefined) {
+            body.body.mass = componentProps["RigidBody.mass"];
+        }
+        if (componentProps["RigidBody.collisionFilterGroup"] !== undefined) {
+            body.body.collisionFilterGroup = componentProps["RigidBody.collisionFilterGroup"];
+        }
+        if (componentProps["RigidBody.collisionFilterMask"] !== undefined) {
+            body.body.collisionFilterMask = componentProps["RigidBody.collisionFilterMask"];
+        }
     }
 }

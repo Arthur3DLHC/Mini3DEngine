@@ -72,12 +72,7 @@ export class PlayerPrefab extends BasePrefab {
         playerBody.body.fixedRotation = true;
         playerBody.affectRotation = false;
 
-        if (componentProps["RigidBody.collisionFilterGroup"] !== undefined) {
-            playerBody.body.collisionFilterGroup = componentProps["RigidBody.collisionFilterGroup"];
-        }
-        if (componentProps["RigidBody.collisionFilterMask"] !== undefined) {
-            playerBody.body.collisionFilterMask = componentProps["RigidBody.collisionFilterMask"];
-        }
+        this.setRigidBodyProperties(playerBody, componentProps);
 
         playerBody.setPosition(gltfSceneFemale.translation);
         playerBody.setRotation(gltfSceneFemale.rotation);
