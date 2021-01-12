@@ -200,7 +200,7 @@ window.onload = () => {
         gameObjectCreator.showMature = showMature;
 
         // physics world and material
-        builderLevel.gameObjectCreator = gameObjectCreator;
+        // builderLevel.gameObjectCreator = gameObjectCreator;
         builderLevel.physicsWorld = physicsWorld;
         builderLevel.defaultPhysicsMaterial = groundPhysicsMtl;
         
