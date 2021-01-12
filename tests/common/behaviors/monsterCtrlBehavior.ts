@@ -187,6 +187,8 @@ export class MonsterCtrlBehavior extends Behavior {
                 }
                 break;
             case MonsterState.Attacked:
+                this._veloctity.x = 0;
+                this._veloctity.z = 0;
                 // recover time left
                 this._recoverTimeLeft -= Clock.instance.elapsedTime;
                 // if recovered (and player in sense range?), move toward player
@@ -229,9 +231,11 @@ export class MonsterCtrlBehavior extends Behavior {
             // todo: calculate damage and hp left.
             // if hp < 0, down; else attacked
             // the down animation will be played once and keep the pose at last frame;
+
+            // todo: different animation of damage: light and heavy
             this._curState = MonsterState.Attacked;
             this._actionCtrl.actionParams.set("curAction", MonsterState.Attacked);
-            this._recoverTimeLeft = 1.0;
+            this._recoverTimeLeft = 0.5;
         }
     }
 

@@ -103,6 +103,8 @@ export class InfectedFemalePrefab extends BasePrefab {
 
         // note: actions must not transit to themselves!
 
+        // todo: use a masked animation level for damage state?
+
         const actionCtrlDef: any = {
             "actionParams": {
                 "curAction": 0
@@ -370,7 +372,7 @@ export class InfectedFemalePrefab extends BasePrefab {
                             {
                                 "typeStr": "single",
                                 "name": "attacked",
-                                "animation": "Female.Damage",
+                                "animation": "Female.Damage.Light",
                                 "animLoopMode": 1,
                                 "transitions": [
                                     {
