@@ -535,8 +535,6 @@ TODO:       主要类结构
 
             环境反射球范围问题；irradiance probe 有的是黑色问题；
 
-            瞄准时相机距离的自动调整？
-
             屏幕像素级点选和 Hover 效果
                 用于实现射击、对象交互
                 点选时将 object ID 绘制到一个FBO，然后 blit 选取范围到内存 FBO，CPU 读取出此 ID
