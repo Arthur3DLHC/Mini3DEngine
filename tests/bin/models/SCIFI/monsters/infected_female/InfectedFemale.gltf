@@ -17103,7 +17103,7 @@
                     }
                 }
             ],
-            "name" : "Female.Damage.light",
+            "name" : "Female.Damage.Light",
             "samplers" : [
                 {
                     "input" : 1060,

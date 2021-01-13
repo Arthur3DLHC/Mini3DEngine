@@ -98,7 +98,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     public minCameraHorizontalOffsetScale: number = 0.5;
     public maxCameraHorizontalOffsetScale: number = 2;
 
-    public cameraHorizontalOffsetScaleAiming: number = 0.3;
+    public cameraHorizontalOffsetScaleAiming: number = 0.5;
     public cameraHorizontalOffsetScaleRunning: number = 1;
 
     /**
