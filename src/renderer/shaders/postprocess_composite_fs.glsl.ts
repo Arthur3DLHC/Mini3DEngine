@@ -189,6 +189,10 @@ void main(void) {
             // should also add radius weight: the smaller the probe, the stronger the weight.
             // https://www.xmswiki.com/wiki/SMS:Inverse_Distance_Weighted_Interpolation
             float dist = length(probe.position - worldPos);
+            if (dist > probe.radius) {
+                continue;
+            }
+
             float distxradius = dist * probe.radius + 0.01;
 
             // envprobes has visible distance limit, so fade out to prevent popup artifact
