@@ -98,6 +98,9 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     public minCameraHorizontalOffsetScale: number = 0.5;
     public maxCameraHorizontalOffsetScale: number = 2;
 
+    public cameraHorizontalOffsetScaleAiming: number = 0.3;
+    public cameraHorizontalOffsetScaleRunning: number = 1;
+
     /**
      * camera vertical offset from rigid body pivot
      */
@@ -110,6 +113,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
 
     private _camera: Camera;
     private _cameraGlobalOffset: vec3 = new vec3();
+    // private _cameraActualHorizOffsetScale: number = 1;
 
     private _horizVelocity: vec3 = new vec3();
 
@@ -189,6 +193,10 @@ export class ThirdPersonCtrlBehavior extends Behavior {
                 break;
             case this.keyAim:
                 this._isAiming = !this._isAiming;
+                if (!this._isAiming) {
+                    // restore running camera distance
+                    this.cameraHorizontalOffsetScale = this.cameraHorizontalOffsetScaleRunning;
+                }
                 break;
             default:
                 break;
@@ -332,6 +340,9 @@ export class ThirdPersonCtrlBehavior extends Behavior {
             this._horizVelocity.z *= rate;
             this._modelYaw = this.yaw;
             quat.fromAxisAngle(this._upVec, this._modelYaw + Math.PI, this.owner.rotation);
+
+            // lock the camera distance
+            this.cameraHorizontalOffsetScale = this.cameraHorizontalOffsetScaleAiming;
         }
 
         // apply horizontal velocty to rigid body
