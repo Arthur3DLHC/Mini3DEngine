@@ -21,10 +21,12 @@ export class AnimationLayer {
     public blendMode: AnimationApplyMode = AnimationApplyMode.replace;
 
     public stateMachine : ActionStateMachine | null = null;
+    /** to prevent state machine can not change current state after weight set to 0 */
+    public alwaysUpdate: boolean = false;
 
     // todo: apply blendWeight to animations, how?
     public update() {
-        if (this.blendWeight > 0) {
+        if (this.blendWeight > 0 || this.alwaysUpdate) {
             if (this.stateMachine !== null) {
                 this.stateMachine.update();
             }

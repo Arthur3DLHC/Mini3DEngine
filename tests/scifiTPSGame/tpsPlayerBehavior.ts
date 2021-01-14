@@ -115,7 +115,7 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
                 
                 // shoot dir
                 // or use inverse world matrix as view transform?
-                const shootDir: vec3 = this.owner.worldTransform.multiplyVec3Normal(new vec3([0, 0, -1]));
+                const shootDir: vec3 = this.owner.worldTransform.multiplyVec3Normal(new vec3([0, 0, 1]));
                 const sideDir: vec3 = this.owner.worldTransform.multiplyVec3Normal(new vec3([1, 0, 0]));
 
                 for (const monster of GameWorld.monsters) {

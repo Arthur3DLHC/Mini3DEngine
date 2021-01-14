@@ -1,7 +1,7 @@
 import mat4 from "../../lib/tsm/mat4.js";
 import quat from "../../lib/tsm/quat.js";
 import vec3 from "../../lib/tsm/vec3.js";
-import { ActionControlBehavior, Behavior, Clock, Object3D, RigidBody, Scene } from "../../src/mini3DEngine.js";
+import { ActionControlBehavior, AnimationLayer, Behavior, Clock, Object3D, RigidBody, Scene } from "../../src/mini3DEngine.js";
 import { GameWorld } from "./gameWorld.js";
 import { TPSPlayerBehavior } from "./tpsPlayerBehavior.js";
 
@@ -47,6 +47,8 @@ export class MonsterCtrlBehavior extends Behavior {
     public attackingActions: number = 1;
     public attackedActions: number = 1;
 
+    public upperBodyLayer: AnimationLayer | undefined;
+
     // orientation ?
     // look orientation and move orientation
     // use yaw pitch or use vectors ?
@@ -64,6 +66,7 @@ export class MonsterCtrlBehavior extends Behavior {
     private _body: RigidBody;
     private _veloctity: CANNON.Vec3;    // alias of CANNON.Body.velocity
     private _actionCtrl: ActionControlBehavior;
+
     // todo: navigation grid agent?
 
     // ref objects
@@ -202,12 +205,18 @@ export class MonsterCtrlBehavior extends Behavior {
             case MonsterState.Attacked:
                 this._veloctity.x = 0;
                 this._veloctity.z = 0;
+                
                 // recover time left
                 this._recoverTimeLeft -= Clock.instance.elapsedTime;
                 // if recovered (and player in sense range?), move toward player
                 if (this._recoverTimeLeft < 0.0) {
                     // move to player?
-                    this.rest();
+                    if(this.playerInSight()) {
+                        // if player in sight, move ?
+                        this.moveTo(MonsterCtrlBehavior._tmpPlayerPosition);
+                    } else {
+                        this.rest();
+                    }
                 }
                 break;
             case MonsterState.Down:
@@ -217,11 +226,20 @@ export class MonsterCtrlBehavior extends Behavior {
                 // if already down, can not transit to other states?
                 break;
         }
+
+        if (this.upperBodyLayer !== undefined) {
+            if (this._curState === MonsterState.Attacked) {
+                this.upperBodyLayer.blendWeight = 1;
+            } else {
+                this.upperBodyLayer.blendWeight = 0;
+            }
+        }
+
         // this._actionCtrl.actionParams.set("curAction", this._curAction);
     }
 
     public moveTo(dest: vec3) {
-        if (this._curState === MonsterState.Idle || this._curState === MonsterState.Moving) {
+        if (this._curState !== MonsterState.Down ) {
             dest.copyTo(this._destination);
             this._curState = MonsterState.Moving;
             this._actionCtrl.actionParams.set("curAction", MonsterState.Moving);
