@@ -74,13 +74,16 @@ export class ObjectIDRenderer {
     /**
      * in the end of every frame, check if there are new picking queries;
      * if so, render all pickable object IDs to picking FBO.
+     * or copy the normal, object ID and tag, depth from scene RTs in query boundary rect to part of a RGBA32F FBO 
+     * this can prevent read back and process half-float values in js
+     * and also prevent the halt of GPU pipeline?
      * @param context render context needed for set the object UBO
      */
-    // public renderIfNeeded(context: ClusteredForwardRenderContext, renderList: RenderList) {
-    //     if (this._queries.length > 0) {
+    public renderIfNeeded(context: ClusteredForwardRenderContext, renderList: RenderList) {
+        if (this._queries.length > 0) {
             
-    //     }
-    // }
+        }
+    }
 
     //#endregion
 }
