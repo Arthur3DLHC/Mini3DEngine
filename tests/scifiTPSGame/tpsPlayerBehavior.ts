@@ -108,7 +108,7 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
         // use a simple method to check if any monsters are shooted?
         // to test the monster damaged state and animation
         // how to iterate all monster gameobjects in scene?
-        if (this._isShooting) {
+        if (this._isShooting && this.isAiming) {
             if (this.nextShootTime <= Clock.instance.curTime) {
                 const monsterPosition: vec3 = new vec3();
                 const myPosition: vec3 = this.owner.worldTransform.getTranslation();

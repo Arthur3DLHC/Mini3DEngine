@@ -44,6 +44,8 @@ export class MonsterCtrlBehavior extends Behavior {
     /** in radians */
     public meleeAttackHalfFOV: number = Math.PI / 4.0;      // should vary according to the melee attack action ?
 
+    public HP: number = 5;
+
     public attackingActions: number = 1;
     public attackedActions: number = 1;
 
@@ -211,12 +213,13 @@ export class MonsterCtrlBehavior extends Behavior {
                 // if recovered (and player in sense range?), move toward player
                 if (this._recoverTimeLeft < 0.0) {
                     // move to player?
-                    if(this.playerInSight()) {
-                        // if player in sight, move ?
-                        this.moveTo(MonsterCtrlBehavior._tmpPlayerPosition);
-                    } else {
-                        this.rest();
-                    }
+                    this.moveTo(MonsterCtrlBehavior._tmpPlayerPosition);
+                    // if(this.playerInSight()) {
+                    //     // if player in sight, move ?
+                    //     this.moveTo(MonsterCtrlBehavior._tmpPlayerPosition);
+                    // } else {
+                    //     this.rest();
+                    // }
                 }
                 break;
             case MonsterState.Down:
@@ -262,11 +265,18 @@ export class MonsterCtrlBehavior extends Behavior {
             // todo: calculate damage and hp left.
             // if hp < 0, down; else attacked
             // the down animation will be played once and keep the pose at last frame;
+            this.HP--;
 
+            if (this.HP > 0) {
+                this._curState = MonsterState.Attacked;
+                this._actionCtrl.actionParams.set("curAction", MonsterState.Attacked);
+                this._recoverTimeLeft = 0.5;                
+            } else {
+                this._curState = MonsterState.Down;
+                this._actionCtrl.actionParams.set("curAction", MonsterState.Down);
+            }
             // todo: different animation of damage: light and heavy
-            this._curState = MonsterState.Attacked;
-            this._actionCtrl.actionParams.set("curAction", MonsterState.Attacked);
-            this._recoverTimeLeft = 0.5;
+
         }
     }
 
