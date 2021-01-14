@@ -1,3 +1,4 @@
+import vec3 from "../../lib/tsm/vec3.js";
 import { ActionControlBehavior, AnimationLayer, Camera, Clock, Object3D, RigidBody } from "../../src/mini3DEngine.js";
 import { ThirdPersonCtrlBehavior } from "../common/behaviors/thirdPersonCtrlBehavior.js";
 import { GameWorld } from "./gameWorld.js";
@@ -109,8 +110,28 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
         // how to iterate all monster gameobjects in scene?
         if (this._isShooting) {
             if (this.nextShootTime <= Clock.instance.curTime) {
+                const monsterPosition: vec3 = new vec3();
+                const myPosition: vec3 = this.owner.worldTransform.getTranslation();
+                
+                // shoot dir
+                // or use inverse world matrix as view transform?
+                const shootDir: vec3 = this.owner.worldTransform.multiplyVec3Normal(new vec3([0, 0, -1]));
+                const sideDir: vec3 = this.owner.worldTransform.multiplyVec3Normal(new vec3([1, 0, 0]));
+
                 for (const monster of GameWorld.monsters) {
-                    
+                    const obj = monster.owner;
+                    obj.worldTransform.getTranslation(monsterPosition);
+
+                    monsterPosition.subtract(myPosition);
+
+                    // dot product?
+                    const sideDist = vec3.dot(monsterPosition, sideDir);
+                    if (Math.abs(sideDist) < 0.3) {
+                        const forwardDist = vec3.dot(monsterPosition, shootDir);
+                        if (forwardDist > 0) {
+                            monster.onAttacked();
+                        }
+                    }
                 }
                 this.nextShootTime = Clock.instance.curTime + this.shootInterval;
             }
