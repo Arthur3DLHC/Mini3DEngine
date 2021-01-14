@@ -1,5 +1,6 @@
-import { ActionControlBehavior, AnimationLayer, Camera, Object3D, RigidBody } from "../../src/mini3DEngine.js";
+import { ActionControlBehavior, AnimationLayer, Camera, Clock, Object3D, RigidBody } from "../../src/mini3DEngine.js";
 import { ThirdPersonCtrlBehavior } from "../common/behaviors/thirdPersonCtrlBehavior.js";
+import { GameWorld } from "./gameWorld.js";
 
 export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
 
@@ -17,6 +18,10 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
     private _actionCtrl: ActionControlBehavior;
     private _isShooting: boolean;
     private _upperBodyLayer: AnimationLayer | undefined;
+    
+    public nextShootTime: number = 0;
+
+    public shootInterval: number = 0.5;
 
     public set upperBodyLayer(layer: AnimationLayer | undefined) {this._upperBodyLayer = layer;}
     public get upperBodyLayer(): AnimationLayer | undefined {return this._upperBodyLayer;}
@@ -25,7 +30,10 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
         super.onMouseDown(ev);
 
         if (ev.button === 0) {
-            this._isShooting = true;
+            if (!this._isShooting) {
+                this.nextShootTime = Clock.instance.curTime;
+                this._isShooting = true;
+            }
         }
     }
 
@@ -95,6 +103,18 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
         //      in the next frame, if there is a query, read back the picking FBO and check if any enemy object picked; damage them; clear the query;
         // grenades, rockets, plasma:
         //      create a bullet object use cannon.js physics collision?
+
+        // use a simple method to check if any monsters are shooted?
+        // to test the monster damaged state and animation
+        // how to iterate all monster gameobjects in scene?
+        if (this._isShooting) {
+            if (this.nextShootTime <= Clock.instance.curTime) {
+                for (const monster of GameWorld.monsters) {
+                    
+                }
+                this.nextShootTime = Clock.instance.curTime + this.shootInterval;
+            }
+        }
 
         // upperbody animaiton layer
         if (this._upperBodyLayer !== undefined) {

@@ -1,8 +1,9 @@
-import mat4 from "../../../lib/tsm/mat4.js";
-import quat from "../../../lib/tsm/quat.js";
-import vec3 from "../../../lib/tsm/vec3.js";
-import { ActionControlBehavior, Behavior, Clock, Object3D, RigidBody, Scene } from "../../../src/mini3DEngine.js";
-import { TPSPlayerBehavior } from "../../scifiTPSGame/tpsPlayerBehavior.js";
+import mat4 from "../../lib/tsm/mat4.js";
+import quat from "../../lib/tsm/quat.js";
+import vec3 from "../../lib/tsm/vec3.js";
+import { ActionControlBehavior, Behavior, Clock, Object3D, RigidBody, Scene } from "../../src/mini3DEngine.js";
+import { GameWorld } from "./gameWorld.js";
+import { TPSPlayerBehavior } from "./tpsPlayerBehavior.js";
 
 export enum MonsterState {
     Idle,
@@ -97,6 +98,8 @@ export class MonsterCtrlBehavior extends Behavior {
             throw new Error("Player not found.");
         }
 
+        GameWorld.monsters.push(this);
+
         // todo: init facing dir according to the world transform of owner object?
 
         // the precedure of add a monster:
@@ -110,7 +113,7 @@ export class MonsterCtrlBehavior extends Behavior {
         // call start() for all behaviors of all objects
 
         // so the worldTransform of owner should have been updated already now
-        this.owner.worldTransform.multiplyVec3Normal(new vec3([0, 0, -1]), this._facingDir);
+        this.owner.worldTransform.multiplyVec3Normal(new vec3([0, 0, 1]), this._facingDir);
         // this._facingDir.normalize();
     }
 
