@@ -1,3 +1,4 @@
+import vec3 from "../../lib/tsm/vec3.js";
 import { Scene } from "../scene/scene.js";
 import { FrameBuffer } from "../WebGLResources/frameBuffer.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
@@ -8,7 +9,7 @@ import { RenderList } from "./renderList.js";
 import { RenderStateSet } from "./renderStateSet.js";
 
 export class ObjectPickQuery {
-    public constructor(x: number, y: number, width: number, height: number, onPick: (tag: number, id: number) => void) {
+    public constructor(x: number, y: number, width: number, height: number, onPick: (tag: number, id: number, depth: number, normal: vec3) => void) {
         this.x = x; this.y = y; this.width = width, this.height = height;
         this.onPick = onPick;
     }
@@ -18,7 +19,7 @@ export class ObjectPickQuery {
     public width: number = 0;
     public height: number = 0;
 
-    public onPick: (tag: number, id: number) => void;
+    public onPick: (tag: number, id: number, depth: number, normal: vec3) => void;
 }
 
 /**
@@ -58,6 +59,7 @@ export class ObjectIDRenderer {
     public processQueries() {
         // todo: read pixels back from scene normal RT?
         // read depth from scene main depth buffer?
+        // need to get the RTs from clusteredForwardRenderer?
         for (const query of this._queries) {
             
         }
@@ -69,7 +71,6 @@ export class ObjectIDRenderer {
         this._queries.push(query);
     }
 
-    // fix me: how to generate the render lists? generate them here?
     /**
      * in the end of every frame, check if there are new picking queries;
      * if so, render all pickable object IDs to picking FBO.

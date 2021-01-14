@@ -122,6 +122,9 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
                     const obj = monster.owner;
                     obj.worldTransform.getTranslation(monsterPosition);
 
+                    // use camera view transform?
+                    // or use model facing dir?
+
                     monsterPosition.subtract(myPosition);
 
                     // dot product?
