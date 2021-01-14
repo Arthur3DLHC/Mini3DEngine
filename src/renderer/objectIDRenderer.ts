@@ -76,11 +76,11 @@ export class ObjectIDRenderer {
      * if so, render all pickable object IDs to picking FBO.
      * @param context render context needed for set the object UBO
      */
-    public renderIfNeeded(context: ClusteredForwardRenderContext, renderList: RenderList) {
-        if (this._queries.length > 0) {
+    // public renderIfNeeded(context: ClusteredForwardRenderContext, renderList: RenderList) {
+    //     if (this._queries.length > 0) {
             
-        }
-    }
+    //     }
+    // }
 
     //#endregion
 }
