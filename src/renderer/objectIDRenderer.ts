@@ -2,6 +2,7 @@ import vec3 from "../../lib/tsm/vec3.js";
 import { Scene } from "../scene/scene.js";
 import { FrameBuffer } from "../WebGLResources/frameBuffer.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
+import { RenderStateCache } from "../WebGLResources/renderStateCache.js";
 import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
 import { Texture2D } from "../WebGLResources/textures/texture2D.js";
@@ -61,6 +62,13 @@ export class ObjectIDRenderer {
         this._pickingFBO.attachTexture(2, this._depthTexture);
         this._pickingFBO.prepare();
 
+        // render state
+        this._copyRenderState = new RenderStateSet();
+        this._copyRenderState.blendState = RenderStateCache.instance.getBlendState(false, gl.FUNC_ADD, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        this._copyRenderState.colorWriteState = RenderStateCache.instance.getColorWriteState(true, true, true, true);
+        this._copyRenderState.cullState = RenderStateCache.instance.getCullState(false, gl.BACK);
+        this._copyRenderState.depthState = RenderStateCache.instance.getDepthStencilState(false, false, gl.ALWAYS);
+
         // todo: build shader programs
     }
 
@@ -82,7 +90,7 @@ export class ObjectIDRenderer {
     // private _objectIDProgram: ShaderProgram;
 
     // render state
-    // private _objectIDRenderState: RenderStateSet;
+    private _copyRenderState: RenderStateSet;
 
     // render list (visible and pickable Object3Ds)
     
