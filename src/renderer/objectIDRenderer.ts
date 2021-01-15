@@ -1,5 +1,4 @@
 import vec3 from "../../lib/tsm/vec3.js";
-import { Scene } from "../scene/scene.js";
 import { FrameBuffer } from "../WebGLResources/frameBuffer.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { RenderStateCache } from "../WebGLResources/renderStateCache.js";
@@ -7,7 +6,6 @@ import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
 import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { ClusteredForwardRenderContext } from "./clusteredForwardRenderContext.js";
-import { RenderList } from "./renderList.js";
 import { RenderStateSet } from "./renderStateSet.js";
 
 export class ObjectPickQuery {
