@@ -147,7 +147,7 @@ export class ClusteredForwardRenderer {
         this._sceneSpecularRoughnessTexture.create();
 
         this._sceneDepthTexture = new Texture2D(GLDevice.canvas.width, GLDevice.canvas.height, 1, 1, gl.DEPTH_STENCIL, gl.UNSIGNED_INT_24_8);
-        this._sceneDepthTexture.samplerState = new SamplerState(GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.CLAMP_TO_EDGE, GLDevice.gl.NEAREST, GLDevice.gl.NEAREST);
+        this._sceneDepthTexture.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.NEAREST, gl.NEAREST);
         this._sceneDepthTexture.create();
 
         this._sceneColorTexture = [];

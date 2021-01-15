@@ -80,6 +80,12 @@ export class GLTFSceneBuilder {
      */
     public setLightsStatic: boolean = true;
 
+    /**
+     * can multiply intensity of lights by a global rate when building level
+     * to overcome the problem of differences in lighting calculation between engine and blender.
+     */
+    public lightIntensityRate: number = 1;
+
     // fix me: hold ref to scene here?
 
     /** if not null, the collider rigid bodies will be created and added to this world */
@@ -580,6 +586,7 @@ export class GLTFSceneBuilder {
         }
         let intensity = 1;
         if (lightDef.intensity !== undefined) intensity = lightDef.intensity;
+        intensity *= this.lightIntensityRate;
         let light: BaseLight;
         switch(lightDef.type) {
             case "directional":
@@ -626,7 +633,8 @@ export class GLTFSceneBuilder {
         }
         if (lightDef.name !== undefined) light.name = lightDef.name;
         if (lightDef.color !== undefined) light.color.xyzw = [lightDef.color[0], lightDef.color[1], lightDef.color[2], 1];
-        if (lightDef.intensity !== undefined) light.intensity = intensity;
+        // if (lightDef.intensity !== undefined) light.intensity = intensity;
+        light.intensity = intensity;
         light.isStatic = this.setLightsStatic;
         // todo: cast shadows ? set in custom properties extras?
         // the shadow properties will be copied from light objects to their custom properties block in Blender by python script.

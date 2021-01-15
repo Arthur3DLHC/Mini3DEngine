@@ -2,6 +2,7 @@ import vec3 from "../../lib/tsm/vec3.js";
 import { Scene } from "../scene/scene.js";
 import { FrameBuffer } from "../WebGLResources/frameBuffer.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
+import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
 import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { ClusteredForwardRenderContext } from "./clusteredForwardRenderContext.js";
@@ -24,12 +25,43 @@ export class ObjectPickQuery {
 
 /**
  * this class is for pixel level picking
+ * use GPU to do pixel level picking, instead of doing intersection detecting by javascript 
  */
 export class ObjectIDRenderer {
     // query pick?
     // every pick can register an event hanlder?
     public constructor() {
         const gl = GLDevice.gl;
+
+        const width = Math.floor(GLDevice.canvas.width / 2);
+        const height = Math.floor(GLDevice.canvas.height / 2);
+
+        if (width === 0 || height === 0) {
+            throw new Error("picking RT zero size");
+        }
+
+        // create textures and FBO, in half canvas size
+        const sampler = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.NEAREST, gl.NEAREST);
+
+        this._objectIDTexture = new Texture2D(width, height, 1, 1, gl.RG, gl.UNSIGNED_SHORT, false);
+        this._normalTexture = new Texture2D(width, height, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, false);
+        this._depthTexture = new Texture2D(width, height, 1, 1, gl.RED, gl.FLOAT, false);
+
+        this._objectIDTexture.samplerState = sampler;
+        this._normalTexture.samplerState = sampler;
+        this._depthTexture.samplerState = sampler;
+
+        this._objectIDTexture.create();
+        this._normalTexture.create();
+        this._depthTexture.create();
+
+        this._pickingFBO = new FrameBuffer();
+        this._pickingFBO.attachTexture(0, this._objectIDTexture);
+        this._pickingFBO.attachTexture(1, this._normalTexture);
+        this._pickingFBO.attachTexture(2, this._depthTexture);
+        this._pickingFBO.prepare();
+
+        // todo: build shader programs
     }
 
     //#region private fields
@@ -37,9 +69,14 @@ export class ObjectIDRenderer {
     // queries
     private _queries: ObjectPickQuery[] = [];
 
-    // render target
-    // private _objectIDTexture: Texture2D;
-    // private _objectIDFBO: FrameBuffer;
+    /** RGBA8 encoded normal */
+    private _normalTexture: Texture2D;
+    /** RG16i object tag and id */
+    private _objectIDTexture: Texture2D;
+    /** F32 view space linear depth */
+    private _depthTexture: Texture2D;
+
+    private _pickingFBO: FrameBuffer;
 
     // shader program
     // private _objectIDProgram: ShaderProgram;
@@ -77,11 +114,16 @@ export class ObjectIDRenderer {
      * or copy the normal, object ID and tag, depth from scene RTs in query boundary rect to part of a RGBA32F FBO 
      * this can prevent read back and process half-float values in js
      * and also prevent the halt of GPU pipeline?
+     * need to downsample and change the output fromat, so can not use gl.blitFramebuffer(). draw textured quads instead.
      * @param context render context needed for set the object UBO
+     * @param sceneNormalTex texture contains scene normal and object tag and ID
+     * @param sceneDepthTex main depth texture, to compute the view z distance.
      */
-    public renderIfNeeded(context: ClusteredForwardRenderContext, renderList: RenderList) {
+    public renderIfNeeded(context: ClusteredForwardRenderContext, sceneNormalTex: Texture2D, sceneDepthTex: Texture2D) {
         if (this._queries.length > 0) {
-            
+            // accumulate query rectangle
+
+            // render quad, transfer datas in rectange from scene textures to picking RT
         }
     }
 
