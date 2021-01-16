@@ -1,4 +1,8 @@
+import objectID_fs from "./shaders/objectID_fs.glsl.js";
+
+import mat4 from "../../lib/tsm/mat4.js";
 import vec3 from "../../lib/tsm/vec3.js";
+import { PlaneGeometry } from "../geometry/common/planeGeometry.js";
 import { FrameBuffer } from "../WebGLResources/frameBuffer.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { RenderStateCache } from "../WebGLResources/renderStateCache.js";
@@ -7,6 +11,7 @@ import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
 import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { ClusteredForwardRenderContext } from "./clusteredForwardRenderContext.js";
 import { RenderStateSet } from "./renderStateSet.js";
+import { GLPrograms } from "../WebGLResources/glPrograms.js";
 
 export class ObjectPickQuery {
     public constructor(x: number, y: number, width: number, height: number, onPick: (tag: number, id: number, depth: number, normal: vec3) => void) {
@@ -68,6 +73,14 @@ export class ObjectIDRenderer {
         this._copyRenderState.depthState = RenderStateCache.instance.getDepthStencilState(false, false, gl.ALWAYS);
 
         // todo: build shader programs
+        const shaderCodes = GLPrograms.shaderCodes;
+        if (shaderCodes["objectID_fs"] === undefined) {
+            shaderCodes["objectID_fs"] = objectID_fs;
+        }
+
+        // geometry
+        this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
+        this._rectTransform = new mat4();
     }
 
     //#region private fields
@@ -85,12 +98,15 @@ export class ObjectIDRenderer {
     private _pickingFBO: FrameBuffer;
 
     // shader program
-    // private _objectIDProgram: ShaderProgram;
+    private _objectIDProgram: ShaderProgram;
 
     // render state
     private _copyRenderState: RenderStateSet;
 
     // render list (visible and pickable Object3Ds)
+    // a geometry to render screen space rectangles
+    private _rectGeom: PlaneGeometry;
+    private _rectTransform: mat4;
     
     //#endregion
 
