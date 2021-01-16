@@ -78,6 +78,11 @@ export class ObjectIDRenderer {
             shaderCodes["objectID_fs"] = objectID_fs;
         }
 
+        this._objectIDProgram = new ShaderProgram();
+        this._objectIDProgram.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["screen_rect_vs"]);
+        this._objectIDProgram.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["objectID_fs"]);
+        this._objectIDProgram.build();
+
         // geometry
         this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
         this._rectTransform = new mat4();
