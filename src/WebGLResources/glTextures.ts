@@ -34,6 +34,30 @@ export class GLTextures {
                 if (type === gl.HALF_FLOAT) internalFormat = gl.RGBA16F;
                 if (type === gl.UNSIGNED_BYTE) internalFormat = gl.RGBA8;
                 break;
+            case gl.RED_INTEGER:
+                if (type === gl.INT) internalFormat = gl.R32I;
+                if (type === gl.UNSIGNED_INT) internalFormat = gl.R32UI;
+                if (type === gl.SHORT) internalFormat = gl.R16I;
+                if (type === gl.UNSIGNED_SHORT) internalFormat = gl.R16UI;
+                break;
+            case gl.RG_INTEGER:
+                if (type === gl.INT) internalFormat = gl.RG32I;
+                if (type === gl.UNSIGNED_INT) internalFormat = gl.RG32UI;
+                if (type === gl.SHORT) internalFormat = gl.RG16I;
+                if (type === gl.UNSIGNED_SHORT) internalFormat = gl.RG16UI;
+                break;
+            case gl.RGB_INTEGER:
+                if (type === gl.INT) internalFormat = gl.RGB32I;
+                if (type === gl.UNSIGNED_INT) internalFormat = gl.RGB32UI;
+                if (type === gl.SHORT) internalFormat = gl.RGB16I;
+                if (type === gl.UNSIGNED_SHORT) internalFormat = gl.RGB16UI;
+                break;
+            case gl.RGBA_INTEGER:
+                if (type === gl.INT) internalFormat = gl.RGBA32I;
+                if (type === gl.UNSIGNED_INT) internalFormat = gl.RGBA32UI;
+                if (type === gl.SHORT) internalFormat = gl.RGBA16I;
+                if (type === gl.UNSIGNED_SHORT) internalFormat = gl.RGBA16UI;
+                break;
             case gl.DEPTH_COMPONENT:
                 if (type === gl.UNSIGNED_SHORT) {
                     internalFormat = gl.DEPTH_COMPONENT16;
