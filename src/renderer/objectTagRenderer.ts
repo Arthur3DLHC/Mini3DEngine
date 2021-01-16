@@ -50,7 +50,8 @@ export class ObjectIDRenderer {
         // create textures and FBO, in half canvas size
         const sampler = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.NEAREST, gl.NEAREST);
 
-        this._objectTagTexture = new Texture2D(width, height, 1, 1, gl.RED, gl.INT, false);
+        // if want to use a integer texture, need to use RED_INTEGER fromat
+        this._objectTagTexture = new Texture2D(width, height, 1, 1, gl.RED_INTEGER, gl.INT, false);
         this._normalTexture = new Texture2D(width, height, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, false);
         this._depthTexture = new Texture2D(width, height, 1, 1, gl.RED, gl.FLOAT, false);
 
