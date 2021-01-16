@@ -1,4 +1,5 @@
-import objectID_fs from "./shaders/objectID_fs.glsl.js";
+import objectTag_fs from "./shaders/objectTag_fs.glsl.js";
+import objectTag_vs from "./shaders/objectTag_vs.glsl.js";
 
 import mat4 from "../../lib/tsm/mat4.js";
 import vec3 from "../../lib/tsm/vec3.js";
@@ -12,6 +13,8 @@ import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { ClusteredForwardRenderContext } from "./clusteredForwardRenderContext.js";
 import { RenderStateSet } from "./renderStateSet.js";
 import { GLPrograms } from "../WebGLResources/glPrograms.js";
+import { GLUniformBuffers } from "../WebGLResources/glUnifomBuffers.js";
+import vec4 from "../../lib/tsm/vec4.js";
 
 export class ObjectPickQuery {
     public constructor(x: number, y: number, width: number, height: number, onPick: (tag: number, id: number, depth: number, normal: vec3) => void) {
@@ -47,20 +50,20 @@ export class ObjectIDRenderer {
         // create textures and FBO, in half canvas size
         const sampler = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.NEAREST, gl.NEAREST);
 
-        this._objectIDTexture = new Texture2D(width, height, 1, 1, gl.RG, gl.UNSIGNED_SHORT, false);
+        this._objectTagTexture = new Texture2D(width, height, 1, 1, gl.RED, gl.INT, false);
         this._normalTexture = new Texture2D(width, height, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, false);
         this._depthTexture = new Texture2D(width, height, 1, 1, gl.RED, gl.FLOAT, false);
 
-        this._objectIDTexture.samplerState = sampler;
+        this._objectTagTexture.samplerState = sampler;
         this._normalTexture.samplerState = sampler;
         this._depthTexture.samplerState = sampler;
 
-        this._objectIDTexture.create();
+        this._objectTagTexture.create();
         this._normalTexture.create();
         this._depthTexture.create();
 
         this._pickingFBO = new FrameBuffer();
-        this._pickingFBO.attachTexture(0, this._objectIDTexture);
+        this._pickingFBO.attachTexture(0, this._objectTagTexture);
         this._pickingFBO.attachTexture(1, this._normalTexture);
         this._pickingFBO.attachTexture(2, this._depthTexture);
         this._pickingFBO.prepare();
@@ -72,20 +75,23 @@ export class ObjectIDRenderer {
         this._copyRenderState.cullState = RenderStateCache.instance.getCullState(false, gl.BACK);
         this._copyRenderState.depthState = RenderStateCache.instance.getDepthStencilState(false, false, gl.ALWAYS);
 
-        // todo: build shader programs
+        // build shader programs
         const shaderCodes = GLPrograms.shaderCodes;
-        if (shaderCodes["objectID_fs"] === undefined) {
-            shaderCodes["objectID_fs"] = objectID_fs;
-        }
+        if (shaderCodes["objectTag_vs"] === undefined) shaderCodes["objectTag_vs"] = objectTag_vs;
+        if (shaderCodes["objectTag_fs"] === undefined) shaderCodes["objectTag_fs"] = objectTag_fs;
 
-        this._objectIDProgram = new ShaderProgram();
-        this._objectIDProgram.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["screen_rect_vs"]);
-        this._objectIDProgram.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["objectID_fs"]);
-        this._objectIDProgram.build();
+        this._objectTagProgram = new ShaderProgram();
+        this._objectTagProgram.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["objectTag_vs"]);
+        this._objectTagProgram.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["objectTag_fs"]);
+        this._objectTagProgram.build();
+
+        // uniform blocks
+        // only view UBO needed?
+        GLUniformBuffers.bindUniformBlock(this._objectTagProgram, "View");
 
         // geometry
         this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
-        this._rectTransform = new mat4();
+        this._rectScaleOffset = new vec4([1, 1, 0, 0]);
     }
 
     //#region private fields
@@ -96,14 +102,14 @@ export class ObjectIDRenderer {
     /** RGBA8 encoded normal */
     private _normalTexture: Texture2D;
     /** RG16i object tag and id */
-    private _objectIDTexture: Texture2D;
+    private _objectTagTexture: Texture2D;
     /** F32 view space linear depth */
     private _depthTexture: Texture2D;
 
     private _pickingFBO: FrameBuffer;
 
     // shader program
-    private _objectIDProgram: ShaderProgram;
+    private _objectTagProgram: ShaderProgram;
 
     // render state
     private _copyRenderState: RenderStateSet;
@@ -111,7 +117,7 @@ export class ObjectIDRenderer {
     // render list (visible and pickable Object3Ds)
     // a geometry to render screen space rectangles
     private _rectGeom: PlaneGeometry;
-    private _rectTransform: mat4;
+    private _rectScaleOffset: vec4;
     
     //#endregion
 
