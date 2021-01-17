@@ -213,6 +213,8 @@ window.onload = () => {
 
         builderLevel.physicsWorld = physicsWorld;
         builderLevel.defaultPhysicsMaterial = groundPhysicsMtl;
+
+        builderLevel.lightIntensityRate = 1;
         
         const gltfSceneLevel = builderLevel.build(loaded[1], 0, undefined, true);
         gltfSceneLevel.name = "Level";
