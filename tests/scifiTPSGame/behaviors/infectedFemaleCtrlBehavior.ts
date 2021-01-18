@@ -27,6 +27,8 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
 
     public update() {
 
+        // todo: think interval
+        
         // const curTime = Clock.instance.curTime;
         // if (curTime - this._lastThinkTime > this.thinkInterval) {
         //     this.think();
