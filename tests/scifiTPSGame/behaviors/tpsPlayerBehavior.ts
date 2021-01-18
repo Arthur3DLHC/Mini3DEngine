@@ -1,7 +1,7 @@
-import vec3 from "../../lib/tsm/vec3.js";
-import { ActionControlBehavior, AnimationLayer, Camera, Clock, Object3D, RigidBody } from "../../src/mini3DEngine.js";
-import { ThirdPersonCtrlBehavior } from "../common/behaviors/thirdPersonCtrlBehavior.js";
-import { GameWorld } from "./gameWorld.js";
+import vec3 from "../../../lib/tsm/vec3.js";
+import { ActionControlBehavior, AnimationLayer, Camera, Clock, Object3D, RigidBody } from "../../../src/mini3DEngine.js";
+import { ThirdPersonCtrlBehavior } from "../../common/behaviors/thirdPersonCtrlBehavior.js";
+import { GameWorld } from "../gameWorld.js";
 
 export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
 

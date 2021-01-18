@@ -5,7 +5,7 @@ import { LookatBehavior } from "../common/behaviors/lookatBehavior.js";
 import { SceneHelper } from "../common/sceneHelper.js";
 import quat from "../../lib/tsm/quat.js";
 import vec2 from "../../lib/tsm/vec2.js";
-import { TPSPlayerBehavior } from "./tpsPlayerBehavior.js";
+import { TPSPlayerBehavior } from "./behaviors/tpsPlayerBehavior.js";
 import { SciFiGameObjCreator } from "./scifiGameObjCreator.js";
 import { PlayerPrefab } from "./prefabs/playerPrefab.js";
 import { InfectedFemalePrefab } from "./prefabs/infectedFemalePrefab.js";

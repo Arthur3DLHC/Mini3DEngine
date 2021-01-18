@@ -1,7 +1,7 @@
 import quat from "../../../lib/tsm/quat.js";
 import vec3 from "../../../lib/tsm/vec3.js";
 import { ActionControlBehavior, ActionStateBlendTree, ActionStateMachine, ActionTransition, AnimationAction, AnimationBlendNode, AnimationLayer, AnimationLoopMode, AnimationMask, BlendMethods, Camera, ConstraintProcessor, GltfAsset, GLTFSceneBuilder, Object3D, PerspectiveCamera, PhysicsWorld, RigidBody, Scene, SingleParamCondition, TextureLoader, TimeUpCondition } from "../../../src/mini3DEngine.js";
-import { TPSPlayerBehavior } from "../tpsPlayerBehavior.js";
+import { TPSPlayerBehavior } from "../behaviors/tpsPlayerBehavior.js";
 import { BasePrefab } from "./basePrefab.js";
 
 /**

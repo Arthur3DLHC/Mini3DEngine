@@ -1,7 +1,7 @@
 import { Behavior, BehaviorFactory, Object3D } from "../../../src/mini3DEngine.js";
 import { AutoRotateBehavior } from "./autoRotateBehavior.js";
 import { FirstPersonViewBehavior } from "./firstPersonViewBehavior.js";
-import { MonsterCtrlBehavior } from "../../scifiTPSGame/monsterCtrlBehavior.js";
+import { MonsterCtrlBehavior } from "../../scifiTPSGame/behaviors/monsterCtrlBehavior.js";
 import { ThirdPersonCtrlBehavior } from "./thirdPersonCtrlBehavior.js";
 
 export class CommonBehaviorFactory extends BehaviorFactory {

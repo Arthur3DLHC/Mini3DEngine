@@ -1,4 +1,4 @@
-import { MonsterCtrlBehavior } from "./monsterCtrlBehavior.js";
+import { MonsterCtrlBehavior } from "./behaviors/monsterCtrlBehavior.js";
 
 /**
  * a class to simplify test the interaction between gameobjects

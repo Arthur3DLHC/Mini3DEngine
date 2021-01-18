@@ -1,8 +1,8 @@
-import mat4 from "../../lib/tsm/mat4.js";
-import quat from "../../lib/tsm/quat.js";
-import vec3 from "../../lib/tsm/vec3.js";
-import { ActionControlBehavior, AnimationLayer, Behavior, Clock, Object3D, RigidBody, Scene } from "../../src/mini3DEngine.js";
-import { GameWorld } from "./gameWorld.js";
+import mat4 from "../../../lib/tsm/mat4.js";
+import quat from "../../../lib/tsm/quat.js";
+import vec3 from "../../../lib/tsm/vec3.js";
+import { ActionControlBehavior, AnimationLayer, Behavior, Clock, Object3D, RigidBody, Scene } from "../../../src/mini3DEngine.js";
+import { GameWorld } from "../gameWorld.js";
 import { TPSPlayerBehavior } from "./tpsPlayerBehavior.js";
 
 export enum MonsterState {

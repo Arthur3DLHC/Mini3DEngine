@@ -1,7 +1,7 @@
 import quat from "../../../lib/tsm/quat.js";
 import vec3 from "../../../lib/tsm/vec3.js";
 import { ActionControlBehavior, AnimationAction, ConstraintProcessor, GltfAsset, GLTFSceneBuilder, Object3D, PhysicsWorld, RigidBody, Scene, TextureLoader } from "../../../src/mini3DEngine.js";
-import { MonsterCtrlBehavior } from "../monsterCtrlBehavior.js";
+import { MonsterCtrlBehavior } from "../behaviors/monsterCtrlBehavior.js";
 import { BasePrefab } from "./basePrefab.js";
 
 export class InfectedFemalePrefab extends BasePrefab {
