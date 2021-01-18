@@ -92,7 +92,9 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
                     // if (this.playerInMeleeAttackRange()) {
                     //     this.attack();
                     // } else {
-                        this.rest();
+                        // this.rest();
+                    this.moveTo(MonsterCtrlBehavior._tmpPlayerPosition);
+
                     //}
                 }
                 break;
