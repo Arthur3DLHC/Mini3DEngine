@@ -8,6 +8,10 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
     public get typeName(): string {
         return "TPSPlayerBehavior";
     }
+    public isA(typeName: string): boolean {
+        if(typeName === "TPSPlayerBehavior") return true;
+        return super.isA(typeName);
+    }
     public constructor(owner: Object3D, body: RigidBody, camera: Camera, actionCtrl: ActionControlBehavior) {
         super(owner, body, camera);
         this._actionCtrl = actionCtrl;

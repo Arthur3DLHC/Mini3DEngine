@@ -10,6 +10,10 @@ export class RigidBody extends PhysicsBehavior {
     public get typename(): string {
         return "RigidBody";
     }
+    public isA(typeName: string): boolean {
+        if(typeName === "RigidBody") return true;
+        return super.isA(typeName);
+    }
     public constructor(owner: Object3D, physicsWorld: PhysicsWorld, option?: CANNON.IBodyOptions) {
         super(owner, physicsWorld);
         

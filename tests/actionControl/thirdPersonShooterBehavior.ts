@@ -5,6 +5,10 @@ export class ThirdPersonShooterBehavior extends ThirdPersonCtrlBehavior {
     public get typeName(): string {
         return "ThirdPersonShooterBehavior";
     }
+    public isA(typeName: string): boolean {
+        if(typeName === "ThirdPersonShooterBehavior") return true;
+        return super.isA(typeName);
+    }
     public constructor(owner: Object3D, body: RigidBody, camera: Camera, actionCtrl: ActionControlBehavior) {
         super(owner, body, camera);
         this._actionCtrl = actionCtrl;

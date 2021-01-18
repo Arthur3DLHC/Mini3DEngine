@@ -15,5 +15,9 @@ export class MakePoseBehavior extends Behavior {
     public get typeName(): string {
         return "MakePoseBehavior";
     }
+    public isA(typeName: string): boolean {
+        if(typeName === "MakePoseBehavior") return true;
+        return super.isA(typeName);
+    }
     public curPose: string = MakePoses.IDLE;
 }

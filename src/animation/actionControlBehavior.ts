@@ -14,6 +14,10 @@ export class ActionControlBehavior extends Behavior {
     public get typeName(): string {
         return "ActionControlBehavior";
     }
+    public isA(typeName: string): boolean {
+        if(typeName === "ActionControlBehavior") return true;
+        return super.isA(typeName);
+    }
     public constructor(owner: Object3D, anims: AnimationAction[]) {
         super(owner);
         // this._stateMachine = new ActionStateMachine(this);

@@ -5,6 +5,10 @@ export class AutoRotateBehavior extends Behavior {
     public get typeName(): string {
         return "AutoRotateBehavior";
     }
+    public isA(typeName: string): boolean {
+        if(typeName === "AutoRotateBehavior") return true;
+        return super.isA(typeName);
+    }
     public constructor(owner: Object3D) {
         super(owner);
     }

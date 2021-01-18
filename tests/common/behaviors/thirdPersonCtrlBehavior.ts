@@ -18,6 +18,10 @@ export class ThirdPersonCtrlBehavior extends Behavior {
     public get typeName(): string {
         return "ThirdPersonCtrlBehavior";
     }
+    public isA(typeName: string): boolean {
+        if(typeName === "ThirdPersonCtrlBehavior") return true;
+        return super.isA(typeName);
+    }
     public constructor(owner: Object3D, body: RigidBody, camera: Camera) {
         super(owner);
         this._body = body;

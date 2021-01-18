@@ -9,6 +9,10 @@ export class PhysicsBehavior extends Behavior {
     public get typeName(): string {
         return "PhysicsBehavior";
     }
+    public isA(typeName: string): boolean {
+        if(typeName === "PhysicsBehavior") return true;
+        return super.isA(typeName);
+    }
     public constructor(owner: Object3D, physicsWorld: PhysicsWorld) {
         super(owner);
         this._world = physicsWorld;

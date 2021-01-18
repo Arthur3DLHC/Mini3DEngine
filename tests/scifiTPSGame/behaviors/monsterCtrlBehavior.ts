@@ -20,6 +20,10 @@ export class MonsterCtrlBehavior extends Behavior {
     public get typeName(): string {
         return "MonsterCtrlBehavior";
     }
+    public isA(typeName: string): boolean {
+        if(typeName === "MonsterCtrlBehavior") return true;
+        return super.isA(typeName);
+    }
     public constructor(owner: Object3D, body: RigidBody, actionCtrl: ActionControlBehavior, scene: Scene) {
         super(owner);
         this._body = body;
@@ -65,37 +69,37 @@ export class MonsterCtrlBehavior extends Behavior {
     public thinkInterval: number = 1.0;
 
     // components
-    private _body: RigidBody;
-    private _veloctity: CANNON.Vec3;    // alias of CANNON.Body.velocity
-    private _actionCtrl: ActionControlBehavior;
+    protected _body: RigidBody;
+    protected _veloctity: CANNON.Vec3;    // alias of CANNON.Body.velocity
+    protected _actionCtrl: ActionControlBehavior;
 
     // todo: navigation grid agent?
 
     // ref objects
     // enemy (player) object?
-    private _scene: Scene;
-    private _player: Object3D | null = null;
-    private _destination: vec3 = new vec3();
+    protected _scene: Scene;
+    protected _player: Object3D | null = null;
+    protected _destination: vec3 = new vec3();
 
-    private _destinationDir: vec3 = new vec3();
-    private _distToPlayer: number = 10000;
+    protected _destinationDir: vec3 = new vec3();
+    protected _distToPlayer: number = 10000;
 
     /** cur facing dir calculated from cur yaw and pitch */
-    private _facingDir: vec3 = new vec3();
+    protected _facingDir: vec3 = new vec3();
 
     // private _lastThinkTime: number = 0;
     // cur state?
     private _curState: MonsterState = MonsterState.Idle;
     // private _curAction: number = 0;
     /** recover time left for states like attacking, attacked, down */
-    private _recoverTimeLeft: number = 0;
-    private _hitTimeLeft: number = 0;
+    protected _recoverTimeLeft: number = 0;
+    protected _hitTimeLeft: number = 0;
 
-    private static _tmpMyPosition: vec3 = new vec3();
-    private static _tmpPlayerPosition: vec3 = new vec3();
-    private static _tmpDir: vec3 = new vec3();
+    protected static _tmpMyPosition: vec3 = new vec3();
+    protected static _tmpPlayerPosition: vec3 = new vec3();
+    protected static _tmpDir: vec3 = new vec3();
 
-    private static readonly _upDir = new vec3([0, 1, 0]);
+    protected static readonly _upDir = new vec3([0, 1, 0]);
 
     public start() {
         this._player = this._scene.getChildByName("Player");

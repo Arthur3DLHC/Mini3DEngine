@@ -10,6 +10,10 @@ export class FirstPersonViewBehavior extends Behavior {
     public get typeName(): string {
         return "FirstPersonViewBehavior";
     }
+    public isA(typeName: string): boolean {
+        if(typeName === "FirstPersonViewBehavior") return true;
+        return super.isA(typeName);
+    }
     public constructor(owner: Object3D) {
         super(owner);
         this.mouseSensitivity = 0.002;

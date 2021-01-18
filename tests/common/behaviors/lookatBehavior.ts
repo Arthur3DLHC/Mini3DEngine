@@ -7,6 +7,10 @@ export class LookatBehavior extends Behavior {
     public get typeName(): string {
         return "LookatBehavior";
     }
+    public isA(typeName: string): boolean {
+        if(typeName === "LookatBehavior") return true;
+        return super.isA(typeName);
+    }
     public constructor(owner: Object3D) {
         super(owner);
         this.position = new vec3();

@@ -16,6 +16,10 @@ export abstract class Behavior {
     /** subclasses must return its own type name */
     public abstract get typeName(): string;
 
+    public isA(typeName: string): boolean {
+        return typeName === "Behavior";
+    }
+
     public start() {
         // subclass can find required components and objects now.
     }
