@@ -4,18 +4,11 @@ import { ActionControlBehavior, AnimationLayer, Behavior, Clock, Object3D, Rigid
 import { GameWorld } from "../gameWorld.js";
 import { TPSPlayerBehavior } from "./tpsPlayerBehavior.js";
 
-export enum MonsterState {
-    Idle,
-    Moving,
-    Attacking,
-    Attacked,
-    Down,
-}
 
 /**
  * general monster control
  */
-export class MonsterCtrlBehavior extends Behavior {
+export abstract class MonsterCtrlBehavior extends Behavior {
     public get typeName(): string {
         return "MonsterCtrlBehavior";
     }
@@ -88,7 +81,6 @@ export class MonsterCtrlBehavior extends Behavior {
 
     // private _lastThinkTime: number = 0;
     // cur state?
-    protected _curState: MonsterState = MonsterState.Idle;
     // private _curAction: number = 0;
     /** recover time left for states like attacking, attacked, down */
     protected _recoverTimeLeft: number = 0;
@@ -149,148 +141,10 @@ export class MonsterCtrlBehavior extends Behavior {
             this._distToPlayer = vec3.distance(MonsterCtrlBehavior._tmpMyPosition, MonsterCtrlBehavior._tmpPlayerPosition);
         }
 
-        switch(this._curState) {
-            case MonsterState.Idle:
-                // this._curAction = 0;
-                // if player in attack range, attack ?
-                this._veloctity.x = 0;
-                this._veloctity.z = 0;
-                if(this.playerInMeleeAttackRange()) {
-                    this.attack();
-                } else if(this.playerInSight()) {
-                    // if player in sight, move ?
-                    this.moveTo(MonsterCtrlBehavior._tmpPlayerPosition);
-                } else {
-                    // if idled for a well, move to an random destination?
-                }
-                break;
-            case MonsterState.Moving:
-                // upate destination position
-                // always player cur position for now?
-                MonsterCtrlBehavior._tmpPlayerPosition.copyTo(this._destination);
-
-                // turn toward destination dir?
-                // calculate dest yaw?
-                // or use quaternions? how?
-                this.turnToFaceDestination();
-
-                // move toward cur facing dir
-                this._veloctity.x = this._facingDir.x * this.moveSpeed;
-                this._veloctity.z = this._facingDir.z * this.moveSpeed;
-
-                // if approached destination position, idle or attack ?
-                // refers to cur behavior is patrolling or chasing?
-                // what if player dead? change state to idle?
-                if (this.playerInMeleeAttackRange()) {
-                    this.attack();
-                } else if (this._distToPlayer > this.senseRange) {
-                    this.rest();
-                }
-                break;
-            case MonsterState.Attacking:
-                // recover time left
-                this._veloctity.x = 0;
-                this._veloctity.z = 0;
-                this._recoverTimeLeft -= Clock.instance.elapsedTime;
-                this._hitTimeLeft -= Clock.instance.elapsedTime;
-                if (this._hitTimeLeft < 0.0 && this._player !== null) {
-                    this._hitTimeLeft = 1000;
-                    const playerCtrl: TPSPlayerBehavior | undefined = this._player.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
-                    if (playerCtrl !== undefined) {
-                        playerCtrl.onAttacked();
-                    }
-                }
-                if (this._recoverTimeLeft < 0.0) {
-                    // attack again or rest?
-                    // if (this.playerInMeleeAttackRange()) {
-                    //     this.attack();
-                    // } else {
-                        this.rest();
-                    //}
-                }
-                break;
-            case MonsterState.Attacked:
-                this._veloctity.x = 0;
-                this._veloctity.z = 0;
-                
-                // recover time left
-                this._recoverTimeLeft -= Clock.instance.elapsedTime;
-                // if recovered (and player in sense range?), move toward player
-                if (this._recoverTimeLeft < 0.0) {
-                    // move to player?
-                    this.moveTo(MonsterCtrlBehavior._tmpPlayerPosition);
-                    // if(this.playerInSight()) {
-                    //     // if player in sight, move ?
-                    //     this.moveTo(MonsterCtrlBehavior._tmpPlayerPosition);
-                    // } else {
-                    //     this.rest();
-                    // }
-                }
-                break;
-            case MonsterState.Down:
-                this._veloctity.x = 0;
-                this._veloctity.z = 0;
-                // set actionCtrl params
-                // if already down, can not transit to other states?
-                break;
-        }
-
-        if (this.upperBodyLayer !== undefined) {
-            if (this._curState === MonsterState.Attacked) {
-                this.upperBodyLayer.blendWeight = 1;
-            } else {
-                this.upperBodyLayer.blendWeight = 0;
-            }
-        }
-
         // this._actionCtrl.actionParams.set("curAction", this._curAction);
     }
 
-    public moveTo(dest: vec3) {
-        if (this._curState !== MonsterState.Down ) {
-            dest.copyTo(this._destination);
-            this._curState = MonsterState.Moving;
-            this._actionCtrl.actionParams.set("curAction", MonsterState.Moving);
-        }
-    }
-
-    public attack() {
-        // attack toward current orientation ?
-        this._curState = MonsterState.Attacking;
-        this._recoverTimeLeft = 1.75;
-        this._hitTimeLeft = 0.5;
-        // todo: select attack action randomly
-        this._actionCtrl.actionParams.set("curAction", this._curState * 100 + Math.round(Math.random() * (this.attackingActions - 1)));
-
-        // if facing player and close enough, player take damage ?
-    }
-
-    public onAttacked() {
-        if (this._curState !== MonsterState.Down) {
-            // todo: calculate damage and hp left.
-            // if hp < 0, down; else attacked
-            // the down animation will be played once and keep the pose at last frame;
-            this.HP--;
-
-            if (this.HP > 0) {
-                this._curState = MonsterState.Attacked;
-                this._actionCtrl.actionParams.set("curAction", MonsterState.Attacked);
-                this._recoverTimeLeft = 0.5;                
-            } else {
-                this._curState = MonsterState.Down;
-                this._actionCtrl.actionParams.set("curAction", MonsterState.Down);
-            }
-            // todo: different animation of damage: light and heavy
-
-        }
-    }
-
-    public rest() {
-        if (this._curState !== MonsterState.Down) {
-            this._curState = MonsterState.Idle;
-            this._actionCtrl.actionParams.set("curAction", MonsterState.Idle);
-        }
-    }
+    public abstract onAttacked(): void;
 
     protected playerInSight(): boolean {
         if (this._player === null) {

@@ -1,7 +1,7 @@
 import quat from "../../../lib/tsm/quat.js";
 import vec3 from "../../../lib/tsm/vec3.js";
 import { ActionControlBehavior, AnimationAction, ConstraintProcessor, GltfAsset, GLTFSceneBuilder, Object3D, PhysicsWorld, RigidBody, Scene, TextureLoader } from "../../../src/mini3DEngine.js";
-import { MonsterCtrlBehavior } from "../behaviors/monsterCtrlBehavior.js";
+import { InfectedFemaleCtrlBehavior } from "../behaviors/infectedFemaleCtrlBehavior.js";
 import { BasePrefab } from "./basePrefab.js";
 
 export class InfectedFemalePrefab extends BasePrefab {
@@ -79,7 +79,7 @@ export class InfectedFemalePrefab extends BasePrefab {
 
         const actionCtrlBehavior = new ActionControlBehavior(gltfSceneFemale, animations);
 
-        const monsterBehavior = new MonsterCtrlBehavior(gltfSceneFemale, femaleBody, actionCtrlBehavior, this.scene);
+        const monsterBehavior = new InfectedFemaleCtrlBehavior(gltfSceneFemale, femaleBody, actionCtrlBehavior, this.scene);
         gltfSceneFemale.behaviors.push(monsterBehavior);
         // todo: monster ctrl behavior properties
         monsterBehavior.moveSpeed = 0.5;

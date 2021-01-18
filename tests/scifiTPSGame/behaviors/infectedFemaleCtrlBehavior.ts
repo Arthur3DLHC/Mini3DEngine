@@ -1,7 +1,15 @@
 import vec3 from "../../../lib/tsm/vec3.js";
 import { ActionControlBehavior, Clock, Object3D, RigidBody, Scene } from "../../../src/mini3DEngine.js";
-import { MonsterCtrlBehavior, MonsterState } from "./monsterCtrlBehavior.js";
+import { MonsterCtrlBehavior } from "./monsterCtrlBehavior.js";
 import { TPSPlayerBehavior } from "./tpsPlayerBehavior.js";
+
+export enum InfectedFemaleState {
+    Idle,
+    Moving,
+    Attacking,
+    Attacked,
+    Down,
+}
 
 export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
     public get typeName(): string {
@@ -15,32 +23,19 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
         super(owner, body, actionCtrl, scene);
     }
 
+    protected _curState: InfectedFemaleState = InfectedFemaleState.Idle;
+
     public update() {
+
         // const curTime = Clock.instance.curTime;
         // if (curTime - this._lastThinkTime > this.thinkInterval) {
         //     this.think();
         //     this._lastThinkTime = curTime;
         // }
-
-        // todo: chase player after attacked.
-
-        // facing dir
-        // 
-        // this._facingDir.setComponents(0, 0, 0);
-        // let facingYaw = this.yaw + Math.PI * 0.5;
-        // this._facingDir.x = Math.cos(facingYaw);
-        // this._facingDir.z = -Math.sin(facingYaw);
-        if (this._player !== null) {
-            this.owner.worldTransform.getTranslation(MonsterCtrlBehavior._tmpMyPosition);
-            this._player.worldTransform.getTranslation(MonsterCtrlBehavior._tmpPlayerPosition);
-
-            // set player direction as destination direction
-            vec3.direction(MonsterCtrlBehavior._tmpPlayerPosition, MonsterCtrlBehavior._tmpMyPosition, this._destinationDir);
-            this._distToPlayer = vec3.distance(MonsterCtrlBehavior._tmpMyPosition, MonsterCtrlBehavior._tmpPlayerPosition);
-        }
+        super.update();
 
         switch(this._curState) {
-            case MonsterState.Idle:
+            case InfectedFemaleState.Idle:
                 // this._curAction = 0;
                 // if player in attack range, attack ?
                 this._veloctity.x = 0;
@@ -54,7 +49,7 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
                     // if idled for a well, move to an random destination?
                 }
                 break;
-            case MonsterState.Moving:
+            case InfectedFemaleState.Moving:
                 // upate destination position
                 // always player cur position for now?
                 MonsterCtrlBehavior._tmpPlayerPosition.copyTo(this._destination);
@@ -77,7 +72,7 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
                     this.rest();
                 }
                 break;
-            case MonsterState.Attacking:
+            case InfectedFemaleState.Attacking:
                 // recover time left
                 this._veloctity.x = 0;
                 this._veloctity.z = 0;
@@ -99,7 +94,7 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
                     //}
                 }
                 break;
-            case MonsterState.Attacked:
+            case InfectedFemaleState.Attacked:
                 this._veloctity.x = 0;
                 this._veloctity.z = 0;
                 
@@ -117,7 +112,7 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
                     // }
                 }
                 break;
-            case MonsterState.Down:
+            case InfectedFemaleState.Down:
                 this._veloctity.x = 0;
                 this._veloctity.z = 0;
                 // set actionCtrl params
@@ -126,11 +121,57 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
         }
 
         if (this.upperBodyLayer !== undefined) {
-            if (this._curState === MonsterState.Attacked) {
+            if (this._curState === InfectedFemaleState.Attacked) {
                 this.upperBodyLayer.blendWeight = 1;
             } else {
                 this.upperBodyLayer.blendWeight = 0;
             }
+        }
+    }
+
+    public moveTo(dest: vec3) {
+        if (this._curState !== InfectedFemaleState.Down ) {
+            dest.copyTo(this._destination);
+            this._curState = InfectedFemaleState.Moving;
+            this._actionCtrl.actionParams.set("curAction", InfectedFemaleState.Moving);
+        }
+    }
+
+    public attack() {
+        // attack toward current orientation ?
+        this._curState = InfectedFemaleState.Attacking;
+        this._recoverTimeLeft = 1.75;
+        this._hitTimeLeft = 0.5;
+        // todo: select attack action randomly
+        this._actionCtrl.actionParams.set("curAction", this._curState * 100 + Math.round(Math.random() * (this.attackingActions - 1)));
+
+        // if facing player and close enough, player take damage ?
+    }
+
+    public onAttacked() {
+        if (this._curState !== InfectedFemaleState.Down) {
+            // todo: calculate damage and hp left.
+            // if hp < 0, down; else attacked
+            // the down animation will be played once and keep the pose at last frame;
+            this.HP--;
+
+            if (this.HP > 0) {
+                this._curState = InfectedFemaleState.Attacked;
+                this._actionCtrl.actionParams.set("curAction", InfectedFemaleState.Attacked);
+                this._recoverTimeLeft = 0.5;                
+            } else {
+                this._curState = InfectedFemaleState.Down;
+                this._actionCtrl.actionParams.set("curAction", InfectedFemaleState.Down);
+            }
+            // todo: different animation of damage: light and heavy
+
+        }
+    }
+
+    public rest() {
+        if (this._curState !== InfectedFemaleState.Down) {
+            this._curState = InfectedFemaleState.Idle;
+            this._actionCtrl.actionParams.set("curAction", InfectedFemaleState.Idle);
         }
     }
 }
