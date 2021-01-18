@@ -15,6 +15,8 @@ import { RenderStateSet } from "./renderStateSet.js";
 import { GLPrograms } from "../WebGLResources/glPrograms.js";
 import { GLUniformBuffers } from "../WebGLResources/glUnifomBuffers.js";
 import vec4 from "../../lib/tsm/vec4.js";
+import vec2 from "../../lib/tsm/vec2.js";
+import { GLTextures } from "../WebGLResources/glTextures.js";
 
 export class ObjectPickQuery {
     public constructor(x: number, y: number, width: number, height: number, onPick: (tag: number, id: number, depth: number, normal: vec3) => void) {
@@ -92,13 +94,16 @@ export class ObjectIDRenderer {
 
         // geometry
         this._rectGeom = new PlaneGeometry(2, 2, 1, 1);
-        this._rectScaleOffset = new vec4([1, 1, 0, 0]);
+        this._texcoordScaleOffset = new vec4([1, 1, 0, 0]);
     }
 
     //#region private fields
 
     // queries
     private _queries: ObjectPickQuery[] = [];
+
+    /** cur sum rectange of all queries, in half resolution? */
+    private _curSumRect: vec2 = new vec2();
 
     /** RGBA8 encoded normal */
     private _normalTexture: Texture2D;
@@ -118,7 +123,8 @@ export class ObjectIDRenderer {
     // render list (visible and pickable Object3Ds)
     // a geometry to render screen space rectangles
     private _rectGeom: PlaneGeometry;
-    private _rectScaleOffset: vec4;
+    /** xy: scale, zw: offset */
+    private _texcoordScaleOffset: vec4;
     
     //#endregion
 
@@ -153,11 +159,71 @@ export class ObjectIDRenderer {
      * @param sceneNormalTex texture contains scene normal and object tag and ID
      * @param sceneDepthTex main depth texture, to compute the view z distance.
      */
-    public renderIfNeeded(context: ClusteredForwardRenderContext, sceneNormalTex: Texture2D, sceneDepthTex: Texture2D) {
+    public renderIfNeeded(context: ClusteredForwardRenderContext, sceneNormalTex: Texture2D, sceneDepthTex: Texture2D, startTexUnit: number) {
         if (this._queries.length > 0) {
             // accumulate query rectangle
+            let x0: number = Number.MAX_VALUE;
+            let y0: number = Number.MAX_VALUE;
+            let x1: number = -Number.MAX_VALUE;
+            let y1: number = -Number.MAX_VALUE;
 
-            // render quad, transfer datas in rectange from scene textures to picking RT
+            for (const query of this._queries) {
+                x0 = Math.min(x0, query.x);
+                y0 = Math.min(y0, query.y);
+                x1 = Math.max(x1, query.x + query.width);
+                y1 = Math.max(y1, query.y + query.height);
+            }
+
+            if (x1 > x0 && y1 > y0) {
+                // query rect full res size
+                let w = x1 - x0;
+                let h = y1 - y0;
+
+                // calculate texcoord scale offset
+                const uvScaleOffset = this._texcoordScaleOffset;
+                uvScaleOffset.x = w / sceneNormalTex.width;
+                uvScaleOffset.y = h / sceneNormalTex.height;
+                uvScaleOffset.z = x0 / sceneNormalTex.width;
+                uvScaleOffset.w = y0 / sceneNormalTex.height;
+
+                // render quad, transfer datas in rectange from scene textures to picking RT
+                // since we limit the viewport, we can draw a full screen quad
+
+                // calculate viewport?
+                // need to half the size?
+                this._curSumRect.x = w / 2;
+                this._curSumRect.y = h / 2;
+
+                // set render target
+                let oldRT = GLDevice.renderTarget;
+                GLDevice.renderTarget = this._pickingFBO;
+
+                const gl = GLDevice.gl;
+
+                gl.viewport(0, 0, this._curSumRect.x, this._curSumRect.y);
+                gl.scissor(0, 0, this._curSumRect.x, this._curSumRect.y);
+
+                // set these textures for all effects
+                const sceneNormalTexUnit = startTexUnit;
+                const sceneDepthTexUnit = startTexUnit + 1;
+                GLTextures.setTextureAt(sceneNormalTexUnit, sceneNormalTex);
+                GLTextures.setTextureAt(sceneDepthTexUnit, sceneDepthTex);
+
+                this._copyRenderState.apply();
+
+                GLPrograms.useProgram(this._objectTagProgram);
+                gl.uniform1i(this._objectTagProgram.getUniformLocation("s_sceneNormal"), sceneNormalTexUnit);
+                gl.uniform1i(this._objectTagProgram.getUniformLocation("s_sceneDepth"), sceneDepthTexUnit);
+                gl.uniform4f(this._objectTagProgram.getUniformLocation("u_texcoordScaleOffset"), uvScaleOffset.x, uvScaleOffset.y, uvScaleOffset.z, uvScaleOffset.w);
+                
+                this._rectGeom.draw(0, Infinity, this._objectTagProgram.attributes);
+
+                // restore render target?
+                GLDevice.renderTarget = oldRT;
+                // restore textures
+                GLTextures.setTextureAt(sceneNormalTexUnit, null);
+                GLTextures.setTextureAt(sceneDepthTexUnit, null);
+            }
         }
     }
 
