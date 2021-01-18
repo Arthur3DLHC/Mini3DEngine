@@ -234,7 +234,8 @@ export class Object3D {
     }
 
     public getBehaviorByTypeName(typeName: string): Behavior | undefined {
-        return this.behaviors.find((b) => {return b.typeName === typeName;});
+        // return this.behaviors.find((b) => {return b.typeName === typeName;});
+        return this.behaviors.find((b) => {return b.isA(typeName);});
     }
 
     public getBehaviorByType<T extends Behavior>(behType: Constructor<T>): Behavior | undefined {
