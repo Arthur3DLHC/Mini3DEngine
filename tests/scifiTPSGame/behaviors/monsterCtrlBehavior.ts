@@ -88,7 +88,7 @@ export class MonsterCtrlBehavior extends Behavior {
 
     // private _lastThinkTime: number = 0;
     // cur state?
-    private _curState: MonsterState = MonsterState.Idle;
+    protected _curState: MonsterState = MonsterState.Idle;
     // private _curAction: number = 0;
     /** recover time left for states like attacking, attacked, down */
     protected _recoverTimeLeft: number = 0;
@@ -131,6 +131,8 @@ export class MonsterCtrlBehavior extends Behavior {
         //     this.think();
         //     this._lastThinkTime = curTime;
         // }
+
+        // todo: chase player after attacked.
 
         // facing dir
         // 
@@ -290,7 +292,7 @@ export class MonsterCtrlBehavior extends Behavior {
         }
     }
 
-    private playerInSight(): boolean {
+    protected playerInSight(): boolean {
         if (this._player === null) {
             return false;
         }
@@ -313,7 +315,7 @@ export class MonsterCtrlBehavior extends Behavior {
         return true;
     }
 
-    private playerInMeleeAttackRange(): boolean {
+    protected playerInMeleeAttackRange(): boolean {
         if (this._player === null) {
             return false;
         }
@@ -332,7 +334,7 @@ export class MonsterCtrlBehavior extends Behavior {
         return true;
     }
 
-    private inView(targetDir: vec3, halfFOV: number): boolean {
+    protected inView(targetDir: vec3, halfFOV: number): boolean {
         const cosFOV = Math.cos(halfFOV);
         const cosFacing = vec3.dot(this._facingDir, targetDir);
         // facing angle < half fov
@@ -340,7 +342,7 @@ export class MonsterCtrlBehavior extends Behavior {
     }
 
     /** turn a bit to face destination direction */
-    private turnToFaceDestination() {
+    protected turnToFaceDestination() {
         // rotate facing dir
         this._destinationDir.copyTo(MonsterCtrlBehavior._tmpDir);
         MonsterCtrlBehavior._tmpDir.scale(this.turnSpeed * Clock.instance.elapsedTime);
