@@ -203,10 +203,75 @@ export class FrameBuffer {
         gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
     }
 
+    /**
+     * read pixels from multiple attachments
+     * @param rects 
+     */
+    public readPixelsMultiple(rects: PixelReadingRect[]) {
+        const gl = GLDevice.gl;
+
+        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, this.glFrameBuffer);
+
+        for (const rc of rects) {
+            gl.readBuffer(rc.attachment);
+            gl.readPixels(rc.x, rc.y, rc.width, rc.height, rc.format, rc.type, rc.pixels, rc.dstOffset);
+        }
+
+        gl.readBuffer(gl.NONE);
+        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
+    }
+
     public release() {
         if (this.glFrameBuffer) {
             GLDevice.gl.deleteFramebuffer(this.glFrameBuffer);
             this.glFrameBuffer = null;
         }
     }
+}
+
+export class PixelReadingRect {
+    /**
+     * 
+     * @param attachment gl.BACK, gl.NONE or gl.COLOR_ATTACHMENT{0-15}
+     * @param x 
+     * @param y 
+     * @param width 
+     * @param height 
+     * @param format see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels for supported formats
+     * @param type see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels for supported types
+     * @param pixels ArrayBufferView for receive the readed pixels.
+     * @param dstOffset start writing offset in dest pixels array
+     */
+    public constructor(attachment: GLenum, x: number, y: number, width: number, height: number, format: GLenum, type: GLenum, pixelStride: number, pixels: ArrayBufferView, dstOffset: GLuint = 0) {
+        this.attachment = attachment;
+        this.x = x; this.y = y; this.width = width; this.height = height;
+        this.format = format;
+        this.type = type;
+        this.pixelStride = pixelStride;
+        this.pixels = pixels;
+        this.dstOffset = dstOffset;
+    }
+
+    /** gl.BACK, gl.NONE or gl.COLOR_ATTACHMENT{0-15} */
+    public attachment: GLenum;
+    public x: number;
+    public y: number;
+    public width: number;
+    public height: number;
+    /** see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels for supported formats */
+    public format: GLenum;
+    /** see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels for supported types */
+    public type: GLenum;
+    /**
+     * array element count per pixel.
+     * example:
+     *  format == RGBA, type == UNSIGNED_BYTE, pixelStride = 4
+     *  format == RED_INTEGER, type == INT, pixelStride = 1
+     *  format == RG_INTEGER, type == INT, pixelStride = 2
+     */
+    public pixelStride: number;
+    /** ArrayBufferView for receive the readed pixels. */
+    public pixels: ArrayBufferView;
+    /** start writing offset in dest pixels array */
+    public dstOffset: GLuint;
 }

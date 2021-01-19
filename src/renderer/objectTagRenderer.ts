@@ -3,7 +3,7 @@ import objectTag_vs from "./shaders/objectTag_vs.glsl.js";
 
 import vec3 from "../../lib/tsm/vec3.js";
 import { PlaneGeometry } from "../geometry/common/planeGeometry.js";
-import { FrameBuffer } from "../WebGLResources/frameBuffer.js";
+import { FrameBuffer, PixelReadingRect } from "../WebGLResources/frameBuffer.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { RenderStateCache } from "../WebGLResources/renderStateCache.js";
 import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
@@ -18,7 +18,7 @@ import vec2 from "../../lib/tsm/vec2.js";
 import { GLTextures } from "../WebGLResources/glTextures.js";
 
 export class ObjectPickQuery {
-    public constructor(x: number, y: number, width: number, height: number, onPick: (tag: number, id: number, depth: number, normal: vec3) => void) {
+    public constructor(x: number, y: number, width: number, height: number, onPick: (tag: number, depth: number, normal: vec3) => void) {
         this.x = x; this.y = y; this.width = width, this.height = height;
         this.onPick = onPick;
     }
@@ -28,7 +28,7 @@ export class ObjectPickQuery {
     public width: number = 0;
     public height: number = 0;
 
-    public onPick: (tag: number, id: number, depth: number, normal: vec3) => void;
+    public onPick: (tag: number, depth: number, normal: vec3) => void;
 }
 
 /**
@@ -48,8 +48,8 @@ export class ObjectIDRenderer {
             throw new Error("picking RT zero size");
         }
 
-        this._normalPixels = new Uint8Array(width * height * 4);
         this._tagPixels = new Uint32Array(width * height);
+        this._normalPixels = new Uint8Array(width * height * 4);
         this._depthPixels = new Float32Array(width * height);
 
         // create textures and FBO, in half canvas size
@@ -73,6 +73,11 @@ export class ObjectIDRenderer {
         this._pickingFBO.attachTexture(1, this._normalTexture);
         this._pickingFBO.attachTexture(2, this._depthTexture);
         this._pickingFBO.prepare();
+
+        this._pickingReadRects = [];
+        this._pickingReadRects.push(new PixelReadingRect(gl.COLOR_ATTACHMENT0, 0, 0, width, height, gl.RED_INTEGER, gl.INT, 1, this._tagPixels));
+        this._pickingReadRects.push(new PixelReadingRect(gl.COLOR_ATTACHMENT1, 0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, 4, this._normalPixels));
+        this._pickingReadRects.push(new PixelReadingRect(gl.COLOR_ATTACHMENT2, 0, 0, width, height, gl.RED, gl.FLOAT, 1, this._depthPixels));
 
         // render state
         this._copyRenderState = new RenderStateSet();
@@ -121,6 +126,8 @@ export class ObjectIDRenderer {
     private _tagPixels: Uint32Array;
     private _depthPixels: Float32Array;
 
+    private _pickingReadRects: PixelReadingRect[];
+
     // shader program
     private _objectTagProgram: ShaderProgram;
 
@@ -146,11 +153,16 @@ export class ObjectIDRenderer {
             // todo: read pixels back from scene normal RT?
             // read depth from scene main depth buffer?
             // need to get the RTs from clusteredForwardRenderer?
-
+            for (const rc of this._pickingReadRects) {
+                rc.width = this._curSumRect.x;
+                rc.height = this._curSumRect.y;
+            }
+            this._pickingFBO.readPixelsMultiple(this._pickingReadRects);
 
             // then check every query
             for (const query of this._queries) {
-
+                // use a set to store tags in the rect
+                // if have some tag in rect, 
             }
         }
 
