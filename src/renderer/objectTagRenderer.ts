@@ -48,6 +48,10 @@ export class ObjectIDRenderer {
             throw new Error("picking RT zero size");
         }
 
+        this._normalPixels = new Uint8Array(width * height * 4);
+        this._tagPixels = new Uint32Array(width * height);
+        this._depthPixels = new Float32Array(width * height);
+
         // create textures and FBO, in half canvas size
         const sampler = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.NEAREST, gl.NEAREST);
 
@@ -106,12 +110,16 @@ export class ObjectIDRenderer {
 
     /** RGBA8 encoded normal */
     private _normalTexture: Texture2D;
-    /** RG16i object tag and id */
+    /** R32I object tag */
     private _objectTagTexture: Texture2D;
     /** F32 view space linear depth */
     private _depthTexture: Texture2D;
 
     private _pickingFBO: FrameBuffer;
+
+    private _normalPixels: Uint8Array;
+    private _tagPixels: Uint32Array;
+    private _depthPixels: Float32Array;
 
     // shader program
     private _objectTagProgram: ShaderProgram;
@@ -138,7 +146,7 @@ export class ObjectIDRenderer {
             // todo: read pixels back from scene normal RT?
             // read depth from scene main depth buffer?
             // need to get the RTs from clusteredForwardRenderer?
-            
+
 
             // then check every query
             for (const query of this._queries) {
