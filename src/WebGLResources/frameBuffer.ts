@@ -180,6 +180,29 @@ export class FrameBuffer {
         }
     }
 
+    /**
+     * 
+     * @param attachment gl.BACK, gl.NONE or gl.COLOR_ATTACHMENT{0-15}
+     * @param x 
+     * @param y 
+     * @param width 
+     * @param height 
+     * @param format see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels for supported formats
+     * @param type see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels for supported types
+     * @param pixels ArrayBufferView for receive the readed pixels.
+     * @param dstOffset start writing offset in dest pixels array
+     */
+    public readPixels(attachment: GLenum, x: number, y: number, width: number, height: number, format: GLenum, type: GLenum, pixels: ArrayBufferView, dstOffset: GLuint = 0) {
+        const gl = GLDevice.gl;
+
+        // fix me: need to bind same framebuffer every time
+        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, this.glFrameBuffer);
+        gl.readBuffer(attachment);
+        gl.readPixels(x, y, width, height, format, type, pixels, dstOffset);
+        gl.readBuffer(gl.NONE);
+        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
+    }
+
     public release() {
         if (this.glFrameBuffer) {
             GLDevice.gl.deleteFramebuffer(this.glFrameBuffer);

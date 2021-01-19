@@ -1,7 +1,6 @@
 import objectTag_fs from "./shaders/objectTag_fs.glsl.js";
 import objectTag_vs from "./shaders/objectTag_vs.glsl.js";
 
-import mat4 from "../../lib/tsm/mat4.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { PlaneGeometry } from "../geometry/common/planeGeometry.js";
 import { FrameBuffer } from "../WebGLResources/frameBuffer.js";
@@ -134,11 +133,17 @@ export class ObjectIDRenderer {
     // if there are, read back pixels for every pick and check picking result?
     // clear the picking queries;
     public processQueries() {
-        // todo: read pixels back from scene normal RT?
-        // read depth from scene main depth buffer?
-        // need to get the RTs from clusteredForwardRenderer?
-        for (const query of this._queries) {
+
+        if (this._queries.length > 0) {
+            // todo: read pixels back from scene normal RT?
+            // read depth from scene main depth buffer?
+            // need to get the RTs from clusteredForwardRenderer?
             
+
+            // then check every query
+            for (const query of this._queries) {
+
+            }
         }
 
         this._queries.length = 0;
