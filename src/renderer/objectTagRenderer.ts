@@ -111,7 +111,8 @@ export class ObjectIDRenderer {
     private _queries: ObjectPickQuery[] = [];
 
     /** cur sum rectange of all queries, in half resolution? */
-    private _curSumRect: vec2 = new vec2();
+    private _curSumRectXY: vec2 = new vec2();
+    private _curSumRectSize: vec2 = new vec2();
 
     /** RGBA8 encoded normal */
     private _normalTexture: Texture2D;
@@ -154,8 +155,8 @@ export class ObjectIDRenderer {
             // read depth from scene main depth buffer?
             // need to get the RTs from clusteredForwardRenderer?
             for (const rc of this._pickingReadRects) {
-                rc.width = this._curSumRect.x;
-                rc.height = this._curSumRect.y;
+                rc.width = this._curSumRectSize.x;
+                rc.height = this._curSumRectSize.y;
             }
             this._pickingFBO.readPixelsMultiple(this._pickingReadRects);
 
@@ -163,6 +164,46 @@ export class ObjectIDRenderer {
             for (const query of this._queries) {
                 // use a set to store tags in the rect
                 // if have some tag in rect, 
+                const l = query.x / 2 - this._curSumRectXY.x;
+                const t = query.y / 2 - this._curSumRectXY.y;
+                const width = query.width / 2;
+                const height = query.height / 2;
+
+                const tags: Set<number> = new Set<number>();
+                const normal: vec3 = new vec3();
+                let numNormals: number = 0;
+                let depth: number = -Infinity;
+
+                for (let y = t; y < t + height; y++) {
+                    const lineStart = y * width;
+                    for (let x = l; x < l + width; x++) {
+                        const idx = lineStart + x;
+                        const tag = this._tagPixels[idx * this._pickingReadRects[0].pixelStride];
+
+                        // pickable
+                        if (tag >= 0) {
+                            tags.add(tag);
+
+                            let nx = this._normalPixels[idx * this._pickingReadRects[1].pixelStride];
+                            let ny = this._normalPixels[idx * this._pickingReadRects[1].pixelStride + 1];
+                            let nz = this._normalPixels[idx * this._pickingReadRects[1].pixelStride + 2];
+    
+                            const colorToN = 2.0 / 255.0;
+                            nx = nx * colorToN - 1.0;
+                            ny = ny * colorToN - 1.0;
+                            nz = nz * colorToN - 1.0;
+                            normal.x += nx; normal.y += ny; normal.z += nz;
+                            numNormals++;
+
+                            const pixDepth = this._depthPixels[idx * this._pickingReadRects[2].pixelStride];
+                            depth = Math.max(depth, pixDepth);
+                        }
+                    }
+                }
+                if (numNormals > 0) {
+                    normal.scale(1.0 / numNormals);
+                    normal.normalize();
+                }
             }
         }
 
@@ -216,8 +257,11 @@ export class ObjectIDRenderer {
 
                 // calculate viewport?
                 // need to half the size?
-                this._curSumRect.x = w / 2;
-                this._curSumRect.y = h / 2;
+                this._curSumRectXY.x = x0 / 2;
+                this._curSumRectXY.y = y0 / 2;
+
+                this._curSumRectSize.x = w / 2;
+                this._curSumRectSize.y = h / 2;
 
                 // set render target
                 let oldRT = GLDevice.renderTarget;
@@ -225,8 +269,8 @@ export class ObjectIDRenderer {
 
                 const gl = GLDevice.gl;
 
-                gl.viewport(0, 0, this._curSumRect.x, this._curSumRect.y);
-                gl.scissor(0, 0, this._curSumRect.x, this._curSumRect.y);
+                gl.viewport(0, 0, this._curSumRectSize.x, this._curSumRectSize.y);
+                gl.scissor(0, 0, this._curSumRectSize.x, this._curSumRectSize.y);
 
                 // set these textures for all effects
                 const sceneNormalTexUnit = startTexUnit;
