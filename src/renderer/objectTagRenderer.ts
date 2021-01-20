@@ -17,8 +17,20 @@ import vec4 from "../../lib/tsm/vec4.js";
 import vec2 from "../../lib/tsm/vec2.js";
 import { GLTextures } from "../WebGLResources/glTextures.js";
 
+export class ObjectPickResult {
+    /** object tag */
+    public tag: number = -1;
+    /** average normal in view space */
+    public normal: vec3 = new vec3();
+    /** nearest depth in view space (negative!) */
+    public depth: number = -Infinity;
+
+    /** internal use */
+    public _normalCount: number = 0;
+}
+
 export class ObjectPickQuery {
-    public constructor(x: number, y: number, width: number, height: number, onPick: (tag: number, depth: number, normal: vec3) => void) {
+    public constructor(x: number, y: number, width: number, height: number, onPick: (results: Map<number, ObjectPickResult>) => void) {
         this.x = x; this.y = y; this.width = width, this.height = height;
         this.onPick = onPick;
     }
@@ -28,7 +40,7 @@ export class ObjectPickQuery {
     public width: number = 0;
     public height: number = 0;
 
-    public onPick: (tag: number, depth: number, normal: vec3) => void;
+    public onPick: (results: Map<number, ObjectPickResult>) => void;
 }
 
 /**
@@ -129,6 +141,8 @@ export class ObjectIDRenderer {
 
     private _pickingReadRects: PixelReadingRect[];
 
+    private _pickResults: Map<number, ObjectPickResult> = new Map<number, ObjectPickResult>();
+
     // shader program
     private _objectTagProgram: ShaderProgram;
 
@@ -149,7 +163,6 @@ export class ObjectIDRenderer {
     // if there are, read back pixels for every pick and check picking result?
     // clear the picking queries;
     public processQueries() {
-
         if (this._queries.length > 0) {
             // todo: read pixels back from scene normal RT?
             // read depth from scene main depth buffer?
@@ -162,17 +175,14 @@ export class ObjectIDRenderer {
 
             // then check every query
             for (const query of this._queries) {
+                this._pickResults.clear();
+
                 // use a set to store tags in the rect
                 // if have some tag in rect, 
                 const l = query.x / 2 - this._curSumRectXY.x;
                 const t = query.y / 2 - this._curSumRectXY.y;
                 const width = query.width / 2;
                 const height = query.height / 2;
-
-                const tags: Set<number> = new Set<number>();
-                const normal: vec3 = new vec3();
-                let numNormals: number = 0;
-                let depth: number = -Infinity;
 
                 for (let y = t; y < t + height; y++) {
                     const lineStart = y * width;
@@ -182,7 +192,14 @@ export class ObjectIDRenderer {
 
                         // pickable
                         if (tag >= 0) {
-                            tags.add(tag);
+                            // tags.add(tag);
+                            let result = this._pickResults.get(tag);
+                            if (result === undefined) {
+                                result = new ObjectPickResult();
+                                this._pickResults.set(tag, result);
+
+                                result.tag = tag;
+                            }
 
                             let nx = this._normalPixels[idx * this._pickingReadRects[1].pixelStride];
                             let ny = this._normalPixels[idx * this._pickingReadRects[1].pixelStride + 1];
@@ -192,17 +209,24 @@ export class ObjectIDRenderer {
                             nx = nx * colorToN - 1.0;
                             ny = ny * colorToN - 1.0;
                             nz = nz * colorToN - 1.0;
-                            normal.x += nx; normal.y += ny; normal.z += nz;
-                            numNormals++;
+                            result.normal.x += nx; result.normal.y += ny; result.normal.z += nz;
+                            result._normalCount++;
 
                             const pixDepth = this._depthPixels[idx * this._pickingReadRects[2].pixelStride];
-                            depth = Math.max(depth, pixDepth);
+                            result.depth = Math.max(result.depth, pixDepth);
                         }
                     }
                 }
-                if (numNormals > 0) {
-                    normal.scale(1.0 / numNormals);
-                    normal.normalize();
+
+                if (this._pickResults.size > 0) {
+                    for (const pair of this._pickResults) {
+                        if (pair[1]._normalCount > 0) {
+                            pair[1].normal.scale(1.0 / pair[1]._normalCount);
+                            pair[1].normal.normalize();
+                        }
+                    }
+
+                    query.onPick(this._pickResults);
                 }
             }
         }
