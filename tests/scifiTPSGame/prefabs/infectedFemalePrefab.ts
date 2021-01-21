@@ -473,13 +473,24 @@ export class InfectedFemalePrefab extends BasePrefab {
                                 "animLoopMode": 0,
                                 "transitions": [
                                     {
-                                        "target": "attacked",
+                                        "target": "attacked.light",
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
                                                 "paramName": "curAction",
                                                 "compareOp": "===",
-                                                "compareValue": 3
+                                                "compareValue": 300
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attacked.heavy",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 301
                                             }
                                         ]
                                     }
@@ -487,7 +498,7 @@ export class InfectedFemalePrefab extends BasePrefab {
                             },
                             {
                                 "typeStr": "single",
-                                "name": "attacked",
+                                "name": "attacked.light",
                                 "animation": "Female.Damage.Light",
                                 "animLoopMode": 1,
                                 "transitions": [
@@ -498,7 +509,26 @@ export class InfectedFemalePrefab extends BasePrefab {
                                                 "typeStr": "singleParam",
                                                 "paramName": "curAction",
                                                 "compareOp": "!==",
-                                                "compareValue": 3
+                                                "compareValue": 300
+                                            }
+                                        ]
+                                    },
+                                ]
+                            },
+                            {
+                                "typeStr": "single",
+                                "name": "attacked.heavy",
+                                "animation": "Female.Damage.Heavy",
+                                "animLoopMode": 1,
+                                "transitions": [
+                                    {
+                                        "target": "idle",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "!==",
+                                                "compareValue": 301
                                             }
                                         ]
                                     },

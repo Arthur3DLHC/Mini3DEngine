@@ -2,6 +2,7 @@ import quat from "../../../lib/tsm/quat.js";
 import vec3 from "../../../lib/tsm/vec3.js";
 import { ActionControlBehavior, AnimationLayer, Behavior, Clock, Object3D, RigidBody, Scene } from "../../../src/mini3DEngine.js";
 import { GameWorld } from "../gameWorld.js";
+import { DamageInfo } from "./damageInfo.js";
 import { TPSPlayerBehavior } from "./tpsPlayerBehavior.js";
 
 
@@ -144,7 +145,7 @@ export abstract class MonsterCtrlBehavior extends Behavior {
         // this._actionCtrl.actionParams.set("curAction", this._curAction);
     }
 
-    public abstract onAttacked(): void;
+    public abstract onAttacked(damageInfo: DamageInfo): void;
 
     protected playerInSight(): boolean {
         if (this._player === null) {

@@ -1,5 +1,6 @@
 import vec3 from "../../../lib/tsm/vec3.js";
 import { ActionControlBehavior, Clock, Object3D, RigidBody, Scene } from "../../../src/mini3DEngine.js";
+import { DamageInfo } from "./damageInfo.js";
 import { MonsterCtrlBehavior } from "./monsterCtrlBehavior.js";
 import { TPSPlayerBehavior } from "./tpsPlayerBehavior.js";
 
@@ -158,20 +159,27 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
         // if facing player and close enough, player take damage ?
     }
 
-    public onAttacked() {
+    public onAttacked(damageInfo: DamageInfo) {
+        // fix me: how to pass in attack description?
         if (this._curState !== InfectedFemaleState.Down) {
             // todo: calculate damage and hp left.
             // if hp < 0, down; else attacked
             // the down animation will be played once and keep the pose at last frame;
-            this.HP--;
+            this.HP -= damageInfo.amount;
 
             if (this.HP > 0) {
                 this._curState = InfectedFemaleState.Attacked;
-                this._actionCtrl.actionParams.set("curAction", InfectedFemaleState.Attacked);
-                this._recoverTimeLeft = 0.5;                
+                if (damageInfo.blowUp) {
+                    this._actionCtrl.actionParams.set("curAction", InfectedFemaleState.Attacked * 100 + 1);
+                    this._recoverTimeLeft = 1.0;
+                } else {
+                    this._actionCtrl.actionParams.set("curAction", InfectedFemaleState.Attacked * 100);
+                    this._recoverTimeLeft = 0.5; 
+                }
             } else {
                 this._curState = InfectedFemaleState.Down;
                 this._actionCtrl.actionParams.set("curAction", InfectedFemaleState.Down);
+                this._body.world.world.removeBody(this._body.body);
             }
             // todo: different animation of damage: light and heavy
 

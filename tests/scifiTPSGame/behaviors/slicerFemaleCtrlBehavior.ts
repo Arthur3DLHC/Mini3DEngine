@@ -2,6 +2,7 @@ import { ActionControlBehavior } from "../../../src/animation/actionControlBehav
 import { RigidBody } from "../../../src/physics/rigidBody.js";
 import { Object3D } from "../../../src/scene/object3D.js";
 import { Scene } from "../../../src/scene/scene.js";
+import { DamageInfo } from "./damageInfo.js";
 import { MonsterCtrlBehavior } from "./monsterCtrlBehavior.js";
 
 export enum SlicerFemaleState {
@@ -34,7 +35,7 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
         throw new Error("Method not implemented.");
     }
 
-    public onAttacked(): void {
+    public onAttacked(damageInfo: DamageInfo): void {
         throw new Error("Method not implemented.");
     }
 }
