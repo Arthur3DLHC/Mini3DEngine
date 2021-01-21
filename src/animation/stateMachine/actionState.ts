@@ -20,6 +20,8 @@ export class ActionState {
     public get name(): string {return this._name;}
 
     // todo: can either hold an animationAction or a blend tree;
+    /** for smooth animation transition when changing state */
+    public weight: number = 1;
 
     public transitions: ActionTransition[] = [];
 
@@ -51,6 +53,14 @@ export class ActionState {
 
     public exit() {
 
+    }
+
+    public playAnimation() {
+
+    }
+
+    public stopAnimation() {
+        
     }
 
     public fromJSON(stateDef: any, animations: AnimationAction[], machine: ActionStateMachine, customConditionCreation?: (conditionDef: any)=>ActionCondition) {

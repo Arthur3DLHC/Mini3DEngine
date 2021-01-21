@@ -20,7 +20,7 @@ export class ActionStateBlendTree extends ActionState {
     public update() {
         super.update();
         if (this.rootNode !== null && this.machine !== null) {
-            this.rootNode.weight = this.machine.animationLayer.blendWeight;
+            this.rootNode.weight = this.machine.animationLayer.blendWeight * this.weight;
             this.rootNode.updateWeights(this.machine.actionCtrl.actionParams);
 
             // todo: clear all target channel values of animations in node?
@@ -36,14 +36,28 @@ export class ActionStateBlendTree extends ActionState {
     public enter() {
         super.enter();
         // play all leaf node animations
-        if (this.rootNode !== null) {
-            this.rootNode.playAnimation();
-        }
+        // if (this.rootNode !== null) {
+        //     this.rootNode.playAnimation();
+        // }
     }
 
     public exit() {
         super.exit();
         // stop all leaf node animations
+        // if (this.rootNode !== null) {
+        //     this.rootNode.stopAnimation();
+        // }
+    }
+
+    public playAnimation() {
+        super.playAnimation();
+        if (this.rootNode !== null) {
+            this.rootNode.playAnimation();
+        }
+    }
+
+    public stopAnimation() {
+        super.stopAnimation();
         if (this.rootNode !== null) {
             this.rootNode.stopAnimation();
         }

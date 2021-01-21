@@ -60,13 +60,13 @@ export class ActionStateMachine {
         // what if two animations are transitioning, and there is another state transition happened?
         // if we don't let new state transition happen when there is a transition transiting, then this problem will be solved?
         // what is the simplest way to do this?
+
         if (this._curState !== null) {
             this._curState.update();
         }
 
         // nextState.canCheckTransitions will always be false now.
         // it will change to true after the state becomes curState
-
         if (this._nextState !== null) {
             this._nextState.update();
         }
@@ -116,6 +116,7 @@ export class ActionStateMachine {
                 throw new Error("default state not found: " + json.curState);
             }
             this.curState = defState;
+            this.curState.playAnimation();
         } else {
             console.warn("statemachine has no default state.");
         }

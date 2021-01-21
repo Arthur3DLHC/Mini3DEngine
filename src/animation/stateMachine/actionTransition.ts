@@ -23,34 +23,52 @@ export class ActionTransition {
 
     public checkTransit() {
         // state is not in machine yet?
-        if (this._state.machine === null) {
+        const machine = this._state.machine;
+        if (machine === null) {
             return;
         }
-        // if all conditions true, transite to target state?
         for (const condition of this.conditions) {
             if (!condition.isTrue) {
                 return;
             }
         }
 
+        // all conditions are true
         if (this.duration > 0) {
             this._timeLeft -= Clock.instance.elapsedTime;
             if (this._timeLeft < 0) {
-                this._state.machine.nextState = null;
-                this._state.machine.curState = this.targetState;
+                machine.nextState = null;
+                if (machine.curState !== this.targetState) {
+                    machine.curState = this.targetState;
+                    if (machine.curState !== null) {
+                        // already played when setted as next state
+                        // machine.curState.playAnimation();
+                        machine.curState.weight = 1;
+                    }                    
+                }
             } else {
-                this._state.machine.nextState = this.targetState;
+                if (machine.nextState !== this.targetState) {
+                    machine.nextState = this.targetState;
+                    if (machine.nextState !== null) {
+                        machine.nextState.playAnimation();
+                    }
+                }
+                if (machine.curState !== null && machine.nextState !== null) {
+                    const t = this._timeLeft / this.duration;
+                    machine.curState.weight = t;
+                    machine.nextState.weight = 1 - t;
+                }
             }
         } else {
-            this._state.machine.curState = this.targetState;
-            this._state.machine.nextState = null;
+            if (machine.curState !== this.targetState) {
+                machine.curState = this.targetState;
+                if (machine.curState !== null) {
+                    machine.curState.playAnimation();
+                    machine.curState.weight = 1;
+                }                
+            }
+            machine.nextState = null;
         }
-
-        // todo: transit duration?
-        // todo: 
-        //      fade out animation of old state, and
-        //      fade in animation of new state ?
-        //      state machine should update both 2 state's animation?
     }
 
     public resetConditions() {
@@ -74,7 +92,7 @@ export class ActionTransition {
 
         this.conditions = [];
 
-        this._timeLeft = this.duration = transDef.duration | 0;
+        this._timeLeft = this.duration = transDef.duration || 0;
 
         // read conditions
         for (const conditionDef of transDef.conditions) {

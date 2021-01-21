@@ -128,6 +128,7 @@ export class InfectedFemalePrefab extends BasePrefab {
                                 "transitions": [
                                     {
                                         "target": "walk",
+                                        "duration": 0.5,
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
@@ -191,6 +192,7 @@ export class InfectedFemalePrefab extends BasePrefab {
                                 "transitions": [
                                     {
                                         "target": "idle",
+                                        "duration": 0.5,
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
@@ -202,6 +204,7 @@ export class InfectedFemalePrefab extends BasePrefab {
                                     },
                                     {
                                         "target": "attack01",
+                                        "duration": 0.5,
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
@@ -213,6 +216,7 @@ export class InfectedFemalePrefab extends BasePrefab {
                                     },
                                     {
                                         "target": "attack02",
+                                        "duration": 0.5,
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
@@ -235,6 +239,7 @@ export class InfectedFemalePrefab extends BasePrefab {
                                     // },
                                     {
                                         "target": "down",
+                                        "duration": 0.5,
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
@@ -265,6 +270,7 @@ export class InfectedFemalePrefab extends BasePrefab {
                                     },
                                     {
                                         "target": "walk",
+                                        "duration": 0.5,
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
@@ -298,6 +304,7 @@ export class InfectedFemalePrefab extends BasePrefab {
                                     // },
                                     {
                                         "target": "down",
+                                        "duration": 0.5,
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
@@ -328,6 +335,7 @@ export class InfectedFemalePrefab extends BasePrefab {
                                     },
                                     {
                                         "target": "walk",
+                                        "duration": 0.5,
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
@@ -361,6 +369,7 @@ export class InfectedFemalePrefab extends BasePrefab {
                                     // },
                                     {
                                         "target": "down",
+                                        "duration": 0.5,
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
@@ -504,6 +513,7 @@ export class InfectedFemalePrefab extends BasePrefab {
                                 "transitions": [
                                     {
                                         "target": "idle",
+                                        "duration": 0.5,
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
@@ -523,6 +533,7 @@ export class InfectedFemalePrefab extends BasePrefab {
                                 "transitions": [
                                     {
                                         "target": "idle",
+                                        "duration": 0.5,
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",

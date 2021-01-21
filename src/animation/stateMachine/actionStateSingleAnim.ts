@@ -1,5 +1,6 @@
 import { Clock } from "../../scene/clock.js";
 import { AnimationAction } from "../animationAction.js";
+import { AnimationApplyMode } from "../animationChannel.js";
 import { ActionCondition } from "./actionCondition.js";
 import { ActionState } from "./actionState.js";
 import { ActionStateMachine } from "./actionStateMachine.js";
@@ -19,7 +20,7 @@ export class ActionStateSingleAnim extends ActionState {
         if (this.animation !== null) {
             if (this.machine !== null) {
                 // fix me: how to use the blendMode of the layer?
-                this.animation.weight = this.machine.animationLayer.blendWeight;
+                this.animation.weight = this.machine.animationLayer.blendWeight * this.weight;
                 this.animation.mask = this.machine.animationLayer.mask;
             }
             
@@ -30,14 +31,29 @@ export class ActionStateSingleAnim extends ActionState {
     public enter() {
         super.enter();
         // play action animation
+        // if (this.animation !== null) {
+        //     this.animation.reset();
+        //     this.animation.play();
+        // }
+    }
+
+    public exit() {
+        super.exit();
+        // if (this.animation !== null) {
+        //     this.animation.stop();
+        // }
+    }
+
+    public playAnimation() {
+        super.playAnimation();
         if (this.animation !== null) {
             this.animation.reset();
             this.animation.play();
         }
     }
 
-    public exit() {
-        super.exit();
+    public stopAnimation() {
+        super.stopAnimation();
         if (this.animation !== null) {
             this.animation.stop();
         }
@@ -53,6 +69,9 @@ export class ActionStateSingleAnim extends ActionState {
             throw new Error("Animation not found: " + stateDef.animation);
         }
         this.animation = anim;
+        // animation mixer will handle clear the targets to zero
+        // use 'add' for smooth transition between action states
+        this.animation.applyMode = AnimationApplyMode.add;
         if (stateDef.animLoopMode !== undefined) {
             this.animation.LoopMode = stateDef.animLoopMode;
         }
