@@ -28,28 +28,32 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
     public update() {
 
         // todo: think interval
+        // todo: when outside a range, need not to display and update animation; how?
         
-        // const curTime = Clock.instance.curTime;
-        // if (curTime - this._lastThinkTime > this.thinkInterval) {
-        //     this.think();
-        //     this._lastThinkTime = curTime;
-        // }
+        const curTime = Clock.instance.curTime;
+
         super.update();
 
         switch(this._curState) {
             case InfectedFemaleState.Idle:
                 // this._curAction = 0;
-                // if player in attack range, attack ?
                 this._veloctity.x = 0;
                 this._veloctity.z = 0;
-                if(this.playerInMeleeAttackRange()) {
-                    this.attack();
-                } else if(this.playerInSight()) {
-                    // if player in sight, move ?
-                    this.moveTo(MonsterCtrlBehavior._tmpPlayerPosition);
-                } else {
-                    // if idled for a well, move to an random destination?
+
+                // when idle, only think once every 1 second?
+                if (curTime - this._lastThinkTime > this.thinkInterval) {
+                    // if player in attack range, attack ?
+                    if(this.playerInMeleeAttackRange()) {
+                        this.attack();
+                    } else if(this.playerInSight()) {
+                        // if player in sight, move ?
+                        this.moveTo(MonsterCtrlBehavior._tmpPlayerPosition);
+                    } else {
+                        // if idled for a well, move to an random destination?
+                    }
+                    this._lastThinkTime = curTime;
                 }
+                
                 break;
             case InfectedFemaleState.Moving:
                 // upate destination position
@@ -121,6 +125,8 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
                 this._veloctity.z = 0;
                 // set actionCtrl params
                 // if already down, can not transit to other states?
+                // respawn?
+                // or disappear after a while?
                 break;
         }
 

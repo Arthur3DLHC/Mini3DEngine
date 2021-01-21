@@ -245,6 +245,9 @@ export class Object3D {
     // 每次更新应该先更新 behavior，再更新 transform，最后更新 visual
     // Fix me: 是应该分三次递归调用，还是一次递归调用中每对象分别调用？
     public updateBehavior() {
+        if (!this._active) {
+            return;
+        }
         // update behavior list of this
         // physics is a behavior?
         for (const behavior of this.behaviors) {
@@ -274,7 +277,7 @@ export class Object3D {
     // }
 
     public updateLocalTransform(forceUpdate: boolean, updateChildren: boolean) {
-        if (this._active === false) {
+        if (!this._active) {
             return;
         }
 
@@ -295,7 +298,7 @@ export class Object3D {
 
     public updateWorldTransform(updateParents: boolean, updateChildren: boolean) {
         // todo: only update transforms when dirty?
-        if (this._active === false) {
+        if (!this._active) {
             return;
         }
 

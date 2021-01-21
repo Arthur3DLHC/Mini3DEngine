@@ -79,7 +79,7 @@ export abstract class MonsterCtrlBehavior extends Behavior {
     /** cur facing dir calculated from cur yaw and pitch */
     protected _facingDir: vec3 = new vec3();
 
-    // private _lastThinkTime: number = 0;
+    protected _lastThinkTime: number = 0;
     // cur state?
     // private _curAction: number = 0;
     /** recover time left for states like attacking, attacked, down */
