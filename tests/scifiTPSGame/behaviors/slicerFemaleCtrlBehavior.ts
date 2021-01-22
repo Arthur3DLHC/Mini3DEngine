@@ -1,4 +1,5 @@
 import { ActionControlBehavior } from "../../../src/animation/actionControlBehavior.js";
+import { Clock } from "../../../src/mini3DEngine.js";
 import { RigidBody } from "../../../src/physics/rigidBody.js";
 import { Object3D } from "../../../src/scene/object3D.js";
 import { Scene } from "../../../src/scene/scene.js";
@@ -32,7 +33,28 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
     protected _curState: SlicerFemaleState = SlicerFemaleState.Idle;
 
     public update() {
-        throw new Error("Method not implemented.");
+        const curTime = Clock.instance.curTime;
+
+        super.update();
+
+        switch(this._curState) {
+            case SlicerFemaleState.Idle:
+                this._veloctity.x = 0;
+                this._veloctity.z = 0;
+
+                // when idle, only think once every 1 second?
+                if (curTime - this._lastThinkTime > this.thinkInterval) {
+                    // priority:
+
+                    // attack
+
+                    // if caution, strafe to dodge damage
+
+                    // chase player
+                }
+
+                break;
+        }
     }
 
     public onAttacked(damageInfo: DamageInfo): void {
