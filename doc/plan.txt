@@ -517,11 +517,9 @@ TODO:       主要类结构
                     调试动画状态机；
                     通过 JSON 创建状态机；
                     walk/jog切换？
-                    测试 ** 切换状态时动画平滑过渡？
-                        当一个有 duration 的 transition 正在过渡时，不允许新的 transition 发生，这样就可以保证同时只有两个正在过渡的动画；
-                            即在当前 transition 完成之前，不要判断新 state 的 transition 情况；只更新新 state 的动画和权重
-                    测试更多状态：受击，倒地，起身等？
-                    使用 monster 角色测试冲刺，近身攻击，被击中倒地等？
+                    ** 测试切换状态时动画平滑过渡？
+                        目前多个 animation layer 混合过渡时还有问题
+                        是否应该在改变 layer 权重时渐变过渡？
                 更多 make 动画？
                 优化动画性能：不每帧更新包围球？预处理 SkinMesh 时计算一个最大包围球？
                     经过实测，是否更新包围球对性能影响不大
@@ -629,10 +627,11 @@ TODO:       主要类结构
         大场景相关
 
             制作模块化的大一点的场景；
-                FPS：模块化类 DOOM 室内场景, 狭窄一些；Local point lights; 
+                TPS：模块化类 DOOM 室内场景, 狭窄一些；Local point lights; 
                     导出，测试 clustered, instancing, occlusion culling 等
                     Blender 的 Reflection probe 中加一个最远可视距离属性；
                     * 走廊地面和墙壁细节用法线贴图表示，节省一下三角形数量？
+                    制作更大范围的场景：车库，二层；
 
                 Action: 日式城堡，室外+室内，宽阔一些 或横板？夜间；无月光；雾；Local point lights：灯烛，火把；
 
@@ -640,11 +639,9 @@ TODO:       主要类结构
                 ShadowmapSize: 考虑在custom props 由手动输入
                     脚本中判断如果没有这个属性就加个默认值？
                 ShadowBias: 对 blender 中的值使用一个经验缩放比率？
-
          
-            制作类 DOOM 室内场景的物理碰撞体；
-            将角色（hero, monster）放入室内场景；
             放置一些可以Hover和选中交互的物体
+            测试像素级别选中和射击判定
 
             经测试，需要注意：
                 1、blender 中的细节物体必须 apply 所有修改器后再复制，否则无法共享网格数据，导致无法 instancing

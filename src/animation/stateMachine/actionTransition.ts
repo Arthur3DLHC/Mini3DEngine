@@ -46,6 +46,7 @@ export class ActionTransition {
                         machine.curState.weight = 1;
                     }                    
                 }
+                // if same state, check if animation is playing?
             } else {
                 if (machine.nextState !== this.targetState) {
                     machine.nextState = this.targetState;
@@ -60,13 +61,16 @@ export class ActionTransition {
                 }
             }
         } else {
-            if (machine.curState !== this.targetState) {
+            // if next state changed but smooth transition not finished...
+            if (machine.curState !== this.targetState || (machine.nextState !== null && machine.nextState !== this.targetState)) {
                 machine.curState = this.targetState;
                 if (machine.curState !== null) {
                     machine.curState.playAnimation();
                     machine.curState.weight = 1;
                 }                
             }
+            // if same state, check if animation is playing?
+
             machine.nextState = null;
         }
     }

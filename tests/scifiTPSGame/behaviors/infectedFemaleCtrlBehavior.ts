@@ -150,7 +150,8 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
     }
 
     public attack() {
-        // attack toward current orientation ?
+        // attack toward current orientation
+        // let player have chance to dodge
         this._curState = InfectedFemaleState.Attacking;
         this._caution = true;
         this._recoverTimeLeft = 1.75;
