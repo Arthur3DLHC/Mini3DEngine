@@ -77,6 +77,9 @@ export abstract class MonsterCtrlBehavior extends Behavior {
     protected _destinationDir: vec3 = new vec3();
     protected _distToPlayer: number = 10000;
 
+    /** set to true when attacked by player or attack player once */
+    protected _caution: boolean = false;
+
     /** cur facing dir calculated from cur yaw and pitch */
     protected _facingDir: vec3 = new vec3();
 

@@ -26,9 +26,6 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
 
     protected _curState: InfectedFemaleState = InfectedFemaleState.Idle;
 
-    /** set to true when attacked by player or attack player once */
-    protected _caution: boolean = false;
-
     public update() {
 
         // todo: think interval
@@ -163,6 +160,13 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
 
         // if facing player and close enough, player take damage ?
     }
+    
+    public rest() {
+        if (this._curState !== InfectedFemaleState.Down) {
+            this._curState = InfectedFemaleState.Idle;
+            this._actionCtrl.actionParams.set("curAction", InfectedFemaleState.Idle);
+        }
+    }
 
     public onAttacked(damageInfo: DamageInfo) {
         // fix me: how to pass in attack description?
@@ -192,10 +196,4 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
         }
     }
 
-    public rest() {
-        if (this._curState !== InfectedFemaleState.Down) {
-            this._curState = InfectedFemaleState.Idle;
-            this._actionCtrl.actionParams.set("curAction", InfectedFemaleState.Idle);
-        }
-    }
 }

@@ -47,13 +47,32 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
                 if (curTime - this._lastThinkTime > this.thinkInterval) {
                     // priority:
 
-                    // attack
+                    // attack (front, back, jump)
 
                     // if caution, chances strafe to dodge damage
 
                     // chase player
                 }
-
+                break;
+            case SlicerFemaleState.MovingForward:
+                // slicer turns faster than infected female
+                break;
+            case SlicerFemaleState.StrafingLeft:
+                // count down
+                break;
+            case SlicerFemaleState.StrafingRight:
+                // count down
+                break;
+            case SlicerFemaleState.Jumping:
+                // turn to idle state when touch ground
+                break;
+            case SlicerFemaleState.Attacking:
+                // count down
+                break;
+            case SlicerFemaleState.Attacked:
+                // count down
+                break;
+            case SlicerFemaleState.Down:
                 break;
         }
     }
