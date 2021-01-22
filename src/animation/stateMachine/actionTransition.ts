@@ -44,8 +44,6 @@ export class ActionTransition {
                         // already played when setted as next state
                         // machine.curState.playAnimation();
                         machine.curState.weight = 1;
-                        // fix me: no chance to update?
-                        machine.curState.update();
                     }                    
                 }
             } else {

@@ -27,11 +27,7 @@ export class ActionState {
 
     public canCheckTransitions: boolean = true;
 
-    /**
-     * subclass can update animations, check conditions in this method
-     * when some conditions true, change to another state
-     */
-    public update() {
+    public checkTransitions() {
         // check the current select action request
         // need to add another behavior to record current select action request?
         if (this.canCheckTransitions) {
@@ -39,6 +35,14 @@ export class ActionState {
                 transition.checkTransit();
             }
         }
+    }
+
+    /**
+     * subclass can update animations, check conditions in this method
+     * when some conditions true, change to another state
+     */
+    public update() {
+
     }
 
     /**

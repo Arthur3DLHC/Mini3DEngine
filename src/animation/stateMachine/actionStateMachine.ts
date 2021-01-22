@@ -62,6 +62,11 @@ export class ActionStateMachine {
         // what is the simplest way to do this?
 
         if (this._curState !== null) {
+            this._curState.checkTransitions();
+        }
+
+        // _curState may be changed when check transitions
+        if (this._curState !== null) {
             this._curState.update();
         }
 
