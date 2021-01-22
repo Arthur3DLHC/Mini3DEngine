@@ -43,12 +43,13 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
                 this._veloctity.z = 0;
 
                 // when idle, only think once every 1 second?
+                // todo: reduce interval when caution
                 if (curTime - this._lastThinkTime > this.thinkInterval) {
                     // priority:
 
                     // attack
 
-                    // if caution, strafe to dodge damage
+                    // if caution, chances strafe to dodge damage
 
                     // chase player
                 }
