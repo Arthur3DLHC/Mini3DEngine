@@ -34,9 +34,9 @@ export class ActionStateMachine {
     public get nextState(): ActionState | null {return this._nextState;}
     public set nextState(state: ActionState | null) {
         this._nextState = state;
-        if (state != null) {
-            state.canCheckTransitions = false;
-        }
+        //if (state != null) {
+        //    state.canCheckTransitions = false;
+        //}
     }
 
     private _actionCtrl: ActionControlBehavior;

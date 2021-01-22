@@ -25,16 +25,16 @@ export class ActionState {
 
     public transitions: ActionTransition[] = [];
 
-    public canCheckTransitions: boolean = true;
+    // public canCheckTransitions: boolean = true;
 
+    /** only called when I become current state */
     public checkTransitions() {
         // check the current select action request
-        // need to add another behavior to record current select action request?
-        if (this.canCheckTransitions) {
+        // if (this.canCheckTransitions) {
             for (const transition of this.transitions) {
                 transition.checkTransit();
             }
-        }
+        // }
     }
 
     /**
@@ -49,7 +49,7 @@ export class ActionState {
      * subclass can play animation, sound and so on in this method
      */
     public enter() {
-        this.canCheckTransitions = true;
+        // this.canCheckTransitions = true;
         for (const transition of this.transitions) {
             transition.resetConditions();
         }
