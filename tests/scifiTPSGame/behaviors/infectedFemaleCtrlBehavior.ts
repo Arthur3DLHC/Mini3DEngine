@@ -26,6 +26,9 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
 
     protected _curState: InfectedFemaleState = InfectedFemaleState.Idle;
 
+    /** set to true when attacked by player or attack player once */
+    protected _caution: boolean = false;
+
     public update() {
 
         // todo: think interval
@@ -44,9 +47,10 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
                 // when idle, only think once every 1 second?
                 if (curTime - this._lastThinkTime > this.thinkInterval) {
                     // if player in attack range, attack ?
-                    if(this.playerInMeleeAttackRange()) {
+                    // only facing player
+                    if(this.playerInMeleeAttackRange(true)) {
                         this.attack();
-                    } else if(this.playerInSight()) {
+                    } else if(this.playerInSight(!this._caution)) {
                         // if player in sight, move ?
                         this.moveTo(MonsterCtrlBehavior._tmpPlayerPosition);
                     } else {
@@ -70,10 +74,8 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
                 this._veloctity.x = this._facingDir.x * this.moveSpeed;
                 this._veloctity.z = this._facingDir.z * this.moveSpeed;
 
-                // if approached destination position, idle or attack ?
-                // refers to cur behavior is patrolling or chasing?
-                // what if player dead? change state to idle?
-                if (this.playerInMeleeAttackRange()) {
+                // only attack when facing player
+                if (this.playerInMeleeAttackRange(true)) {
                     this.attack();
                 } else if (this._distToPlayer > this.senseRange) {
                     this.rest();
@@ -94,12 +96,14 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
                 }
                 if (this._recoverTimeLeft < 0.0) {
                     // attack again or rest?
-                    // if (this.playerInMeleeAttackRange()) {
-                    //     this.attack();
-                    // } else {
-                        // this.rest();
-                    this.moveTo(MonsterCtrlBehavior._tmpPlayerPosition);
-
+                    //if (this.playerInMeleeAttackRange()) {
+                        // animation state can not change to itself
+                    //    this.attack();
+                    //} else {
+                        // if transit to move, will delay 0.5s duration, then the attack anim can not transit to attack again
+                        // so transit to idle (with duration 0)
+                        this.rest();
+                        // this.moveTo(MonsterCtrlBehavior._tmpPlayerPosition);
                     //}
                 }
                 break;
@@ -151,6 +155,7 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
     public attack() {
         // attack toward current orientation ?
         this._curState = InfectedFemaleState.Attacking;
+        this._caution = true;
         this._recoverTimeLeft = 1.75;
         this._hitTimeLeft = 0.5;
         // todo: select attack action randomly
@@ -166,6 +171,7 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
             // if hp < 0, down; else attacked
             // the down animation will be played once and keep the pose at last frame;
             this.HP -= damageInfo.amount;
+            this._caution = true;
 
             if (this.HP > 0) {
                 this._curState = InfectedFemaleState.Attacked;

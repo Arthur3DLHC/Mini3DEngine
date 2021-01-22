@@ -147,7 +147,7 @@ export abstract class MonsterCtrlBehavior extends Behavior {
 
     public abstract onAttacked(damageInfo: DamageInfo): void;
 
-    protected playerInSight(): boolean {
+    protected playerInSight(checkFOV: boolean): boolean {
         if (this._player === null) {
             return false;
         }
@@ -162,15 +162,18 @@ export abstract class MonsterCtrlBehavior extends Behavior {
         // }
 
         // orientation ? sense player by vision, sound or smell ?
-        if (this.senseHalfFOV < Math.PI) {
-            if (!this.inView(this._destinationDir, this.senseHalfFOV)) {
-                return false;
+        if (checkFOV) {
+            if (this.senseHalfFOV < Math.PI) {
+                if (!this.inView(this._destinationDir, this.senseHalfFOV)) {
+                    return false;
+                }
             }
         }
+
         return true;
     }
 
-    protected playerInMeleeAttackRange(): boolean {
+    protected playerInMeleeAttackRange(checkFOV: boolean): boolean {
         if (this._player === null) {
             return false;
         }
@@ -181,11 +184,14 @@ export abstract class MonsterCtrlBehavior extends Behavior {
         }
 
         // orientation ? sense player by vision, sound or smell ?
-        if (this.meleeAttackHalfFOV < Math.PI) {
-            if (!this.inView(this._destinationDir, this.meleeAttackHalfFOV)) {
-                return false;
+        if (checkFOV) {
+            if (this.meleeAttackHalfFOV < Math.PI) {
+                if (!this.inView(this._destinationDir, this.meleeAttackHalfFOV)) {
+                    return false;
+                }
             }
         }
+
         return true;
     }
 

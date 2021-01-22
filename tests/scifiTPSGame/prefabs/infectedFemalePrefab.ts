@@ -204,7 +204,7 @@ export class InfectedFemalePrefab extends BasePrefab {
                                     },
                                     {
                                         "target": "attack01",
-                                        "duration": 0.5,
+                                        "duration": 0.2,
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
@@ -216,7 +216,7 @@ export class InfectedFemalePrefab extends BasePrefab {
                                     },
                                     {
                                         "target": "attack02",
-                                        "duration": 0.5,
+                                        "duration": 0.2,
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
@@ -239,7 +239,6 @@ export class InfectedFemalePrefab extends BasePrefab {
                                     // },
                                     {
                                         "target": "down",
-                                        "duration": 0.5,
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
@@ -304,7 +303,6 @@ export class InfectedFemalePrefab extends BasePrefab {
                                     // },
                                     {
                                         "target": "down",
-                                        "duration": 0.5,
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
@@ -369,7 +367,6 @@ export class InfectedFemalePrefab extends BasePrefab {
                                     // },
                                     {
                                         "target": "down",
-                                        "duration": 0.5,
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
