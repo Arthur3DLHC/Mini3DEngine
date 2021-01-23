@@ -6,6 +6,7 @@ import { Object3D } from "../../../src/scene/object3D.js";
 import { Scene } from "../../../src/scene/scene.js";
 import { DamageInfo } from "./damageInfo.js";
 import { MonsterCtrlBehavior } from "./monsterCtrlBehavior.js";
+import { TPSPlayerBehavior } from "./tpsPlayerBehavior.js";
 
 export enum SlicerFemaleState {
     Idle,
@@ -40,6 +41,11 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
         const curTime = Clock.instance.curTime;
 
         super.update();
+        if (this._player === null) {
+            return;
+        }
+
+        let chance: number = 0;
 
         switch(this._curState) {
             case SlicerFemaleState.Idle:
@@ -48,12 +54,48 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
 
                 // when idle, only think once every 1 second?
                 // todo: reduce interval when caution
-                if (curTime - this._lastThinkTime > this.thinkInterval) {
+                if (curTime - this._lastThinkTime > this.thinkInterval || this._caution) {
                     // priority:
 
                     // attack (front, back, jump)
+                    if(vec3.dot(this._destinationDir, this._facingDir) > 0) {
+                        if (this.playerInMeleeAttackRange(!this._caution)) {
+                            // front melee attack
+                            this.attack(true);
+                            break;
+                        } else if(this.playerInJumpAttackRange()) {
+                            // chances for jump attack
+                            chance = Math.random();
+                            if (chance < 0.8) {
+                                this.jump();
+                                break;
+                            }
+                        }
+                    } else {
+                        // back attack, only when caution
+                        // check back attack range
+                        if (this._caution && this._distToPlayer < this.meleeAttackRange) {
+                            this._destinationDir.negate(MonsterCtrlBehavior._tmpDir);
+                            if (this.inView(MonsterCtrlBehavior._tmpDir, this.meleeAttackHalfFOV)) {
+                                this.attack(false);
+                                break;
+                            }
+                        }
+                    }
 
-                    // if caution, chances strafe to dodge damage
+                    // chances strafe to dodge damage
+                    // player is aiming?
+                    const tpsBeh = this._player.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
+                    if (tpsBeh !== undefined) {
+                        if (tpsBeh.isAiming) {
+                            // I'm facing player and player is aiming at me
+                            if (this.inView(this._destinationDir, 0.3)) {
+                                tpsBeh.getShootDir(MonsterCtrlBehavior._tmpDir);
+                                
+                            }
+                            break;
+                        }
+                    }
 
                     // chase player
                 }
@@ -83,6 +125,7 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
                 break;
         }
     }
+
 
     public moveTo(dest: vec3) {
         // if (this._curState !== SlicerFemaleState.Down) {
@@ -142,6 +185,10 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
     }
 
     public onAttacked(damageInfo: DamageInfo): void {
+        throw new Error("Method not implemented.");
+    }
+    
+    private playerInJumpAttackRange(): boolean {
         throw new Error("Method not implemented.");
     }
 }

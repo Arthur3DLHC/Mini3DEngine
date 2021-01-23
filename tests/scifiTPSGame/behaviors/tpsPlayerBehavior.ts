@@ -161,4 +161,8 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
 
         // todo: attacked, down...
     }
+
+    public getShootDir(dir: vec3) {
+        this.owner.worldTransform.multiplyVec3Normal(new vec3([0, 0, 1]), dir);
+    }
 }
