@@ -62,63 +62,21 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
                     // priority:
 
                     // attack (front, back, jump)
-                    if(vec3.dot(this._playerDir, this._facingDir) > 0) {
-                        if (this.playerInMeleeAttackRange(!this._caution)) {
-                            // front melee attack
-                            this.attack(true);
-                            break;
-                        } else if(this.playerInJumpAttackRange()) {
-                            // chances for jump attack
-                            chance = Math.random();
-                            if (chance < 0.8) {
-                                this.jump();
-                                break;
-                            }
-                        }
-                    } else {
-                        // back attack, only when caution
-                        // check back attack range
-                        if (this._caution && this._distToPlayer < this.meleeAttackRange) {
-                            this._playerDir.negate(MonsterCtrlBehavior._tmpDir);
-                            if (this.inView(MonsterCtrlBehavior._tmpDir, this.meleeAttackHalfFOV)) {
-                                this.attack(false);
-                                break;
-                            }
-                        }
+                    if (this.attackIfCan()) {
+                        break;
                     }
 
                     // chances strafe to dodge damage
-                    // player is aiming?
-                    const tpsBeh = this._player.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
-                    if (tpsBeh !== undefined) {
-                        if (tpsBeh.isAiming) {
-                            // I saw player is aiming at me?
-                            if (this.inView(this._playerDir, 0.3)) {
-                                tpsBeh.getShootDir(MonsterCtrlBehavior._tmpDir);
-                                // this._playerDir.negate(SlicerFemaleCtrlBehavoir._tmpPlayerToMeDir);
-                                MonsterCtrlBehavior._myPosition.copyTo(SlicerFemaleCtrlBehavoir._tmpPlayerToMeVec);
-                                SlicerFemaleCtrlBehavoir._tmpPlayerToMeVec.subtract(MonsterCtrlBehavior._playerPosition);
-                                // only check 2D angle?
-                                SlicerFemaleCtrlBehavoir._tmpPlayerToMeVec.y = 0;
-                                MonsterCtrlBehavior._tmpDir.y = 0;
-
-                                // project my position to aiming dir
-                                const b = vec3.dot(MonsterCtrlBehavior._tmpDir, SlicerFemaleCtrlBehavoir._tmpPlayerToMeVec);
-                                const c = this._distToPlayer;
-                                const aSq = c * c - b * b;
-                                // if dist to aiming plan < 0.2, strafe
-                                if (aSq < 0.04) {
-                                    chance = Math.random();
-                                    if (chance < 0.6) {
-                                        this.strafe();
-                                        break;
-                                    }
-                                }
-                            }
-                        }
+                    if (this.needsToDodge()) {
+                        this.strafe();
+                        break;
                     }
 
                     // chase player
+                    if(this.playerInSight(!this._caution)) {
+                        // if player in sight, move ?
+                        this.moveTo(MonsterCtrlBehavior._playerPosition);
+                    }
                 }
                 break;
             case SlicerFemaleState.MovingForward:
@@ -211,5 +169,67 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
     
     private playerInJumpAttackRange(): boolean {
         throw new Error("Method not implemented.");
+    }
+
+    private attackIfCan(): boolean {
+        if(vec3.dot(this._playerDir, this._facingDir) > 0) {
+            if (this.playerInMeleeAttackRange(!this._caution)) {
+                // front melee attack
+                this.attack(true);
+                return true;
+            } else if(this.playerInJumpAttackRange()) {
+                // chances for jump attack
+                const chance = Math.random();
+                if (chance < 0.8) {
+                    this.jump();
+                    return true;
+                }
+            }
+        } else {
+            // back attack, only when caution
+            // check back attack range
+            if (this._caution && this._distToPlayer < this.meleeAttackRange) {
+                this._playerDir.negate(MonsterCtrlBehavior._tmpDir);
+                if (this.inView(MonsterCtrlBehavior._tmpDir, this.meleeAttackHalfFOV)) {
+                    this.attack(false);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private needsToDodge(): boolean {
+        if (this._player === null) {
+            return false;
+        }
+        const tpsBeh = this._player.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
+        if (tpsBeh !== undefined) {
+            if (tpsBeh.isAiming) {
+                // I saw player is aiming at me?
+                if (this.inView(this._playerDir, 0.3)) {
+                    tpsBeh.getShootDir(MonsterCtrlBehavior._tmpDir);
+                    // this._playerDir.negate(SlicerFemaleCtrlBehavoir._tmpPlayerToMeDir);
+                    MonsterCtrlBehavior._myPosition.copyTo(SlicerFemaleCtrlBehavoir._tmpPlayerToMeVec);
+                    SlicerFemaleCtrlBehavoir._tmpPlayerToMeVec.subtract(MonsterCtrlBehavior._playerPosition);
+                    // only check 2D angle?
+                    SlicerFemaleCtrlBehavoir._tmpPlayerToMeVec.y = 0;
+                    MonsterCtrlBehavior._tmpDir.y = 0;
+
+                    // project my position to aiming dir
+                    const b = vec3.dot(MonsterCtrlBehavior._tmpDir, SlicerFemaleCtrlBehavoir._tmpPlayerToMeVec);
+                    const c = this._distToPlayer;
+                    const aSq = c * c - b * b;
+                    // if dist to aiming plan < 0.2, strafe
+                    if (aSq < 0.04) {
+                        const chance = Math.random();
+                        if (chance < 0.6) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
