@@ -49,7 +49,7 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
                         this.attack();
                     } else if(this.playerInSight(!this._caution)) {
                         // if player in sight, move ?
-                        this.moveTo(MonsterCtrlBehavior._tmpPlayerPosition);
+                        this.moveTo(MonsterCtrlBehavior._playerPosition);
                     } else {
                         // if idled for a well, move to an random destination?
                     }
@@ -60,7 +60,7 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
             case InfectedFemaleState.Moving:
                 // upate destination position
                 // always player cur position for now?
-                MonsterCtrlBehavior._tmpPlayerPosition.copyTo(this._destination);
+                MonsterCtrlBehavior._playerPosition.copyTo(this._destination);
 
                 // turn toward destination dir?
                 // calculate dest yaw?
@@ -113,7 +113,7 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
                 // if recovered (and player in sense range?), move toward player
                 if (this._recoverTimeLeft < 0.0) {
                     // move to player?
-                    this.moveTo(MonsterCtrlBehavior._tmpPlayerPosition);
+                    this.moveTo(MonsterCtrlBehavior._playerPosition);
                     // if(this.playerInSight()) {
                     //     // if player in sight, move ?
                     //     this.moveTo(MonsterCtrlBehavior._tmpPlayerPosition);

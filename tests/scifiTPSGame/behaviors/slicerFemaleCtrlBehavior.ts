@@ -1,3 +1,4 @@
+import vec2 from "../../../lib/tsm/vec2.js";
 import vec3 from "../../../lib/tsm/vec3.js";
 import { ActionControlBehavior } from "../../../src/animation/actionControlBehavior.js";
 import { Clock } from "../../../src/mini3DEngine.js";
@@ -37,6 +38,9 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
 
     protected _curState: SlicerFemaleState = SlicerFemaleState.Idle;
 
+    // for dodging
+    private static _tmpPlayerToMeVec: vec3 = new vec3();
+
     public update() {
         const curTime = Clock.instance.curTime;
 
@@ -58,7 +62,7 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
                     // priority:
 
                     // attack (front, back, jump)
-                    if(vec3.dot(this._destinationDir, this._facingDir) > 0) {
+                    if(vec3.dot(this._playerDir, this._facingDir) > 0) {
                         if (this.playerInMeleeAttackRange(!this._caution)) {
                             // front melee attack
                             this.attack(true);
@@ -75,7 +79,7 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
                         // back attack, only when caution
                         // check back attack range
                         if (this._caution && this._distToPlayer < this.meleeAttackRange) {
-                            this._destinationDir.negate(MonsterCtrlBehavior._tmpDir);
+                            this._playerDir.negate(MonsterCtrlBehavior._tmpDir);
                             if (this.inView(MonsterCtrlBehavior._tmpDir, this.meleeAttackHalfFOV)) {
                                 this.attack(false);
                                 break;
@@ -88,12 +92,29 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
                     const tpsBeh = this._player.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
                     if (tpsBeh !== undefined) {
                         if (tpsBeh.isAiming) {
-                            // I'm facing player and player is aiming at me
-                            if (this.inView(this._destinationDir, 0.3)) {
+                            // I saw player is aiming at me?
+                            if (this.inView(this._playerDir, 0.3)) {
                                 tpsBeh.getShootDir(MonsterCtrlBehavior._tmpDir);
-                                
+                                // this._playerDir.negate(SlicerFemaleCtrlBehavoir._tmpPlayerToMeDir);
+                                MonsterCtrlBehavior._myPosition.copyTo(SlicerFemaleCtrlBehavoir._tmpPlayerToMeVec);
+                                SlicerFemaleCtrlBehavoir._tmpPlayerToMeVec.subtract(MonsterCtrlBehavior._playerPosition);
+                                // only check 2D angle?
+                                SlicerFemaleCtrlBehavoir._tmpPlayerToMeVec.y = 0;
+                                MonsterCtrlBehavior._tmpDir.y = 0;
+
+                                // project my position to aiming dir
+                                const b = vec3.dot(MonsterCtrlBehavior._tmpDir, SlicerFemaleCtrlBehavoir._tmpPlayerToMeVec);
+                                const c = this._distToPlayer;
+                                const aSq = c * c - b * b;
+                                // if dist to aiming plan < 0.2, strafe
+                                if (aSq < 0.04) {
+                                    chance = Math.random();
+                                    if (chance < 0.6) {
+                                        this.strafe();
+                                        break;
+                                    }
+                                }
                             }
-                            break;
                         }
                     }
 

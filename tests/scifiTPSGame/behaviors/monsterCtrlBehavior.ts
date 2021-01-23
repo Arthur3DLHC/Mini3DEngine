@@ -74,7 +74,8 @@ export abstract class MonsterCtrlBehavior extends Behavior {
     protected _player: Object3D | null = null;
     protected _destination: vec3 = new vec3();
 
-    protected _destinationDir: vec3 = new vec3();
+    /** dir to player */
+    protected _playerDir: vec3 = new vec3();
     protected _distToPlayer: number = 10000;
 
     /** set to true when attacked by player or attack player once */
@@ -90,8 +91,9 @@ export abstract class MonsterCtrlBehavior extends Behavior {
     protected _recoverTimeLeft: number = 0;
     protected _hitTimeLeft: number = 0;
 
-    protected static _tmpMyPosition: vec3 = new vec3();
-    protected static _tmpPlayerPosition: vec3 = new vec3();
+    /** note: should always used as player position */
+    protected static _playerPosition: vec3 = new vec3();
+    protected static _myPosition: vec3 = new vec3();
     protected static _tmpDir: vec3 = new vec3();
 
     protected static readonly _upDir = new vec3([0, 1, 0]);
@@ -137,12 +139,12 @@ export abstract class MonsterCtrlBehavior extends Behavior {
         // this._facingDir.x = Math.cos(facingYaw);
         // this._facingDir.z = -Math.sin(facingYaw);
         if (this._player !== null) {
-            this.owner.worldTransform.getTranslation(MonsterCtrlBehavior._tmpMyPosition);
-            this._player.worldTransform.getTranslation(MonsterCtrlBehavior._tmpPlayerPosition);
+            this.owner.worldTransform.getTranslation(MonsterCtrlBehavior._myPosition);
+            this._player.worldTransform.getTranslation(MonsterCtrlBehavior._playerPosition);
 
             // set player direction as destination direction
-            vec3.direction(MonsterCtrlBehavior._tmpPlayerPosition, MonsterCtrlBehavior._tmpMyPosition, this._destinationDir);
-            this._distToPlayer = vec3.distance(MonsterCtrlBehavior._tmpMyPosition, MonsterCtrlBehavior._tmpPlayerPosition);
+            vec3.direction(MonsterCtrlBehavior._playerPosition, MonsterCtrlBehavior._myPosition, this._playerDir);
+            this._distToPlayer = vec3.distance(MonsterCtrlBehavior._myPosition, MonsterCtrlBehavior._playerPosition);
         }
 
         // this._actionCtrl.actionParams.set("curAction", this._curAction);
@@ -167,7 +169,7 @@ export abstract class MonsterCtrlBehavior extends Behavior {
         // orientation ? sense player by vision, sound or smell ?
         if (checkFOV) {
             if (this.senseHalfFOV < Math.PI) {
-                if (!this.inView(this._destinationDir, this.senseHalfFOV)) {
+                if (!this.inView(this._playerDir, this.senseHalfFOV)) {
                     return false;
                 }
             }
@@ -189,7 +191,7 @@ export abstract class MonsterCtrlBehavior extends Behavior {
         // orientation ? sense player by vision, sound or smell ?
         if (checkFOV) {
             if (this.meleeAttackHalfFOV < Math.PI) {
-                if (!this.inView(this._destinationDir, this.meleeAttackHalfFOV)) {
+                if (!this.inView(this._playerDir, this.meleeAttackHalfFOV)) {
                     return false;
                 }
             }
@@ -208,7 +210,7 @@ export abstract class MonsterCtrlBehavior extends Behavior {
     /** turn a bit to face destination direction */
     protected turnToFaceDestination() {
         // rotate facing dir
-        this._destinationDir.copyTo(MonsterCtrlBehavior._tmpDir);
+        this._playerDir.copyTo(MonsterCtrlBehavior._tmpDir);
         MonsterCtrlBehavior._tmpDir.scale(this.turnSpeed * Clock.instance.elapsedTime);
         this._facingDir.add(MonsterCtrlBehavior._tmpDir);
         this._facingDir.normalize();
