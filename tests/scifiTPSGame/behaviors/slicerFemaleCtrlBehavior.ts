@@ -31,15 +31,40 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
     }
     public constructor(owner: Object3D, body: RigidBody, actionCtrl: ActionControlBehavior, scene: Scene) {
         super(owner, body, actionCtrl, scene);
+
+        body.body.addEventListener("collide", (ev: any) => {
+            const contact: CANNON.ContactEquation = ev.contact;
+            // todo: check contact normal dir, set canJump flag
+            // fix me: what if the monster fall down from an edge?
+
+            // contact.bi and contact.bj are the colliding bodies, and contact.ni is the collision normal.
+            // We do not yet know which one is which! Let's check.
+            if (contact.bi.id === body.body.id) {       // bi is the monster body, flip the contact normal
+                contact.ni.negate(this._contactNormal);
+            } else {
+                this._contactNormal.copy(contact.ni);   // bi is something else. Keep the normal as it is
+            }
+
+            // assuming the up vector is always [0, 1, 0]
+            if (this._contactNormal.y > 0.5) {
+                // maybe jumping or attacked state on air
+                // change to Idle state?
+                this.rest();
+                //this._canJump = true;
+            }
+        });
     }
 
     public jumpHorizSpeed: number = 2;
     public jumpVertiSpeed: number = 1;
 
+
     public strafeSpeed: number = 1;
 
     protected _curState: SlicerFemaleState = SlicerFemaleState.Idle;
-
+    /** already hit player when jumping? */
+    protected _jumpHit: boolean = false;
+    private _contactNormal: CANNON.Vec3 = new CANNON.Vec3();    // // Normal in the contact, pointing *out* of whatever the player touched
     // for dodging
     private static _tmpPlayerToMeVec: vec3 = new vec3();
 
@@ -137,15 +162,34 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
                 }
                 break;
             case SlicerFemaleState.Jumping:
-                // jump state is a blendtree state
+                // don't change velocity;
+                // jump state is a blendtree state,
+                // blends the jumpup and falldown animation
                 // set y speed param as blending param
+                const blendfactor = Math.max(-1, Math.min(this._veloctity.y, 1));
+                this._actionCtrl.actionParams.set("ySpeed", blendfactor);
 
-                // turn to idle state when touch ground
+                // turn to idle state when touch ground?
+                // (in collision response callback)
+
+                // when to do damage to player?
+                // if near player, do damage; and mark already damaged;
+                if (!this._jumpHit) {
+                    if (this._distToPlayer < 1) {
+                        // todo: damage player
+                        const tpsBeh = this._player.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
+                        if (tpsBeh !== undefined) {
+                            tpsBeh.onAttacked();
+                            this._jumpHit = true;
+                        }
+                    }
+                }
                 break;
             case SlicerFemaleState.Attacking:
                 // count down
                 break;
             case SlicerFemaleState.Attacked:
+                // may be attacked on air
                 // count down
                 break;
             case SlicerFemaleState.Down:
@@ -200,6 +244,7 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
         this._veloctity.y = this.jumpVertiSpeed;
         
         this._caution = true;
+        this._jumpHit = false;
         this._curState = SlicerFemaleState.Jumping;
         this._actionCtrl.actionParams.set("curAction", SlicerFemaleState.Jumping);
     }
@@ -212,6 +257,10 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
     }
 
     public onAttacked(damageInfo: DamageInfo): void {
+        // if is jumping, play heavy damage animation; and modify the velocity by shoot dir?
+
+        // 
+
         throw new Error("Method not implemented.");
     }
     

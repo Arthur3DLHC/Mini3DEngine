@@ -84,6 +84,7 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
                     this._hitTimeLeft -= Clock.instance.elapsedTime;
                     if (this._hitTimeLeft <= 0.0 && this._player !== null) {
                         // this._hitTimeLeft = 1000;
+                        // todo: check attack range;
                         const playerCtrl: TPSPlayerBehavior | undefined = this._player.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
                         if (playerCtrl !== undefined) {
                             playerCtrl.onAttacked();
