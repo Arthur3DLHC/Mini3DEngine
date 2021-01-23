@@ -62,9 +62,6 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
                 // always player cur position for now?
                 MonsterCtrlBehavior._playerPosition.copyTo(this._destination);
 
-                // turn toward destination dir?
-                // calculate dest yaw?
-                // or use quaternions? how?
                 this.turnToFaceDestination();
 
                 // move toward cur facing dir
@@ -83,14 +80,17 @@ export class InfectedFemaleCtrlBehavior extends MonsterCtrlBehavior {
                 this._veloctity.x = 0;
                 this._veloctity.z = 0;
                 this._recoverTimeLeft -= Clock.instance.elapsedTime;
-                this._hitTimeLeft -= Clock.instance.elapsedTime;
-                if (this._hitTimeLeft < 0.0 && this._player !== null) {
-                    this._hitTimeLeft = 1000;
-                    const playerCtrl: TPSPlayerBehavior | undefined = this._player.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
-                    if (playerCtrl !== undefined) {
-                        playerCtrl.onAttacked();
+                if (this._hitTimeLeft > 0) {
+                    this._hitTimeLeft -= Clock.instance.elapsedTime;
+                    if (this._hitTimeLeft <= 0.0 && this._player !== null) {
+                        // this._hitTimeLeft = 1000;
+                        const playerCtrl: TPSPlayerBehavior | undefined = this._player.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
+                        if (playerCtrl !== undefined) {
+                            playerCtrl.onAttacked();
+                        }
                     }
                 }
+                
                 if (this._recoverTimeLeft < 0.0) {
                     // attack again or rest?
                     //if (this.playerInMeleeAttackRange()) {

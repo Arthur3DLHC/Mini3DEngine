@@ -36,6 +36,8 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
     public jumpHorizSpeed: number = 2;
     public jumpVertiSpeed: number = 1;
 
+    public strafeSpeed: number = 1;
+
     protected _curState: SlicerFemaleState = SlicerFemaleState.Idle;
 
     // for dodging
@@ -80,13 +82,59 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
                 }
                 break;
             case SlicerFemaleState.MovingForward:
-                // slicer turns faster than infected female
+                // upate destination position
+                // always player cur position for now?
+                MonsterCtrlBehavior._playerPosition.copyTo(this._destination);
+
+                // slicer moves and turns faster than infected female
+                this.turnToFaceDestination();
+
+                // move toward cur facing dir
+                this._veloctity.x = this._facingDir.x * this.moveSpeed;
+                this._veloctity.z = this._facingDir.z * this.moveSpeed;
+
+                // attack or dodge
+                // attack (front, back, jump)
+                if (this.attackIfCan()) {
+                    break;
+                }
+
+                // chances strafe to dodge damage
+                if (this.needsToDodge()) {
+                    this.strafe();
+                    break;
+                }
+
+                // if too far, rest
+                if (this._distToPlayer > this.senseRange) {
+                    this.rest();
+                }
+
                 break;
             case SlicerFemaleState.StrafingLeft:
+                // velocity
+                // need to calc left side dir
+                this._veloctity.x = this._facingDir.z * this.strafeSpeed;
+                this._veloctity.z = -this._facingDir.x * this.strafeSpeed;
+
                 // count down
+                this._recoverTimeLeft -= Clock.instance.elapsedTime;
+                if (this._recoverTimeLeft < 0) {
+                    this.rest();
+                }
+
                 break;
             case SlicerFemaleState.StrafingRight:
+                // velocity
+                // need to calc left side dir
+                this._veloctity.x = -this._facingDir.z * this.strafeSpeed;
+                this._veloctity.z = this._facingDir.x * this.strafeSpeed;
+
                 // count down
+                this._recoverTimeLeft -= Clock.instance.elapsedTime;
+                if (this._recoverTimeLeft < 0) {
+                    this.rest();
+                }
                 break;
             case SlicerFemaleState.Jumping:
                 // jump state is a blendtree state
