@@ -191,6 +191,9 @@ void main(void)
         float radiusWeight = 1.0 / probe.radius;
         float weight = distWeight * radiusWeight;
 
+        // debug
+        weight = 10.0;
+
         // IBL diffuse part
         // todo: simple subsurface?
         iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, int(probeIdx), n, albedoColor) * weight;
@@ -202,6 +205,8 @@ void main(void)
         // o.color.rgb += reflection * 0.5 / totalWeight;
         // f_specular += iblSpecular / totalWeight;
         // f_diffuse += vec3(0.5);
+
+        // f_diffuse += vec3(totalWeight);
 
         f_diffuse += iblDiffuse / totalWeight;
     }
@@ -355,6 +360,10 @@ void main(void)
     // todo: opacity for transparent surfaces;
     // todo: tone mapping? linear space to sRGB space?
     vec3 color = f_diffuse + f_subsurface + f_specular + f_emissive;
+    
+    // debug
+    color = iblDiffuse + f_emissive;
+    
     // put tone mapping in post process
     // color = ACESToneMapping(color, 1.0);
 

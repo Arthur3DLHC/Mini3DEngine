@@ -173,8 +173,8 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
                 // (in collision response callback)
 
                 // when to do damage to player?
-                // if near player, do damage; and mark already damaged;
                 if (!this._jumpHit) {
+                    // fix me: how to check damage range?
                     if (this._distToPlayer < 1) {
                         // todo: damage player
                         const tpsBeh = this._player.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;

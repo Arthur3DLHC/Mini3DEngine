@@ -1714,11 +1714,11 @@ export class ClusteredForwardRenderer {
         // and the envprobe's radius is represented by its scale transform,
         // so we can use a default unique projection frustum with far plane at 1
         // later will be overwritten by clipping range of envprobe
-        cubefaceCamera.projTransform = mat4.perspective(90, 1, 0.01, 1);
+        // cubefaceCamera.projTransform = mat4.perspective(90, 1, 0.01, 1);
         cubefaceCamera.viewport = new vec4([0, 0, this._renderContext.envmapSize, this._renderContext.envmapSize]);
         
         const worldPosition = new vec3();
-        const matWorldToProbe = new mat4();
+        const matWorldToProbe = mat4.identity.copyTo();
         const matViewProj = new mat4();
 
         const envMapDepthTexture = new Texture2D();
@@ -1740,7 +1740,8 @@ export class ClusteredForwardRenderer {
 
             // use envprobe clipping properties to prevent light leaking.
             cubefaceCamera.projTransform = mat4.perspective(90, 1, envprobe.clippingStart, envprobe.clippingEnd);
-
+            cubefaceCamera.near = envprobe.clippingStart;
+            cubefaceCamera.far = envprobe.clippingEnd;
             // all envprobes must be axis aligned
             envprobe.worldTransform.getTranslation(worldPosition);
             // envprobe.worldTransform.copy(matWorldToProbe);
@@ -1776,6 +1777,10 @@ export class ClusteredForwardRenderer {
                 mat4.product(matFaceView, matWorldToProbe, cubefaceCamera.viewTransform);
                 mat4.product(cubefaceCamera.projTransform, cubefaceCamera.viewTransform, matViewProj);
                 this._frustum.setFromProjectionMatrix(matViewProj);
+                const camWorld = cubefaceCamera.viewTransform.inverse();
+                if (camWorld !== null) {
+                    cubefaceCamera.worldTransform = camWorld;
+                }
                 // set uniforms per view
                 // will fill all visible lights, decals, envprobes;
                 // is that necessary to render decals ? maybe not;
