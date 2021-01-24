@@ -192,7 +192,7 @@ void main(void)
         float weight = distWeight * radiusWeight;
 
         // debug
-        weight = 10.0;
+        // weight = 10.0;
 
         // IBL diffuse part
         // todo: simple subsurface?
@@ -362,7 +362,7 @@ void main(void)
     vec3 color = f_diffuse + f_subsurface + f_specular + f_emissive;
     
     // debug
-    color = iblDiffuse + f_emissive;
+    // color = iblDiffuse + f_emissive;
     
     // put tone mapping in post process
     // color = ACESToneMapping(color, 1.0);
