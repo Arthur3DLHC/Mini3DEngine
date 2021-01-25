@@ -18,14 +18,14 @@
                         1,
                         1
                     ],
-                    "intensity" : 20,
+                    "intensity" : 30,
                     "type" : "directional",
                     "name" : "Sun.001",
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 512,
                         "radius" : 5,
-                        "shadowBias" : 0.10000000149011612,
+                        "shadowBias" : -0.10000000149011612,
                         "shadowDistance" : 20
                     }
                 },
@@ -35,14 +35,14 @@
                         1,
                         1
                     ],
-                    "intensity" : 20,
+                    "intensity" : 30,
                     "type" : "directional",
                     "name" : "Sun.003",
                     "extras" : {
                         "castShadow" : 1,
                         "shadowMapSize" : 512,
                         "radius" : 2,
-                        "shadowBias" : 0.10000000149011612,
+                        "shadowBias" : -0.10000000149011612,
                         "shadowDistance" : 20
                     }
                 }
