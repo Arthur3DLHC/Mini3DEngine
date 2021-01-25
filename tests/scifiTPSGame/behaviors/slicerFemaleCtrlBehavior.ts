@@ -195,13 +195,41 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
                     this._hitTimeLeft -= Clock.instance.elapsedTime;
                     if (this._hitTimeLeft <= 0.0 && this._player !== null) {
                         // player is still in attack range?
-                        // front or back?
-
+                        if (this.playerInMeleeAttackRange(true)) {
+                            const playerCtrl: TPSPlayerBehavior | undefined = this._player.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
+                            if (playerCtrl !== undefined) {
+                                playerCtrl.onAttacked();
+                            }
+                        }
                     }
+                }
+                if (this._recoverTimeLeft < 0.0) {
+                    // if transit to move, will delay 0.5s duration, then the attack anim can not transit to attack again
+                    // so transit to idle (with duration 0)
+                    this.rest();
                 }
                 break;
             case SlicerFemaleState.AttackingBack:
-                
+                this._veloctity.x = 0;
+                this._veloctity.z = 0;
+                this._recoverTimeLeft -= Clock.instance.elapsedTime;
+                if (this._hitTimeLeft > 0) {
+                    this._hitTimeLeft -= Clock.instance.elapsedTime;
+                    if (this._hitTimeLeft <= 0.0 && this._player !== null) {
+                        // player is still in attack range?
+                        if (this.playerInBackMeleeAttackRange()) {
+                            const playerCtrl: TPSPlayerBehavior | undefined = this._player.getBehaviorByTypeName("TPSPlayerBehavior") as TPSPlayerBehavior;
+                            if (playerCtrl !== undefined) {
+                                playerCtrl.onAttacked();
+                            } 
+                        }
+                    }
+                }
+                if (this._recoverTimeLeft < 0.0) {
+                    // if transit to move, will delay 0.5s duration, then the attack anim can not transit to attack again
+                    // so transit to idle (with duration 0)
+                    this.rest();
+                }
                 break;
             case SlicerFemaleState.Attacked:
                 // may be attacked on air
@@ -286,7 +314,7 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
 
     private attackIfCan(): boolean {
         if(vec3.dot(this._playerDir, this._facingDir) > 0) {
-            if (this.playerInMeleeAttackRange(!this._caution)) {
+            if (this.playerInMeleeAttackRange(true)) {
                 // front melee attack
                 this.attack(true);
                 return true;
@@ -301,12 +329,19 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
         } else {
             // back attack, only when caution
             // check back attack range
-            if (this._caution && this._distToPlayer < this.meleeAttackRange) {
-                this._playerDir.negate(MonsterCtrlBehavior._tmpDir);
-                if (this.inView(MonsterCtrlBehavior._tmpDir, this.meleeAttackHalfFOV)) {
-                    this.attack(false);
-                    return true;
-                }
+            if (this._caution && this.playerInBackMeleeAttackRange()) {
+                this.attack(false);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private playerInBackMeleeAttackRange(): boolean {
+        if (this._distToPlayer < this.meleeAttackRange) {
+            this._playerDir.negate(MonsterCtrlBehavior._tmpDir);
+            if (this.inView(MonsterCtrlBehavior._tmpDir, this.meleeAttackHalfFOV)) {
+                return true;
             }
         }
         return false;
