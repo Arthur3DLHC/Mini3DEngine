@@ -24,7 +24,7 @@
                     "name" : "Point",
                     "extras" : {
                         "castShadow" : 1,
-                        "shadowMapSize" : 512,
+                        "shadowMapSize" : 256,
                         "shadowBias" : 1
                     }
                 }

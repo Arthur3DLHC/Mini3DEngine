@@ -16,8 +16,8 @@ window.onload = () => {
         return;
     }
 
-    canvas.width = Math.max(1280, window.innerWidth - 10);
-    canvas.height = Math.max(720, window.innerHeight - 10);
+    // canvas.width = Math.max(1280, window.innerWidth - 10);
+    // canvas.height = Math.max(720, window.innerHeight - 10);
 
     GLDevice.initialize(canvas);
 
@@ -214,7 +214,7 @@ window.onload = () => {
         }
         else if (gltfNode instanceof EnvironmentProbe) {
             const envProbe = gltfNode as EnvironmentProbe;
-            // envProbe.debugDraw = true;
+            envProbe.debugDraw = true;
         }
 
         for (const child of gltfNode.children) {
