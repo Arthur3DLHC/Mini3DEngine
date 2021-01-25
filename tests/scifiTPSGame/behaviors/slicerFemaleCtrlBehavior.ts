@@ -51,6 +51,7 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
                 // maybe jumping or attacked state on air
                 // change to Idle state?
                 this.rest();
+                this._onAir = false;
                 //this._canJump = true;
             }
         });
@@ -65,6 +66,7 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
     protected _curState: SlicerFemaleState = SlicerFemaleState.Idle;
     /** already hit player when jumping? */
     protected _jumpHit: boolean = false;
+    protected _onAir: boolean = false;
     private _contactNormal: CANNON.Vec3 = new CANNON.Vec3();    // // Normal in the contact, pointing *out* of whatever the player touched
     // for dodging
     private static _tmpPlayerToMeVec: vec3 = new vec3();
@@ -233,9 +235,23 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
                 break;
             case SlicerFemaleState.Attacked:
                 // may be attacked on air
-                // count down
+                if (this._onAir) {
+                    
+                } else {
+                    this._veloctity.x = 0;
+                    this._veloctity.z = 0;
+
+                    // recover time left
+                    this._recoverTimeLeft -= Clock.instance.elapsedTime;
+                    // if recovered (and player in sense range?), move toward player
+                    if (this._recoverTimeLeft < 0.0) {
+                        this.moveTo(MonsterCtrlBehavior._playerPosition);
+                    }
+                }
                 break;
             case SlicerFemaleState.Down:
+                this._veloctity.x = 0;
+                this._veloctity.z = 0;
                 break;
         }
     }
@@ -289,6 +305,7 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
         
         this._caution = true;
         this._jumpHit = false;
+        this._onAir = true;
         this._curState = SlicerFemaleState.Jumping;
         this._actionCtrl.actionParams.set("curAction", SlicerFemaleState.Jumping);
     }
