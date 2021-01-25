@@ -11,6 +11,8 @@ export default /** glsl */`
     }
 
     uint clusterOfPixel(vec4 hPosition) {
+        if(u_view.clusterParams.xy == vec2(1.0)) return 0u;
+
         // http://www.aortiz.me/2018/12/21/CG.html, solving slice from DOOM like equation
 
         // clusterParams are calculated as:
