@@ -1777,10 +1777,9 @@ export class ClusteredForwardRenderer {
                 mat4.product(matFaceView, matWorldToProbe, cubefaceCamera.viewTransform);
                 mat4.product(cubefaceCamera.projTransform, cubefaceCamera.viewTransform, matViewProj);
                 this._frustum.setFromProjectionMatrix(matViewProj);
-                const camWorld = cubefaceCamera.viewTransform.inverse();
-                if (camWorld !== null) {
-                    cubefaceCamera.worldTransform = camWorld;
-                }
+                cubefaceCamera.viewTransform.copyTo(cubefaceCamera.worldTransform);
+                cubefaceCamera.worldTransform.inverse();
+
                 // set uniforms per view
                 // will fill all visible lights, decals, envprobes;
                 // is that necessary to render decals ? maybe not;

@@ -132,6 +132,7 @@ window.onload = () => {
 
     // todo: adjust the way that promise and loadingManager cooperate
     const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/SCIFI/level_1/robot_maintance_area.gltf");
+    // const gltfPromise: Promise<GltfAsset> = gltfLoader.load("./models/SCIFI/testlevel/TestLevel.gltf");
 
     // todo: use an outdoor scene skybox
     console.log("loading skybox...");
@@ -151,12 +152,18 @@ window.onload = () => {
         ]
     } else {
         envmapUrls = [
-            "./textures/skyboxes/space/px.jpg",
-            "./textures/skyboxes/space/nx.jpg",
-            "./textures/skyboxes/space/py.jpg",
-            "./textures/skyboxes/space/ny.jpg",
-            "./textures/skyboxes/space/pz.jpg",
-            "./textures/skyboxes/space/nz.jpg",
+            "./textures/skyboxes/kloofendal_48d_partly_cloudy_2k/px.png",
+            "./textures/skyboxes/kloofendal_48d_partly_cloudy_2k/nx.png",
+            "./textures/skyboxes/kloofendal_48d_partly_cloudy_2k/py.png",
+            "./textures/skyboxes/kloofendal_48d_partly_cloudy_2k/ny.png",
+            "./textures/skyboxes/kloofendal_48d_partly_cloudy_2k/pz.png",
+            "./textures/skyboxes/kloofendal_48d_partly_cloudy_2k/nz.png",
+            // "./textures/skyboxes/space/px.jpg",
+            // "./textures/skyboxes/space/nx.jpg",
+            // "./textures/skyboxes/space/py.jpg",
+            // "./textures/skyboxes/space/ny.jpg",
+            // "./textures/skyboxes/space/pz.jpg",
+            // "./textures/skyboxes/space/nz.jpg",
         ];
     }
 
