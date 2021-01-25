@@ -39,13 +39,9 @@ vec3 convolurionCubeMap(int faceIndex, vec2 uv) {
             vec3 d = calcCartesian(phi, theta);  // Transform spherical coordinate to cartesian coordinate
             d = d.x * r + d.y * u + d.z * n;  // Transform tangent space coordinate to world space coordinate
             
-            // int sampleFaceIdx = 0;
-            // vec2 cubeUV = getCubemapTexcoord(d, sampleFaceIdx);
-            // vec3 texColor = sampleCubeMapArray(s_source, cubeUV, sampleFaceIdx, u_layer).rgb;
             // note: must normalize d because textureCubeArray() is not a hw cubemap
             vec3 texColor = textureCubeArray(s_source, normalize(d), u_envmapIdx).rgb;
             lum = lum + texColor * cos(theta) * sin(theta);  // L * (ndotl) * sin(theta) d(theta)d(phi)
-            // lum = lum + texColor * cos(theta);  // L * (ndotl) * sin(theta) d(theta)d(phi)
             samples = samples + 1.0;
         }
     }

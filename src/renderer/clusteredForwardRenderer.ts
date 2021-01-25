@@ -1710,11 +1710,6 @@ export class ClusteredForwardRenderer {
         
         const cubefaceCamera = new Camera();
         cubefaceCamera.autoUpdateTransform = false;
-        // because objects will be transformed to envprobe local space,
-        // and the envprobe's radius is represented by its scale transform,
-        // so we can use a default unique projection frustum with far plane at 1
-        // later will be overwritten by clipping range of envprobe
-        // cubefaceCamera.projTransform = mat4.perspective(90, 1, 0.01, 1);
         cubefaceCamera.viewport = new vec4([0, 0, this._renderContext.envmapSize, this._renderContext.envmapSize]);
         
         const worldPosition = new vec3();
@@ -1744,8 +1739,6 @@ export class ClusteredForwardRenderer {
             cubefaceCamera.far = envprobe.clippingEnd;
             // all envprobes must be axis aligned
             envprobe.worldTransform.getTranslation(worldPosition);
-            // envprobe.worldTransform.copy(matWorldToProbe);
-            // matWorldToProbe.inverse();
             matWorldToProbe.fromTranslation(worldPosition.negate());
 
             for (let iface = 0; iface < 6; iface++) {
@@ -1777,6 +1770,7 @@ export class ClusteredForwardRenderer {
                 mat4.product(matFaceView, matWorldToProbe, cubefaceCamera.viewTransform);
                 mat4.product(cubefaceCamera.projTransform, cubefaceCamera.viewTransform, matViewProj);
                 this._frustum.setFromProjectionMatrix(matViewProj);
+                // ensure the camera position passed in the shader is right;
                 cubefaceCamera.viewTransform.copyTo(cubefaceCamera.worldTransform);
                 cubefaceCamera.worldTransform.inverse();
 
