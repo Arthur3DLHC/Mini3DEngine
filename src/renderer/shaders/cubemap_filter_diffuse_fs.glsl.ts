@@ -24,7 +24,7 @@ vec3 convolurionCubeMap(int faceIndex, vec2 uv) {
      // Calculate tangent space base vector
     vec3 n = calcNormal(faceIndex, uv);
     n = normalize(n);
-    vec3 u = vec3(0.0, 1.0, 0.0);
+    vec3 u = calcUpDir(faceIndex); // vec3(0.0, 1.0, 0.0);
     vec3 r = cross(u, n);
     r = normalize(r);
     u = cross(n, r);

@@ -24,7 +24,7 @@ vec3 convolurionCubeMap(int faceIndex, vec2 uv) {
      // Calculate tangent space base vector
     vec3 n = calcNormal(faceIndex, uv);
     n = normalize(n);
-    vec3 u = vec3(0.0, 1.0, 0.0);
+    vec3 u = calcUpDir(faceIndex); // vec3(0.0, 1.0, 0.0);
     vec3 r = cross(u, n);
     r = normalize(r);
     u = cross(n, r);
@@ -38,11 +38,14 @@ vec3 convolurionCubeMap(int faceIndex, vec2 uv) {
         for (float theta = 0.0; theta < 0.5 * PI; theta = theta + samplingStep) {
             vec3 d = calcCartesian(phi, theta);  // Transform spherical coordinate to cartesian coordinate
             d = d.x * r + d.y * u + d.z * n;  // Transform tangent space coordinate to world space coordinate
+            
             // int sampleFaceIdx = 0;
             // vec2 cubeUV = getCubemapTexcoord(d, sampleFaceIdx);
             // vec3 texColor = sampleCubeMapArray(s_source, cubeUV, sampleFaceIdx, u_layer).rgb;
-            vec3 texColor = textureCubeArray(s_source, d, u_envmapIdx).rgb;
+            // note: must normalize d because textureCubeArray() is not a hw cubemap
+            vec3 texColor = textureCubeArray(s_source, normalize(d), u_envmapIdx).rgb;
             lum = lum + texColor * cos(theta) * sin(theta);  // L * (ndotl) * sin(theta) d(theta)d(phi)
+            // lum = lum + texColor * cos(theta);  // L * (ndotl) * sin(theta) d(theta)d(phi)
             samples = samples + 1.0;
         }
     }

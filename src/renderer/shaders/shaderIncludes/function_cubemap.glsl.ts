@@ -68,6 +68,26 @@ export default /** glsl */`
         return n;
     }
 
+    vec3 calcUpDir(int face) {
+        // 6 faces (+x, -x, +y, -y, +z, -z) from 0 to 5
+        // from [0, 1] to [-1, 1]
+        vec3 n = vec3(0.0);
+        if (face == CUBE_FACE_POSITIVE_X) {
+            n = vec3(0.0, 1.0, 0.0);
+        } else if (face == CUBE_FACE_NEGATIVE_X) {
+            n = vec3(0.0, 1.0, 0.0);
+        } else if (face == CUBE_FACE_POSITIVE_Y) {
+            n = vec3(0.0, 0.0, 1.0);
+        } else if (face == CUBE_FACE_NEGATIVE_Y) {
+            n = vec3(0.0, 0.0, -1.0);
+        } else if (face == CUBE_FACE_POSITIVE_Z) {
+            n = vec3(0.0, 1.0, 0.0);
+        } else if (face == CUBE_FACE_NEGATIVE_Z) {
+            n = vec3(0.0, 1.0, 0.0);
+        }
+        return n;
+    }
+
     vec4 sampleCubeMapArray(sampler2DArray s, vec2 uv, int faceIdx, int layer) {
         // const float cubeUVScale = 1.0 / 6.0;
         // uv.x = uv.x * cubeUVScale + float(faceIdx) * cubeUVScale;

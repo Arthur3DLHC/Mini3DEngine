@@ -1,7 +1,7 @@
 // shader codes
 import function_ibl from "./shaders/shaderIncludes/function_ibl.glsl.js";
 import cubemap_filter_vs from "./shaders/cubemap_filter_vs.glsl.js";
-import cubemap_filter_diffuse_fs from "./shaders/cubemap_filter_diffuse_fs.glsl.js";
+// import cubemap_filter_diffuse_fs from "./shaders/cubemap_filter_diffuse_fs.glsl.js";
 import cubemap_filter_fix_edge from "./shaders/cubemap_filter_fix_edge_fs.glsl.js";
 import cubemap_filter_irradiance_fs from "./shaders/cubemap_filter_irradiance_fs.glsl.js";
 import cubemap_filter_specular_LD_fs from "./shaders/cubemap_filter_specular_LD_fs.glsl.js";

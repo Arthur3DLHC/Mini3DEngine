@@ -34,6 +34,7 @@ vec3 convolutionCubeMap(sampler2DArray s, int faceIndex, vec2 uv) {
         vec2 xi = hammersley(i, samples);
         vec3 h = importanceSamplingGGX(xi, u_roughness, n);
         vec3 l = 2.0 * dot(v, h) * h - v;
+        l = normalize(l);
 
         float ndotl = max(0.0, dot(n, l));
         if (ndotl > 0.0) {
