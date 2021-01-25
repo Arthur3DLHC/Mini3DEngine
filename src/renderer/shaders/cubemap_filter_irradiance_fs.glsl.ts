@@ -1,6 +1,7 @@
 /**
  * cubemap (texture2darray) diffuse filter
  * https://blog.csdn.net/i_dovelemon/article/details/79091105
+ * https://learnopengl.com/PBR/IBL/Diffuse-irradiance
  */
 export default /** glsl */`
 precision mediump sampler2DArray;
