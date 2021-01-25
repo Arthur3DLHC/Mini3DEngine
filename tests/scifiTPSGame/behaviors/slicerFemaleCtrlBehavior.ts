@@ -236,7 +236,8 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
             case SlicerFemaleState.Attacked:
                 // may be attacked on air
                 if (this._onAir) {
-                    
+                    // recover untill landed?
+                    // do not modify speed?
                 } else {
                     this._veloctity.x = 0;
                     this._veloctity.z = 0;
@@ -266,8 +267,6 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
     }
 
     public strafe() {
-        // note: only strafe when facing player? 'saw' player is aiming
-
         // strafe left or right? randomly?
         const rand = Math.random();
         if (rand <= 0.5) {
@@ -298,7 +297,7 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
     }
 
     public jump() {
-        // todo: set jump velocity once?
+        // set jump velocity once
         this._veloctity.x = this._facingDir.x * this.jumpHorizSpeed;
         this._veloctity.z = this._facingDir.z * this.jumpHorizSpeed;
         this._veloctity.y = this.jumpVertiSpeed;
@@ -318,15 +317,43 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
     }
 
     public onAttacked(damageInfo: DamageInfo): void {
-        // if is jumping, play heavy damage animation; and modify the velocity by shoot dir?
+        // if is on air (may be jumping or attacked on air), play heavy damage animation; and modify the velocity by shoot dir?
+        // or can not attack again after attacked on air?
+        if (this._curState === SlicerFemaleState.Down) {
+            return;
+        }
 
-        // 
+        this.HP -= damageInfo.amount;
+        this._caution = true;
 
-        throw new Error("Method not implemented.");
+        if (this._onAir) {
+            // if hp < 0, down after landing?
+            this._curState = SlicerFemaleState.Attacked;
+            this._actionCtrl.actionParams.set("curAction", SlicerFemaleState.Attacked * 100 + 1); // damage.heavy
+            // recover till landing
+        } else {
+            if (this.HP > 0) {
+                this._curState = SlicerFemaleState.Attacked;
+                this._actionCtrl.actionParams.set("curAction", SlicerFemaleState.Attacked * 100); // damage.light
+                this._recoverTimeLeft = 1.0;
+            } else {
+                this._curState = SlicerFemaleState.Down;
+                this._actionCtrl.actionParams.set("curAction", SlicerFemaleState.Down);
+                this._body.world.world.removeBody(this._body.body);
+            }
+        }
     }
     
     private playerInJumpAttackRange(): boolean {
-        throw new Error("Method not implemented.");
+        // distance
+        if (this._distToPlayer > 1.5 && this._distToPlayer < 4) {
+            // angle (about 5 deg half angle?)
+            if (this.inView(this._playerDir, 0.1)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private attackIfCan(): boolean {
