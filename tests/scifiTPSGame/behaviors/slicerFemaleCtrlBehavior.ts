@@ -14,7 +14,8 @@ export enum SlicerFemaleState {
     MovingForward,
     StrafingLeft,
     StrafingRight,
-    Attacking,
+    AttackingFront,
+    AttackingBack,
     Attacked,
     Jumping,
     Down,
@@ -185,8 +186,22 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
                     }
                 }
                 break;
-            case SlicerFemaleState.Attacking:
+            case SlicerFemaleState.AttackingFront:
                 // count down
+                this._veloctity.x = 0;
+                this._veloctity.z = 0;
+                this._recoverTimeLeft -= Clock.instance.elapsedTime;
+                if (this._hitTimeLeft > 0) {
+                    this._hitTimeLeft -= Clock.instance.elapsedTime;
+                    if (this._hitTimeLeft <= 0.0 && this._player !== null) {
+                        // player is still in attack range?
+                        // front or back?
+
+                    }
+                }
+                break;
+            case SlicerFemaleState.AttackingBack:
+                
                 break;
             case SlicerFemaleState.Attacked:
                 // may be attacked on air
@@ -224,17 +239,18 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
     public attack(front: boolean) {
         // attack toward current orientation
         // let player have chance to dodge
-        this._curState = SlicerFemaleState.Attacking;
         this._caution = true;
         this._recoverTimeLeft = 1.85;
-        let action = this._curState * 100;
+        // let action = this._curState * 100;
         if (front) {
             this._hitTimeLeft = 0.73;
+            this._curState = SlicerFemaleState.AttackingFront;
         } else {
-            action = this._curState * 100 + 1;
+            // action = this._curState * 100 + 1;
             this._hitTimeLeft = 0.73;
+            this._curState = SlicerFemaleState.AttackingBack;
         }
-        this._actionCtrl.actionParams.set("curAction", action);
+        this._actionCtrl.actionParams.set("curAction", this._curState);
     }
 
     public jump() {
