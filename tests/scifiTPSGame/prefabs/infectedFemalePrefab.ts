@@ -20,41 +20,20 @@ export class InfectedFemalePrefab extends BasePrefab {
             throw new Error("physics world not presented.");
         }
 
-        const builderFemale = new GLTFSceneBuilder();
-        const constraintProcssor = new ConstraintProcessor();
+        const assetKey: string = "infectedFemale";
 
-        builderFemale.processConstraints = constraintProcssor.processConstraintsGltf;
-
-        const animations: AnimationAction[] = [];
-
-        const gltfAsset = this.gltfAssets.get("infectedFemale");
-
-        if (gltfAsset === undefined) {
-            throw new Error("glTF Asset for infected female model not found.");
-        }
-
-        const gltfSceneFemale = builderFemale.build(gltfAsset, 0, animations);
-        gltfSceneFemale.name = name;
-        gltfSceneFemale.autoUpdateTransform = true;
-
-        // todo: location and orientation
-        position.copyTo(gltfSceneFemale.translation);
-        rotation.copyTo(gltfSceneFemale.rotation);
-
-        this.scene.attachChild(gltfSceneFemale);
-        this.prepareGLTFCharacter(gltfSceneFemale);
+        const { gltfSceneFemale, animations }: { gltfSceneFemale: Object3D; animations: AnimationAction[]; } = this.buildCharacterModel(assetKey, name, position, rotation);
 
         if (this.showMature) {
             this.setMatureSkinForCharacter(gltfSceneFemale, this.textureLoader);
         }
 
         // add rigid body for character
-        // use a compound shape from two spheres
+        // use a compound shape from three spheres
         // fixed rotation
         const femaleBody = new RigidBody(gltfSceneFemale, this.physicsWorld, { mass: 5, material: this.playerPhysicsMtl });
         this.physicsWorld.world.addBody(femaleBody.body);
 
-        // add rigid body last? after third person control
         gltfSceneFemale.behaviors.push(femaleBody);
 
         femaleBody.body.collisionFilterGroup = 2;
@@ -81,7 +60,7 @@ export class InfectedFemalePrefab extends BasePrefab {
 
         const monsterBehavior = new InfectedFemaleCtrlBehavior(gltfSceneFemale, femaleBody, actionCtrlBehavior, this.scene);
         gltfSceneFemale.behaviors.push(monsterBehavior);
-        // todo: monster ctrl behavior properties
+        // monster ctrl behavior properties
         monsterBehavior.moveSpeed = 0.5;
         monsterBehavior.attackingActions = 2;
         monsterBehavior.senseRange = 7;
@@ -95,6 +74,8 @@ export class InfectedFemalePrefab extends BasePrefab {
 
         return gltfSceneFemale;
     }
+
+
 
     // fix me: json is too long. is it better to add states programly?
     private addActionControl(actor: Object3D, animations: AnimationAction[], actionCtrlBehavior: ActionControlBehavior) {

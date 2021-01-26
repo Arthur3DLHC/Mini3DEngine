@@ -1,6 +1,6 @@
 import quat from "../../../lib/tsm/quat.js";
 import vec3 from "../../../lib/tsm/vec3.js";
-import { AnimationAction, AnimationMask, GltfAsset, Mesh, Object3D, PhysicsWorld, RigidBody, Scene, StandardPBRMaterial, Texture, TextureLoader } from "../../../src/mini3DEngine.js";
+import { AnimationAction, AnimationMask, ConstraintProcessor, GltfAsset, GLTFSceneBuilder, Mesh, Object3D, PhysicsWorld, RigidBody, Scene, StandardPBRMaterial, Texture, TextureLoader } from "../../../src/mini3DEngine.js";
 
 export abstract class BasePrefab {
     public constructor(assets: Map<string, GltfAsset>, physicsWorld: PhysicsWorld, scene: Scene, ) {
@@ -19,6 +19,41 @@ export abstract class BasePrefab {
     public showMature: boolean = false;
     /** temperory */
     public matureSkinUrl: string = ";"
+
+    /**
+     * build characer model object from gltf asset then add to scene
+     * @param assetKey 
+     * @param name 
+     * @param position 
+     * @param rotation 
+     * @returns builded model and it's animation array
+     */
+    protected buildCharacterModel(assetKey: string, name: string, position: vec3, rotation: quat) {
+        const builderFemale = new GLTFSceneBuilder();
+        const constraintProcssor = new ConstraintProcessor();
+
+        builderFemale.processConstraints = constraintProcssor.processConstraintsGltf;
+
+        const animations: AnimationAction[] = [];
+
+        const gltfAsset = this.gltfAssets.get(assetKey);
+
+        if (gltfAsset === undefined) {
+            throw new Error("glTF Asset not found: " + assetKey);
+        }
+
+        const gltfSceneFemale = builderFemale.build(gltfAsset, 0, animations);
+        gltfSceneFemale.name = name;
+        gltfSceneFemale.autoUpdateTransform = true;
+
+        // todo: location and orientation
+        position.copyTo(gltfSceneFemale.translation);
+        rotation.copyTo(gltfSceneFemale.rotation);
+
+        this.scene.attachChild(gltfSceneFemale);
+        this.prepareGLTFCharacter(gltfSceneFemale);
+        return { gltfSceneFemale, animations };
+    }
 
     protected prepareGLTFCharacter(gltfNode: Object3D) {
         // gltfNode.isStatic = true;

@@ -60,7 +60,6 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
     public jumpHorizSpeed: number = 2;
     public jumpVertiSpeed: number = 1;
 
-
     public strafeSpeed: number = 1;
 
     protected _curState: SlicerFemaleState = SlicerFemaleState.Idle;
