@@ -83,7 +83,8 @@ export class SciFiGameObjCreator extends GameObjectCreator {
             throw new Error("Need physics world to create player");
         }
         const prefab: SlicerFemalePrefab = new SlicerFemalePrefab(this.gltfAssets, this.physicsWorld, this.scene, this.textureLoader, this.playerPhysicsMtl);
-        prefab.showMature = this.showMature;
+        // prefab.showMature = this.showMature;
+        prefab.showMature = false;
         prefab.matureSkinUrl = "./models/SCIFI/monsters/slicer_female/SkinBaseColor_Clothes_NSFW.png";
         return prefab.createGameObject(name, componentProps, position, rotation, scale);
     }

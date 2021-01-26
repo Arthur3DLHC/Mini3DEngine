@@ -31,7 +31,7 @@ export class SlicerFemalePrefab extends BasePrefab {
         // add rigid body for character
         // use a compound shape from four spheres?
         // fixed rotation?
-        const femaleBody = new RigidBody(gltfSceneFemale, this.physicsWorld, { mass: 5, material: this.playerPhysicsMtl });
+        const femaleBody = new RigidBody(gltfSceneFemale, this.physicsWorld, { mass: 0.5, material: this.playerPhysicsMtl });
         this.physicsWorld.world.addBody(femaleBody.body);
 
         gltfSceneFemale.behaviors.push(femaleBody);
@@ -65,9 +65,9 @@ export class SlicerFemalePrefab extends BasePrefab {
         slicerBehavior.meleeAttackRange = 1.2;
         slicerBehavior.senseHalfFOV = Math.PI * 0.5;
 
-        slicerBehavior.jumpHorizSpeed = 2;
-        slicerBehavior.jumpVertiSpeed = 1;
-        slicerBehavior.strafeSpeed = 1;
+        slicerBehavior.jumpHorizSpeed = 3;
+        slicerBehavior.jumpVertiSpeed = 5;
+        slicerBehavior.strafeSpeed = 2;
 
         this.addActionControlJSON(gltfSceneFemale, animations, actionCtrlBehavior);
         return gltfSceneFemale;
@@ -328,6 +328,17 @@ export class SlicerFemalePrefab extends BasePrefab {
                                         ]
                                     },
                                     {
+                                        "target": "moveForward",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 1
+                                            }
+                                        ]
+                                    },
+                                    {
                                         "target": "damageLight",
                                         "conditions": [
                                             {
@@ -370,6 +381,17 @@ export class SlicerFemalePrefab extends BasePrefab {
                                         ]
                                     },
                                     {
+                                        "target": "moveForward",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 1
+                                            }
+                                        ]
+                                    },
+                                    {
                                         "target": "damageLight",
                                         "conditions": [
                                             {
@@ -406,6 +428,18 @@ export class SlicerFemalePrefab extends BasePrefab {
                                                 "paramName": "curAction",
                                                 "compareOp": "===",
                                                 "compareValue": 0
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "moveForward",
+                                        "duration": 0.5,
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 1
                                             }
                                         ]
                                     },
@@ -577,6 +611,17 @@ export class SlicerFemalePrefab extends BasePrefab {
                                                 "paramName": "curAction",
                                                 "compareOp": "===",
                                                 "compareValue": 0
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "down",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 8
                                             }
                                         ]
                                     },

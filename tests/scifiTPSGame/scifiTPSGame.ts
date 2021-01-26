@@ -109,10 +109,11 @@ window.onload = () => {
     console.log("loading gltf models...");
 
     // character models
-    const characterModelKeys: string[] = ["playerFemale", "infectedFemale"];
+    const characterModelKeys: string[] = ["playerFemale", "infectedFemale", "slicerFemale"];
     const gltfCharacterPromises: Promise<GltfAsset>[] = [];
     gltfCharacterPromises.push(gltfLoader.load("./models/SCIFI/heroes/cyberGirl/CyberGirl_animation.gltf"));
     gltfCharacterPromises.push(gltfLoader.load("./models/SCIFI/monsters/infected_female/InfectedFemale.gltf"));
+    gltfCharacterPromises.push(gltfLoader.load("./models/SCIFI/monsters/slicer_female/SlicerFemale.gltf"));
 
     // level model
     // const gltfPromiseLevel: Promise<GltfAsset> = gltfLoader.load("./models/SCIFI/testlevel/TestLevel.gltf");

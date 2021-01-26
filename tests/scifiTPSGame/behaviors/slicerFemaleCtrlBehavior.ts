@@ -58,7 +58,7 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
     }
 
     public jumpHorizSpeed: number = 2;
-    public jumpVertiSpeed: number = 1;
+    public jumpVertiSpeed: number = 5;
 
     public strafeSpeed: number = 1;
 
@@ -383,7 +383,7 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
     private playerInBackMeleeAttackRange(): boolean {
         if (this._distToPlayer < this.meleeAttackRange) {
             this._playerDir.negate(MonsterCtrlBehavior._tmpDir);
-            if (this.inView(MonsterCtrlBehavior._tmpDir, this.meleeAttackHalfFOV)) {
+            if (this.inView(MonsterCtrlBehavior._tmpDir, this.meleeAttackHalfFOV * 2)) {
                 return true;
             }
         }
