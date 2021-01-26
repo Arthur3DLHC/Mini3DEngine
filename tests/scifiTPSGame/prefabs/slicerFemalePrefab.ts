@@ -120,7 +120,7 @@ export class SlicerFemalePrefab extends BasePrefab {
                                         ]
                                     },
                                     {
-                                        "target": "strafeRigth",
+                                        "target": "strafeRight",
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
@@ -230,7 +230,7 @@ export class SlicerFemalePrefab extends BasePrefab {
                                         ]
                                     },
                                     {
-                                        "target": "strafeRigth",
+                                        "target": "strafeRight",
                                         "duration": 0.2,
                                         "conditions": [
                                             {
@@ -308,13 +308,294 @@ export class SlicerFemalePrefab extends BasePrefab {
                                         ]
                                     },
                                 ]
+                            },
+                            // strafe left
+                            {
+                                "typeStr": "single",
+                                "name": "strafeLeft",
+                                "animation": "Female.Strafe.Left",
+                                "animLoopMode": 0,
+                                "transitions": [
+                                    {
+                                        "target": "idle",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 0
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "damageLight",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 600
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "down",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 8
+                                            }
+                                        ]
+                                    },
+                                ]
+                            },
+                            // strafe right
+                            {
+                                "typeStr": "single",
+                                "name": "strafeRight",
+                                "animation": "Female.Strafe.Right",
+                                "animLoopMode": 0,
+                                "transitions": [
+                                    {
+                                        "target": "idle",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 0
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "damageLight",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 600
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "down",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 8
+                                            }
+                                        ]
+                                    },
+                                ]
+                            },
+                            // jump
+                            {
+                                "typeStr": "blendTree",
+                                "name": "jump",
+                                "transitions": [
+                                    {
+                                        "target": "idle",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 0
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "damageHeavy",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 601
+                                            }
+                                        ]
+                                    },
+                                ],
+                                "rootNode": {
+                                    "blendParameters": ["ySpeed"],
+                                    "blendMethod": 0,
+                                    "weight": 1,
+                                    "children": [
+                                        {
+                                            // jump up
+                                            "blendMethod": 4,
+                                            "weigth": 0,
+                                            "weightParamPosition": [1],
+                                            "animation": "Female.Jump.Up",
+                                            "animLoopMode": 1
+                                        },
+                                        {
+                                            // fall down
+                                            "blendMethod": 4,
+                                            "weigth": 0,
+                                            "weightParamPosition": [-1],
+                                            "animation": "Female.Fall.Down",
+                                            "animLoopMode": 1
+                                        }
+                                    ]
+                                }
+                            },
+                            // attack forward
+                            {
+                                "typeStr": "single",
+                                "name": "attackFront",
+                                "animation": "Female.Attack.001",
+                                "animLoopMode": 1,
+                                "transitions": [
+                                    {
+                                        "target": "idle",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 0
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "damageLight",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 600
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "down",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 8
+                                            }
+                                        ]
+                                    },
+                                ]    
+                            },
+                            // attack backward
+                            {
+                                "typeStr": "single",
+                                "name": "attackBack",
+                                "animation": "Female.Attack.002",
+                                "animLoopMode": 1,
+                                "transitions": [
+                                    {
+                                        "target": "idle",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 0
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "damageLight",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 600
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "down",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 8
+                                            }
+                                        ]
+                                    },
+                                ]    
+                            },
+                            // damaged light
+                            {
+                                "typeStr": "single",
+                                "name": "damageLight",
+                                "animation": "Female.Damage.Light",
+                                "animLoopMode": 1,
+                                "transitions": [
+                                    {
+                                        "target": "moveForward",
+                                        "duration": 0.5,
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 1
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "down",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 8
+                                            }
+                                        ]
+                                    },
+                                ]    
+                            },
+                            // damaged heavy
+                            {
+                                "typeStr": "single",
+                                "name": "damageHeavy",
+                                "animation": "Female.Damage.Heavy",
+                                "animLoopMode": 1,
+                                "transitions": [
+                                    {
+                                        "target": "idle",
+                                        "duration": 0.5,
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 0
+                                            }
+                                        ]
+                                    },
+                                ]    
+                            },
+                            // down
+                            {
+                                "typeStr": "single",
+                                "name": "down",
+                                "animation": "Female.Down",
+                                "animLoopMode": 1,
+                                "transitions": []   // if down, can not transit to other states?
                             }
                         ]
                     }
                 }
             ]
         }
-        
-        throw new Error("Method not implemented.");
+
+        actionCtrlBehavior.fromJSON(actionCtrlDef);
     }
 }

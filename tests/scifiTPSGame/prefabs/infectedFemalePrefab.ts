@@ -359,69 +359,6 @@ export class InfectedFemalePrefab extends BasePrefab {
                                     }
                                 ]
                             },
-                            // {
-                            //     "typeStr": "single",
-                            //     "name": "attacked",
-                            //     "animation": "Female.Damage.Light",
-                            //     "animLoopMode": 1,
-                            //     "transitions": [
-                            //         {
-                            //             "target": "idle",
-                            //             "conditions": [
-                            //                 {
-                            //                     "typeStr": "singleParam",
-                            //                     "paramName": "curAction",
-                            //                     "compareOp": "===",
-                            //                     "compareValue": 0
-                            //                 }
-                            //             ]
-                            //         },
-                            //         {
-                            //             "target": "walk",
-                            //             "conditions": [
-                            //                 {
-                            //                     "typeStr": "singleParam",
-                            //                     "paramName": "curAction",
-                            //                     "compareOp": "===",
-                            //                     "compareValue": 1
-                            //                 }
-                            //             ]
-                            //         },
-                            //         {
-                            //             "target": "attack01",
-                            //             "conditions": [
-                            //                 {
-                            //                     "typeStr": "singleParam",
-                            //                     "paramName": "curAction",
-                            //                     "compareOp": "===",
-                            //                     "compareValue": 200
-                            //                 }
-                            //             ]
-                            //         },
-                            //         {
-                            //             "target": "attack02",
-                            //             "conditions": [
-                            //                 {
-                            //                     "typeStr": "singleParam",
-                            //                     "paramName": "curAction",
-                            //                     "compareOp": "===",
-                            //                     "compareValue": 201
-                            //                 }
-                            //             ]
-                            //         },
-                            //         {
-                            //             "target": "down",
-                            //             "conditions": [
-                            //                 {
-                            //                     "typeStr": "singleParam",
-                            //                     "paramName": "curAction",
-                            //                     "compareOp": "===",
-                            //                     "compareValue": 4
-                            //                 }
-                            //             ]
-                            //         }
-                            //     ]
-                            // },
                             {
                                 "typeStr": "single",
                                 "name": "down",
