@@ -73,7 +73,248 @@ export class SlicerFemalePrefab extends BasePrefab {
         return gltfSceneFemale;
     }
 
-    private addActionControlJSON(gltfSceneFemale: Object3D, animations: AnimationAction[], actionCtrlBehavior: ActionControlBehavior) {
+    private addActionControlJSON(actor: Object3D, animations: AnimationAction[], actionCtrlBehavior: ActionControlBehavior) {
+        actor.behaviors.push(actionCtrlBehavior);
+        
+        const actionCtrlDef: any = {
+            "actionParams": {
+                "curAction": 0,
+                "ySpeed": -1
+            },
+            "animationLayers": [
+                {
+                    name: "baseLayer",
+                    "blendWeight": 1,
+                    "blendMode": 1,
+                    "stateMachine": {
+                        "curState": "idle",
+                        "states": [
+                            // idle
+                            {
+                                "typeStr": "single",
+                                "name": "idle",
+                                "animation": "Female.Idle",
+                                "animLoopMode": 0,
+                                "transitions": [
+                                    {
+                                        "target": "moveForward",
+                                        "duration": 0.5,
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 1
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "strafeLeft",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 2
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "strafeRigth",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 3
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attackFront",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 4
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attackBack",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 5
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "damageLight",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 600
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "damageHeavy",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 601
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "jump",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 7
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "down",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 8
+                                            }
+                                        ]
+                                    },
+                                ]
+                            },
+                            // moveForward
+                            {
+                                "typeStr": "single",
+                                "name": "moveForward",
+                                "animation": "Female.Crawl",
+                                "animLoopMode": 0,
+                                "transitions": [
+                                    {
+                                        "target": "idle",
+                                        "duration": 0.5,
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 0
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "strafeLeft",
+                                        "duration": 0.2,
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 2
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "strafeRigth",
+                                        "duration": 0.2,
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 3
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attackFront",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 4
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "attackBack",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 5
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "damageLight",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 600
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "damageHeavy",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 601
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "jump",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 7
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "down",
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 8
+                                            }
+                                        ]
+                                    },
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+        
         throw new Error("Method not implemented.");
     }
 }
