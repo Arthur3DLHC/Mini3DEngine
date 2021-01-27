@@ -11,7 +11,7 @@ export class InfectedFemalePrefab extends BasePrefab {
         this.textureLoader = textureLoader;
         this.playerPhysicsMtl = playerPhysicsMtl;
 
-        this.category = ObjectCategory.THREATEN;
+        this.category = ObjectCategory.ENEMIES;
     }
 
     private textureLoader: TextureLoader;

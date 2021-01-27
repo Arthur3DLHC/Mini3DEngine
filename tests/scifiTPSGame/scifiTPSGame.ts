@@ -89,9 +89,11 @@ window.onload = () => {
     renderer.postprocessor.silhouette.width = 2.0;
     renderer.postprocessor.silhouette.selectMode = SilhouetteSelectMode.ByCursor;
     renderer.postprocessor.silhouette.cursor = new vec2([canvas.width / 2, canvas.height / 2]);
-    renderer.postprocessor.silhouette.setSilhouetteColor(ObjectCategory.THREATEN, new vec4([1, 0, 0, 1]));
+    renderer.postprocessor.silhouette.setSilhouetteColor(ObjectCategory.DANGER_ITEMS, new vec4([1, 0, 0, 1]));
     renderer.postprocessor.silhouette.setSilhouetteColor(ObjectCategory.INTERACTIVE, new vec4([0, 1, 0, 1]));
     renderer.postprocessor.silhouette.setSilhouetteColor(ObjectCategory.LOCKED, new vec4([1, 1, 0, 1]));
+    renderer.postprocessor.silhouette.setSilhouetteColor(ObjectCategory.ENEMIES, new vec4([1, 0, 0, 1]));
+    // renderer.postprocessor.silhouette.setSilhouetteColor(ObjectCategory.ENEMIES, new vec4([0, 0, 0, 0])); // no silhouette but pickable
 
     const scene = new Scene();
     const camera = new PerspectiveCamera();
@@ -301,7 +303,7 @@ function addTestDynamicObjects(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CAN
     {
         const boxMesh = new Mesh();
         boxMesh.name = "box01";
-        boxMesh.category = ObjectCategory.THREATEN;
+        boxMesh.category = ObjectCategory.DANGER_ITEMS;
         boxMesh.geometry = new BoxGeometry(0.25, 0.25, 0.25);
         boxMesh.castShadow = true;
         boxMesh.isStatic = false;
