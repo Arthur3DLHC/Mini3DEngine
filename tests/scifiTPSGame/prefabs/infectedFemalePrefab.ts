@@ -1,7 +1,8 @@
 import quat from "../../../lib/tsm/quat.js";
 import vec3 from "../../../lib/tsm/vec3.js";
-import { ActionControlBehavior, AnimationAction, ConstraintProcessor, GltfAsset, GLTFSceneBuilder, Object3D, PhysicsWorld, RigidBody, Scene, TextureLoader } from "../../../src/mini3DEngine.js";
+import { ActionControlBehavior, AnimationAction, GltfAsset, Object3D, PhysicsWorld, RigidBody, Scene, TextureLoader } from "../../../src/mini3DEngine.js";
 import { InfectedFemaleCtrlBehavior } from "../behaviors/infectedFemaleCtrlBehavior.js";
+import { ObjectCategory } from "../objectCategory.js";
 import { BasePrefab } from "./basePrefab.js";
 
 export class InfectedFemalePrefab extends BasePrefab {
@@ -9,6 +10,8 @@ export class InfectedFemalePrefab extends BasePrefab {
         super(assets, physicsWorld, scene);
         this.textureLoader = textureLoader;
         this.playerPhysicsMtl = playerPhysicsMtl;
+
+        this.category = ObjectCategory.THREATEN;
     }
 
     private textureLoader: TextureLoader;
@@ -67,7 +70,7 @@ export class InfectedFemalePrefab extends BasePrefab {
         monsterBehavior.meleeAttackRange = 0.9;
         monsterBehavior.senseHalfFOV = Math.PI * 0.5;
 
-        this.addActionControlJSON(gltfSceneFemale, animations, actionCtrlBehavior);
+        this.addActionControlJSON(gltfSceneFemale, actionCtrlBehavior);
         monsterBehavior.upperBodyLayer = actionCtrlBehavior.animationLayers.find((layer)=>{return layer.name === "upperBody"});
         // prevent state machine cannot change state if weight is 0
         if(monsterBehavior.upperBodyLayer) monsterBehavior.upperBodyLayer.alwaysUpdate = true;
@@ -77,12 +80,8 @@ export class InfectedFemalePrefab extends BasePrefab {
 
 
 
-    // fix me: json is too long. is it better to add states programly?
-    private addActionControl(actor: Object3D, animations: AnimationAction[], actionCtrlBehavior: ActionControlBehavior) {
-        throw new Error("Not implemented");
-    }
 
-    private addActionControlJSON(actor: Object3D, animations: AnimationAction[], actionCtrlBehavior: ActionControlBehavior) {
+    private addActionControlJSON(actor: Object3D, actionCtrlBehavior: ActionControlBehavior) {
         actor.behaviors.push(actionCtrlBehavior);
 
         // note: actions must not transit to themselves!

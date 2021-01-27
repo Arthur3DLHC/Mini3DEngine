@@ -1,7 +1,8 @@
 import quat from "../../../lib/tsm/quat.js";
 import vec3 from "../../../lib/tsm/vec3.js";
-import { ActionControlBehavior, AnimationAction, ConstraintProcessor, GltfAsset, GLTFSceneBuilder, Object3D, PhysicsWorld, RigidBody, Scene, TextureLoader } from "../../../src/mini3DEngine.js";
+import { ActionControlBehavior, AnimationAction, GltfAsset, Object3D, PhysicsWorld, RigidBody, Scene, TextureLoader } from "../../../src/mini3DEngine.js";
 import { SlicerFemaleCtrlBehavoir } from "../behaviors/slicerFemaleCtrlBehavior.js";
+import { ObjectCategory } from "../objectCategory.js";
 import { BasePrefab } from "./basePrefab.js";
 
 export class SlicerFemalePrefab extends BasePrefab {
@@ -9,6 +10,8 @@ export class SlicerFemalePrefab extends BasePrefab {
         super(assets, physicsWorld, scene);
         this.textureLoader = textureLoader;
         this.playerPhysicsMtl = playerPhysicsMtl;
+
+        this.category = ObjectCategory.THREATEN;
     }
 
     private textureLoader: TextureLoader;
@@ -48,10 +51,10 @@ export class SlicerFemalePrefab extends BasePrefab {
         femaleBody.setRotation(gltfSceneFemale.rotation);
 
         // use 1 sphere on every corner to represent the shape ?
-        femaleBody.body.addShape(new CANNON.Sphere(0.3), new CANNON.Vec3(-0.3, 0.3, -0.3));
-        femaleBody.body.addShape(new CANNON.Sphere(0.3), new CANNON.Vec3(-0.3, 0.3,  0.3));
-        femaleBody.body.addShape(new CANNON.Sphere(0.3), new CANNON.Vec3( 0.3, 0.3, -0.3));
-        femaleBody.body.addShape(new CANNON.Sphere(0.3), new CANNON.Vec3( 0.3, 0.3,  0.3));
+        femaleBody.body.addShape(new CANNON.Sphere(0.6), new CANNON.Vec3(0.0, 0.6, 0.0));
+        // femaleBody.body.addShape(new CANNON.Sphere(0.3), new CANNON.Vec3(-0.3, 0.3,  0.3));
+        // femaleBody.body.addShape(new CANNON.Sphere(0.3), new CANNON.Vec3( 0.3, 0.3, -0.3));
+        // femaleBody.body.addShape(new CANNON.Sphere(0.3), new CANNON.Vec3( 0.3, 0.3,  0.3));
 
         const actionCtrlBehavior = new ActionControlBehavior(gltfSceneFemale, animations);
 
@@ -65,15 +68,15 @@ export class SlicerFemalePrefab extends BasePrefab {
         slicerBehavior.meleeAttackRange = 1.2;
         slicerBehavior.senseHalfFOV = Math.PI * 0.5;
 
-        slicerBehavior.jumpHorizSpeed = 3;
+        slicerBehavior.jumpHorizSpeed = 2;
         slicerBehavior.jumpVertiSpeed = 5;
         slicerBehavior.strafeSpeed = 2;
 
-        this.addActionControlJSON(gltfSceneFemale, animations, actionCtrlBehavior);
+        this.addActionControlJSON(gltfSceneFemale, actionCtrlBehavior);
         return gltfSceneFemale;
     }
 
-    private addActionControlJSON(actor: Object3D, animations: AnimationAction[], actionCtrlBehavior: ActionControlBehavior) {
+    private addActionControlJSON(actor: Object3D, actionCtrlBehavior: ActionControlBehavior) {
         actor.behaviors.push(actionCtrlBehavior);
         
         const actionCtrlDef: any = {

@@ -20,6 +20,9 @@ export abstract class BasePrefab {
     /** temperory */
     public matureSkinUrl: string = ";"
 
+    /** category of the gameobject */
+    public category: number = -1;
+
     /**
      * build characer model object from gltf asset then add to scene
      * @param assetKey 
@@ -59,6 +62,8 @@ export abstract class BasePrefab {
         // gltfNode.isStatic = true;
         gltfNode.isStatic = false;
         gltfNode.autoUpdateTransform = true;
+        // set category for all nodes
+        gltfNode.category = this.category;
         
         if (gltfNode instanceof Mesh) {
             gltfNode.castShadow = true;

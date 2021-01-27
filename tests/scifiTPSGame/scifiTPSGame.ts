@@ -9,6 +9,7 @@ import { TPSPlayerBehavior } from "./behaviors/tpsPlayerBehavior.js";
 import { SciFiGameObjCreator } from "./scifiGameObjCreator.js";
 import { PlayerPrefab } from "./prefabs/playerPrefab.js";
 import { InfectedFemalePrefab } from "./prefabs/infectedFemalePrefab.js";
+import { ObjectCategory } from "./objectCategory.js";
 
 window.onload = () => {
     const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
@@ -88,9 +89,9 @@ window.onload = () => {
     renderer.postprocessor.silhouette.width = 2.0;
     renderer.postprocessor.silhouette.selectMode = SilhouetteSelectMode.ByCursor;
     renderer.postprocessor.silhouette.cursor = new vec2([canvas.width / 2, canvas.height / 2]);
-    renderer.postprocessor.silhouette.setSilhouetteColor(1, new vec4([1, 0, 0, 1]));
-    renderer.postprocessor.silhouette.setSilhouetteColor(2, new vec4([0, 1, 0, 1]));
-    renderer.postprocessor.silhouette.setSilhouetteColor(3, new vec4([0, 0, 1, 1]));
+    renderer.postprocessor.silhouette.setSilhouetteColor(ObjectCategory.THREATEN, new vec4([1, 0, 0, 1]));
+    renderer.postprocessor.silhouette.setSilhouetteColor(ObjectCategory.INTERACTIVE, new vec4([0, 1, 0, 1]));
+    renderer.postprocessor.silhouette.setSilhouetteColor(ObjectCategory.LOCKED, new vec4([1, 1, 0, 1]));
 
     const scene = new Scene();
     const camera = new PerspectiveCamera();
@@ -101,7 +102,7 @@ window.onload = () => {
 
     scene.attachChild(camera);
 
-    addTestDynamicObjects(physicsWorld, widgetPhysicsMtl, scene, addPlane, groundPhysicsMtl);
+    addTestDynamicObjects(physicsWorld, widgetPhysicsMtl, scene, groundPhysicsMtl);
 
     // add some objects to scene
     // test box geometry
@@ -276,46 +277,6 @@ window.onload = () => {
         requestAnimationFrame(gameLoop);
     }
 
-    function addPlane(name: string, width: number, height: number, position: vec3, rotation: quat, wallColor: vec4, metallic: number, roughness: number, scene: Scene, world: PhysicsWorld, physicsMtl: CANNON.Material, textureUrl?:string) {
-        const planeMesh = new Mesh();
-        planeMesh.name = name;
-        // mat4.product(matPlaneTran, matPlaneRot, planeMesh.localTransform);
-        planeMesh.geometry = new PlaneGeometry(width, height, 1, 1);
-        planeMesh.castShadow = true;
-        planeMesh.isStatic = true;
-        planeMesh.translation = position;
-        planeMesh.rotation = rotation;
-        planeMesh.autoUpdateTransform = true;
-        const planeMtl = new StandardPBRMaterial();
-        planeMtl.color = wallColor.copyTo();
-        planeMtl.metallic = metallic;// 0.05;
-        planeMtl.roughness = roughness;// 0.8;
-    
-        // test load texture
-        if(textureUrl !== undefined) {
-            planeMtl.colorMap = textureLoader.load(textureUrl, (texture: Texture)=>{
-                planeMtl.colorMapAmount = 1.0;
-            }) as Texture2D;
-        }
-    
-        planeMesh.materials.push(planeMtl);
-        scene.attachChild(planeMesh);
-
-        // physics plane
-        const planeShape = new CANNON.Plane();
-        // planeShape.worldNormal.set(0, 1, 0);
-        const planeBody = new RigidBody(planeMesh, physicsWorld, { mass:0, material: physicsMtl });
-        
-        // todo: set position, rotations
-        planeBody.setPosition(position);
-        // planeBody.setRotation(rotation);
-        planeBody.body.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-
-        planeMesh.behaviors.push(planeBody);
-        planeBody.body.addShape(planeShape);
-        physicsWorld.world.addBody(planeBody.body);
-    }
-
     function prepareGLTFLevel(gltfNode: Object3D) {
         gltfNode.isStatic = true;
         gltfNode.autoUpdateTransform = false;
@@ -336,11 +297,11 @@ window.onload = () => {
     }
 }
 
-function addTestDynamicObjects(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CANNON.Material, scene: Scene, addPlane: (name: string, width: number, height: number, position: vec3, rotation: quat, wallColor: vec4, metallic: number, roughness: number, scene: Scene, world: PhysicsWorld, physicsMtl: CANNON.Material, textureUrl?: string | undefined) => void, groundPhysicsMtl: CANNON.Material) {
+function addTestDynamicObjects(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CANNON.Material, scene: Scene, groundPhysicsMtl: CANNON.Material) {
     {
         const boxMesh = new Mesh();
         boxMesh.name = "box01";
-        boxMesh.category = 1;
+        boxMesh.category = ObjectCategory.THREATEN;
         boxMesh.geometry = new BoxGeometry(0.25, 0.25, 0.25);
         boxMesh.castShadow = true;
         boxMesh.isStatic = false;
@@ -372,7 +333,7 @@ function addTestDynamicObjects(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CAN
     // dynamic sphere small
     {
         const sphereMesh = new Mesh();
-        sphereMesh.category = 2;
+        sphereMesh.category = ObjectCategory.INTERACTIVE;
         sphereMesh.name = "sphere.Dynamic";
         // sphereMesh.localTransform.fromTranslation(new vec3([0, 0, 0.75]));
         sphereMesh.geometry = new SphereGeometry(0.2, 16, 8);
@@ -403,7 +364,7 @@ function addTestDynamicObjects(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CAN
     // dynamic sphere big
     {
         const sphereMesh = new Mesh();
-        sphereMesh.category = 3;
+        sphereMesh.category = ObjectCategory.LOCKED;
         sphereMesh.name = "sphere.Static";
         // sphereMesh.localTransform.fromTranslation(new vec3([-0.75, -1.2, 0]));
         sphereMesh.geometry = new SphereGeometry(0.4, 16, 8);
@@ -431,68 +392,4 @@ function addTestDynamicObjects(physicsWorld: PhysicsWorld, widgetPhysicsMtl: CAN
 
     // modified: load gltf level to load lights and static scene
     return;
-
-    // static cylinder
-    {
-        const cylinderMesh = new Mesh();
-        cylinderMesh.name = "cylinder01";
-        // cylinderMesh.localTransform.fromTranslation(new vec3([0.75, 0, 0]));
-        cylinderMesh.geometry = new CylinderGeometry(0.25, 0.5, 24);
-        cylinderMesh.castShadow = true;
-        cylinderMesh.isStatic = true;
-        cylinderMesh.autoUpdateTransform = true;
-        cylinderMesh.translation.setComponents(0.75, 0.5, 0);
-        const cylinderMtl = new StandardPBRMaterial();
-        cylinderMtl.color = new vec4([0.0, 1.0, 0.0, 1.0]);
-        cylinderMtl.emissive = new vec4([0.5, 0.5, 0.5, 1]);
-        cylinderMtl.metallic = 0.2;
-        cylinderMtl.roughness = 0.6;
-        cylinderMesh.materials.push(cylinderMtl);
-
-        /*
-        const cylinderAutoRot = new AutoRotateBehavior(cylinderMesh);
-        cylinderMesh.behaviors.push(cylinderAutoRot);
-        */
-        scene.attachChild(cylinderMesh);
-
-        // physics
-        const cylinderBody = new RigidBody(cylinderMesh, physicsWorld, { mass: 0, material: widgetPhysicsMtl });
-        physicsWorld.world.addBody(cylinderBody.body);
-        cylinderMesh.behaviors.push(cylinderBody);
-        cylinderBody.setPosition(cylinderMesh.translation);
-
-        const cylinderShape = new CANNON.Cylinder(0.25, 0.25, 0.5, 12);
-        cylinderBody.body.addShape(cylinderShape);
-    }
-
-    // ground plane
-    {
-        const planePosition = new vec3([0, 0, 0]);
-        const planeRotation = quat.fromEuler(0, 0, 0, "ZXY");
-
-        addPlane("floor", 40, 40, planePosition, planeRotation, new vec4([1.0, 1.0, 1.0, 1.0]), 0.5, 0.5, scene, physicsWorld, groundPhysicsMtl);
-    }
-
-    // add some lights and envprobes
-    {
-        const dirLight01 = new DirectionalLight();
-        dirLight01.isStatic = true;
-        dirLight01.autoUpdateTransform = false; // let the behaivor work
-        dirLight01.on = true;
-        dirLight01.color = new vec4([3, 3, 3, 1]);
-        dirLight01.radius = 5;
-        dirLight01.castShadow = true;
-        (dirLight01.shadow as DirectionalLightShadow).range = 15;
-        const dirLightLookAt = new LookatBehavior(dirLight01);
-        dirLight01.behaviors.push(dirLightLookAt);
-        dirLightLookAt.position = new vec3([5, 5, 5]);
-        dirLightLookAt.target = new vec3([0, 0, 0]);
-        dirLightLookAt.up = new vec3([0, 1, 0]);
-
-        scene.attachChild(dirLight01);
-
-        // test environment probes
-        SceneHelper.addEnvProbe("envProbe01", 20, new vec3([0, 1, 0]), scene, EnvironmentProbeType.Reflection);
-        SceneHelper.addEnvProbe("irrProbe01", 20, new vec3([0, 1, 0]), scene, EnvironmentProbeType.Irradiance);
-    }
 }
