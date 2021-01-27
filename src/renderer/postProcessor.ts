@@ -940,7 +940,7 @@ export class PostProcessor {
         gl.uniform2f(this._silhouetteProgram.getUniformLocation("u_unitOffset"), this.silhouette.width * texelW, this.silhouette.width * texelH);
         gl.uniform4fv(this._silhouetteProgram.getUniformLocation("u_silhouetteColors"), this.silhouette._silhouetteColors);
         gl.uniform1i(this._silhouetteProgram.getUniformLocation("u_selectMode"), this.silhouette.selectMode);
-        gl.uniform1f(this._silhouetteProgram.getUniformLocation("u_categoryRef"), this.silhouette.categoryRef);
+        gl.uniform1f(this._silhouetteProgram.getUniformLocation("u_tagRef"), this.silhouette.tagRef);
         gl.uniform2f(this._silhouetteProgram.getUniformLocation("u_positionRef"), this.silhouette.cursor.x * texelW, this.silhouette.cursor.y * texelH);
         // gl.uniform1f(this._silhouetteProgram.getUniformLocation("u_maxDistance"), this.silhouette.maxDistance);
 

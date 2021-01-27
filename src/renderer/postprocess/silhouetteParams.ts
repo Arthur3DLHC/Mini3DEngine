@@ -16,7 +16,7 @@ export class SilhouetteParams {
     public enable: boolean = false;
     // public silhouetteColors: vec4[] = [];
     public selectMode: SilhouetteSelectMode = SilhouetteSelectMode.ByCategory;
-    public categoryRef: number = -1;
+    public tagRef: number = -1;
     public cursor: vec2 = new vec2([0.5, 0.5]);
     public width: number = 1;
     // public maxDistance: number = 100;

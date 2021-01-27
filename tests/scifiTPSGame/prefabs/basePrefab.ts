@@ -22,6 +22,7 @@ export abstract class BasePrefab {
 
     /** category of the gameobject */
     public category: number = -1;
+    protected static curId: number = 1;
 
     /**
      * build characer model object from gltf asset then add to scene
@@ -55,6 +56,10 @@ export abstract class BasePrefab {
 
         this.scene.attachChild(gltfSceneFemale);
         this.prepareGLTFCharacter(gltfSceneFemale);
+
+        // the precision of 16 bit float buffer can not tell difference between 4005 and 4006 :(
+        BasePrefab.curId += 2;
+
         return { gltfSceneFemale, animations };
     }
 
@@ -64,6 +69,7 @@ export abstract class BasePrefab {
         gltfNode.autoUpdateTransform = true;
         // set category for all nodes
         gltfNode.category = this.category;
+        gltfNode.id = BasePrefab.curId;
         
         if (gltfNode instanceof Mesh) {
             gltfNode.castShadow = true;

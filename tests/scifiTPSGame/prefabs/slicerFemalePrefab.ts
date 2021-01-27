@@ -68,7 +68,7 @@ export class SlicerFemalePrefab extends BasePrefab {
         slicerBehavior.meleeAttackRange = 1.2;
         slicerBehavior.senseHalfFOV = Math.PI * 0.5;
 
-        slicerBehavior.jumpHorizSpeed = 2;
+        slicerBehavior.jumpHorizSpeed = 5;
         slicerBehavior.jumpVertiSpeed = 5;
         slicerBehavior.strafeSpeed = 2;
 

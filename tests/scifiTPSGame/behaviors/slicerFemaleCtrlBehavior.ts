@@ -1,3 +1,4 @@
+import quat from "../../../lib/tsm/quat.js";
 import vec2 from "../../../lib/tsm/vec2.js";
 import vec3 from "../../../lib/tsm/vec3.js";
 import { ActionControlBehavior } from "../../../src/animation/actionControlBehavior.js";
@@ -116,9 +117,14 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
                 // slicer moves and turns faster than infected female
                 this.turnToFaceDestination();
 
+                let forward = 1;
+                if (vec3.dot(this._facingDir, this._playerDir) < 0) {
+                    forward = -1;
+                }
+
                 // move toward cur facing dir
-                this._veloctity.x = this._facingDir.x * this.moveSpeed;
-                this._veloctity.z = this._facingDir.z * this.moveSpeed;
+                this._veloctity.x = forward * this._facingDir.x * this.moveSpeed;
+                this._veloctity.z = forward * this._facingDir.z * this.moveSpeed;
 
                 // attack or dodge
                 // attack (front, back, jump)
@@ -345,7 +351,7 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
     
     private playerInJumpAttackRange(): boolean {
         // distance
-        if (this._distToPlayer > 1.5 && this._distToPlayer < 4) {
+        if (this._distToPlayer > 5 && this._distToPlayer < 6) {
             // angle (about 5 deg half angle?)
             if (this.inView(this._playerDir, 0.1)) {
                 return true;
@@ -422,5 +428,22 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
             }
         }
         return false;
+    }
+
+    protected turnToFaceDestination() {
+        // rotate facing dir
+        this._playerDir.copyTo(MonsterCtrlBehavior._tmpDir);
+
+        // facing use face or ass
+        if (vec3.dot(this._playerDir, this._facingDir) < 0) {
+            MonsterCtrlBehavior._tmpDir.negate();
+        }
+
+        MonsterCtrlBehavior._tmpDir.scale(this.turnSpeed * Clock.instance.elapsedTime);
+        this._facingDir.add(MonsterCtrlBehavior._tmpDir);
+        this._facingDir.normalize();
+
+        // set rotation of owner
+        quat.fromLookRotation(this._facingDir, MonsterCtrlBehavior._upDir, this.owner.rotation);
     }
 }
