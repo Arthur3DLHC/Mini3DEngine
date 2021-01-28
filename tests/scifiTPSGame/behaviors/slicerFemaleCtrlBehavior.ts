@@ -147,7 +147,7 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
             case SlicerFemaleState.StrafingLeft:
                 // velocity
                 // need to calc left side dir
-                if (this._recoverTimeLeft > 0.2) {
+                if (this._recoverTimeLeft > 0.3) {
                     this._veloctity.x = this._facingDir.z * this.strafeSpeed;
                     this._veloctity.z = -this._facingDir.x * this.strafeSpeed;
                 } else {
@@ -165,9 +165,13 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
             case SlicerFemaleState.StrafingRight:
                 // velocity
                 // need to calc left side dir
-                this._veloctity.x = -this._facingDir.z * this.strafeSpeed;
-                this._veloctity.z = this._facingDir.x * this.strafeSpeed;
-
+                if (this._recoverTimeLeft > 0.3) {
+                    this._veloctity.x = -this._facingDir.z * this.strafeSpeed;
+                    this._veloctity.z = this._facingDir.x * this.strafeSpeed;
+                } else {
+                    this._veloctity.x = 0;
+                    this._veloctity.z = 0;
+                }
                 // count down
                 this._recoverTimeLeft -= Clock.instance.elapsedTime;
                 if (this._recoverTimeLeft < 0) {
@@ -285,7 +289,7 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
             this._curState = SlicerFemaleState.StrafingRight;
         }
         this._caution = true;
-        this._recoverTimeLeft = 0.7;
+        this._recoverTimeLeft = 0.8;
         this._actionCtrl.actionParams.set("curAction", this._curState);
     }
 
