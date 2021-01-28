@@ -262,6 +262,9 @@ window.onload = () => {
             Clock.instance.update(now);
             physicsWorld.step();
 
+            // fix me: handle last frame picking queries before or after scene update?
+            renderer.objectTagRenderer.processQueries();
+
             scene.update();
 
             renderer.render(scene);

@@ -883,6 +883,9 @@ export class ClusteredForwardRenderer {
         // gl.scissor(0, 0, GLDevice.canvas.width, GLDevice.canvas.height);
         // this.renderScreenRect(0, 0, 1, 1, new vec4([1,1,1,1]), this._sceneColorTexture, 1, 0, 0, false);
 
+        // object tag?
+        this._objectTagRenderer.renderIfNeeded(this._renderContext, this._sceneNormalTexture, this._sceneDepthTexture, this.numReservedTextures);
+
         this._postprocessor.processFinal(this.numReservedTextures);
 
         this._debugRenderer.render(this.numReservedTextures, null);
