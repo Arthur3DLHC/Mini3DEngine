@@ -36,9 +36,15 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
         super.onMouseDown(ev);
 
         if (ev.button === 0) {
-            if (!this._isShooting) {
-                this.nextShootTime = Clock.instance.curTime;
-                this._isShooting = true;
+            if (this.isAiming) {
+                if (!this._isShooting) {
+                    this.nextShootTime = Clock.instance.curTime;
+                    this._isShooting = true;
+                }
+            } else {
+                // pick items or interacte with objects
+                // start a query on objectTagRenderer?
+                // what about continu
             }
         }
     }
@@ -115,6 +121,9 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
         // how to iterate all monster gameobjects in scene?
         if (this._isShooting && this.isAiming) {
             if (this.nextShootTime <= Clock.instance.curTime) {
+
+                // TODO: query by objectTagRenderer
+
                 const monsterPosition: vec3 = new vec3();
                 const myPosition: vec3 = this.owner.worldTransform.getTranslation();
                 

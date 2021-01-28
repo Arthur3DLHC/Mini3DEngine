@@ -10,6 +10,7 @@ import { SciFiGameObjCreator } from "./scifiGameObjCreator.js";
 import { PlayerPrefab } from "./prefabs/playerPrefab.js";
 import { InfectedFemalePrefab } from "./prefabs/infectedFemalePrefab.js";
 import { ObjectCategory } from "./objectCategory.js";
+import { GameWorld } from "./gameWorld.js";
 
 window.onload = () => {
     const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
@@ -94,6 +95,8 @@ window.onload = () => {
     renderer.postprocessor.silhouette.setSilhouetteColor(ObjectCategory.LOCKED, new vec4([1, 1, 0, 1]));
     renderer.postprocessor.silhouette.setSilhouetteColor(ObjectCategory.ENEMIES, new vec4([1, 0, 0, 1]));
     // renderer.postprocessor.silhouette.setSilhouetteColor(ObjectCategory.ENEMIES, new vec4([0, 0, 0, 0])); // no silhouette but pickable
+
+    GameWorld.objectTagRenderer = renderer.objectTagRenderer;
 
     const scene = new Scene();
     const camera = new PerspectiveCamera();

@@ -52,6 +52,7 @@ export * from "./renderer/postprocess/ssr2Params.js";
 export * from "./renderer/boundingRenderModes.js";
 export * from "./renderer/clusteredForwardRenderer.js";
 export * from "./renderer/debugRenderer.js";
+export * from "./renderer/objectTagRenderer.js";
 export * from "./renderer/postProcessor.js";
 export * from "./renderer/renderItem.js";
 export * from "./renderer/renderList.js";
