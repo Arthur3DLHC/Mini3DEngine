@@ -317,7 +317,7 @@ export class SlicerFemalePrefab extends BasePrefab {
                                 "typeStr": "single",
                                 "name": "strafeLeft",
                                 "animation": "Female.Strafe.Left",
-                                "animLoopMode": 0,
+                                "animLoopMode": 1,
                                 "transitions": [
                                     {
                                         "target": "idle",
@@ -370,7 +370,7 @@ export class SlicerFemalePrefab extends BasePrefab {
                                 "typeStr": "single",
                                 "name": "strafeRight",
                                 "animation": "Female.Strafe.Right",
-                                "animLoopMode": 0,
+                                "animLoopMode": 1,
                                 "transitions": [
                                     {
                                         "target": "idle",

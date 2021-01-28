@@ -47,7 +47,7 @@ export class ObjectPickQuery {
  * this class is for pixel level picking
  * use GPU to do pixel level picking, instead of doing intersection detecting by javascript 
  */
-export class ObjectIDRenderer {
+export class ObjectTagRenderer {
     // query pick?
     // every pick can register an event hanlder?
     public constructor() {
@@ -69,21 +69,21 @@ export class ObjectIDRenderer {
 
         // if want to use a integer texture, need to use RED_INTEGER fromat
         this._objectTagTexture = new Texture2D(width, height, 1, 1, gl.RED_INTEGER, gl.INT, false);
-        this._normalTexture = new Texture2D(width, height, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, false);
-        this._depthTexture = new Texture2D(width, height, 1, 1, gl.RED, gl.FLOAT, false);
+        this._copiedNormalTexture = new Texture2D(width, height, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, false);
+        this._viewLinearDepthTexture = new Texture2D(width, height, 1, 1, gl.RED, gl.FLOAT, false);
 
         this._objectTagTexture.samplerState = sampler;
-        this._normalTexture.samplerState = sampler;
-        this._depthTexture.samplerState = sampler;
+        this._copiedNormalTexture.samplerState = sampler;
+        this._viewLinearDepthTexture.samplerState = sampler;
 
         this._objectTagTexture.create();
-        this._normalTexture.create();
-        this._depthTexture.create();
+        this._copiedNormalTexture.create();
+        this._viewLinearDepthTexture.create();
 
         this._pickingFBO = new FrameBuffer();
         this._pickingFBO.attachTexture(0, this._objectTagTexture);
-        this._pickingFBO.attachTexture(1, this._normalTexture);
-        this._pickingFBO.attachTexture(2, this._depthTexture);
+        this._pickingFBO.attachTexture(1, this._copiedNormalTexture);
+        this._pickingFBO.attachTexture(2, this._viewLinearDepthTexture);
         this._pickingFBO.prepare();
 
         this._pickingReadRects = [];
@@ -127,11 +127,11 @@ export class ObjectIDRenderer {
     private _curSumRectSize: vec2 = new vec2();
 
     /** RGBA8 encoded normal */
-    private _normalTexture: Texture2D;
+    private _copiedNormalTexture: Texture2D;
     /** R32I object tag */
     private _objectTagTexture: Texture2D;
     /** F32 view space linear depth */
-    private _depthTexture: Texture2D;
+    private _viewLinearDepthTexture: Texture2D;
 
     private _pickingFBO: FrameBuffer;
 

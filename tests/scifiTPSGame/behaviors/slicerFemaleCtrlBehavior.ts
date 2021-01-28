@@ -147,8 +147,13 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
             case SlicerFemaleState.StrafingLeft:
                 // velocity
                 // need to calc left side dir
-                this._veloctity.x = this._facingDir.z * this.strafeSpeed;
-                this._veloctity.z = -this._facingDir.x * this.strafeSpeed;
+                if (this._recoverTimeLeft > 0.2) {
+                    this._veloctity.x = this._facingDir.z * this.strafeSpeed;
+                    this._veloctity.z = -this._facingDir.x * this.strafeSpeed;
+                } else {
+                    this._veloctity.x = 0;
+                    this._veloctity.z = 0;
+                }
 
                 // count down
                 this._recoverTimeLeft -= Clock.instance.elapsedTime;
@@ -280,7 +285,7 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
             this._curState = SlicerFemaleState.StrafingRight;
         }
         this._caution = true;
-        this._recoverTimeLeft = 0.5;
+        this._recoverTimeLeft = 0.7;
         this._actionCtrl.actionParams.set("curAction", this._curState);
     }
 
@@ -335,7 +340,14 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
             // if hp < 0, down after landing?
             this._curState = SlicerFemaleState.Attacked;
             this._actionCtrl.actionParams.set("curAction", SlicerFemaleState.Attacked * 100 + 1); // damage.heavy
-            // recover till landing
+            // recover till landing; no need to set recover time
+            // modify speed by shoot dir
+            this._playerDir.copyTo(MonsterCtrlBehavior._tmpDir);
+            MonsterCtrlBehavior._tmpDir.negate();
+            this._veloctity.x += MonsterCtrlBehavior._tmpDir.x * 3;
+            this._veloctity.y += MonsterCtrlBehavior._tmpDir.y * 3;
+            this._veloctity.z += MonsterCtrlBehavior._tmpDir.z * 3;
+
         } else {
             if (this.HP > 0) {
                 this._curState = SlicerFemaleState.Attacked;
