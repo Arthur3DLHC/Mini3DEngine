@@ -35,25 +35,28 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
         super(owner, body, actionCtrl, scene);
 
         body.body.addEventListener("collide", (ev: any) => {
-            const contact: CANNON.ContactEquation = ev.contact;
-            // todo: check contact normal dir, set canJump flag
-            // fix me: what if the monster fall down from an edge?
 
-            // contact.bi and contact.bj are the colliding bodies, and contact.ni is the collision normal.
-            // We do not yet know which one is which! Let's check.
-            if (contact.bi.id === body.body.id) {       // bi is the monster body, flip the contact normal
-                contact.ni.negate(this._contactNormal);
-            } else {
-                this._contactNormal.copy(contact.ni);   // bi is something else. Keep the normal as it is
-            }
-
-            // assuming the up vector is always [0, 1, 0]
-            if (this._contactNormal.y > 0.5) {
-                // maybe jumping or attacked state on air
-                // change to Idle state?
-                this.rest();
-                this._onAir = false;
-                //this._canJump = true;
+            if (this._onAir) {
+                const contact: CANNON.ContactEquation = ev.contact;
+                // todo: check contact normal dir, set canJump flag
+                // fix me: what if the monster fall down from an edge?
+    
+                // contact.bi and contact.bj are the colliding bodies, and contact.ni is the collision normal.
+                // We do not yet know which one is which! Let's check.
+                if (contact.bi.id === body.body.id) {       // bi is the monster body, flip the contact normal
+                    contact.ni.negate(this._contactNormal);
+                } else {
+                    this._contactNormal.copy(contact.ni);   // bi is something else. Keep the normal as it is
+                }
+    
+                // assuming the up vector is always [0, 1, 0]
+                if (this._contactNormal.y > 0.5) {
+                    // maybe jumping or attacked state on air
+                    // change to Idle state?
+                    this.rest();
+                    this._onAir = false;
+                    //this._canJump = true;
+                }
             }
         });
     }

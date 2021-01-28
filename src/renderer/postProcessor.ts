@@ -934,14 +934,16 @@ export class PostProcessor {
         // gl.uniform1i(this._silhouetteProgram.getUniformLocation("s_sceneNormal"), this._sceneNormalTexUnit);
 
         // calculate pixel size
-        const texelW = 1.0 / this._sceneNormalTexture.width;
-        const texelH = 1.0 / this._sceneNormalTexture.height;
+        const w = this._sceneNormalTexture.width;
+        const h = this._sceneNormalTexture.height;
+        const texelW = 1.0 / w;
+        const texelH = 1.0 / h;
 
         gl.uniform2f(this._silhouetteProgram.getUniformLocation("u_unitOffset"), this.silhouette.width * texelW, this.silhouette.width * texelH);
         gl.uniform4fv(this._silhouetteProgram.getUniformLocation("u_silhouetteColors"), this.silhouette._silhouetteColors);
         gl.uniform1i(this._silhouetteProgram.getUniformLocation("u_selectMode"), this.silhouette.selectMode);
         gl.uniform1f(this._silhouetteProgram.getUniformLocation("u_tagRef"), this.silhouette.tagRef);
-        gl.uniform2f(this._silhouetteProgram.getUniformLocation("u_positionRef"), this.silhouette.cursor.x * texelW, this.silhouette.cursor.y * texelH);
+        gl.uniform2f(this._silhouetteProgram.getUniformLocation("u_positionRef"), this.silhouette.cursor.x / w, this.silhouette.cursor.y / h);
         // gl.uniform1f(this._silhouetteProgram.getUniformLocation("u_maxDistance"), this.silhouette.maxDistance);
 
         this._rectGeom.draw(0, Infinity, this._silhouetteProgram.attributes);

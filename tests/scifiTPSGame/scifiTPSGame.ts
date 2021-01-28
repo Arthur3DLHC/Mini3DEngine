@@ -35,11 +35,10 @@ window.onload = () => {
         alert("Your browser doesn\'t seem to support Pointer Lock API");
     }
 
-    // todo: keep crosshair at center of canvas
-    // todo: show / hide crosshair?
     const crosshair = document.getElementById("crosshair") as HTMLDivElement;
-    crosshair.style.left = String((canvas.width - 4) / 2) + "px";
-    crosshair.style.top = String((canvas.height - 4) / 2) + "px"; 
+    // '8' is HTML body default margin...
+    crosshair.style.left = String(8 + (canvas.width - 4) / 2) + "px";
+    crosshair.style.top = String(8 + (canvas.height - 4) / 2) + "px"; 
 
     let tpsBehavior: TPSPlayerBehavior | undefined = undefined;
 

@@ -607,13 +607,24 @@ export class SlicerFemalePrefab extends BasePrefab {
                                 "transitions": [
                                     {
                                         "target": "idle",
-                                        "duration": 0.5,
                                         "conditions": [
                                             {
                                                 "typeStr": "singleParam",
                                                 "paramName": "curAction",
                                                 "compareOp": "===",
                                                 "compareValue": 0
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "target": "moveForward",
+                                        "duration": 0.5,
+                                        "conditions": [
+                                            {
+                                                "typeStr": "singleParam",
+                                                "paramName": "curAction",
+                                                "compareOp": "===",
+                                                "compareValue": 1
                                             }
                                         ]
                                     },
