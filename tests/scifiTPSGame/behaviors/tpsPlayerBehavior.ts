@@ -1,5 +1,5 @@
 import vec3 from "../../../lib/tsm/vec3.js";
-import { ActionControlBehavior, AnimationLayer, Camera, Clock, Object3D, RigidBody } from "../../../src/mini3DEngine.js";
+import { ActionControlBehavior, AnimationLayer, Camera, Clock, GameObjectCreator, GLDevice, Object3D, ObjectPickQuery, ObjectPickResult, RigidBody } from "../../../src/mini3DEngine.js";
 import { ThirdPersonCtrlBehavior } from "../../common/behaviors/thirdPersonCtrlBehavior.js";
 import { GameWorld } from "../gameWorld.js";
 import { DamageInfo } from "./damageInfo.js";
@@ -17,12 +17,14 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
         super(owner, body, camera);
         this._actionCtrl = actionCtrl;
         this._isShooting = false;
+        this._isPicking = false;
 
         this._upperBodyLayer = undefined;
     }
 
     private _actionCtrl: ActionControlBehavior;
     private _isShooting: boolean;
+    private _isPicking: boolean;
     private _upperBodyLayer: AnimationLayer | undefined;
     
     public nextShootTime: number = 0;
@@ -42,9 +44,9 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
                     this._isShooting = true;
                 }
             } else {
-                // pick items or interacte with objects
-                // start a query on objectTagRenderer?
-                // what about continu
+                // can not add query here, because they will be processed in the begining of the game loop then cleared
+                // must add them in update function
+                this._isPicking = true;
             }
         }
     }
@@ -157,6 +159,19 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
                 }
                 this.nextShootTime = Clock.instance.curTime + this.shootInterval;
             }
+        }
+
+        if (this._isPicking) {
+            if (GameWorld.objectTagRenderer !== null) {
+                const pickQuery = new ObjectPickQuery(GLDevice.canvas.width / 2 - 1, GLDevice.canvas.height / 2 - 1, 1, 1,
+                    (results: Map<number, ObjectPickResult>) => {
+                        for (const result of results) {
+                            console.log("pick tag:" + String(result[0]));
+                        }
+                    });
+                GameWorld.objectTagRenderer.queryPick(pickQuery);
+            }
+            this._isPicking = false;
         }
 
         // upperbody animaiton layer

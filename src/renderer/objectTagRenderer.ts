@@ -60,7 +60,7 @@ export class ObjectTagRenderer {
             throw new Error("picking RT zero size");
         }
 
-        this._tagPixels = new Uint32Array(width * height);
+        this._tagPixels = new Int32Array(width * height);
         this._normalPixels = new Uint8Array(width * height * 4);
         this._depthPixels = new Float32Array(width * height);
 
@@ -136,7 +136,7 @@ export class ObjectTagRenderer {
     private _pickingFBO: FrameBuffer;
 
     private _normalPixels: Uint8Array;
-    private _tagPixels: Uint32Array;
+    private _tagPixels: Int32Array;
     private _depthPixels: Float32Array;
 
     private _pickingReadRects: PixelReadingRect[];
@@ -179,10 +179,10 @@ export class ObjectTagRenderer {
 
                 // use a set to store tags in the rect
                 // if have some tag in rect, 
-                const l = query.x / 2 - this._curSumRectXY.x;
-                const t = query.y / 2 - this._curSumRectXY.y;
-                const width = query.width / 2;
-                const height = query.height / 2;
+                const l = Math.floor(query.x / 2 - this._curSumRectXY.x);
+                const t = Math.floor(query.y / 2 - this._curSumRectXY.y);
+                const width = Math.max(1, Math.floor(query.width / 2));
+                const height = Math.max(1, Math.floor(query.height / 2));
 
                 for (let y = t; y < t + height; y++) {
                     const lineStart = y * width;
@@ -281,11 +281,11 @@ export class ObjectTagRenderer {
 
                 // calculate viewport?
                 // need to half the size?
-                this._curSumRectXY.x = x0 / 2;
-                this._curSumRectXY.y = y0 / 2;
+                this._curSumRectXY.x = Math.floor(x0 / 2);
+                this._curSumRectXY.y = Math.floor(y0 / 2);
 
-                this._curSumRectSize.x = w / 2;
-                this._curSumRectSize.y = h / 2;
+                this._curSumRectSize.x = Math.max(1, w / 2);
+                this._curSumRectSize.y = Math.max(1, h / 2);
 
                 // set render target
                 let oldRT = GLDevice.renderTarget;
@@ -311,11 +311,13 @@ export class ObjectTagRenderer {
                 
                 this._rectGeom.draw(0, Infinity, this._objectTagProgram.attributes);
 
-                // restore render target?
-                GLDevice.renderTarget = oldRT;
                 // restore textures
                 GLTextures.setTextureAt(sceneNormalTexUnit, null);
                 GLTextures.setTextureAt(sceneDepthTexUnit, null);
+
+                // restore render target?
+                GLDevice.renderTarget = oldRT;
+
             }
         }
     }
