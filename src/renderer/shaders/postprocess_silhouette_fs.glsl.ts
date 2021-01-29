@@ -4,7 +4,7 @@
 export default /** glsl */`
 #include <uniforms_view>
 #include <samplers_postprocess>
-// #include <function_depth>
+#include <function_depth>
 
 #define MAX_CATEGORY_COLORS      32
 
@@ -17,7 +17,7 @@ uniform int                     u_selectMode;       // 0 - outline around every 
 uniform float                   u_tagRef;
                                                     // when hover, output object feature to tag RT?
 uniform vec2                    u_positionRef;      // xy ranges [0, 1], normalized cursor position
-// uniform float                   u_maxDistance;      // max distance to display silhouette
+uniform float                   u_maxDistance;      // max distance to display silhouette
 
 in vec2                         ex_texcoord;
 layout(location = 0) out vec4   o_color;
@@ -52,10 +52,17 @@ void main(void) {
     // tag * 10000 + id?
 
     float tagRef = u_tagRef;
+    float dist = 0;
 
     if (u_selectMode == 2) {
         // tagRef = categoryFromTag(getSceneTag(u_positionRef));
         tagRef = getSceneTag(u_positionRef);
+        float depth = texture(s_sceneDepth, u_positionRef).r;
+        dist = abs(perspectiveDepthToViewZ(depth, u_view.zRange.x, u_view.zRange.y));
+    }
+
+    if (dist > u_maxDistance) {
+        discard;
     }
 
     if (tagRef < 0.0) {

@@ -944,7 +944,7 @@ export class PostProcessor {
         gl.uniform1i(this._silhouetteProgram.getUniformLocation("u_selectMode"), this.silhouette.selectMode);
         gl.uniform1f(this._silhouetteProgram.getUniformLocation("u_tagRef"), this.silhouette.tagRef);
         gl.uniform2f(this._silhouetteProgram.getUniformLocation("u_positionRef"), this.silhouette.cursor.x / w, this.silhouette.cursor.y / h);
-        // gl.uniform1f(this._silhouetteProgram.getUniformLocation("u_maxDistance"), this.silhouette.maxDistance);
+        gl.uniform1f(this._silhouetteProgram.getUniformLocation("u_maxDistance"), this.silhouette.maxDistance);
 
         this._rectGeom.draw(0, Infinity, this._silhouetteProgram.attributes);
 

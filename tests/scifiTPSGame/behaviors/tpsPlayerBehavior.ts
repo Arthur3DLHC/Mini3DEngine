@@ -124,8 +124,32 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
         if (this._isShooting && this.isAiming) {
             if (this.nextShootTime <= Clock.instance.curTime) {
 
-                // TODO: query by objectTagRenderer
+                this.nextShootTime = Clock.instance.curTime + this.shootInterval;
 
+                // query by objectTagRenderer
+                if (GameWorld.objectTagRenderer !== null) {
+                    const pickQuery = new ObjectPickQuery(GLDevice.canvas.width / 2 - 1, GLDevice.canvas.height / 2 - 1, 1, 1,
+                        (results: Map<number, ObjectPickResult>) => {
+                            for (const result of results) {
+                                console.log("shoot tag:" + String(result[0]));
+
+                                for (const monster of GameWorld.monsters) {
+                                    const obj = monster.owner;
+                                    if (obj.tag === result[0]) {
+                                        const damageInfo: DamageInfo = new DamageInfo(this.owner, 1);
+                                        if (result[1].depth < 2) {
+                                            damageInfo.blowUp = true;
+                                        } else {
+                                        }
+                                        monster.onAttacked(damageInfo);
+                                    }
+                                }
+                            }
+                        });
+                    GameWorld.objectTagRenderer.queryPick(pickQuery);
+                }
+
+                /*
                 const monsterPosition: vec3 = new vec3();
                 const myPosition: vec3 = this.owner.worldTransform.getTranslation();
                 
@@ -157,7 +181,7 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
                         }
                     }
                 }
-                this.nextShootTime = Clock.instance.curTime + this.shootInterval;
+                */
             }
         }
 
@@ -167,6 +191,8 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
                     (results: Map<number, ObjectPickResult>) => {
                         for (const result of results) {
                             console.log("pick tag:" + String(result[0]));
+
+                            // todo: only can pick objects within certain distance
                         }
                     });
                 GameWorld.objectTagRenderer.queryPick(pickQuery);

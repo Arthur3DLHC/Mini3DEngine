@@ -19,7 +19,7 @@ export class SilhouetteParams {
     public tagRef: number = -1;
     public cursor: vec2 = new vec2([0.5, 0.5]);
     public width: number = 1;
-    // public maxDistance: number = 100;
+    public maxDistance: number = 100;
 
     public static readonly maxSilhouetteColors = 32;
 
