@@ -16,7 +16,7 @@ void main(void) {
     vec4 normalAndTag = texture(s_sceneNormal, ex_texcoord);
     float fragDepth = texture(s_sceneDepth, ex_texcoord).r;
 
-    o_objTagID = int(normalAndTag.a);
+    o_objTagID = int(round(normalAndTag.a));
     o_normal = vec4(normalAndTag.rgb * 0.5 + vec3(0.5), 1.0);   // pack normal to RGB8
     o_linearDepth = perspectiveDepthToViewZ(fragDepth, u_view.zRange.x, u_view.zRange.y);
 

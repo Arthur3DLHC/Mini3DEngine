@@ -24,7 +24,7 @@ layout(location = 0) out vec4   o_color;
 
 int categoryFromTag(float tag) {
     if(tag < 0.0) return -1;
-    return int(tag) / 1000;
+    return int(tag) / 100;
 }
 
 float outlineAmount(vec2 uv, float tagRef) {
@@ -52,7 +52,7 @@ void main(void) {
     // tag * 10000 + id?
 
     float tagRef = u_tagRef;
-    float dist = 0;
+    float dist = 0.0;
 
     if (u_selectMode == 2) {
         // tagRef = categoryFromTag(getSceneTag(u_positionRef));

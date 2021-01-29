@@ -70,7 +70,7 @@ export class Object3D {
      * tag passed into shader. internal use only
      */
     public get tag(): number {
-        return this.category * 1000 + this.id;
+        return this.category * 100 + this.id;
     }
 
     /**
