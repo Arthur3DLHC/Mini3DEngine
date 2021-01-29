@@ -57,8 +57,7 @@ export abstract class BasePrefab {
         this.scene.attachChild(gltfSceneFemale);
         this.prepareGLTFCharacter(gltfSceneFemale);
 
-        // the precision of 16 bit float buffer can not tell difference between 4005 and 4006 :(
-        BasePrefab.curId += 2;
+        BasePrefab.curId += 1;
 
         return { gltfSceneFemale, animations };
     }

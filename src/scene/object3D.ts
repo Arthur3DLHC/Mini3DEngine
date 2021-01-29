@@ -70,6 +70,9 @@ export class Object3D {
      * tag passed into shader. internal use only
      */
     public get tag(): number {
+        // because will be stored in 16 bit float texture, and there are only 10 bit for fraction (6 for sign and exponent)
+        // so can not use too big number
+        // so, we can only have 10 categories and 100 ids per category
         return this.category * 100 + this.id;
     }
 

@@ -140,7 +140,8 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
                                     const obj = monster.owner;
                                     if (obj.tag === result[0]) {
                                         const damageInfo: DamageInfo = new DamageInfo(this.owner, 1);
-                                        if (resultValues.depth < 2) {
+                                        // depth is negative
+                                        if (-resultValues.depth < 2) {
                                             damageInfo.blowUp = true;
                                         } else {
                                         }

@@ -141,6 +141,7 @@ export class ClusteredForwardRenderer {
         // todo: handle size change
 
         // can not use RG16F to store the view space normal, because the normal z may be negative near the edge of the view
+        // consider use 16 bit integer buffer? because half float only have 10 fraction bits (1024)?
         this._sceneNormalTexture = new Texture2D(GLDevice.canvas.width, GLDevice.canvas.height, 1, 1, gl.RGBA, gl.HALF_FLOAT);
         this._sceneNormalTexture.create();
 
