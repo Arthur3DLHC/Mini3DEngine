@@ -185,7 +185,6 @@ window.onload = () => {
             gltfAssets.set(characterModelKeys[i], loaded[0][i]);
         }
 
-
         if (addObjectsManually) {
             // test use prefabs to create character objects
             const playerPrefab: PlayerPrefab = new PlayerPrefab(gltfAssets, physicsWorld, scene, camera, textureLoader, playerPhysicsMtl);

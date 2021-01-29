@@ -131,17 +131,24 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
                     const pickQuery = new ObjectPickQuery(GLDevice.canvas.width / 2 - 1, GLDevice.canvas.height / 2 - 1, 1, 1,
                         (results: Map<number, ObjectPickResult>) => {
                             for (const result of results) {
-                                console.log("shoot tag:" + String(result[0]));
+                                const resultValues = result[1];
+                                console.log("shoot tag:" + String(result[0])
+                                 + " depth: " + String(resultValues.depth)
+                                 + " normal: " + String(resultValues.normal.x) + "," + String(resultValues.normal.y) + "," + String(resultValues.normal.z));
 
                                 for (const monster of GameWorld.monsters) {
                                     const obj = monster.owner;
                                     if (obj.tag === result[0]) {
                                         const damageInfo: DamageInfo = new DamageInfo(this.owner, 1);
-                                        if (result[1].depth < 2) {
+                                        if (resultValues.depth < 2) {
                                             damageInfo.blowUp = true;
                                         } else {
                                         }
                                         monster.onAttacked(damageInfo);
+
+                                        // todo: add blood and sparks particle system
+                                        // calculate world position from depth and view transform
+                                        // calculate world normal from view transform
                                     }
                                 }
                             }
@@ -190,9 +197,12 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
                 const pickQuery = new ObjectPickQuery(GLDevice.canvas.width / 2 - 1, GLDevice.canvas.height / 2 - 1, 1, 1,
                     (results: Map<number, ObjectPickResult>) => {
                         for (const result of results) {
-                            console.log("pick tag:" + String(result[0]));
+                            const resultValues = result[1];
+                            console.log("shoot tag:" + String(result[0])
+                                 + " depth: " + String(resultValues.depth)
+                                 + " normal: " + String(resultValues.normal.x) + "," + String(resultValues.normal.y) + "," + String(resultValues.normal.z));
 
-                            // todo: only can pick objects within certain distance
+                            // todo: pick logic
                         }
                     });
                 GameWorld.objectTagRenderer.queryPick(pickQuery);
