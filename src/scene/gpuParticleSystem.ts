@@ -18,6 +18,8 @@ export class GPUParticleSystem extends Object3D {
         // this._vertexBuffer = new VertexBuffer(GLDevice.gl.DYNAMIC_DRAW);
 
         // fix me: format?
+
+        // init data?
     }
 
     public destroy() {
@@ -30,12 +32,20 @@ export class GPUParticleSystem extends Object3D {
 
     public geometry: BufferGeometry | null = null;
 
+    /** read and write vertex buffer */
     private _vertexBuffers: VertexBuffer[] = [];
-    private _attributes: VertexBufferAttribute[] = [];
+    /** vertex attributes for read and write vertex buffers */
+    private _attributes: VertexBufferAttribute[][] = [];
 
     // todo: use VAOs?
 
     // fix me: how to present material and shader program?
+
+    // update shader program (default?)
+    // render shader program (default?)
+    // uniform buffer?
+
+    // textures?
 
     // todo: psys properties
 
@@ -43,4 +53,11 @@ export class GPUParticleSystem extends Object3D {
     // and also use buffer A as source when render;
     // this will prevent waiting for the transform feedback finished
     // after render, swap the buffer B as source buffer.
+    public update() {
+
+    }
+
+    public render() {
+        
+    }
 }
