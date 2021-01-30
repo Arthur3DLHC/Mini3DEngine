@@ -63,6 +63,9 @@ export class BufferGeometry {
         }
         GLGeometryBuffers.clearVertexAttributes();
 
+        // TODO: use VAO?
+        // use layout to bind the attribute location in shader
+
         // must enable all active attributes of shader?
         // GLGeometryBuffers.enableVertexAttributes(attribLocations);
 
