@@ -63,7 +63,7 @@ export class BufferGeometry {
         }
         GLGeometryBuffers.clearVertexAttributes();
 
-        // TODO: use VAO?
+        // TODO: use VAO? do not need to set VBO and attribptrs every time.
         // use layout to bind the attribute location in shader
 
         // must enable all active attributes of shader?
