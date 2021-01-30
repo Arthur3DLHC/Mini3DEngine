@@ -38,4 +38,9 @@ export class GPUParticleSystem extends Object3D {
     // fix me: how to present material and shader program?
 
     // todo: psys properties
+
+    // note: when update, use buffer A as source,
+    // and also use buffer A as source when render;
+    // this will prevent waiting for the transform feedback finished
+    // after render, swap the buffer B as source buffer.
 }
