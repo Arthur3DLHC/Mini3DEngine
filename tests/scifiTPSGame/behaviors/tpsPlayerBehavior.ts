@@ -204,6 +204,7 @@ export class TPSPlayerBehavior extends ThirdPersonCtrlBehavior {
                                  + " normal: " + String(resultValues.normal.x) + "," + String(resultValues.normal.y) + "," + String(resultValues.normal.z));
 
                             // todo: pick logic
+                            // interact with object (doors, locks, terminals...)
                         }
                     });
                 GameWorld.objectTagRenderer.queryPick(pickQuery);
