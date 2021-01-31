@@ -300,10 +300,10 @@ export class SlicerFemaleCtrlBehavoir extends MonsterCtrlBehavior {
         // attack toward current orientation
         // let player have chance to dodge
         this._caution = true;
-        this._recoverTimeLeft = 1.85;
+        this._recoverTimeLeft = 2.2;
         // let action = this._curState * 100;
         if (front) {
-            this._hitTimeLeft = 0.73;
+            this._hitTimeLeft = 1.1;
             this._curState = SlicerFemaleState.AttackingFront;
         } else {
             // action = this._curState * 100 + 1;
