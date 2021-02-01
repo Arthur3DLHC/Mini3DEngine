@@ -115,5 +115,6 @@ export * from "./WebGLResources/textures/textureAtlas3D.js";
 export * from "./WebGLResources/textures/textureCube.js";
 export * from "./WebGLResources/uniformBuffer.js";
 export * from "./WebGLResources/vertexBuffer.js";
+export * from "./WebGLResources/VertexBufferArray.js";
 export * from "./WebGLResources/vertexBufferAttribute.js";
 

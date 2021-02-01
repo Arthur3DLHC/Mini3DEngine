@@ -8,6 +8,7 @@ import { BoundingSphere } from "../math/boundingSphere.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { BoundingBox } from "../math/boundingBox.js";
 import { COMPONENT_BYTE_SIZES } from "../WebGLResources/componentSize.js";
+import { VertexBufferArray } from "../WebGLResources/VertexBufferArray.js";
 
 export class BufferGeometry {
     public constructor() {
@@ -19,6 +20,8 @@ export class BufferGeometry {
         this.boundingSphere = new BoundingSphere();
         this.boundingBox = new BoundingBox();
         this.inCache = false;
+
+        this._vertexBufferArray = null;
     }
 
     // vertex attributes
@@ -33,6 +36,8 @@ export class BufferGeometry {
 
     // primitives
     public primitives: Primitive[];
+
+    private _vertexBufferArray: VertexBufferArray | null;
 
     // todo: geometry type?
     public drawMode: GLenum;
@@ -52,6 +57,18 @@ export class BufferGeometry {
      */
     public inCache: boolean;
 
+    /**
+     * create vertex buffer array object to improve performance
+     */
+    public prepare() {
+        if (this._vertexBufferArray === null) {
+            this._vertexBufferArray = new VertexBufferArray();
+        }
+        // GLGeometryBuffers.bindVertexBufferArray(this._vertexBufferArray);
+        this._vertexBufferArray.prepare(this.attributes, this.indexBuffer);
+        // GLGeometryBuffers.bindVertexBufferArray(null);
+    }
+
     public draw(start: number, count: number, attribLocations: Map<string, number>, mode: GLenum|null = null) {
         // if (!this.vertexBuffer || !this.vertexBuffer.data || !this.vertexBuffer.glBuffer) {
         //     return;
@@ -61,39 +78,58 @@ export class BufferGeometry {
             console.warn("BufferGeometry.draw(): No vertex buffer or attributes found.");
             return;
         }
-        GLGeometryBuffers.clearVertexAttributes();
 
-        // TODO: use VAO? do not need to set VBO and attribptrs every time.
-        // use layout to bind the attribute location in shader
-
-        // must enable all active attributes of shader?
-        // GLGeometryBuffers.enableVertexAttributes(attribLocations);
-
-        // GLGeometryBuffers.bindVertexBuffer(this.vertexBuffer);
-        // 在 OpenGL 中只要将 VertexBufferObject 绑定到 Vertex attribute pointer 上，就可以直接用后者绘制了，不用再绑定 VBO
-        for (const attr of this.attributes) {
-            if (attr.buffer.data === null || attr.buffer.glBuffer === null) {
-                throw new Error("Vertex buffer is empty or not created");
+        if (this._vertexBufferArray !== null) {
+            GLGeometryBuffers.bindVertexBufferArray(this._vertexBufferArray);
+            if (this.indexBuffer && this.indexBuffer.indices && this.indexBuffer.glBuffer) {
+                const s = Math.max(0, start);
+                const c = Math.min(count, this.indexBuffer.count - s);
+                // drawElements 时需要用 byte 偏移, int16 = 2 bytes
+                const byteOffset = s * COMPONENT_BYTE_SIZES[this.indexBuffer.componentType];
+                GLDevice.gl.drawElements(mode?mode:this.drawMode, c, this.indexBuffer.componentType, byteOffset);
+            } else {
+                // draw array 时不用 byte 偏移
+                const s = Math.max(0, start);
+                const c = Math.min(count, this.vertexBuffers[0].vertexCount - s);
+                GLDevice.gl.drawArrays(mode?mode:this.drawMode, s, c);
             }
-            if (attribLocations.has(attr.name)) {
-                GLGeometryBuffers.bindVertexBuffer(attr.buffer);
-                GLGeometryBuffers.setVertexAttribute(attr, attribLocations);
-            }
-        }
-        GLGeometryBuffers.disableUnusedAttributes();
-
-        if (this.indexBuffer && this.indexBuffer.indices && this.indexBuffer.glBuffer) {
-            GLGeometryBuffers.bindIndexBuffer(this.indexBuffer);
-            const s = Math.max(0, start);
-            const c = Math.min(count, this.indexBuffer.count - s);
-            // drawElements 时需要用 byte 偏移, int16 = 2 bytes
-            const byteOffset = s * COMPONENT_BYTE_SIZES[this.indexBuffer.componentType];
-            GLDevice.gl.drawElements(mode?mode:this.drawMode, c, this.indexBuffer.componentType, byteOffset);
         } else {
-            // draw array 时不用 byte 偏移
-            const s = Math.max(0, start);
-            const c = Math.min(count, this.vertexBuffers[0].vertexCount - s);
-            GLDevice.gl.drawArrays(mode?mode:this.drawMode, s, c);
+            // use default VAO
+            GLGeometryBuffers.bindVertexBufferArray(null);
+            GLGeometryBuffers.clearVertexAttributes();
+
+            // TODO: use VAO? do not need to set VBO and attribptrs every time.
+            // use layout to bind the attribute location in shader
+    
+            // must enable all active attributes of shader?
+            // GLGeometryBuffers.enableVertexAttributes(attribLocations);
+    
+            // GLGeometryBuffers.bindVertexBuffer(this.vertexBuffer);
+            // 在 OpenGL 中只要将 VertexBufferObject 绑定到 Vertex attribute pointer 上，就可以直接用后者绘制了，不用再绑定 VBO
+            for (const attr of this.attributes) {
+                if (attr.buffer.data === null || attr.buffer.glBuffer === null) {
+                    throw new Error("Vertex buffer is empty or not created");
+                }
+                if (attribLocations.has(attr.name)) {
+                    GLGeometryBuffers.bindVertexBuffer(attr.buffer);
+                    GLGeometryBuffers.setVertexAttribute(attr, attribLocations);
+                }
+            }
+            GLGeometryBuffers.disableUnusedAttributes();
+    
+            if (this.indexBuffer && this.indexBuffer.indices && this.indexBuffer.glBuffer) {
+                GLGeometryBuffers.bindIndexBuffer(this.indexBuffer);
+                const s = Math.max(0, start);
+                const c = Math.min(count, this.indexBuffer.count - s);
+                // drawElements 时需要用 byte 偏移, int16 = 2 bytes
+                const byteOffset = s * COMPONENT_BYTE_SIZES[this.indexBuffer.componentType];
+                GLDevice.gl.drawElements(mode?mode:this.drawMode, c, this.indexBuffer.componentType, byteOffset);
+            } else {
+                // draw array 时不用 byte 偏移
+                const s = Math.max(0, start);
+                const c = Math.min(count, this.vertexBuffers[0].vertexCount - s);
+                GLDevice.gl.drawArrays(mode?mode:this.drawMode, s, c);
+            }
         }
     }
 
@@ -149,6 +185,10 @@ export class BufferGeometry {
     }
 
     public destroy() {
+        if (this._vertexBufferArray !== null) {
+            this._vertexBufferArray.release();
+            this._vertexBufferArray = null;
+        }
         for (const vertexBuffer of this.vertexBuffers) {
             if (vertexBuffer) {
                 vertexBuffer.release();

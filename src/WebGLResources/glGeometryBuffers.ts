@@ -2,10 +2,12 @@ import { VertexBuffer } from "./vertexBuffer.js";
 import { IndexBuffer } from "./indexBuffer.js";
 import { GLDevice } from "./glDevice.js";
 import { VertexBufferAttribute } from "./vertexBufferAttribute.js";
+import { VertexBufferArray } from "./VertexBufferArray.js";
 
 export class GLGeometryBuffers {
     private static _vertexBuffer: VertexBuffer | null = null;
     private static _indexBuffer: IndexBuffer | null = null;
+    private static _vertexBufferArray: VertexBufferArray | null = null;
     // learned form three.js
     private static _enabledAttributes: Uint8Array;
     private static _newAttributes: Uint8Array;
@@ -89,6 +91,17 @@ export class GLGeometryBuffers {
             if(this._enabledAttributes[i] !== this._newAttributes[i]) {
                 GLDevice.gl.disableVertexAttribArray(i);
                 this._enabledAttributes[i] = 0;
+            }
+        }
+    }
+
+    public static bindVertexBufferArray(vertexBufferArray: VertexBufferArray | null) {
+        if (this._vertexBufferArray !== vertexBufferArray) {
+            this._vertexBufferArray = vertexBufferArray;
+            if (this._vertexBufferArray !== null) {
+                GLDevice.gl.bindVertexArray(this._vertexBufferArray.glArray);
+            } else {
+                GLDevice.gl.bindVertexArray(null);
             }
         }
     }

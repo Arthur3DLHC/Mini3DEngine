@@ -1,4 +1,6 @@
 import { GLDevice } from "./glDevice.js";
+import { GLGeometryBuffers } from "./glGeometryBuffers.js";
+import { IndexBuffer } from "./indexBuffer.js";
 import { VertexBufferAttribute } from "./vertexBufferAttribute.js";
 
 /**
@@ -11,7 +13,7 @@ export class VertexBufferArray {
     private attributes: VertexBufferAttribute[] = [];
 
     // prepare
-    public prepare(attributes: VertexBufferAttribute[]) {
+    public prepare(attributes: VertexBufferAttribute[], indexBuffer: IndexBuffer | null) {
         // check
         if (attributes.length === 0) {
             throw new Error("vertex attributes is empty");
@@ -24,14 +26,22 @@ export class VertexBufferArray {
 
         this.attributes = attributes;
 
-        // todo: bind vertex buffers and attribute pointers?
-        gl.bindVertexArray(this.glArray);
+        // gl.bindVertexArray(this.glArray);
+        GLGeometryBuffers.bindVertexBufferArray(this);
 
         for (const attr of attributes) {
-            
+            gl.bindBuffer(gl.ARRAY_BUFFER, attr.buffer.glBuffer);
+            gl.enableVertexAttribArray(attr.location);
+            gl.vertexAttribPointer(attr.location, attr.size, attr.componentType, false, attr.buffer.stride, attr.offset);
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
         }
 
-        gl.bindVertexArray(null);
+        if (indexBuffer !== null) {
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.glBuffer);
+        }
+
+        GLGeometryBuffers.bindVertexBufferArray(null);
+        // gl.bindVertexArray(null);
     }
 
     public release() {
