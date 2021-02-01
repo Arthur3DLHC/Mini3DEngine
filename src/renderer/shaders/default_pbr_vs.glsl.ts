@@ -4,7 +4,7 @@
 export default /** glsl */`
 // todo: 在 js 中统一指定 version?
 // uniforms
-#include <uniforms_scene>
+// #include <uniforms_scene>
 #include <uniforms_view>
 #include <uniforms_object>
 
