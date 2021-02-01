@@ -3,7 +3,7 @@ import { VertexBuffer } from "../../WebGLResources/vertexBuffer.js";
 import { IndexBuffer } from "../../WebGLResources/indexBuffer.js";
 import { GLDevice } from "../../WebGLResources/glDevice.js";
 import { Primitive } from "../primitive.js";
-import { VertexBufferAttribute } from "../../WebGLResources/vertexBufferAttribute.js";
+import { DefaultAttributeLocations, VertexBufferAttribute } from "../../WebGLResources/vertexBufferAttribute.js";
 
 export class CylinderGeometry extends BufferGeometry {
     public constructor(radius: number, height: number, segments: number) {
@@ -93,9 +93,9 @@ export class CylinderGeometry extends BufferGeometry {
         this.indexBuffer.create();
 
         let curOffset = 0;
-        curOffset = this.addAttribute(VertexBufferAttribute.defaultNamePosition, vertexBuffer, 3, GLDevice.gl.FLOAT, curOffset);
-        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameNormal, vertexBuffer, 3, GLDevice.gl.FLOAT, curOffset);
-        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameTexcoord0, vertexBuffer, 2, GLDevice.gl.FLOAT, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNamePosition, DefaultAttributeLocations[VertexBufferAttribute.defaultNamePosition], vertexBuffer, 3, GLDevice.gl.FLOAT, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameNormal, DefaultAttributeLocations[VertexBufferAttribute.defaultNameNormal], vertexBuffer, 3, GLDevice.gl.FLOAT, curOffset);
+        curOffset = this.addAttribute(VertexBufferAttribute.defaultNameTexcoord0, DefaultAttributeLocations[VertexBufferAttribute.defaultNameTexcoord0], vertexBuffer, 2, GLDevice.gl.FLOAT, curOffset);
 
         const grp = new Primitive();
         this.primitives.push(grp);

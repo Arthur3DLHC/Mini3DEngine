@@ -3,7 +3,7 @@ import { VertexBuffer } from "../../WebGLResources/vertexBuffer.js";
 import { GLDevice } from "../../WebGLResources/glDevice.js";
 import { IndexBuffer } from "../../WebGLResources/indexBuffer.js";
 import vec3 from "../../../lib/tsm/vec3.js";
-import { VertexBufferAttribute } from "../../WebGLResources/vertexBufferAttribute.js";
+import { DefaultAttributeLocations, VertexBufferAttribute } from "../../WebGLResources/vertexBufferAttribute.js";
 import { Primitive } from "../primitive.js";
 import mat4 from "../../../lib/tsm/mat4.js";
 import vec4 from "../../../lib/tsm/vec4.js";
@@ -51,7 +51,7 @@ export class SphereWireframeGeometry extends BufferGeometry {
         this.indexBuffer.create();
 
         // vertex buffer attribute
-        this.addAttribute(VertexBufferAttribute.defaultNamePosition, vertexBuffer, 3, GLDevice.gl.FLOAT, 0);
+        this.addAttribute(VertexBufferAttribute.defaultNamePosition, DefaultAttributeLocations[VertexBufferAttribute.defaultNamePosition], vertexBuffer, 3, GLDevice.gl.FLOAT, 0);
 
         const grp = new Primitive();
         this.primitives.push(grp);

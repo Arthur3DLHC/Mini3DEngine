@@ -14,7 +14,7 @@ import { RenderStateCache } from "../WebGLResources/renderStateCache.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
-import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
+import { DefaultAttributeLocations, VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { IndexBuffer } from "../WebGLResources/indexBuffer.js";
 import { GeometryCache } from "../geometry/geometryCache.js";
@@ -902,7 +902,7 @@ export class GLTFSceneBuilder {
                             vertexBuffers.set(vbKey, vb);
                         }
 
-                        const vbAttr = new VertexBufferAttribute(attrname, vb, itemSize, accessor.componentType, byteOffset);
+                        const vbAttr = new VertexBufferAttribute(attrname, DefaultAttributeLocations[attrname], vb, itemSize, accessor.componentType, byteOffset);
                         vertexAttributes.push(vbAttr);
                     }
                 }

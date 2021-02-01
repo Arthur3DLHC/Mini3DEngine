@@ -10,8 +10,9 @@ export class VertexBufferAttribute {
      * @param componentType 
      * @param offset 
      */
-    public constructor(name: string, buffer: VertexBuffer, size: number, componentType: GLenum, offset: number, locationOffset?: number, divisor: number = 0) {
+    public constructor(name: string, location: number, buffer: VertexBuffer, size: number, componentType: GLenum, offset: number, locationOffset?: number, divisor: number = 0) {
         this.name = name;
+        this.location = location;
         this.buffer = buffer;
         this.size = size;
         this.componentType = componentType;
@@ -36,6 +37,9 @@ export class VertexBufferAttribute {
     public static readonly defaultNameInstMatrix = "a_instanceMatrix";
     public static readonly defaultNameInstColor = "a_instanceColor";
 
+    // todo: define attribute locations?
+    // map attriute names to location indices?
+
     // vertex buffer (shared? interleaved)
     public buffer: VertexBuffer;
     
@@ -44,6 +48,11 @@ export class VertexBufferAttribute {
      * attribute name, for look up in shader;
      */
     public name: string;
+
+    /**
+     * attribute location, corresponding of layout(location = x) in glsl shader
+     */
+    public location: number;
 
     /**
      * number components (floats) of this attribute
@@ -110,3 +119,16 @@ export class VertexBufferAttribute {
         }
     }
 }
+
+export const DefaultAttributeLocations: {[index: string] : number} = {
+    a_position: 0,
+    a_normal: 1,
+    a_tangent: 2,
+    a_texcoord0: 3,
+    a_texcoord1: 4,
+    a_joints0: 5,
+    a_weights0: 6,
+    a_color0: 7,
+    a_instanceMatrix: 8, // 9, 10, 11
+    a_instanceColor: 12
+};

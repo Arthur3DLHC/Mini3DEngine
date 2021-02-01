@@ -1,7 +1,7 @@
 import { Mesh } from "./mesh.js";
 import mat4 from "../../lib/tsm/mat4.js";
 import vec4 from "../../lib/tsm/vec4.js";
-import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
+import { DefaultAttributeLocations, VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { Object3D } from "./object3D.js";
@@ -29,14 +29,18 @@ export class InstancedMesh extends Mesh {
 
         // todo: create vertex attributes
         // mat4 a_instanceMatrix
-        this._attributes.push(new VertexBufferAttribute("a_instanceMatrix", this._vertexBuffer, 4, GLDevice.gl.FLOAT, 0, 0, 1));
-        this._attributes.push(new VertexBufferAttribute("a_instanceMatrix", this._vertexBuffer, 4, GLDevice.gl.FLOAT, 16, 1, 1));
-        this._attributes.push(new VertexBufferAttribute("a_instanceMatrix", this._vertexBuffer, 4, GLDevice.gl.FLOAT, 32, 2, 1));
-        this._attributes.push(new VertexBufferAttribute("a_instanceMatrix", this._vertexBuffer, 4, GLDevice.gl.FLOAT, 48, 3, 1));
+        let attrName = VertexBufferAttribute.defaultNameInstMatrix;
+        let attrLocation = DefaultAttributeLocations[attrName];
+        this._attributes.push(new VertexBufferAttribute(attrName, attrLocation, this._vertexBuffer, 4, GLDevice.gl.FLOAT, 0, 0, 1));
+        this._attributes.push(new VertexBufferAttribute(attrName, attrLocation, this._vertexBuffer, 4, GLDevice.gl.FLOAT, 16, 1, 1));
+        this._attributes.push(new VertexBufferAttribute(attrName, attrLocation, this._vertexBuffer, 4, GLDevice.gl.FLOAT, 32, 2, 1));
+        this._attributes.push(new VertexBufferAttribute(attrName, attrLocation, this._vertexBuffer, 4, GLDevice.gl.FLOAT, 48, 3, 1));
 
         // vec4 a_instanceColor
         if (hasColor) {
-            this._attributes.push(new VertexBufferAttribute("a_instanceColor", this._vertexBuffer, 4, GLDevice.gl.FLOAT, 64, 0, 1));
+            attrName = VertexBufferAttribute.defaultNameInstColor;
+            attrLocation = DefaultAttributeLocations[attrName];
+            this._attributes.push(new VertexBufferAttribute(attrName, attrLocation, this._vertexBuffer, 4, GLDevice.gl.FLOAT, 64, 0, 1));
         }
 
         this._dirty = true;

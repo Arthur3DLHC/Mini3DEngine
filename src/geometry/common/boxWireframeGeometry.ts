@@ -2,7 +2,7 @@ import { BufferGeometry } from "../bufferGeometry.js";
 import { VertexBuffer } from "../../WebGLResources/vertexBuffer.js";
 import { IndexBuffer } from "../../WebGLResources/indexBuffer.js";
 import { GLDevice } from "../../WebGLResources/glDevice.js";
-import { VertexBufferAttribute } from "../../WebGLResources/vertexBufferAttribute.js";
+import { DefaultAttributeLocations, VertexBufferAttribute } from "../../WebGLResources/vertexBufferAttribute.js";
 import { Primitive } from "../primitive.js";
 
 /**
@@ -58,7 +58,7 @@ export class BoxWireframeGeometry extends BufferGeometry {
         ]);
         this.indexBuffer.create();
 
-        this.addAttribute(VertexBufferAttribute.defaultNamePosition, vertexBuffer, 3, GLDevice.gl.FLOAT, 0);
+        this.addAttribute(VertexBufferAttribute.defaultNamePosition, DefaultAttributeLocations[VertexBufferAttribute.defaultNamePosition], vertexBuffer, 3, GLDevice.gl.FLOAT, 0);
 
         const grp = new Primitive();
         this.primitives.push(grp);

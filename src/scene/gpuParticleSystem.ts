@@ -41,11 +41,11 @@ export class GPUParticleSystem extends Object3D {
 
     // fix me: how to present material and shader program?
 
-    // update shader program (default?)
-    // render shader program (default?)
+    // update shader program (if null, use default?)
+    // render shader program (if null, use default?)
     // uniform buffer?
 
-    // textures?
+    // textures? support texture animation frames?
 
     // todo: psys properties
 
