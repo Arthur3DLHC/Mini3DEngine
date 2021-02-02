@@ -69,6 +69,9 @@ export class BufferGeometry {
         // GLGeometryBuffers.bindVertexBufferArray(null);
     }
 
+    // fix me: prepare with instance vertex buffer?
+    // or bind instance vertex buffer and attrib every drawing time?
+
     public draw(start: number, count: number, attribLocations: Map<string, number>, mode: GLenum|null = null) {
         // if (!this.vertexBuffer || !this.vertexBuffer.data || !this.vertexBuffer.glBuffer) {
         //     return;
@@ -142,50 +145,103 @@ export class BufferGeometry {
             console.warn("BufferGeometry.draw(): No vertex buffer or attributes found.");
             return;
         }
-        // if (!this.vertexBuffer || !this.vertexBuffer.data || !this.vertexBuffer.glBuffer || instanceAttribs.length <= 0) {
-        //     return;
-        // }
 
-        // use default VAO
-        GLGeometryBuffers.bindVertexBufferArray(null);
+        // test: if has VAO, bind it first, then bind VBOs for instances
+        // can this work?
+        if (this._vertexBufferArray !== null) {
+            GLGeometryBuffers.bindVertexBufferArray(this._vertexBufferArray);
 
-        GLGeometryBuffers.clearVertexAttributes();
+            const gl = GLDevice.gl;
 
-        // GLGeometryBuffers.enableVertexAttributes(attribLocations);
-
-        // bind geometry vertex buffer
-        for (const attr of this.attributes) {
-            if (attr.buffer.data === null || attr.buffer.glBuffer === null) {
-                throw new Error("Vertex buffer is empty or not created");
-            }
-            if(attribLocations.has(attr.name)) {
+            // must ensure the instance attrib location is fixed.
+            for (const attr of instanceAttribs) {
+                // if (attribLocations.has(attr.name)) {
+                //     GLGeometryBuffers.bindVertexBuffer(attr.buffer);
+                //     GLGeometryBuffers.setVertexAttribute(attr, attribLocations);
+                // }
+                // gl.bindBuffer(gl.ARRAY_BUFFER, attr.buffer.glBuffer);
                 GLGeometryBuffers.bindVertexBuffer(attr.buffer);
-                GLGeometryBuffers.setVertexAttribute(attr, attribLocations);
+                
+                const idx = attr.location + attr.locationOffset;
+                gl.enableVertexAttribArray(idx);
+                gl.vertexAttribPointer(idx, attr.size, attr.componentType, false, attr.buffer.stride, attr.offset);
+                gl.vertexAttribDivisor(idx, attr.divisor);
             }
-        }
 
-        // don't forget bind vertex buffer of instanceAttribs
-        for (const attr of instanceAttribs) {
-            if (attribLocations.has(attr.name)) {
-                GLGeometryBuffers.bindVertexBuffer(attr.buffer);
-                GLGeometryBuffers.setVertexAttribute(attr, attribLocations);                
+            // fix me: how to disable unused attributes?
+            // is that necessary?
+
+            if (this.indexBuffer && this.indexBuffer.indices && this.indexBuffer.glBuffer) {
+                const s = Math.max(0, start);
+                const c = Math.min(count, this.indexBuffer.count - s);
+                // drawElements 时需要用 byte 偏移, int16 = 2 bytes
+                const byteOffset = s * COMPONENT_BYTE_SIZES[this.indexBuffer.componentType];
+                gl.drawElementsInstanced(mode ? mode : this.drawMode, c, this.indexBuffer.componentType, byteOffset, instanceCount);
+            } else {
+                // draw array 时不用 byte 偏移
+                const s = Math.max(0, start);
+                const c = Math.min(count, this.vertexBuffers[0].vertexCount - s);
+                gl.drawArraysInstanced(mode ? mode : this.drawMode, s, c, instanceCount);
             }
-        }
 
-        GLGeometryBuffers.disableUnusedAttributes();
+            // clear instance attribute properties after drawing
+            for (const attr of instanceAttribs) {
+                // GLGeometryBuffers.bindVertexBuffer(attr.buffer);
+                GLGeometryBuffers.bindVertexBuffer(null);
 
-        if (this.indexBuffer && this.indexBuffer.indices && this.indexBuffer.glBuffer) {
-            GLGeometryBuffers.bindIndexBuffer(this.indexBuffer);
-            const s = Math.max(0, start);
-            const c = Math.min(count, this.indexBuffer.count - s);
-            // drawElements 时需要用 byte 偏移, int16 = 2 bytes
-            const byteOffset = s * COMPONENT_BYTE_SIZES[this.indexBuffer.componentType];
-            GLDevice.gl.drawElementsInstanced(mode?mode:this.drawMode, c, this.indexBuffer.componentType, byteOffset, instanceCount);
-        } else {
-            // draw array 时不用 byte 偏移
-            const s = Math.max(0, start);
-            const c = Math.min(count, this.vertexBuffers[0].vertexCount - s);
-            GLDevice.gl.drawArraysInstanced(mode?mode:this.drawMode, s, c, instanceCount);
+                // gl.bindBuffer(gl.ARRAY_BUFFER, attr.buffer.glBuffer);
+                const idx = attr.location + attr.locationOffset;
+                gl.vertexAttribDivisor(idx, 0);
+                gl.vertexAttribPointer(idx, attr.size, attr.componentType, false, attr.buffer.stride, attr.offset);
+                gl.disableVertexAttribArray(idx);
+                
+                // GLGeometryBuffers.bindVertexBuffer(null);
+            }
+            GLGeometryBuffers.bindVertexBufferArray(null);
+
+        } else
+         {
+            // use default VAO
+            GLGeometryBuffers.bindVertexBufferArray(null);
+
+            GLGeometryBuffers.clearVertexAttributes();
+
+            // GLGeometryBuffers.enableVertexAttributes(attribLocations);
+
+            // bind geometry vertex buffer
+            for (const attr of this.attributes) {
+                if (attr.buffer.data === null || attr.buffer.glBuffer === null) {
+                    throw new Error("Vertex buffer is empty or not created");
+                }
+                if (attribLocations.has(attr.name)) {
+                    GLGeometryBuffers.bindVertexBuffer(attr.buffer);
+                    GLGeometryBuffers.setVertexAttribute(attr, attribLocations);
+                }
+            }
+
+            // don't forget bind vertex buffer of instanceAttribs
+            for (const attr of instanceAttribs) {
+                if (attribLocations.has(attr.name)) {
+                    GLGeometryBuffers.bindVertexBuffer(attr.buffer);
+                    GLGeometryBuffers.setVertexAttribute(attr, attribLocations);
+                }
+            }
+
+            GLGeometryBuffers.disableUnusedAttributes();
+
+            if (this.indexBuffer && this.indexBuffer.indices && this.indexBuffer.glBuffer) {
+                GLGeometryBuffers.bindIndexBuffer(this.indexBuffer);
+                const s = Math.max(0, start);
+                const c = Math.min(count, this.indexBuffer.count - s);
+                // drawElements 时需要用 byte 偏移, int16 = 2 bytes
+                const byteOffset = s * COMPONENT_BYTE_SIZES[this.indexBuffer.componentType];
+                GLDevice.gl.drawElementsInstanced(mode ? mode : this.drawMode, c, this.indexBuffer.componentType, byteOffset, instanceCount);
+            } else {
+                // draw array 时不用 byte 偏移
+                const s = Math.max(0, start);
+                const c = Math.min(count, this.vertexBuffers[0].vertexCount - s);
+                GLDevice.gl.drawArraysInstanced(mode ? mode : this.drawMode, s, c, instanceCount);
+            }
         }
     }
 

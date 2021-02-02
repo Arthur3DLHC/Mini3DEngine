@@ -17,12 +17,12 @@ layout(location = POSITION_LOCATION) in vec3 a_position;
 // in vec3 a_normal;
 // in vec2 a_texcoord0;
 
-in vec4 a_joints0;              // joint indices
-in vec4 a_weights0;             // joint weights
+layout(location = JOINTS0_LOCATION) in vec4 a_joints0;              // joint indices
+layout(location = WEIGHTS0_LOCATION) in vec4 a_weights0;             // joint weights
 
 // vertex attribute instancing?
-in mat4 a_instanceMatrix;
-in vec4 a_instanceColor;
+layout(location = INSTANCE_MATRIX_LOCATION) in mat4 a_instanceMatrix;
+layout(location = INSTANCE_COLOR_LOCATION) in vec4 a_instanceColor;
 
 // todo: include common funcitons?
 #include <function_skin>
