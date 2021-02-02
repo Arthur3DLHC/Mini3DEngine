@@ -3,6 +3,8 @@
  */
 export default /** glsl */`
 // todo: 在 js 中统一指定 version?
+#include <attrib_locations>
+
 // uniforms
 // #include <uniforms_scene>
 #include <uniforms_view>
@@ -12,19 +14,19 @@ export default /** glsl */`
 // vertex attribute
 // 使用<attribs>规定的vertex attribute
 // TODO: tangents
-in vec3 a_position;
-in vec3 a_normal;
-in vec2 a_texcoord0;
+layout(location = POSITION_LOCATION) in vec3 a_position;
+layout(location = NORMAL_LOCATION) in vec3 a_normal;
+layout(location = TEXCOORD0_LOCATION) in vec2 a_texcoord0;
 // 注意不要添加无用的 vertex 输入，否则 instancing 会出问题
 
 // #ifdef USE_SKINNING
 
-in vec4 a_joints0;              // joint indices
-in vec4 a_weights0;             // joint weights
+layout(location = JOINTS0_LOCATION) in vec4 a_joints0;              // joint indices
+layout(location = WEIGHTS0_LOCATION) in vec4 a_weights0;             // joint weights
 
 // vertex attribute instancing?
-in mat4 a_instanceMatrix;
-in vec4 a_instanceColor;
+layout(location = INSTANCE_MATRIX_LOCATION) in mat4 a_instanceMatrix;
+layout(location = INSTANCE_COLOR_LOCATION) in vec4 a_instanceColor;
 
 #include <function_skin>
 #include <function_instance>

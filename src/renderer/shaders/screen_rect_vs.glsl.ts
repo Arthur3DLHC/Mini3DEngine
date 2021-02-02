@@ -3,6 +3,8 @@
  */
 export default /** glsl */`
 // todo: 在 js 中统一指定 version?
+#include <attrib_locations>
+
 // uniforms
 // #include <uniforms_scene>
 #include <uniforms_view>
@@ -10,8 +12,8 @@ export default /** glsl */`
 
 // vertex attribute
 // 使用<attribs>规定的vertex attribute
-in vec3 a_position;
-in vec2 a_texcoord0;
+layout(location = POSITION_LOCATION) in vec3 a_position;
+layout(location = TEXCOORD0_LOCATION)in vec2 a_texcoord0;
 
 // todo: include common funcitons?
 #include <function_transforms>

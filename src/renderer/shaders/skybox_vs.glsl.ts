@@ -2,15 +2,16 @@
  * scene sky box shader
  */
 export default /** glsl */`
+#include <attrib_locations>
 #include <uniforms_view>
 #include <uniforms_object>
 
 // vertex attribute
 // 使用<attribs>规定的vertex attribute
-in vec3 a_position;
+layout(location = POSITION_LOCATION) in vec3 a_position;
 // 不需要法线和纹理坐标
-in vec3 a_normal;
-in vec2 a_texcoord0;
+layout(location = NORMAL_LOCATION) in vec3 a_normal;
+layout(location = TEXCOORD0_LOCATION) in vec2 a_texcoord0;
 
 #include <function_transforms>
 

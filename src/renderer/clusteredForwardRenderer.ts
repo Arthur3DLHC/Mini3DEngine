@@ -1,4 +1,5 @@
 // shader includes
+import attrib_locations from "./shaders/shaderIncludes/attrib_locations.glsl.js";
 import samplers_scene from "./shaders/shaderIncludes/samplers_scene.glsl.js";
 import uniforms_mtl_pbr from "./shaders/shaderIncludes/uniforms_mtl_pbr.glsl.js";
 import uniforms_object from "./shaders/shaderIncludes/uniforms_object.glsl.js";
@@ -531,6 +532,7 @@ export class ClusteredForwardRenderer {
 
     private registerShaderCodes() {
         // shader includes
+        GLPrograms.shaderCodes["attrib_locations"] = attrib_locations;
         GLPrograms.shaderCodes["samplers_scene"] = samplers_scene;
         GLPrograms.shaderCodes["uniforms_mtl_pbr"] = uniforms_mtl_pbr;
         GLPrograms.shaderCodes["uniforms_object"] = uniforms_object;
