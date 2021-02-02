@@ -1,4 +1,5 @@
 import { BufferGeometry } from "../geometry/bufferGeometry.js";
+import { RenderList } from "../renderer/renderList.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
@@ -38,6 +39,9 @@ export class GPUParticleSystem extends Object3D {
     private _attributes: VertexBufferAttribute[][] = [];
 
     // todo: use VAOs?
+    // ref: https://gpfault.net/posts/webgl2-particles.txt.html
+    // use 4 VAOs, 2 for update, 2 for render
+    
 
     // fix me: how to present material and shader program?
 
@@ -59,5 +63,9 @@ export class GPUParticleSystem extends Object3D {
 
     public render() {
         
+    }
+
+    public provideRenderItem(renderList: RenderList) {
+
     }
 }
