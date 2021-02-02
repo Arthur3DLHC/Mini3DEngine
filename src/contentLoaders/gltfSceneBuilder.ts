@@ -933,6 +933,7 @@ export class GLTFSceneBuilder {
                 geometry.primitives.push(prim);
 
                 geometry.computeBounding();
+                geometry.prepareVertexBufferArray();
             }
 
             iprim++;

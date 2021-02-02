@@ -60,7 +60,7 @@ export class BufferGeometry {
     /**
      * create vertex buffer array object to improve performance
      */
-    public prepare() {
+    public prepareVertexBufferArray() {
         if (this._vertexBufferArray === null) {
             this._vertexBufferArray = new VertexBufferArray();
         }
@@ -80,6 +80,7 @@ export class BufferGeometry {
         }
 
         if (this._vertexBufferArray !== null) {
+            // use my VAO
             GLGeometryBuffers.bindVertexBufferArray(this._vertexBufferArray);
             if (this.indexBuffer && this.indexBuffer.indices && this.indexBuffer.glBuffer) {
                 const s = Math.max(0, start);
@@ -144,6 +145,10 @@ export class BufferGeometry {
         // if (!this.vertexBuffer || !this.vertexBuffer.data || !this.vertexBuffer.glBuffer || instanceAttribs.length <= 0) {
         //     return;
         // }
+
+        // use default VAO
+        GLGeometryBuffers.bindVertexBufferArray(null);
+
         GLGeometryBuffers.clearVertexAttributes();
 
         // GLGeometryBuffers.enableVertexAttributes(attribLocations);

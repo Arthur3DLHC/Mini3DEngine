@@ -31,8 +31,8 @@ export class VertexBufferArray {
 
         for (const attr of attributes) {
             gl.bindBuffer(gl.ARRAY_BUFFER, attr.buffer.glBuffer);
-            gl.enableVertexAttribArray(attr.location);
-            gl.vertexAttribPointer(attr.location, attr.size, attr.componentType, false, attr.buffer.stride, attr.offset);
+            gl.enableVertexAttribArray(attr.location + attr.locationOffset);
+            gl.vertexAttribPointer(attr.location + attr.locationOffset, attr.size, attr.componentType, false, attr.buffer.stride, attr.offset);
             gl.bindBuffer(gl.ARRAY_BUFFER, null);
         }
 
