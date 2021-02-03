@@ -8,6 +8,7 @@ import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { VertexBufferArray } from "../WebGLResources/VertexBufferArray.js";
 import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
+import { Clock } from "./clock.js";
 import { Object3D } from "./object3D.js";
 
 /**
@@ -46,8 +47,11 @@ export class GPUParticleSystem extends Object3D {
     // todo: general psys properties
     public emitRate: number = 10;
 
-    // emitter range?
-    // emit direction?
+    // emitter shape and range?
+    // different shape use different shaders?
+    // or allow a few simple shapes, and use if branch in shader?
+
+    // emit direction? need randomize param
 
     public isBillboard: boolean = true;
     /** limit billbard rotation along particle direction axis */
@@ -70,6 +74,8 @@ export class GPUParticleSystem extends Object3D {
     /** emit color */
     public color: vec4 = new vec4([1,1,1,1]);
 
+    // todo: gradient color?
+
     // todo: noise texture?
 
     /** particles collide with scene depth texture? */
@@ -82,9 +88,13 @@ export class GPUParticleSystem extends Object3D {
     private _maxParticleCount: number = 0;
     /**
      * increase every frame by emit rate;
-     * then controls how many instances are rendered when drawElementsInstanced
+     * will not subtract newly dead particles.
+     * this is only to control how many instances are updated and rendered when drawElementsInstanced
      */
     private _curParticleCount: number = 0;
+
+    /** will be passed in shader to control emitting */
+    private _isEmitting = false;
 
     /** read and write vertex buffer */
     private _vertexBuffers: VertexBuffer[] = [];
@@ -167,6 +177,8 @@ export class GPUParticleSystem extends Object3D {
     }
 
     public destroy() {
+        this._isEmitting = false;
+
         const gl = GLDevice.gl;
         for (const vao of this._updateVAO) {
             vao.release();
@@ -187,21 +199,24 @@ export class GPUParticleSystem extends Object3D {
      * start emitting
      */
     public start() {
-
+        this._isEmitting = true;
     }
 
     /**
      * stop emitting
      */
     public stop() {
-
+        this._isEmitting = false;
     }
 
     /**
      * kill all existing particles?
      */
     public reset() {
+        this._curParticleCount = 0;
+        this._isEmitting = false;
 
+        // fix me: need to reset particle vertex data?
     }
 
     // todo: prewarm?
@@ -212,11 +227,23 @@ export class GPUParticleSystem extends Object3D {
     // this will prevent waiting for the transform feedback finished
     // after render, swap the buffer B as source buffer.
     public update() {
-
+        // curr particle count
+        // note: need to use float value
+        if(this._isEmitting) {
+            this._curParticleCount += Clock.instance.elapsedTime * this.emitRate;
+        }
+        this._curParticleCount = Math.min(this._curParticleCount, this._maxParticleCount);
+        const updateCount = Math.floor(this._curParticleCount);
+        if (updateCount > 0) {
+            
+        }
     }
 
     public render() {
-        
+        const drawCount = Math.floor(this._curParticleCount);
+        if (drawCount > 0) {
+            
+        }
     }
 
     public provideRenderItem(renderList: RenderList) {
