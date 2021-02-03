@@ -21,6 +21,8 @@ export class GPUParticleSystem extends Object3D {
     public rebuild() {
         this.destroy();
 
+        // todo: control data contents, vertex attribs by psys flags
+
         const data: number[] = [];
 
         for (let i = 0; i < this._maxParticelCount; i++) {
