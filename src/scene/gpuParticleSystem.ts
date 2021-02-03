@@ -15,41 +15,70 @@ import { Object3D } from "./object3D.js";
 export class GPUParticleSystem extends Object3D {
     public constructor(maxParticleCount: number) {
         super();
-        // use interleaved vertex buffers?
+        this._maxParticelCount = maxParticleCount;
+    }
+
+    public rebuild() {
+        this.destroy();
 
         const data: number[] = [];
 
-        for (let i = 0; i < maxParticleCount; i++) {
-            // position
-            // direction or [billboard rotation angle, rotate speed]?
-            // sideDirection
-            // age
-            // life
-            // seed
-            // size
-            // color
-            // frameIndex: texture animation frame index
+        for (let i = 0; i < this._maxParticelCount; i++) {
+            // position: vec3
+            data.push(0, 0, 0);
+            // direction: vec3 or [billboard rotation angle, rotate speed]?
+            data.push(0, 0, 0);
+            // upDirection: vec3
+            data.push(0, 1, 0);
+            // age: number
+            data.push(0);   // use a dead particle; emit in update shader
+            // life: number // life for every particle is different; generated randomly from life range.
+            data.push(0);   // zero indicates this is a dead particle
+            // seed: vec4
+            data.push(Math.random(), Math.random(), Math.random(), Math.random());
+            // size: vec3
+            data.push(1, 1, 1);
+            // color: vec4
+            data.push(1, 1, 1, 1);
+            // frameIndex: number // texture animation frame index
+            data.push(0);
             // noiseTexcoord
+            data.push(0, 0);
         }
         
         const gl = GLDevice.gl;
 
         // todo: create vertex buffers
-        // can use STATIC_DRAW (in babylon.js)
+        // can use STATIC_DRAW (according to babylon.js)
         // this._vertexBuffer = new VertexBuffer(GLDevice.gl.DYNAMIC_DRAW);
         this._vertexBuffers.push(new VertexBuffer(gl.STATIC_DRAW));
         this._vertexBuffers.push(new VertexBuffer(gl.STATIC_DRAW));
+
+        // attributes
+        this._attributes.push([]);
+        this._attributes.push([]);
     }
 
     public destroy() {
         const gl = GLDevice.gl;
+        for (const vao of this._updateVAO) {
+            vao.release();
+        }
+        for (const vao of this._renderVAO) {
+            vao.release();
+        }
+        this._updateVAO.length = 0;
+        this._renderVAO.length = 0;
+
         for (const vb of this._vertexBuffers) {
-            gl.deleteBuffer(vb);
+            vb.release();
         }
         this._vertexBuffers.length = 0;
     }
 
     public geometry: BufferGeometry | null = null;
+
+    private _maxParticelCount: number = 0;
 
     /** read and write vertex buffer */
     private _vertexBuffers: VertexBuffer[] = [];
@@ -79,6 +108,32 @@ export class GPUParticleSystem extends Object3D {
     // isBillboard?
     // has texture animation?
 
+    //#region public methods
+
+    /**
+     * start emitting
+     */
+    public start() {
+
+    }
+
+    /**
+     * stop emitting
+     */
+    public stop() {
+
+    }
+
+    /**
+     * kill all existing particles?
+     */
+    public reset() {
+
+    }
+
+    // todo: prewarm?
+    // set a prewarm flag for entire rendering loop?
+
     // note: when update, use buffer A as source,
     // and also use buffer A as source when render;
     // this will prevent waiting for the transform feedback finished
@@ -94,4 +149,6 @@ export class GPUParticleSystem extends Object3D {
     public provideRenderItem(renderList: RenderList) {
 
     }
+
+    //#endregion
 }
