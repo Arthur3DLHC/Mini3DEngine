@@ -1,3 +1,5 @@
+import vec3 from "../../lib/tsm/vec3.js";
+import vec4 from "../../lib/tsm/vec4.js";
 import { BufferGeometry } from "../geometry/bufferGeometry.js";
 import { RenderList } from "../renderer/renderList.js";
 import { RenderStateSet } from "../renderer/renderStateSet.js";
@@ -17,7 +19,7 @@ import { Object3D } from "./object3D.js";
 export class GPUParticleSystem extends Object3D {
     public constructor(maxParticleCount: number) {
         super();
-        this._maxParticelCount = maxParticleCount;
+        this._maxParticleCount = maxParticleCount;
     }
 
     //#region public properties
@@ -42,6 +44,10 @@ export class GPUParticleSystem extends Object3D {
     // textures? support texture animation frames?
 
     // todo: general psys properties
+    public emitRate: number = 10;
+
+    // emitter range?
+    // emit direction?
 
     public isBillboard: boolean = true;
     /** limit billbard rotation along particle direction axis */
@@ -52,16 +58,33 @@ export class GPUParticleSystem extends Object3D {
 
     // todo: animation frames?
     // use one-row texture?
-    public texAnimframeCount: number = 1;
+    public texAnimFrameCount: number = 1;
+    public randomAnimStartFrame: boolean = false;
+
+    public minLife: number = 1;
+    public maxLife: number = 1;
+
+    public minSize: vec3 = new vec3([1,1,1]);
+    public maxSize: vec3 = new vec3([1,1,1]);
+
+    /** emit color */
+    public color: vec4 = new vec4([1,1,1,1]);
 
     // todo: noise texture?
 
-    //#endregion
+    /** particles collide with scene depth texture? */
+    public collision: boolean = false;
 
+    //#endregion
 
     //#region private fields
 
-    private _maxParticelCount: number = 0;
+    private _maxParticleCount: number = 0;
+    /**
+     * increase every frame by emit rate;
+     * then controls how many instances are rendered when drawElementsInstanced
+     */
+    private _curParticleCount: number = 0;
 
     /** read and write vertex buffer */
     private _vertexBuffers: VertexBuffer[] = [];
@@ -102,7 +125,7 @@ export class GPUParticleSystem extends Object3D {
 
         const data: number[] = [];
 
-        for (let i = 0; i < this._maxParticelCount; i++) {
+        for (let i = 0; i < this._maxParticleCount; i++) {
             // position: vec3
             data.push(0, 0, 0);
             // direction: vec3 or [billboard rotation angle, rotate speed]?
@@ -136,6 +159,11 @@ export class GPUParticleSystem extends Object3D {
         // attributes
         this._attributes.push([]);
         this._attributes.push([]);
+
+        // VAOs
+        // update VAO: only contains particle instance buffer
+
+        // render VAO: contains geometry and instance buffer
     }
 
     public destroy() {
