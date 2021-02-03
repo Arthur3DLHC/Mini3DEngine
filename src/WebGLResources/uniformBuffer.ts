@@ -7,6 +7,9 @@ import mat2 from "../../lib/tsm/mat2.js";
 import mat4 from "../../lib/tsm/mat4.js";
 import mat3 from "../../lib/tsm/mat3.js";
 
+/**
+ * note: only support floating point type (float, vec2, vec3, vec4, mat2, mat3, mat4) uniforms now
+ */
 export class UniformBuffer {
     /**
      * 构造函数

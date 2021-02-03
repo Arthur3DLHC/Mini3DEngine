@@ -1,6 +1,8 @@
 import { BufferGeometry } from "../geometry/bufferGeometry.js";
 import { RenderList } from "../renderer/renderList.js";
+import { RenderStateSet } from "../renderer/renderStateSet.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
+import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { VertexBufferArray } from "../WebGLResources/VertexBufferArray.js";
 import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
@@ -18,6 +20,81 @@ export class GPUParticleSystem extends Object3D {
         this._maxParticelCount = maxParticleCount;
     }
 
+    //#region public properties
+
+    public geometry: BufferGeometry | null = null;
+
+    
+    // fix me: how to present material and shader program?
+
+    public renderStateSet: RenderStateSet | null = null;
+
+    /** update shader program (if null, will use a default one) */
+    public updateProgram: ShaderProgram | null = null;
+
+    /** render shader program (if null, will use a default one) */
+    public renderProgram: ShaderProgram | null = null;
+
+    // uniform values for custom shader program?
+    // fix me: how to call different api for different data types?
+    // or use a uniformBuffer object?
+
+    // textures? support texture animation frames?
+
+    // todo: general psys properties
+
+    public isBillboard: boolean = true;
+    /** limit billbard rotation along particle direction axis */
+    public limitBillboardRotation: boolean = false;
+
+    /** has framed animation in texture? */
+    public hasTextureAnimation: boolean = false;
+
+    // todo: animation frames?
+    // use one-row texture?
+    public texAnimframeCount: number = 1;
+
+    // todo: noise texture?
+
+    //#endregion
+
+
+    //#region private fields
+
+    private _maxParticelCount: number = 0;
+
+    /** read and write vertex buffer */
+    private _vertexBuffers: VertexBuffer[] = [];
+    /** vertex attributes for read and write vertex buffers */
+    private _attributes: VertexBufferAttribute[][] = [];
+
+    // todo: use VAOs?
+    // ref:
+    // https://gpfault.net/posts/webgl2-particles.txt.html
+    // https://github.com/WebGLSamples/WebGL2Samples/blob/master/samples/transform_feedback_instanced.html
+    // https://github.com/BabylonJS/Babylon.js/blob/master/src/Particles/gpuParticleSystem.ts
+
+    // use 4 VAOs, 2 for update, 2 for render
+    private _updateVAO: VertexBufferArray[] = [];
+    private _renderVAO: VertexBufferArray[] = [];
+
+    private static _defaultUpdateProgram: ShaderProgram | null = null;
+    private static _defaultRenderProgram: ShaderProgram | null = null;
+    private static _defaultRenderStates: RenderStateSet | null = null;
+
+    //#endregion
+
+
+    //#region public methods
+
+    public static initDefaultMaterial() {
+
+    }
+
+    public static releaseDefaultMaterial() {
+
+    }
+    
     public rebuild() {
         this.destroy();
 
@@ -30,7 +107,7 @@ export class GPUParticleSystem extends Object3D {
             data.push(0, 0, 0);
             // direction: vec3 or [billboard rotation angle, rotate speed]?
             data.push(0, 0, 0);
-            // upDirection: vec3
+            // upDirection: vec3    // current up dir
             data.push(0, 1, 0);
             // age: number
             data.push(0);   // use a dead particle; emit in update shader
@@ -77,40 +154,6 @@ export class GPUParticleSystem extends Object3D {
         }
         this._vertexBuffers.length = 0;
     }
-
-    public geometry: BufferGeometry | null = null;
-
-    private _maxParticelCount: number = 0;
-
-    /** read and write vertex buffer */
-    private _vertexBuffers: VertexBuffer[] = [];
-    /** vertex attributes for read and write vertex buffers */
-    private _attributes: VertexBufferAttribute[][] = [];
-
-    // todo: use VAOs?
-    // ref:
-    // https://gpfault.net/posts/webgl2-particles.txt.html
-    // https://github.com/WebGLSamples/WebGL2Samples/blob/master/samples/transform_feedback_instanced.html
-    // https://github.com/BabylonJS/Babylon.js/blob/master/src/Particles/gpuParticleSystem.ts
-
-    // use 4 VAOs, 2 for update, 2 for render
-    private _updateVAO: VertexBufferArray[] = [];
-    private _renderVAO: VertexBufferArray[] = [];
-
-    // fix me: how to present material and shader program?
-
-    // update shader program (if null, use default?)
-    // render shader program (if null, use default?)
-    // uniform buffer?
-
-    // textures? support texture animation frames?
-
-    // todo: psys properties
-
-    // isBillboard?
-    // has texture animation?
-
-    //#region public methods
 
     /**
      * start emitting
