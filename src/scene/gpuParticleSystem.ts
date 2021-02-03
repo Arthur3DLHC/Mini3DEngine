@@ -9,7 +9,13 @@ import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { VertexBufferArray } from "../WebGLResources/VertexBufferArray.js";
 import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
 import { Clock } from "./clock.js";
+import { GPUParticleMaterial } from "./materials/gpuParticleMaterial.js";
 import { Object3D } from "./object3D.js";
+
+export enum EmitterShape {
+    Sphere,
+    Box,
+}
 
 /**
  * the GPU accelerated particle system
@@ -27,16 +33,17 @@ export class GPUParticleSystem extends Object3D {
 
     public geometry: BufferGeometry | null = null;
 
-    
     // fix me: how to present material and shader program?
+    public material: GPUParticleMaterial | null = null;
+    public static defaultMaterial: GPUParticleMaterial | null = null;
 
-    public renderStateSet: RenderStateSet | null = null;
+    // public renderStateSet: RenderStateSet | null = null;
 
-    /** update shader program (if null, will use a default one) */
-    public updateProgram: ShaderProgram | null = null;
+    // /** update shader program (if null, will use a default one) */
+    // public updateProgram: ShaderProgram | null = null;
 
-    /** render shader program (if null, will use a default one) */
-    public renderProgram: ShaderProgram | null = null;
+    // /** render shader program (if null, will use a default one) */
+    // public renderProgram: ShaderProgram | null = null;
 
     // uniform values for custom shader program?
     // fix me: how to call different api for different data types?
@@ -50,8 +57,13 @@ export class GPUParticleSystem extends Object3D {
     // emitter shape and range?
     // different shape use different shaders?
     // or allow a few simple shapes, and use if branch in shader?
+    public emitterShape: EmitterShape = EmitterShape.Sphere;
 
-    // emit direction? need randomize param
+    public emitterSize: vec3 = new vec3([1,1,1]);
+
+    public emitDirection: vec3 = new vec3([0, 1, 0]);
+
+    public emitDirectionVariation: number = 0;
 
     public isBillboard: boolean = true;
     /** limit billbard rotation along particle direction axis */
@@ -72,9 +84,10 @@ export class GPUParticleSystem extends Object3D {
     public maxSize: vec3 = new vec3([1,1,1]);
 
     /** emit color */
-    public color: vec4 = new vec4([1,1,1,1]);
+    public startColor: vec4 = new vec4([1,1,1,1]);
 
     // todo: gradient color?
+    public endColor: vec4 = new vec4([1,1,1,1]);
 
     // todo: noise texture?
 
@@ -111,9 +124,9 @@ export class GPUParticleSystem extends Object3D {
     private _updateVAO: VertexBufferArray[] = [];
     private _renderVAO: VertexBufferArray[] = [];
 
-    private static _defaultUpdateProgram: ShaderProgram | null = null;
-    private static _defaultRenderProgram: ShaderProgram | null = null;
-    private static _defaultRenderStates: RenderStateSet | null = null;
+    // private static _defaultUpdateProgram: ShaderProgram | null = null;
+    // private static _defaultRenderProgram: ShaderProgram | null = null;
+    // private static _defaultRenderStates: RenderStateSet | null = null;
 
     //#endregion
 
@@ -121,11 +134,16 @@ export class GPUParticleSystem extends Object3D {
     //#region public methods
 
     public static initDefaultMaterial() {
-
+        if (GPUParticleSystem.defaultMaterial === null) {
+            GPUParticleSystem.defaultMaterial = new GPUParticleMaterial();
+        }
     }
 
     public static releaseDefaultMaterial() {
-
+        if (GPUParticleSystem.defaultMaterial !== null) {
+            GPUParticleSystem.defaultMaterial.destroy();
+            GPUParticleSystem.defaultMaterial = null;
+        }
     }
     
     public rebuild() {
