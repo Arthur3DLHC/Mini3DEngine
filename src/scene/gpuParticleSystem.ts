@@ -20,6 +20,22 @@ export enum EmitterShape {
 }
 
 /**
+ * default attributes of the update instance vertex buffer
+ * note: need to skip geometry attribute locations when creating the render VAO!
+ */
+export const DefaultParticleAttributes = {
+    POSITION: 0,
+    DIRECTION: 1,
+    UPDIR: 2,
+    AGE_LIFE: 3,
+    SEED: 4,
+    SIZE: 5,
+    COLOR: 6,
+    FRAME_INDEX: 7,
+    NOISE_TEXCOORD: 8
+};
+
+/**
  * the GPU accelerated particle system
  * can be sprites or geometries
  * uses transform feedback to update particle positions,
@@ -121,7 +137,7 @@ export class GPUParticleSystem extends Object3D {
     /** read and write vertex buffer */
     private _vertexBuffers: VertexBuffer[] = [];
     /** vertex attributes for read and write vertex buffers */
-    private _attributes: VertexBufferAttribute[][] = [];
+    private _updateAttributes: VertexBufferAttribute[][] = [];
 
     // todo: use VAOs?
     // ref:
@@ -210,10 +226,32 @@ export class GPUParticleSystem extends Object3D {
         vb2.create();
 
         // attributes
-        const attribSet1 = new VertexBufferAttributeSet();
-        const attribSet2 = new VertexBufferAttributeSet();
+        const updateAttribSet1 = new VertexBufferAttributeSet();
+        const updateAttribSet2 = new VertexBufferAttributeSet();
 
-        this._attributes.push(attribSet1.attributes, attribSet2.attributes);
+        updateAttribSet1.addAttribute("p_position", DefaultParticleAttributes.POSITION, vb1, 3, gl.FLOAT);
+        updateAttribSet1.addAttribute("p_direction", DefaultParticleAttributes.DIRECTION, vb1, 3, gl.FLOAT);
+        updateAttribSet1.addAttribute("p_upDir", DefaultParticleAttributes.UPDIR, vb1, 3, gl.FLOAT);
+        // put age and life in one vec2?
+        updateAttribSet1.addAttribute("p_ageLife", DefaultParticleAttributes.AGE_LIFE, vb1, 2, gl.FLOAT);
+        updateAttribSet1.addAttribute("p_seed", DefaultParticleAttributes.SEED, vb1, 4, gl.FLOAT);
+        updateAttribSet1.addAttribute("p_size", DefaultParticleAttributes.SIZE, vb1, 3, gl.FLOAT);
+        updateAttribSet1.addAttribute("p_color", DefaultParticleAttributes.COLOR, vb1, 4, gl.FLOAT);
+        updateAttribSet1.addAttribute("p_frameIdx", DefaultParticleAttributes.FRAME_INDEX, vb1, 1, gl.FLOAT);
+        updateAttribSet1.addAttribute("p_noiseTexCoord", DefaultParticleAttributes.NOISE_TEXCOORD, vb1, 2, gl.FLOAT);
+
+        updateAttribSet2.addAttribute("p_position", DefaultParticleAttributes.POSITION, vb2, 3, gl.FLOAT);
+        updateAttribSet2.addAttribute("p_direction", DefaultParticleAttributes.DIRECTION, vb2, 3, gl.FLOAT);
+        updateAttribSet2.addAttribute("p_upDir", DefaultParticleAttributes.UPDIR, vb2, 3, gl.FLOAT);
+        // put age and life in one vec2?
+        updateAttribSet2.addAttribute("p_ageLife", DefaultParticleAttributes.AGE_LIFE, vb2, 2, gl.FLOAT);
+        updateAttribSet2.addAttribute("p_seed", DefaultParticleAttributes.SEED, vb2, 4, gl.FLOAT);
+        updateAttribSet2.addAttribute("p_size", DefaultParticleAttributes.SIZE, vb2, 3, gl.FLOAT);
+        updateAttribSet2.addAttribute("p_color", DefaultParticleAttributes.COLOR, vb2, 4, gl.FLOAT);
+        updateAttribSet2.addAttribute("p_frameIdx", DefaultParticleAttributes.FRAME_INDEX, vb2, 1, gl.FLOAT);
+        updateAttribSet2.addAttribute("p_noiseTexCoord", DefaultParticleAttributes.NOISE_TEXCOORD, vb2, 2, gl.FLOAT);
+
+        this._updateAttributes.push(updateAttribSet1.attributes, updateAttribSet2.attributes);
 
         // VAOs
         // update VAO: only contains particle instance buffer
@@ -221,7 +259,20 @@ export class GPUParticleSystem extends Object3D {
         const updateVAO2 = new VertexBufferArray();
         this._updateVAO.push(updateVAO1, updateVAO2);
 
+        updateVAO1.prepare(updateAttribSet1.attributes, null);
+        updateVAO2.prepare(updateAttribSet2.attributes, null);
+
         // render VAO: contains geometry and instance buffer
+        // CAUTION: need to add an offset to particle instance vertex attributes, for add geometry vertix attributes.
+        // (find the max location of current geometry vertex attributes as offset)
+        
+        const renderAttribSet1 = new VertexBufferAttributeSet();
+        const renderAttribSet2 = new VertexBufferAttributeSet();
+
+        // todo: add geometry vertex attributes first
+
+        // then add particle instance attributes with offseted location
+        
         const renderVAO1 = new VertexBufferArray();
         const renderVAO2 = new VertexBufferArray();
         this._renderVAO.push(renderVAO1, renderVAO2);
