@@ -9,6 +9,7 @@ import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { VertexBufferArray } from "../WebGLResources/VertexBufferArray.js";
 import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
+import { VertexBufferAttributeSet } from "../WebGLResources/vertexBufferAttributeSet.js";
 import { Clock } from "./clock.js";
 import { GPUParticleMaterial } from "./materials/gpuParticleMaterial.js";
 import { Object3D } from "./object3D.js";
@@ -196,18 +197,34 @@ export class GPUParticleSystem extends Object3D {
         // todo: create vertex buffers
         // can use STATIC_DRAW (according to babylon.js)
         // this._vertexBuffer = new VertexBuffer(GLDevice.gl.DYNAMIC_DRAW);
-        this._vertexBuffers.push(new VertexBuffer(gl.STATIC_DRAW), new VertexBuffer(gl.STATIC_DRAW));
+        const vb1 = new VertexBuffer(gl.STATIC_DRAW);
+        const vb2 = new VertexBuffer(gl.STATIC_DRAW);
+        this._vertexBuffers.push(vb1, vb2);
+
+        const floatData = new Float32Array(data);
+
+        vb1.data = floatData;
+        vb2.data = floatData;
+
+        vb1.create();
+        vb2.create();
 
         // attributes
-        this._attributes.push([]);
-        this._attributes.push([]);
+        const attribSet1 = new VertexBufferAttributeSet();
+        const attribSet2 = new VertexBufferAttributeSet();
+
+        this._attributes.push(attribSet1.attributes, attribSet2.attributes);
 
         // VAOs
         // update VAO: only contains particle instance buffer
-        this._updateVAO.push(new VertexBufferArray(), new VertexBufferArray());
+        const updateVAO1 = new VertexBufferArray();
+        const updateVAO2 = new VertexBufferArray();
+        this._updateVAO.push(updateVAO1, updateVAO2);
 
         // render VAO: contains geometry and instance buffer
-        this._renderVAO.push(new VertexBufferArray(), new VertexBufferArray());
+        const renderVAO1 = new VertexBufferArray();
+        const renderVAO2 = new VertexBufferArray();
+        this._renderVAO.push(renderVAO1, renderVAO2);
 
         // create transform feedback and record output buffer
         this._transformFeedback = gl.createTransformFeedback();
