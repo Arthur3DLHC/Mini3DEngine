@@ -20,7 +20,7 @@ export class ShaderProgram {
     private _attributes: Map<string, number>|null;
     private _uniformLocations: Map<string, WebGLUniformLocation>;
 
-    public build() {
+    public build(transformFeedbackVaryings?: string[]) {
         if (this.vertexShaderCode === "" || this.fragmentShaderCode === "") {
             throw new Error("Shader code is empty");
         }
@@ -29,37 +29,46 @@ export class ShaderProgram {
             throw new Error("Already built. call release first.");
         }
 
+        const gl = GLDevice.gl;
+
         // Fix me: 在哪预处理shader代码？替换 #include 等
-        const vs = this.compile(this.vertexShaderCode, GLDevice.gl.VERTEX_SHADER);
-        const fs = this.compile(this.fragmentShaderCode, GLDevice.gl.FRAGMENT_SHADER);
+        const vs = this.compile(this.vertexShaderCode, gl.VERTEX_SHADER);
+        const fs = this.compile(this.fragmentShaderCode, gl.FRAGMENT_SHADER);
 
         if (!vs || !fs) {
             throw new Error("Faild building shader: " + this.name);
         }
 
-        this.glProgram = GLDevice.gl.createProgram();
+        this.glProgram = gl.createProgram();
         if (!this.glProgram) {
             throw new Error("Faild creating gl program");
         }
-        GLDevice.gl.attachShader(this.glProgram, vs);
-        GLDevice.gl.attachShader(this.glProgram, fs);
-        // 此时先不绑定 attribute location
-        GLDevice.gl.linkProgram(this.glProgram);
-        let linkLog = GLDevice.gl.getProgramInfoLog(this.glProgram);
+        gl.attachShader(this.glProgram, vs);
+        gl.attachShader(this.glProgram, fs);
+
+        // do not bind attribute locations now
+
+        // is this a transform feedback program?
+        if (transformFeedbackVaryings !== undefined && transformFeedbackVaryings.length > 0) {
+            gl.transformFeedbackVaryings(this.glProgram, transformFeedbackVaryings, gl.INTERLEAVED_ATTRIBS);
+        }
+
+        gl.linkProgram(this.glProgram);
+        let linkLog = gl.getProgramInfoLog(this.glProgram);
         if (linkLog) {
             if (linkLog.length > 0) {
                 console.warn(this.name + " " + linkLog);
             }
         }
-        if(!GLDevice.gl.getProgramParameter(this.glProgram, GLDevice.gl.LINK_STATUS)) {
+        if(!gl.getProgramParameter(this.glProgram, gl.LINK_STATUS)) {
             throw "failed linking program: " + this.name;
         }
 
         // todo: cache uniform locations?
 
         // clean up
-        GLDevice.gl.deleteShader(vs);
-        GLDevice.gl.deleteShader(fs);
+        gl.deleteShader(vs);
+        gl.deleteShader(fs);
     }
 
     public release() {
@@ -77,12 +86,13 @@ export class ShaderProgram {
         }
         if (!this._attributes) {
             this._attributes = new Map<string, number>();
-            const numAttrs = GLDevice.gl.getProgramParameter(this.glProgram, GLDevice.gl.ACTIVE_ATTRIBUTES);
+            const gl = GLDevice.gl;
+            const numAttrs = gl.getProgramParameter(this.glProgram, gl.ACTIVE_ATTRIBUTES);
             for(let i = 0; i < numAttrs; i++) {
-                const info = GLDevice.gl.getActiveAttrib(this.glProgram, i);
+                const info = gl.getActiveAttrib(this.glProgram, i);
                 if (info) {
                     const name = info.name;
-                    this._attributes.set(name, GLDevice.gl.getAttribLocation(this.glProgram, name));
+                    this._attributes.set(name, gl.getAttribLocation(this.glProgram, name));
                 }
             }
         }
@@ -108,18 +118,19 @@ export class ShaderProgram {
     }
 
     private compile(code: string, type: GLenum): WebGLShader | null {
-        const shader = GLDevice.gl.createShader(type);
+        const gl = GLDevice.gl;
+        const shader = gl.createShader(type);
         if (shader) {
-            GLDevice.gl.shaderSource(shader, code);
-            GLDevice.gl.compileShader(shader);
-            let compileLog = GLDevice.gl.getShaderInfoLog(shader);
+            gl.shaderSource(shader, code);
+            gl.compileShader(shader);
+            let compileLog = gl.getShaderInfoLog(shader);
             if (compileLog) {
                 if (compileLog.length > 0) {
                     console.warn(this.name + " :\n" + code + "\nerror: " + compileLog);
                     // throw compileLog;
                 }
             }
-            if( ! GLDevice.gl.getShaderParameter(shader, GLDevice.gl.COMPILE_STATUS)) {
+            if( ! gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
                 throw this.name + " :\n" + code + "\nerror: " + compileLog;
             }
         } else {

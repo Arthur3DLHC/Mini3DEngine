@@ -157,6 +157,7 @@ export class GPUParticleSystem extends Object3D {
             // position: vec3
             data.push(0, 0, 0);
             // direction: vec3 or [billboard rotation angle, rotate speed]?
+            // direciton is also velocity?
             data.push(0, 0, 0);
             // upDirection: vec3    // current up dir
             data.push(0, 1, 0);
@@ -253,7 +254,22 @@ export class GPUParticleSystem extends Object3D {
         this._curParticleCount = Math.min(this._curParticleCount, this._maxParticleCount);
         const updateCount = Math.floor(this._curParticleCount);
         if (updateCount > 0) {
-            
+            // bind vertex array
+            // bind transform feedback object
+            // bind transfrom feedback buffer
+            // attrib divisor
+            // turn off rasterization
+
+            // use program
+
+            // begin transform feedback
+            // draw updateCount vertices
+            // end transform feedback
+
+            // turn on rasterization
+            // bind vertex array and transform buffers to null
+
+            // pingpong the buffers
         }
     }
 

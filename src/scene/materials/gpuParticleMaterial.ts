@@ -1,12 +1,22 @@
+// shader codes
+import psys_gpu_update_vs from "../../renderer/shaders/psys_gpu_update_vs.glsl.js";
+import psys_gpu_update_fs from "../../renderer/shaders/psys_gpu_update_fs.glsl.js";
+import psys_gpu_render_vs from "../../renderer/shaders/psys_gpu_render_vs.glsl.js";
+import psys_gpu_render_fs from "../../renderer/shaders/psys_gpu_render_fs.glsl.js";
+// modules
 import { ShaderProgram } from "../../WebGLResources/shaderProgram.js";
 import { GPUParticleSystem } from "../gpuParticleSystem.js";
 import { Material } from "./material.js";
+import { GLPrograms } from "../../WebGLResources/glPrograms.js";
 
 /**
  * the default material for GPU particle systems.
  * can derive custom material classes from this class.
  */
 export class GPUParticleMaterial extends Material {
+    /**
+     * don't call this before renderer initialized
+     */
     public constructor() {
         super();
         this.loadPrograms();
@@ -18,6 +28,28 @@ export class GPUParticleMaterial extends Material {
 
     public loadPrograms() {
         // load default programs
+        // default feedback varyings
+        const varyings: string[] = ["gl_position",
+            "o_dir",
+            "o_upDir",
+            "o_age",
+            "o_life",
+            "o_seed",
+            "o_size",
+            "o_color",
+            "o_frameIdx",
+            "o_noiseTexcoord"
+        ];
+        this.updateProgram = new ShaderProgram();
+        this.updateProgram.vertexShaderCode = GLPrograms.processSourceCode(psys_gpu_update_vs);
+        this.updateProgram.fragmentShaderCode = GLPrograms.processSourceCode(psys_gpu_update_fs);
+        this.updateProgram.build(varyings);
+
+        this.renderProgram = new ShaderProgram();
+        this.renderProgram.vertexShaderCode = GLPrograms.processSourceCode(psys_gpu_render_vs);
+        this.renderProgram.fragmentShaderCode = GLPrograms.processSourceCode(psys_gpu_render_fs);
+        this.renderProgram.build();
+
         // subclasses can override this method to load their own programs
     }
 
