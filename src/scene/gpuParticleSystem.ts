@@ -180,6 +180,11 @@ export class GPUParticleSystem extends Object3D {
     public rebuild() {
         this.destroy();
 
+        // check geomery
+        if (this.geometry === null) {
+            return;
+        }
+
         // todo: control data contents, vertex attribs by psys flags
 
         const data: number[] = [];
@@ -213,69 +218,77 @@ export class GPUParticleSystem extends Object3D {
         // todo: create vertex buffers
         // can use STATIC_DRAW (according to babylon.js)
         // this._vertexBuffer = new VertexBuffer(GLDevice.gl.DYNAMIC_DRAW);
-        const vb1 = new VertexBuffer(gl.STATIC_DRAW);
-        const vb2 = new VertexBuffer(gl.STATIC_DRAW);
-        this._vertexBuffers.push(vb1, vb2);
-
         const floatData = new Float32Array(data);
 
-        vb1.data = floatData;
-        vb2.data = floatData;
+        for(let i = 0; i < 2; i++) {
+            const vb = new VertexBuffer(gl.STATIC_DRAW);
+            this._vertexBuffers.push(vb);
 
-        vb1.create();
-        vb2.create();
+            vb.data = floatData;
+            vb.create();
 
-        // attributes
-        const updateAttribSet1 = new VertexBufferAttributeSet();
-        const updateAttribSet2 = new VertexBufferAttributeSet();
+            const updateAttribSet = new VertexBufferAttributeSet();
 
-        updateAttribSet1.addAttribute("p_position", DefaultParticleAttributes.POSITION, vb1, 3, gl.FLOAT);
-        updateAttribSet1.addAttribute("p_direction", DefaultParticleAttributes.DIRECTION, vb1, 3, gl.FLOAT);
-        updateAttribSet1.addAttribute("p_upDir", DefaultParticleAttributes.UPDIR, vb1, 3, gl.FLOAT);
-        // put age and life in one vec2?
-        updateAttribSet1.addAttribute("p_ageLife", DefaultParticleAttributes.AGE_LIFE, vb1, 2, gl.FLOAT);
-        updateAttribSet1.addAttribute("p_seed", DefaultParticleAttributes.SEED, vb1, 4, gl.FLOAT);
-        updateAttribSet1.addAttribute("p_size", DefaultParticleAttributes.SIZE, vb1, 3, gl.FLOAT);
-        updateAttribSet1.addAttribute("p_color", DefaultParticleAttributes.COLOR, vb1, 4, gl.FLOAT);
-        updateAttribSet1.addAttribute("p_frameIdx", DefaultParticleAttributes.FRAME_INDEX, vb1, 1, gl.FLOAT);
-        updateAttribSet1.addAttribute("p_noiseTexCoord", DefaultParticleAttributes.NOISE_TEXCOORD, vb1, 2, gl.FLOAT);
+            // set divisor to 0 (per vertex) when update
+            updateAttribSet.addAttribute("p_position", DefaultParticleAttributes.POSITION, vb, 3, gl.FLOAT, 0);
+            updateAttribSet.addAttribute("p_direction", DefaultParticleAttributes.DIRECTION, vb, 3, gl.FLOAT, 0);
+            updateAttribSet.addAttribute("p_upDir", DefaultParticleAttributes.UPDIR, vb, 3, gl.FLOAT, 0);
+            // put age and life in one vec2?
+            updateAttribSet.addAttribute("p_ageLife", DefaultParticleAttributes.AGE_LIFE, vb, 2, gl.FLOAT, 0);
+            updateAttribSet.addAttribute("p_seed", DefaultParticleAttributes.SEED, vb, 4, gl.FLOAT, 0);
+            updateAttribSet.addAttribute("p_size", DefaultParticleAttributes.SIZE, vb, 3, gl.FLOAT, 0);
+            updateAttribSet.addAttribute("p_color", DefaultParticleAttributes.COLOR, vb, 4, gl.FLOAT, 0);
+            updateAttribSet.addAttribute("p_frameIdx", DefaultParticleAttributes.FRAME_INDEX, vb, 1, gl.FLOAT, 0);
+            updateAttribSet.addAttribute("p_noiseTexCoord", DefaultParticleAttributes.NOISE_TEXCOORD, vb, 2, gl.FLOAT, 0);
 
-        updateAttribSet2.addAttribute("p_position", DefaultParticleAttributes.POSITION, vb2, 3, gl.FLOAT);
-        updateAttribSet2.addAttribute("p_direction", DefaultParticleAttributes.DIRECTION, vb2, 3, gl.FLOAT);
-        updateAttribSet2.addAttribute("p_upDir", DefaultParticleAttributes.UPDIR, vb2, 3, gl.FLOAT);
-        // put age and life in one vec2?
-        updateAttribSet2.addAttribute("p_ageLife", DefaultParticleAttributes.AGE_LIFE, vb2, 2, gl.FLOAT);
-        updateAttribSet2.addAttribute("p_seed", DefaultParticleAttributes.SEED, vb2, 4, gl.FLOAT);
-        updateAttribSet2.addAttribute("p_size", DefaultParticleAttributes.SIZE, vb2, 3, gl.FLOAT);
-        updateAttribSet2.addAttribute("p_color", DefaultParticleAttributes.COLOR, vb2, 4, gl.FLOAT);
-        updateAttribSet2.addAttribute("p_frameIdx", DefaultParticleAttributes.FRAME_INDEX, vb2, 1, gl.FLOAT);
-        updateAttribSet2.addAttribute("p_noiseTexCoord", DefaultParticleAttributes.NOISE_TEXCOORD, vb2, 2, gl.FLOAT);
+            this._updateAttributes.push(updateAttribSet.attributes);
 
-        this._updateAttributes.push(updateAttribSet1.attributes, updateAttribSet2.attributes);
+            const updateVAO = new VertexBufferArray();
+            this._updateVAO.push(updateVAO);
 
-        // VAOs
         // update VAO: only contains particle instance buffer
-        const updateVAO1 = new VertexBufferArray();
-        const updateVAO2 = new VertexBufferArray();
-        this._updateVAO.push(updateVAO1, updateVAO2);
-
-        updateVAO1.prepare(updateAttribSet1.attributes, null);
-        updateVAO2.prepare(updateAttribSet2.attributes, null);
+            updateVAO.prepare(updateAttribSet.attributes, null);
+        }
 
         // render VAO: contains geometry and instance buffer
         // CAUTION: need to add an offset to particle instance vertex attributes, for add geometry vertix attributes.
         // (find the max location of current geometry vertex attributes as offset)
-        
-        const renderAttribSet1 = new VertexBufferAttributeSet();
-        const renderAttribSet2 = new VertexBufferAttributeSet();
 
-        // todo: add geometry vertex attributes first
+        // swap update vb
+        const renderVB: VertexBuffer[] = [this._vertexBuffers[1], this._vertexBuffers[0]];
 
-        // then add particle instance attributes with offseted location
-        
-        const renderVAO1 = new VertexBufferArray();
-        const renderVAO2 = new VertexBufferArray();
-        this._renderVAO.push(renderVAO1, renderVAO2);
+        for(let i = 0; i < 2; i++) {
+            const vb = renderVB[i];
+            const renderAttribSet = new VertexBufferAttributeSet();
+            
+            let locationOffset = 0;
+            // add geometry vertex attributes first
+            for (const geomAttr of this.geometry.attributes) {
+                renderAttribSet.addAttribute(geomAttr.name, geomAttr.location, geomAttr.buffer, geomAttr.size, geomAttr.componentType, 0);
+                locationOffset = Math.max(locationOffset, geomAttr.location);
+            }
+
+            // then add particle instance attributes with offseted location
+            // fix me: how to set same locations in shader?
+
+            // set divisor to 1 (per instance)
+            renderAttribSet.addAttribute("p_position", DefaultParticleAttributes.POSITION + locationOffset, vb, 3, gl.FLOAT, 1);
+            renderAttribSet.addAttribute("p_direction", DefaultParticleAttributes.DIRECTION + locationOffset, vb, 3, gl.FLOAT, 1);
+            renderAttribSet.addAttribute("p_upDir", DefaultParticleAttributes.UPDIR + locationOffset, vb, 3, gl.FLOAT, 1);
+            // put age and life in one vec2?
+            renderAttribSet.addAttribute("p_ageLife", DefaultParticleAttributes.AGE_LIFE + locationOffset, vb, 2, gl.FLOAT, 1);
+            renderAttribSet.addAttribute("p_seed", DefaultParticleAttributes.SEED + locationOffset, vb, 4, gl.FLOAT, 1);
+            renderAttribSet.addAttribute("p_size", DefaultParticleAttributes.SIZE + locationOffset, vb, 3, gl.FLOAT, 1);
+            renderAttribSet.addAttribute("p_color", DefaultParticleAttributes.COLOR + locationOffset, vb, 4, gl.FLOAT, 1);
+            renderAttribSet.addAttribute("p_frameIdx", DefaultParticleAttributes.FRAME_INDEX + locationOffset, vb, 1, gl.FLOAT, 1);
+            renderAttribSet.addAttribute("p_noiseTexCoord", DefaultParticleAttributes.NOISE_TEXCOORD + locationOffset, vb, 2, gl.FLOAT, 1);
+
+            const renderVAO = new VertexBufferArray();
+            this._renderVAO.push(renderVAO);
+
+            // todo: pass in geometry index buffer
+            renderVAO.prepare(renderAttribSet.attributes, this.geometry.indexBuffer);
+        }
 
         // create transform feedback and record output buffer
         this._transformFeedback = gl.createTransformFeedback();
@@ -298,6 +311,8 @@ export class GPUParticleSystem extends Object3D {
             vb.release();
         }
         this._vertexBuffers.length = 0;
+
+        this._updateAttributes.length = 0;
 
         if (this._transformFeedback !== null) {
             gl.deleteTransformFeedback(this._transformFeedback);

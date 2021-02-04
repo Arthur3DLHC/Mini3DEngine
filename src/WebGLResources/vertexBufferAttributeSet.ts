@@ -11,8 +11,8 @@ export class VertexBufferAttributeSet {
 
     public get attributes() { return this._attributes; }
 
-    public addAttribute(name: string, location: number, vertexBuffer: VertexBuffer, size: number, componentType: GLenum) {
-        this.attributes.push(new VertexBufferAttribute(name, location, vertexBuffer, size, componentType, this._curOffset));
+    public addAttribute(name: string, location: number, vertexBuffer: VertexBuffer, size: number, componentType: GLenum, divisor?: number) {
+        this.attributes.push(new VertexBufferAttribute(name, location, vertexBuffer, size, componentType, this._curOffset, divisor));
         this._curOffset += size * COMPONENT_BYTE_SIZES[componentType];
     }
 }
