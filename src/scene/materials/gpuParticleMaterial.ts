@@ -8,6 +8,7 @@ import { ShaderProgram } from "../../WebGLResources/shaderProgram.js";
 import { GPUParticleSystem } from "../gpuParticleSystem.js";
 import { Material } from "./material.js";
 import { GLPrograms } from "../../WebGLResources/glPrograms.js";
+import { ClusteredForwardRenderContext } from "../../renderer/clusteredForwardRenderContext.js";
 
 /**
  * the default material for GPU particle systems.
@@ -17,16 +18,16 @@ export class GPUParticleMaterial extends Material {
     /**
      * don't call this before renderer initialized
      */
-    public constructor() {
+    public constructor(renderContext: ClusteredForwardRenderContext) {
         super();
-        this.loadPrograms();
+        this.loadPrograms(renderContext);
     }
 
     public updateProgram: ShaderProgram | null = null;
     public renderProgram: ShaderProgram | null = null;
     // private static _defaultRenderStates: RenderStateSet | null = null;
 
-    public loadPrograms() {
+    public loadPrograms(renderContext: ClusteredForwardRenderContext) {
         // load default programs
         // default feedback varyings
         const varyings: string[] = ["gl_position",
@@ -49,6 +50,11 @@ export class GPUParticleMaterial extends Material {
         this.renderProgram.vertexShaderCode = GLPrograms.processSourceCode(psys_gpu_render_vs);
         this.renderProgram.fragmentShaderCode = GLPrograms.processSourceCode(psys_gpu_render_fs);
         this.renderProgram.build();
+
+        // bind uniform buffer objects: perscene, perview, perobject
+        // for render program only?
+        renderContext.bindUniformBlocks(this.updateProgram);
+        renderContext.bindUniformBlocks(this.renderProgram);
 
         // subclasses can override this method to load their own programs
     }

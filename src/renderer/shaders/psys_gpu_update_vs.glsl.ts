@@ -4,9 +4,10 @@
 export default /** glsl */`
 // todo: 在 js 中统一指定 version?
 // uniforms
-#include <uniforms_scene>
-#include <uniforms_view>
-#include <uniforms_object>
+
+// #include <uniforms_scene>
+#include <uniforms_view>        // to get camera position and so on?
+#include <uniforms_object>      // to get emitter posiiton and so on?
 
 
 // vertex attribute

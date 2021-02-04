@@ -1,6 +1,7 @@
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { BufferGeometry } from "../geometry/bufferGeometry.js";
+import { ClusteredForwardRenderContext } from "../renderer/clusteredForwardRenderContext.js";
 import { RenderList } from "../renderer/renderList.js";
 import { RenderStateSet } from "../renderer/renderStateSet.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
@@ -65,6 +66,7 @@ export class GPUParticleSystem extends Object3D {
 
     public emitDirectionVariation: number = 0;
 
+
     public isBillboard: boolean = true;
     /** limit billbard rotation along particle direction axis */
     public limitBillboardRotation: boolean = false;
@@ -79,6 +81,10 @@ export class GPUParticleSystem extends Object3D {
 
     public minLife: number = 1;
     public maxLife: number = 1;
+    
+    // init speed?
+    public minSpeed: number = 1;
+    public maxSpeed: number = 1;
 
     public minSize: vec3 = new vec3([1,1,1]);
     public maxSize: vec3 = new vec3([1,1,1]);
@@ -86,13 +92,15 @@ export class GPUParticleSystem extends Object3D {
     /** emit color */
     public startColor: vec4 = new vec4([1,1,1,1]);
 
-    // todo: gradient color?
+    // todo: gradient color? generate a color gradient texture?
     public endColor: vec4 = new vec4([1,1,1,1]);
 
     // todo: noise texture?
 
     /** particles collide with scene depth texture? */
     public collision: boolean = false;
+
+    public gravity: vec3 = new vec3();
 
     //#endregion
 
@@ -124,6 +132,12 @@ export class GPUParticleSystem extends Object3D {
     private _updateVAO: VertexBufferArray[] = [];
     private _renderVAO: VertexBufferArray[] = [];
 
+    private _curSourceIndex: number = 0;
+
+    // transform feedback object?
+    // encapsulate or use gl object directly?
+    private _transformFeedback: WebGLTransformFeedback | null = null;
+
     // private static _defaultUpdateProgram: ShaderProgram | null = null;
     // private static _defaultRenderProgram: ShaderProgram | null = null;
     // private static _defaultRenderStates: RenderStateSet | null = null;
@@ -133,9 +147,9 @@ export class GPUParticleSystem extends Object3D {
 
     //#region public methods
 
-    public static initDefaultMaterial() {
+    public static initDefaultMaterial(renderContext: ClusteredForwardRenderContext) {
         if (GPUParticleSystem.defaultMaterial === null) {
-            GPUParticleSystem.defaultMaterial = new GPUParticleMaterial();
+            GPUParticleSystem.defaultMaterial = new GPUParticleMaterial(renderContext);
         }
     }
 
@@ -182,8 +196,7 @@ export class GPUParticleSystem extends Object3D {
         // todo: create vertex buffers
         // can use STATIC_DRAW (according to babylon.js)
         // this._vertexBuffer = new VertexBuffer(GLDevice.gl.DYNAMIC_DRAW);
-        this._vertexBuffers.push(new VertexBuffer(gl.STATIC_DRAW));
-        this._vertexBuffers.push(new VertexBuffer(gl.STATIC_DRAW));
+        this._vertexBuffers.push(new VertexBuffer(gl.STATIC_DRAW), new VertexBuffer(gl.STATIC_DRAW));
 
         // attributes
         this._attributes.push([]);
@@ -191,8 +204,13 @@ export class GPUParticleSystem extends Object3D {
 
         // VAOs
         // update VAO: only contains particle instance buffer
+        this._updateVAO.push(new VertexBufferArray(), new VertexBufferArray());
 
         // render VAO: contains geometry and instance buffer
+        this._renderVAO.push(new VertexBufferArray(), new VertexBufferArray());
+
+        // create transform feedback and record output buffer
+        this._transformFeedback = gl.createTransformFeedback();
     }
 
     public destroy() {
@@ -212,6 +230,11 @@ export class GPUParticleSystem extends Object3D {
             vb.release();
         }
         this._vertexBuffers.length = 0;
+
+        if (this._transformFeedback !== null) {
+            gl.deleteTransformFeedback(this._transformFeedback);
+            this._transformFeedback = null;
+        }
     }
 
     /**
@@ -254,29 +277,46 @@ export class GPUParticleSystem extends Object3D {
         this._curParticleCount = Math.min(this._curParticleCount, this._maxParticleCount);
         const updateCount = Math.floor(this._curParticleCount);
         if (updateCount > 0) {
-            // bind vertex array
+
+            // bind update VAO
             // bind transform feedback object
             // bind transfrom feedback buffer
             // attrib divisor
             // turn off rasterization
 
-            // use program
+            // use update program
 
             // begin transform feedback
             // draw updateCount vertices
             // end transform feedback
 
             // turn on rasterization
-            // bind vertex array and transform buffers to null
+            // bind VAO and transform buffers to null
 
             // pingpong the buffers
+            this._curSourceIndex++;
+            if (this._curSourceIndex >= 2) {
+                this._curSourceIndex = 0;
+            }
         }
     }
 
     public render() {
         const drawCount = Math.floor(this._curParticleCount);
         if (drawCount > 0) {
-            
+            // set material render states
+
+            // use render program
+
+            // uniforms
+
+            // textures
+
+            // bind render VAO
+
+            // drawinstanced
+
+            // restore render VAO?
         }
     }
 
