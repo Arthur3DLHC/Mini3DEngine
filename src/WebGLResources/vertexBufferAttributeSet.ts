@@ -10,6 +10,8 @@ export class VertexBufferAttributeSet {
     private _curOffset: number = 0;
 
     public get attributes() { return this._attributes; }
+    public get curSizeInBytes() { return this._curOffset; }
+    public set curSizeInBytes(val: number) { this._curOffset = val;}
 
     public addAttribute(name: string, location: number, vertexBuffer: VertexBuffer, size: number, componentType: GLenum, divisor?: number) {
         this.attributes.push(new VertexBufferAttribute(name, location, vertexBuffer, size, componentType, this._curOffset, divisor));

@@ -245,6 +245,8 @@ export class GPUParticleSystem extends Object3D {
             updateAttribSet.addAttribute("p_frameIdx", DefaultParticleAttributes.FRAME_INDEX, vb, 1, gl.FLOAT, 0);
             updateAttribSet.addAttribute("p_noiseTexCoord", DefaultParticleAttributes.NOISE_TEXCOORD, vb, 2, gl.FLOAT, 0);
 
+            vb.stride = updateAttribSet.curSizeInBytes;
+
             this._updateAttributes.push(updateAttribSet.attributes);
 
             const updateVAO = new VertexBufferArray();
@@ -264,7 +266,6 @@ export class GPUParticleSystem extends Object3D {
             const renderAttribSet = new VertexBufferAttributeSet();
             
             // use a fix location offset; easy to fit with shader
-            let locationOffset = 8;
             // add geometry vertex attributes first
             for (const geomAttr of this.geometry.attributes) {
                 renderAttribSet.addAttribute(geomAttr.name, geomAttr.location, geomAttr.buffer, geomAttr.size, geomAttr.componentType, 0);
@@ -272,6 +273,10 @@ export class GPUParticleSystem extends Object3D {
             }
 
             // then add particle instance attributes with offseted location
+            let locationOffset = 8;
+
+            // vertex buffer changed, reset the offset.
+            renderAttribSet.curSizeInBytes = 0;
 
             // set divisor to 1 (per instance)
             renderAttribSet.addAttribute("p_position", DefaultParticleAttributes.POSITION + locationOffset, vb, 3, gl.FLOAT, 1);
@@ -284,6 +289,8 @@ export class GPUParticleSystem extends Object3D {
             renderAttribSet.addAttribute("p_color", DefaultParticleAttributes.COLOR + locationOffset, vb, 4, gl.FLOAT, 1);
             renderAttribSet.addAttribute("p_frameIdx", DefaultParticleAttributes.FRAME_INDEX + locationOffset, vb, 1, gl.FLOAT, 1);
             renderAttribSet.addAttribute("p_noiseTexCoord", DefaultParticleAttributes.NOISE_TEXCOORD + locationOffset, vb, 2, gl.FLOAT, 1);
+
+            // vertex buffer stride has been setted already.
 
             const renderVAO = new VertexBufferArray();
             this._renderVAO.push(renderVAO);
@@ -396,7 +403,13 @@ export class GPUParticleSystem extends Object3D {
 
             GLPrograms.useProgram(mtl.updateProgram);
 
-            // todo: setup uniforms and textures for program
+            // set my properties to uniforms?
+            // or let mtl set them?
+
+            // where to set textures for updating and sampler uniforms?
+            // noise textures, gradiant textures...
+
+            mtl.setUpdateProgramUniforms(this);
 
             // begin transform feedback
             GLTransformFeedbacks.beginTransformFeedback(gl.POINTS);
@@ -408,7 +421,9 @@ export class GPUParticleSystem extends Object3D {
             // turn on rasterization
             GLDevice.discardResterization = false;
             // bind VAO and transform buffers to null
+            // this should also bind transform feedback output buffer to null
             GLTransformFeedbacks.bindTransformFeedback(null);
+            // GLPrograms.useProgram(null);
 
             // pingpong the buffers
             this._curSourceIndex++;

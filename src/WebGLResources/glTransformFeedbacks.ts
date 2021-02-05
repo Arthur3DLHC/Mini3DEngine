@@ -9,6 +9,9 @@ export class GLTransformFeedbacks {
             this._curTransformFeedback = transformFeedback;
             const gltfb = this._curTransformFeedback !== null ? this._curTransformFeedback.glTransformFeedback : null;
             GLDevice.gl.bindTransformFeedback(GLDevice.gl.TRANSFORM_FEEDBACK, gltfb);
+            if (gltfb === null) {
+                GLDevice.gl.bindBuffer(GLDevice.gl.TRANSFORM_FEEDBACK_BUFFER, null);
+            }
         }
     }
 
