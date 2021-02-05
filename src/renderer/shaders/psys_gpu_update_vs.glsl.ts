@@ -2,7 +2,8 @@
  * use GPU vertex transform feedback to update particles
  */
 export default /** glsl */`
-// version will be specified in js
+// version and precision will be added in js
+
 // uniforms
 
 // #include <uniforms_scene>
@@ -11,11 +12,13 @@ export default /** glsl */`
 
 // elapsed time
 uniform float u_elapsedTime;
-// fix me: how to control the emit rate?
-uniform float u_isEmitting;
 uniform vec3 u_gravity;
+
+// particle system params
+// fix me: how to control the emit rate?
+uniform int u_isEmitting;
 uniform vec3 u_origin;          // position of emitter?
-uniform vec4 u_emitDir_Variation;
+uniform vec4 u_emitDir_variation;
 // uniform float u_emitDirVariation;
 uniform int u_texAnimFrameCount;
 uniform vec2 u_lifeRange;
@@ -26,11 +29,8 @@ uniform int u_collision;
 
 // fix me: 'isBillboard' flag have usage here? or in drawing program?
 
-// particle system params
-
-
 // particle instance vertex attributeS
-// TODO: put into a header file?
+// TODO: put these into a header file?
 #define POSITION_LOC 0
 #define DIRECTION_LOC 1
 #define UPDIR_LOC 2
@@ -43,7 +43,7 @@ uniform int u_collision;
 
 layout(location = POSITION_LOC)     in vec3 p_position;
 layout(location = DIRECTION_LOC)    in vec3 p_direction;
-layout(location = UPDIR_LOC)        in vec3 p_upDir;
+layout(location = UPDIR_LOC)        in vec3 p_upDir;        // is this necessary?
 layout(location = AGE_LIFE_LOC)     in vec2 p_ageLife;
 layout(location = SEED_LOC)         in vec4 p_seed;
 layout(location = SIZE_LOC)         in vec3 p_size;
@@ -51,18 +51,52 @@ layout(location = COLOR_LOC)        in vec4 p_color;
 layout(location = FRAME_INDEX_LOC)  in float p_frameIdx;
 layout(location = NOISE_TEXCOORD_LOC) in vec2 p_noiseTexCoord;
 
-#include <function_transforms>
+// #include <function_transforms>
 
 // vertex output
-out vec4 ex_color;
+// the position will output to gl_position
+out vec3    ex_direction;
+out vec3    ex_upDir;
+out vec2    ex_ageLife;
+out vec4    ex_seed;
+out vec3    ex_size;
+out vec4    ex_color;
+out float   ex_frameIdx;
+out vec2    ex_noiseTexCoord;
 
 void main(void)
 {
-    vec4 worldPosition = vec4(0.);
-    vec4 localPosition = vec4(a_position, 1.0);
-    worldPosition = localToWorld(localPosition);
-    gl_Position = viewToProj(worldToView(worldPosition));
-    ex_color = u_object.color;
+    // check emit new particles
+    // at very beginning, the age and life will both be zero, indicating all particles are dead particles
+    // after first emiting, if a particle's age exceed it's life, we can treat it as dead again and emit as a new particle
+
+    // if psys stop emitting, we discard all particles who's age > life when rendering
+    float newAge = p_ageLife.x + u_elapsedTime;
+
+    if (newAge > p_ageLife.y && u_isEmitting > 0) {
+        vec3 newPosition;
+        vec3 newDirection;
+
+        // todo: get random value from random texture
+        vec4 random;
+
+        // age and life
+        ex_ageLife.x = newAge - p_ageLife.y;
+        ex_ageLife.y = mix(u_lifeRange.x, u_lifeRange.y, random.r);
+
+        ex_seed = p_seed;
+
+        // todo: size
+
+        // todo: generate position according to the emitter shape and size
+
+        // todo: generate direction by the u_emitDir_Variation
+
+        gl_position = newPosition;
+        ex_direction = newDirection;
+    } else {
+        // update this particle's velocity, position, direction...
+    }
 }
 
 `;
