@@ -136,4 +136,13 @@ export class GLDevice {
             this.gl.clear(mode);
         }
     }
+
+    /** for transform feedback */
+    public static set discardResterization(val: boolean) {
+        if (val) {
+            this.gl.enable(this.gl.RASTERIZER_DISCARD);
+        } else {
+            this.gl.disable(this.gl.RASTERIZER_DISCARD);
+        }
+    }
 }

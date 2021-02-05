@@ -5,6 +5,9 @@ import { ClusteredForwardRenderContext } from "../renderer/clusteredForwardRende
 import { RenderList } from "../renderer/renderList.js";
 import { RenderStateSet } from "../renderer/renderStateSet.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
+import { GLGeometryBuffers } from "../WebGLResources/glGeometryBuffers.js";
+import { GLPrograms } from "../WebGLResources/glPrograms.js";
+import { GLTransformFeedbacks } from "../WebGLResources/glTransformFeedbacks.js";
 import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
 import { TransformFeedback } from "../WebGLResources/transformFeedback.js";
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
@@ -361,6 +364,16 @@ export class GPUParticleSystem extends Object3D {
     // this will prevent waiting for the transform feedback finished
     // after render, swap the buffer B as source buffer.
     public update() {
+
+        // have material?
+        let mtl = this.material;
+        if (mtl === null) {
+            mtl = GPUParticleSystem.defaultMaterial;
+        }
+        if (mtl === null || mtl.updateProgram === null) {
+            return;
+        }
+
         // curr particle count
         // note: need to use float value
         if(this._isEmitting) {
@@ -370,20 +383,32 @@ export class GPUParticleSystem extends Object3D {
         const updateCount = Math.floor(this._curParticleCount);
         if (updateCount > 0) {
 
-            // bind update VAO
-            // bind transform feedback object
-            // bind transfrom feedback buffer
-            // attrib divisor
-            // turn off rasterization
+            const gl = GLDevice.gl;
 
-            // use update program
+            // bind update VAO
+            GLGeometryBuffers.bindVertexBufferArray(this._updateVAO[this._curSourceIndex]);
+            GLTransformFeedbacks.bindTransformFeedback(this._transformFeedbacks[this._curSourceIndex]);
+            
+            // attrib divisors?
+            
+            // turn off rasterization
+            GLDevice.discardResterization = true;
+
+            GLPrograms.useProgram(mtl.updateProgram);
+
+            // todo: setup uniforms and textures for program
 
             // begin transform feedback
-            // draw updateCount vertices
-            // end transform feedback
+            GLTransformFeedbacks.beginTransformFeedback(gl.POINTS);
+
+            gl.drawArrays(gl.POINTS, 0, this._curParticleCount);
+            
+            GLTransformFeedbacks.endTransformFeedback();
 
             // turn on rasterization
+            GLDevice.discardResterization = false;
             // bind VAO and transform buffers to null
+            GLTransformFeedbacks.bindTransformFeedback(null);
 
             // pingpong the buffers
             this._curSourceIndex++;
