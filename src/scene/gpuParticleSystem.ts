@@ -6,6 +6,7 @@ import { RenderList } from "../renderer/renderList.js";
 import { RenderStateSet } from "../renderer/renderStateSet.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
+import { TransformFeedback } from "../WebGLResources/transformFeedback.js";
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { VertexBufferArray } from "../WebGLResources/VertexBufferArray.js";
 import { VertexBufferAttribute } from "../WebGLResources/vertexBufferAttribute.js";
@@ -153,7 +154,7 @@ export class GPUParticleSystem extends Object3D {
 
     // transform feedback object?
     // encapsulate or use gl object directly?
-    private _transformFeedback: WebGLTransformFeedback | null = null;
+    private _transformFeedbacks: TransformFeedback[] = [];
 
     // private static _defaultUpdateProgram: ShaderProgram | null = null;
     // private static _defaultRenderProgram: ShaderProgram | null = null;
@@ -251,25 +252,23 @@ export class GPUParticleSystem extends Object3D {
         }
 
         // render VAO: contains geometry and instance buffer
-        // CAUTION: need to add an offset to particle instance vertex attributes, for add geometry vertix attributes.
-        // (find the max location of current geometry vertex attributes as offset)
 
-        // swap update vb
+        // swap update vbs
         const renderVB: VertexBuffer[] = [this._vertexBuffers[1], this._vertexBuffers[0]];
 
         for(let i = 0; i < 2; i++) {
             const vb = renderVB[i];
             const renderAttribSet = new VertexBufferAttributeSet();
             
-            let locationOffset = 0;
+            // use a fix location offset; easy to fit with shader
+            let locationOffset = 8;
             // add geometry vertex attributes first
             for (const geomAttr of this.geometry.attributes) {
                 renderAttribSet.addAttribute(geomAttr.name, geomAttr.location, geomAttr.buffer, geomAttr.size, geomAttr.componentType, 0);
-                locationOffset = Math.max(locationOffset, geomAttr.location);
+                // locationOffset = Math.max(locationOffset, geomAttr.location);
             }
 
             // then add particle instance attributes with offseted location
-            // fix me: how to set same locations in shader?
 
             // set divisor to 1 (per instance)
             renderAttribSet.addAttribute("p_position", DefaultParticleAttributes.POSITION + locationOffset, vb, 3, gl.FLOAT, 1);
@@ -286,16 +285,30 @@ export class GPUParticleSystem extends Object3D {
             const renderVAO = new VertexBufferArray();
             this._renderVAO.push(renderVAO);
 
-            // todo: pass in geometry index buffer
+            // pass in geometry index buffer
             renderVAO.prepare(renderAttribSet.attributes, this.geometry.indexBuffer);
         }
 
         // create transform feedback and record output buffer
-        this._transformFeedback = gl.createTransformFeedback();
+        const feedback1 = new TransformFeedback();
+        const feedback2 = new TransformFeedback();
+
+        feedback1.outputBuffer = this._vertexBuffers[1];
+        feedback2.outputBuffer = this._vertexBuffers[0];
+
+        feedback1.prepare();
+        feedback2.prepare();
+
+        this._transformFeedbacks.push(feedback1, feedback2);
     }
 
     public destroy() {
         this._isEmitting = false;
+        
+        for (const feedback of this._transformFeedbacks) {
+            feedback.release();
+        }
+        this._transformFeedbacks.length = 0;
 
         const gl = GLDevice.gl;
         for (const vao of this._updateVAO) {
@@ -314,10 +327,6 @@ export class GPUParticleSystem extends Object3D {
 
         this._updateAttributes.length = 0;
 
-        if (this._transformFeedback !== null) {
-            gl.deleteTransformFeedback(this._transformFeedback);
-            this._transformFeedback = null;
-        }
     }
 
     /**
