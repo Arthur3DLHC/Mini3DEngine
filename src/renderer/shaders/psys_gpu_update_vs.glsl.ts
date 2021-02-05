@@ -1,5 +1,7 @@
 /**
  * use GPU vertex transform feedback to update particles
+ * this is a simplified version of 
+ * https://github.com/BabylonJS/Babylon.js/blob/master/src/Shaders/gpuUpdateParticles.vertex.fx
  */
 export default /** glsl */`
 // version and precision will be added in js
@@ -42,7 +44,7 @@ uniform int u_collision;
 #define NOISE_TEXCOORD_LOC 8
 
 layout(location = POSITION_LOC)     in vec3 p_position;
-layout(location = DIRECTION_LOC)    in vec3 p_direction;
+layout(location = DIRECTION_LOC)    in vec3 p_direction;    // unnormaled. actually, 'velocity'
 layout(location = UPDIR_LOC)        in vec3 p_upDir;        // is this necessary?
 layout(location = AGE_LIFE_LOC)     in vec2 p_ageLife;
 layout(location = SEED_LOC)         in vec4 p_seed;
@@ -55,7 +57,7 @@ layout(location = NOISE_TEXCOORD_LOC) in vec2 p_noiseTexCoord;
 
 // vertex output
 // the position will output to gl_position
-out vec3    ex_direction;
+out vec3    ex_direction;    // unnormaled. actually, 'velocity'
 out vec3    ex_upDir;
 out vec2    ex_ageLife;
 out vec4    ex_seed;
@@ -96,6 +98,18 @@ void main(void)
         ex_direction = newDirection;
     } else {
         // update this particle's velocity, position, direction...
+        vec3 newDirection = p_direction + u_gravity * u_elapsedTime;
+        ex_direction = newDirection;
+        gl_position = p_position + newDirection;
+
+        ex_ageLife = p_ageLife;
+        ex_ageLife.x = newAge;
+
+        ex_seed = p_seed;
+
+        float ageGradient = newAge / ex_ageLife.y;
+
+        // todo: calc size, color and frameIdx by ageGradient
     }
 }
 

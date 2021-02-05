@@ -9,6 +9,7 @@ import { GLGeometryBuffers } from "../WebGLResources/glGeometryBuffers.js";
 import { GLPrograms } from "../WebGLResources/glPrograms.js";
 import { GLTransformFeedbacks } from "../WebGLResources/glTransformFeedbacks.js";
 import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
+import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { TransformFeedback } from "../WebGLResources/transformFeedback.js";
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
 import { VertexBufferArray } from "../WebGLResources/VertexBufferArray.js";
@@ -44,6 +45,8 @@ export const DefaultParticleAttributes = {
  * can be sprites or geometries
  * uses transform feedback to update particle positions,
  * and instancing to render them.
+ * this is a simplified version of BabylonJS gpuParticleSystem
+ * see https://github.com/BabylonJS/Babylon.js/blob/master/src/Particles/gpuParticleSystem.ts
  */
 export class GPUParticleSystem extends Object3D {
     public constructor(maxParticleCount: number) {
@@ -158,6 +161,9 @@ export class GPUParticleSystem extends Object3D {
     // transform feedback object?
     // encapsulate or use gl object directly?
     private _transformFeedbacks: TransformFeedback[] = [];
+
+    /** help generate fake random values in update vertex shader */
+    private _randomTexture: Texture2D | null = null;
 
     // private static _defaultUpdateProgram: ShaderProgram | null = null;
     // private static _defaultRenderProgram: ShaderProgram | null = null;
@@ -310,6 +316,16 @@ export class GPUParticleSystem extends Object3D {
         feedback2.prepare();
 
         this._transformFeedbacks.push(feedback1, feedback2);
+
+        // todo: create random texture
+
+        this._randomTexture = new Texture2D(1024, 1, 1, 1, gl.RGBA, gl.FLOAT, false);
+        const floats = 1024 * 4;
+        this._randomTexture.image = new Float32Array(floats);
+        for (let i = 0; i < floats; i++) {
+            this._randomTexture.image[i] = Math.random();
+        }
+        this._randomTexture.upload();
     }
 
     public destroy() {
@@ -337,6 +353,10 @@ export class GPUParticleSystem extends Object3D {
 
         this._updateAttributes.length = 0;
 
+        if (this._randomTexture !== null) {
+            this._randomTexture.release();
+            this._randomTexture = null;
+        }
     }
 
     /**
