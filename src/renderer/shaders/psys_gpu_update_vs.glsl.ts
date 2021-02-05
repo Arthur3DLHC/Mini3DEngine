@@ -9,6 +9,26 @@ export default /** glsl */`
 #include <uniforms_view>        // to get camera position and so on?
 #include <uniforms_object>      // to get emitter posiiton and so on?
 
+// elapsed time
+uniform float u_elapsedTime;
+// fix me: how to control the emit rate?
+uniform float u_isEmitting;
+uniform vec3 u_gravity;
+uniform vec3 u_origin;          // position of emitter?
+uniform vec4 u_emitDir_Variation;
+// uniform float u_emitDirVariation;
+uniform int u_texAnimFrameCount;
+uniform vec2 u_lifeRange;
+uniform vec2 u_speedRange;
+uniform vec3 u_minSize;
+uniform vec3 u_maxSize;
+uniform int u_collision;
+
+// fix me: 'isBillboard' flag have usage here? or in drawing program?
+
+// particle system params
+
+
 // particle instance vertex attributeS
 // TODO: put into a header file?
 #define POSITION_LOC 0
