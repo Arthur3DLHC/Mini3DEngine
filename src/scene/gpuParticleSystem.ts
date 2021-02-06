@@ -7,6 +7,7 @@ import { RenderStateSet } from "../renderer/renderStateSet.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { GLGeometryBuffers } from "../WebGLResources/glGeometryBuffers.js";
 import { GLPrograms } from "../WebGLResources/glPrograms.js";
+import { GLTextures } from "../WebGLResources/glTextures.js";
 import { GLTransformFeedbacks } from "../WebGLResources/glTransformFeedbacks.js";
 import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
 import { Texture2D } from "../WebGLResources/textures/texture2D.js";
@@ -396,7 +397,8 @@ export class GPUParticleSystem extends Object3D {
     // and also use buffer A as source when render;
     // this will prevent waiting for the transform feedback finished
     // after render, swap the buffer B as source buffer.
-    public update() {
+    // todo: pass in (last frame?) scene normal and depth texture
+    public update(startTexUnit: number) {
 
         // have material?
         let mtl = this.material;
@@ -431,8 +433,7 @@ export class GPUParticleSystem extends Object3D {
 
             GLPrograms.useProgram(updateProgram);
 
-            // set my properties to uniforms?
-            // or let mtl set them?
+            // set psys properties to uniforms
             gl.uniform1f(updateProgram.getUniformLocation("u_elapsedTime"), Clock.instance.elapsedTime);
             gl.uniform3f(updateProgram.getUniformLocation("u_gravity"), this.gravity.x, this.gravity.y, this.gravity.z);
             gl.uniform1f(updateProgram.getUniformLocation("u_curCount"), this._curParticleCount);
@@ -459,8 +460,12 @@ export class GPUParticleSystem extends Object3D {
 
             // random textures, gradiant textures...
             
-            // 
+            let texUnit = startTexUnit;
+            GLTextures.setTextureAt(texUnit, this._randomTexture);
+            gl.uniform1i(updateProgram.getUniformLocation("s_randomTexture"), texUnit);
+            texUnit++;
 
+            // set material specific params
             mtl.setUpdateProgramUniforms(this);
 
             // begin transform feedback
@@ -489,6 +494,7 @@ export class GPUParticleSystem extends Object3D {
         const drawCount = Math.floor(this._curParticleCount);
         if (drawCount > 0) {
             // set material render states
+            // if use collision, do not write depth buffer?
 
             // use render program
 

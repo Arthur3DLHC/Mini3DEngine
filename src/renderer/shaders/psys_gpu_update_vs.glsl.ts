@@ -135,17 +135,17 @@ void main(void)
         // animation frame index
         ex_frameIdx = u_texAnimFrameInfo.x;
         if(u_texAnimFrameInfo.w > 0.5) {
-            // todo: support random start index? for effects like fire...
+            // support random start index? for effects like fire...
             ex_frameIdx = mix(u_texAnimFrameInfo.x, u_texAnimFrameInfo.y, random.a);
         }
 
         // todo: nose texture?
 
-        // todo: generate local direction by the u_emitDir_variation
+        // generate local direction by the u_emitDir_variation
         newDirection = u_emitDir_variation.xyz + getRandomVec3(p_seed.z) * u_emitDir_variation.w;
         newDirection *= mix(u_speedRange.x, u_speedRange.y, random.a);
 
-        // transform them to world space?
+        // transform them to world space
         newPosition = (u_emitterModelTransform * vec4(newPosition, 1.0)).xyz;
         newDirection = (u_emitterModelTransform * vec4(newDirection, 0.0)).xyz;
 
