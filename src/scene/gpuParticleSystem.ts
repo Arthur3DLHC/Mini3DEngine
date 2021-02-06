@@ -427,7 +427,16 @@ export class GPUParticleSystem extends Object3D {
             // or let mtl set them?
 
             // where to set textures for updating and sampler uniforms?
-            // noise textures, gradiant textures...
+            // scene depth and normal texture
+            // since we need to use these two textures, we must draw all particles after opaque objects finished drawing
+            // and we can not render to these two textures.
+
+            // or can we use last frame of these textures ? need to double-buffer depth and normal texture in renderer too.
+            // particles with collision detecting still can not write to depth buffer; or they will collide with themselves in last frame...
+
+            // random textures, gradiant textures...
+            
+            // 
 
             mtl.setUpdateProgramUniforms(this);
 

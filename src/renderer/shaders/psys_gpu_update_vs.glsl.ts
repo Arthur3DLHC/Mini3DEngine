@@ -16,6 +16,8 @@ export default /** glsl */`
 uniform float u_elapsedTime;
 uniform vec3 u_gravity;
 
+uniform float u_curCount;       // current particle count (including respawned)
+
 // particle system params
 // fix me: how to control the emit rate?
 uniform int u_isEmitting;
@@ -29,7 +31,9 @@ uniform vec3 u_minSize;
 uniform vec3 u_maxSize;
 uniform int u_collision;
 
-// fix me: 'isBillboard' flag have usage here? or in drawing program?
+uniform sampler2D s_sceneDepth;     // for collision detecting
+uniform sampler2D s_sceneNormal;
+uniform sampler2D s_randomTexture;
 
 // particle instance vertex attributeS
 // TODO: put these into a header file?
@@ -66,6 +70,16 @@ out vec4    ex_color;
 out float   ex_frameIdx;
 out vec2    ex_noiseTexCoord;
 
+vec3 getRandomVec3(float offset) {
+    // babylon.js use two random textures;
+    // is one texture OK?
+    return texture(s_randomTexture, vec2(float(gl_vertexID) * offset / u_curCount, 0)).rgb;
+}
+
+vec4 getRandomVec4(float offset) {
+    return texture(s_randomTexture, vec2(float(gl_vertexID) * offset / u_curCount, 0));
+}
+
 void main(void)
 {
     // check emit new particles
@@ -80,7 +94,7 @@ void main(void)
         vec3 newDirection;
 
         // todo: get random value from random texture
-        vec4 random;
+        vec4 random = getRandomVec4(p_seed.x);
 
         // age and life
         ex_ageLife.x = newAge - p_ageLife.y;
