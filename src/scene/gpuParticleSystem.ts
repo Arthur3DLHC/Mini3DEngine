@@ -31,13 +31,13 @@ export enum EmitterShape {
 export const DefaultParticleAttributes = {
     POSITION: 0,
     DIRECTION: 1,
-    UPDIR: 2,
-    AGE_LIFE: 3,
-    SEED: 4,
-    SIZE: 5,
-    COLOR: 6,
-    FRAME_INDEX: 7,
-    NOISE_TEXCOORD: 8
+    AGE_LIFE: 2,
+    SEED: 3,
+    SIZE: 4,
+    COLOR: 5,
+    FRAME_INDEX: 6,
+    // NOISE_TEXCOORD: 7,
+    // UPDIR: 8,
 };
 
 /**
@@ -206,7 +206,7 @@ export class GPUParticleSystem extends Object3D {
             // direciton is also velocity?
             data.push(0, 0, 0);
             // upDirection: vec3    // current up dir
-            data.push(0, 1, 0);
+            // data.push(0, 1, 0);
             // age: number
             data.push(0);   // use a dead particle; emit in update shader
             // life: number // life for every particle is different; generated randomly from life range.
@@ -220,7 +220,7 @@ export class GPUParticleSystem extends Object3D {
             // frameIndex: number // texture animation frame index
             data.push(0);
             // noiseTexcoord
-            data.push(0, 0);
+            // data.push(0, 0);
         }
         
         const gl = GLDevice.gl;
@@ -242,14 +242,14 @@ export class GPUParticleSystem extends Object3D {
             // set divisor to 0 (per vertex) when update
             updateAttribSet.addAttribute("p_position", DefaultParticleAttributes.POSITION, vb, 3, gl.FLOAT, 0);
             updateAttribSet.addAttribute("p_direction", DefaultParticleAttributes.DIRECTION, vb, 3, gl.FLOAT, 0);
-            updateAttribSet.addAttribute("p_upDir", DefaultParticleAttributes.UPDIR, vb, 3, gl.FLOAT, 0);
+            // updateAttribSet.addAttribute("p_upDir", DefaultParticleAttributes.UPDIR, vb, 3, gl.FLOAT, 0);
             // put age and life in one vec2?
             updateAttribSet.addAttribute("p_ageLife", DefaultParticleAttributes.AGE_LIFE, vb, 2, gl.FLOAT, 0);
             updateAttribSet.addAttribute("p_seed", DefaultParticleAttributes.SEED, vb, 4, gl.FLOAT, 0);
             updateAttribSet.addAttribute("p_size", DefaultParticleAttributes.SIZE, vb, 3, gl.FLOAT, 0);
             updateAttribSet.addAttribute("p_color", DefaultParticleAttributes.COLOR, vb, 4, gl.FLOAT, 0);
             updateAttribSet.addAttribute("p_frameIdx", DefaultParticleAttributes.FRAME_INDEX, vb, 1, gl.FLOAT, 0);
-            updateAttribSet.addAttribute("p_noiseTexCoord", DefaultParticleAttributes.NOISE_TEXCOORD, vb, 2, gl.FLOAT, 0);
+            // updateAttribSet.addAttribute("p_noiseTexCoord", DefaultParticleAttributes.NOISE_TEXCOORD, vb, 2, gl.FLOAT, 0);
 
             vb.stride = updateAttribSet.curSizeInBytes;
 
@@ -287,14 +287,14 @@ export class GPUParticleSystem extends Object3D {
             // set divisor to 1 (per instance)
             renderAttribSet.addAttribute("p_position", DefaultParticleAttributes.POSITION + locationOffset, vb, 3, gl.FLOAT, 1);
             renderAttribSet.addAttribute("p_direction", DefaultParticleAttributes.DIRECTION + locationOffset, vb, 3, gl.FLOAT, 1);
-            renderAttribSet.addAttribute("p_upDir", DefaultParticleAttributes.UPDIR + locationOffset, vb, 3, gl.FLOAT, 1);
+            // renderAttribSet.addAttribute("p_upDir", DefaultParticleAttributes.UPDIR + locationOffset, vb, 3, gl.FLOAT, 1);
             // put age and life in one vec2?
             renderAttribSet.addAttribute("p_ageLife", DefaultParticleAttributes.AGE_LIFE + locationOffset, vb, 2, gl.FLOAT, 1);
             renderAttribSet.addAttribute("p_seed", DefaultParticleAttributes.SEED + locationOffset, vb, 4, gl.FLOAT, 1);
             renderAttribSet.addAttribute("p_size", DefaultParticleAttributes.SIZE + locationOffset, vb, 3, gl.FLOAT, 1);
             renderAttribSet.addAttribute("p_color", DefaultParticleAttributes.COLOR + locationOffset, vb, 4, gl.FLOAT, 1);
             renderAttribSet.addAttribute("p_frameIdx", DefaultParticleAttributes.FRAME_INDEX + locationOffset, vb, 1, gl.FLOAT, 1);
-            renderAttribSet.addAttribute("p_noiseTexCoord", DefaultParticleAttributes.NOISE_TEXCOORD + locationOffset, vb, 2, gl.FLOAT, 1);
+            // renderAttribSet.addAttribute("p_noiseTexCoord", DefaultParticleAttributes.NOISE_TEXCOORD + locationOffset, vb, 2, gl.FLOAT, 1);
 
             // vertex buffer stride has been setted already.
 

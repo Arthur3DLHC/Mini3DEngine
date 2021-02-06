@@ -54,36 +54,36 @@ uniform sampler2D s_randomTexture;
 // TODO: put these into a header file?
 #define POSITION_LOC    0
 #define DIRECTION_LOC   1
-#define UPDIR_LOC       2
-#define AGE_LIFE_LOC    3
-#define SEED_LOC        4
-#define SIZE_LOC        5
-#define COLOR_LOC       6
-#define FRAME_INDEX_LOC 7
-#define NOISE_TEXCOORD_LOC 8
+#define AGE_LIFE_LOC    2
+#define SEED_LOC        3
+#define SIZE_LOC        4
+#define COLOR_LOC       5
+#define FRAME_INDEX_LOC 6
+// #define NOISE_TEXCOORD_LOC 7
+// #define UPDIR_LOC       8
 
 layout(location = POSITION_LOC)     in vec3 p_position;
 layout(location = DIRECTION_LOC)    in vec3 p_direction;    // unnormaled. actually, 'velocity'
-layout(location = UPDIR_LOC)        in vec3 p_upDir;        // is this necessary?
+// layout(location = UPDIR_LOC)        in vec3 p_upDir;        // is this necessary?
 layout(location = AGE_LIFE_LOC)     in vec2 p_ageLife;
 layout(location = SEED_LOC)         in vec4 p_seed;
 layout(location = SIZE_LOC)         in vec3 p_size;
 layout(location = COLOR_LOC)        in vec4 p_color;
 layout(location = FRAME_INDEX_LOC)  in float p_frameIdx;    // use a float value to enable blending between 2 frames
-layout(location = NOISE_TEXCOORD_LOC) in vec2 p_noiseTexCoord;
+// layout(location = NOISE_TEXCOORD_LOC) in vec2 p_noiseTexCoord;
 
 // #include <function_transforms>
 
 // vertex output
 // the position will output to gl_position
 out vec3    ex_direction;    // unnormaled. actually, 'velocity'
-out vec3    ex_upDir;
+// out vec3    ex_upDir;
 out vec2    ex_ageLife;
 out vec4    ex_seed;
 out vec3    ex_size;
 out vec4    ex_color;
 out float   ex_frameIdx;
-out vec2    ex_noiseTexCoord;
+// out vec2    ex_noiseTexCoord;
 
 vec3 getRandomVec3(float offset) {
     // babylon.js use two random textures;
@@ -136,7 +136,7 @@ void main(void)
         ex_frameIdx = u_texAnimFrameInfo.x;
         if(u_texAnimFrameInfo.w > 0.5) {
             // todo: support random start index? for effects like fire...
-
+            ex_frameIdx = mix(u_texAnimFrameInfo.x, u_texAnimFrameInfo.y, random.a);
         }
 
         // todo: nose texture?
@@ -168,7 +168,7 @@ void main(void)
         ex_color = p_color;
         ex_size = p_size;
         ex_frameIdx = p_frameIdx + u_texAnimFrameInfo.z * u_elapsedTime;
-        if(ex_frameIdx > u_texAnimFrameInfo.y) ex_frameIdx -= u_texAnimFrameInfo.y;
+        if(ex_frameIdx > u_texAnimFrameInfo.y) ex_frameIdx = u_texAnimFrameInfo.x;
     }
 }
 
