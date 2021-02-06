@@ -165,6 +165,10 @@ void main(void)
         float ageGradient = newAge / ex_ageLife.y;
 
         // todo: calc size, color and frameIdx by ageGradient
+        ex_color = p_color;
+        ex_size = p_size;
+        ex_frameIdx = p_frameIdx + u_texAnimFrameInfo.z * u_elapsedTime;
+        if(ex_frameIdx > u_texAnimFrameInfo.y) ex_frameIdx -= u_texAnimFrameInfo.y;
     }
 }
 
