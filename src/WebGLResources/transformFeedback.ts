@@ -1,5 +1,5 @@
-import { GLDevice } from "./glDevice";
-import { VertexBuffer } from "./vertexBuffer";
+import { GLDevice } from "./glDevice.js";
+import { VertexBuffer } from "./vertexBuffer.js";
 
 export class TransformFeedback {
     public constructor() {
