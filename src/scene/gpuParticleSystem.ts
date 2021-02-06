@@ -20,7 +20,7 @@ import { GPUParticleMaterial } from "./materials/gpuParticleMaterial.js";
 import { Object3D } from "./object3D.js";
 
 export enum EmitterShape {
-    Sphere,
+    Ellipsoid,
     Box,
 }
 
@@ -82,7 +82,7 @@ export class GPUParticleSystem extends Object3D {
     // emitter shape and range?
     // different shape use different shaders?
     // or allow a few simple shapes, and use if branch in shader?
-    public emitterShape: EmitterShape = EmitterShape.Sphere;
+    public emitterShape: EmitterShape = EmitterShape.Ellipsoid;
 
     public emitterSize: vec3 = new vec3([1,1,1]);
 
@@ -100,7 +100,13 @@ export class GPUParticleSystem extends Object3D {
 
     // todo: animation frames?
     // use one-row texture?
+    // can use only part of all frames.
+    public texAnimStartFrame: number = 0;
+    public texAnimEndFrame: number = 0;
+    public texAnimFrameIncreaseSpeed: number = 0;
+    /** total frame count */
     public texAnimFrameCount: number = 1;
+
     public randomAnimStartFrame: boolean = false;
 
     public minLife: number = 1;
@@ -416,16 +422,33 @@ export class GPUParticleSystem extends Object3D {
             GLGeometryBuffers.bindVertexBufferArray(this._updateVAO[this._curSourceIndex]);
             GLTransformFeedbacks.bindTransformFeedback(this._transformFeedbacks[this._curSourceIndex]);
             
-            // attrib divisors?
+            // attrib divisors? should have been recorded in VAO
             
             // turn off rasterization
             GLDevice.discardResterization = true;
 
-            GLPrograms.useProgram(mtl.updateProgram);
+            const updateProgram = mtl.updateProgram;
+
+            GLPrograms.useProgram(updateProgram);
 
             // set my properties to uniforms?
             // or let mtl set them?
-
+            gl.uniform1f(updateProgram.getUniformLocation("u_elapsedTime"), Clock.instance.elapsedTime);
+            gl.uniform3f(updateProgram.getUniformLocation("u_gravity"), this.gravity.x, this.gravity.y, this.gravity.z);
+            gl.uniform1f(updateProgram.getUniformLocation("u_curCount"), this._curParticleCount);
+            gl.uniform1i(updateProgram.getUniformLocation("u_isEmitting"), this._isEmitting ? 1 : 0);
+            gl.uniform1i(updateProgram.getUniformLocation("u_emitterShape"), this.emitterShape);
+            gl.uniformMatrix4fv(updateProgram.getUniformLocation("u_emitterModelTransform"), false, this.worldTransform.values);
+            gl.uniform4f(updateProgram.getUniformLocation("u_emitDir_variation"), this.emitDirection.x, this.emitDirection.y, this.emitDirection.z, this.emitDirectionVariation);
+            gl.uniform4f(updateProgram.getUniformLocation("u_texAnimFrameInfo"), this.texAnimStartFrame, this.texAnimEndFrame, this.texAnimFrameIncreaseSpeed, this.randomAnimStartFrame ? 1 : 0);
+            gl.uniform2f(updateProgram.getUniformLocation("u_lifeRange"), this.minLife, this.maxLife);
+            gl.uniform2f(updateProgram.getUniformLocation("u_speedRange"), this.minSpeed, this.maxSpeed);
+            gl.uniform3f(updateProgram.getUniformLocation("u_minSize"), this.minSize.x, this.minSize.y, this.minSize.z);
+            gl.uniform3f(updateProgram.getUniformLocation("u_maxSize"), this.maxSize.x, this.maxSize.y, this.maxSize.z);
+            gl.uniform1i(updateProgram.getUniformLocation("u_collision"), this.collision ? 1 : 0);
+            gl.uniform4f(updateProgram.getUniformLocation("u_color1"), this.startColor.x, this.startColor.y, this.startColor.z, this.startColor.w);
+            gl.uniform4f(updateProgram.getUniformLocation("u_color2"), this.endColor.x, this.endColor.y, this.endColor.z, this.endColor.w);
+            
             // where to set textures for updating and sampler uniforms?
             // scene depth and normal texture
             // since we need to use these two textures, we must draw all particles after opaque objects finished drawing
