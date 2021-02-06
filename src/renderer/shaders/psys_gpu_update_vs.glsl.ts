@@ -29,14 +29,22 @@ uniform int     u_emitterShape;
 // uniform vec3    u_emitterSize;          // local size in x, y, z axis
 uniform mat4    u_emitterModelTransform;   // contains rotate, scale, translation already.
 
-uniform vec4    u_emitDir_variation;
-// uniform float u_emitDirVariation;
-uniform int     u_texAnimFrameCount;
-uniform vec2    u_lifeRange;
-uniform vec2    u_speedRange;
+uniform vec4    u_emitDir_variation;    // xyz: emit dir (normalized dir)
+                                        // w: dir variation
+
+uniform vec4    u_texAnimFrameInfo;     // x: start frame
+                                        // y: end frame
+                                        // z: frame change speed
+                                        // w: use random frame offset?
+
+uniform vec2    u_lifeRange;            // x: min random life; y: max random life
+uniform vec2    u_speedRange;           // x: min start speed; y: max start speed
 uniform vec3    u_minSize;
 uniform vec3    u_maxSize;
 uniform int     u_collision;
+// can assign random color when emitting?
+uniform vec4    u_color1;
+uniform vec4    u_color2;
 
 uniform sampler2D s_sceneDepth;     // for collision detecting
 uniform sampler2D s_sceneNormal;
@@ -61,7 +69,7 @@ layout(location = AGE_LIFE_LOC)     in vec2 p_ageLife;
 layout(location = SEED_LOC)         in vec4 p_seed;
 layout(location = SIZE_LOC)         in vec3 p_size;
 layout(location = COLOR_LOC)        in vec4 p_color;
-layout(location = FRAME_INDEX_LOC)  in float p_frameIdx;
+layout(location = FRAME_INDEX_LOC)  in float p_frameIdx;    // use a float value to enable blending between 2 frames
 layout(location = NOISE_TEXCOORD_LOC) in vec2 p_noiseTexCoord;
 
 // #include <function_transforms>
@@ -121,11 +129,25 @@ void main(void)
             newPosition = getRandomVec3(p_seed.y);
         }
 
-        // todo: generate local direction by the u_emitDir_Variation
+        // random color
+        ex_color = mix(u_color1, u_color2, random.b);
+
+        // animation frame index
+        ex_frameIdx = u_texAnimFrameInfo.x;
+        if(u_texAnimFrameInfo.w > 0.5) {
+            // todo: support random start index? for effects like fire...
+
+        }
+
+        // todo: nose texture?
+
+        // todo: generate local direction by the u_emitDir_variation
+        newDirection = u_emitDir_variation.xyz + getRandomVec3(p_seed.z) * u_emitDir_variation.w;
+        newDirection *= mix(u_speedRange.x, u_speedRange.y, random.a);
 
         // transform them to world space?
         newPosition = (u_emitterModelTransform * vec4(newPosition, 1.0)).xyz;
-        newDirection = (u_emitterModelTransform * vec4(newPosition, 0.0)).xyz;
+        newDirection = (u_emitterModelTransform * vec4(newDirection, 0.0)).xyz;
 
         gl_position = newPosition;
         ex_direction = newDirection;
@@ -133,7 +155,7 @@ void main(void)
         // update this particle's velocity, position, direction...
         vec3 newDirection = p_direction + u_gravity * u_elapsedTime;
         ex_direction = newDirection;
-        gl_position = p_position + newDirection;
+        gl_position = p_position + newDirection * u_elapsedTime;
 
         ex_ageLife = p_ageLife;
         ex_ageLife.x = newAge;
