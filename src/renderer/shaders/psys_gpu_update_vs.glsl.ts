@@ -12,24 +12,31 @@ export default /** glsl */`
 #include <uniforms_view>        // to get camera position and so on?
 #include <uniforms_object>      // to get emitter posiiton and so on?
 
-// elapsed time
-uniform float u_elapsedTime;
-uniform vec3 u_gravity;
+#define EMITTER_ELLIPSOID  0
+#define EMITTER_BOX        1
 
-uniform float u_curCount;       // current particle count (including respawned)
+// elapsed time
+uniform float   u_elapsedTime;
+uniform vec3    u_gravity;
+
+uniform float   u_curCount;             // current particle count (including respawned)
 
 // particle system params
 // fix me: how to control the emit rate?
-uniform int u_isEmitting;
-uniform vec3 u_origin;          // position of emitter?
-uniform vec4 u_emitDir_variation;
+uniform int     u_isEmitting;
+// uniform vec3    u_origin;            // position of emitter?
+uniform int     u_emitterShape;
+// uniform vec3    u_emitterSize;          // local size in x, y, z axis
+uniform mat4    u_emitterModelTransform;   // contains rotate, scale, translation already.
+
+uniform vec4    u_emitDir_variation;
 // uniform float u_emitDirVariation;
-uniform int u_texAnimFrameCount;
-uniform vec2 u_lifeRange;
-uniform vec2 u_speedRange;
-uniform vec3 u_minSize;
-uniform vec3 u_maxSize;
-uniform int u_collision;
+uniform int     u_texAnimFrameCount;
+uniform vec2    u_lifeRange;
+uniform vec2    u_speedRange;
+uniform vec3    u_minSize;
+uniform vec3    u_maxSize;
+uniform int     u_collision;
 
 uniform sampler2D s_sceneDepth;     // for collision detecting
 uniform sampler2D s_sceneNormal;
@@ -37,13 +44,13 @@ uniform sampler2D s_randomTexture;
 
 // particle instance vertex attributeS
 // TODO: put these into a header file?
-#define POSITION_LOC 0
-#define DIRECTION_LOC 1
-#define UPDIR_LOC 2
-#define AGE_LIFE_LOC 3
-#define SEED_LOC 4
-#define SIZE_LOC 5
-#define COLOR_LOC 6
+#define POSITION_LOC    0
+#define DIRECTION_LOC   1
+#define UPDIR_LOC       2
+#define AGE_LIFE_LOC    3
+#define SEED_LOC        4
+#define SIZE_LOC        5
+#define COLOR_LOC       6
 #define FRAME_INDEX_LOC 7
 #define NOISE_TEXCOORD_LOC 8
 
@@ -102,11 +109,23 @@ void main(void)
 
         ex_seed = p_seed;
 
-        // todo: size
+        // todo: size; random init size; gradient texture?
+        ex_size = mix(u_minSize, u_maxSize, random.g);
 
         // todo: generate position according to the emitter shape and size
+        // generate in local unit space, then assign emitter world transform.
+        if (u_emitterShape == EMITTER_ELLIPSOID) {
+            // random radius and polar coords?
+        } else if (u_emitterShape == EMITTER_BOX) {
+            // random xyz
+            newPosition = getRandomVec3(p_seed.y);
+        }
 
-        // todo: generate direction by the u_emitDir_Variation
+        // todo: generate local direction by the u_emitDir_Variation
+
+        // transform them to world space?
+        newPosition = (u_emitterModelTransform * vec4(newPosition, 1.0)).xyz;
+        newDirection = (u_emitterModelTransform * vec4(newPosition, 0.0)).xyz;
 
         gl_position = newPosition;
         ex_direction = newDirection;
