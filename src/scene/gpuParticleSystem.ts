@@ -7,6 +7,7 @@ import { RenderStateSet } from "../renderer/renderStateSet.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { GLGeometryBuffers } from "../WebGLResources/glGeometryBuffers.js";
 import { GLPrograms } from "../WebGLResources/glPrograms.js";
+import { GLRenderStates } from "../WebGLResources/glRenderStates.js";
 import { GLTextures } from "../WebGLResources/glTextures.js";
 import { GLTransformFeedbacks } from "../WebGLResources/glTransformFeedbacks.js";
 import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
@@ -121,10 +122,10 @@ export class GPUParticleSystem extends Object3D {
     public maxSize: vec3 = new vec3([1,1,1]);
 
     /** emit color */
-    public startColor: vec4 = new vec4([1,1,1,1]);
+    public color1: vec4 = new vec4([1,1,1,1]);
+    public color2: vec4 = new vec4([1,1,1,1]);
 
     // todo: gradient color? generate a color gradient texture?
-    public endColor: vec4 = new vec4([1,1,1,1]);
 
     // todo: noise texture?
 
@@ -288,7 +289,7 @@ export class GPUParticleSystem extends Object3D {
             // then add particle instance attributes with offseted location
             let locationOffset = 8;
 
-            // vertex buffer changed, reset the offset.
+            // vertex buffer changed, reset the byte offset.
             renderAttribSet.curSizeInBytes = 0;
 
             // set divisor to 1 (per instance)
@@ -324,7 +325,7 @@ export class GPUParticleSystem extends Object3D {
 
         this._transformFeedbacks.push(feedback1, feedback2);
 
-        // todo: create random texture
+        // create random texture
 
         this._randomTexture = new Texture2D(1024, 1, 1, 1, gl.RGBA, gl.FLOAT, false);
         const floats = 1024 * 4;
@@ -434,6 +435,7 @@ export class GPUParticleSystem extends Object3D {
             GLPrograms.useProgram(updateProgram);
 
             // set psys properties to uniforms
+            // too much...
             gl.uniform1f(updateProgram.getUniformLocation("u_elapsedTime"), Clock.instance.elapsedTime);
             gl.uniform3f(updateProgram.getUniformLocation("u_gravity"), this.gravity.x, this.gravity.y, this.gravity.z);
             gl.uniform1f(updateProgram.getUniformLocation("u_curCount"), this._curParticleCount);
@@ -447,8 +449,8 @@ export class GPUParticleSystem extends Object3D {
             gl.uniform3f(updateProgram.getUniformLocation("u_minSize"), this.minSize.x, this.minSize.y, this.minSize.z);
             gl.uniform3f(updateProgram.getUniformLocation("u_maxSize"), this.maxSize.x, this.maxSize.y, this.maxSize.z);
             gl.uniform1i(updateProgram.getUniformLocation("u_collision"), this.collision ? 1 : 0);
-            gl.uniform4f(updateProgram.getUniformLocation("u_color1"), this.startColor.x, this.startColor.y, this.startColor.z, this.startColor.w);
-            gl.uniform4f(updateProgram.getUniformLocation("u_color2"), this.endColor.x, this.endColor.y, this.endColor.z, this.endColor.w);
+            gl.uniform4f(updateProgram.getUniformLocation("u_color1"), this.color1.x, this.color1.y, this.color1.z, this.color1.w);
+            gl.uniform4f(updateProgram.getUniformLocation("u_color2"), this.color2.x, this.color2.y, this.color2.z, this.color2.w);
             
             // where to set textures for updating and sampler uniforms?
             // scene depth and normal texture
@@ -481,32 +483,59 @@ export class GPUParticleSystem extends Object3D {
             // this should also bind transform feedback output buffer to null
             GLTransformFeedbacks.bindTransformFeedback(null);
             // GLPrograms.useProgram(null);
-
-            // pingpong the buffers
-            this._curSourceIndex++;
-            if (this._curSourceIndex >= 2) {
-                this._curSourceIndex = 0;
-            }
         }
     }
 
-    public render() {
+    public render(startTexUnit: number) {
+        if(this.geometry === null) return;
+        let mtl = this.material;
+        if (mtl === null) {
+            mtl = GPUParticleSystem.defaultMaterial;
+        }
+        if (mtl === null || mtl.renderProgram === null) {
+            return;
+        }
+
         const drawCount = Math.floor(this._curParticleCount);
         if (drawCount > 0) {
             // set material render states
             // if use collision, do not write depth buffer?
+            if(mtl.blendState !== null) GLRenderStates.setBlendState(mtl.blendState);
+            if(mtl.cullState !== null) GLRenderStates.setCullState(mtl.cullState);
+            if(mtl.depthStencilState != null) GLRenderStates.setDepthStencilState(mtl.depthStencilState);
+
+            const gl = GLDevice.gl;
 
             // use render program
+            const renderProgram = mtl.renderProgram;
+
+            GLPrograms.useProgram(renderProgram);
 
             // uniforms
 
             // textures
+            // some scene textures: irradiance probes;
+            // depth, for soft particles;
+            // particle own texture (with animation frames?)
 
             // bind render VAO
+            GLGeometryBuffers.bindVertexBufferArray(this._renderVAO[this._curSourceIndex]);
 
             // drawinstanced
+            if (this.geometry.indexBuffer !== null) {
+                // gl.drawElementsInstanced(gl.TRIANGLES, Infinity, )
+            } else {
+                // gl.drawArraysInstanced();
+            }
 
             // restore render VAO?
+            GLGeometryBuffers.bindVertexBufferArray(null);
+
+            // pingpong the buffers? now?
+            this._curSourceIndex++;
+            if (this._curSourceIndex >= 2) {
+                this._curSourceIndex = 0;
+            }
         }
     }
 
