@@ -12,6 +12,8 @@ export default /** glsl */`
 #include <uniforms_view>        // to get camera position and so on?
 #include <uniforms_object>      // to get emitter posiiton and so on?
 
+#define PI  3.1415926535
+
 #define EMITTER_ELLIPSOID  0
 #define EMITTER_BOX        1
 
@@ -39,6 +41,8 @@ uniform vec4    u_texAnimFrameInfo;     // x: start frame
 
 uniform vec2    u_lifeRange;            // x: min random life; y: max random life
 uniform vec2    u_speedRange;           // x: min start speed; y: max start speed
+uniform vec2    u_angleRange;           // x: min start rotate angle; y: max start rotate angle;
+uniform vec2    u_angularSpeedRange;    // x: min angular speed; y: max angular speed
 uniform vec3    u_minSize;
 uniform vec3    u_maxSize;
 uniform int     u_collision;
@@ -59,17 +63,17 @@ uniform sampler2D s_randomTexture;
 #define SIZE_LOC        4
 #define COLOR_LOC       5
 #define FRAME_INDEX_LOC 6
+#define ANGLE_LOC       7
 // #define NOISE_TEXCOORD_LOC 7
-// #define UPDIR_LOC       8
 
 layout(location = POSITION_LOC)     in vec3 p_position;
 layout(location = DIRECTION_LOC)    in vec3 p_direction;    // unnormaled. actually, 'velocity'
-// layout(location = UPDIR_LOC)        in vec3 p_upDir;        // is this necessary?
 layout(location = AGE_LIFE_LOC)     in vec2 p_ageLife;
 layout(location = SEED_LOC)         in vec4 p_seed;
 layout(location = SIZE_LOC)         in vec3 p_size;
 layout(location = COLOR_LOC)        in vec4 p_color;
 layout(location = FRAME_INDEX_LOC)  in float p_frameIdx;    // use a float value to enable blending between 2 frames
+layout(location = ANGLE_LOC)        in vec2 p_angle;        // x: current rotate angle; y: angular speed
 // layout(location = NOISE_TEXCOORD_LOC) in vec2 p_noiseTexCoord;
 
 // #include <function_transforms>
@@ -83,6 +87,7 @@ out vec4    ex_seed;
 out vec3    ex_size;
 out vec4    ex_color;
 out float   ex_frameIdx;
+out vec2    ex_angle;
 // out vec2    ex_noiseTexCoord;
 
 vec3 getRandomVec3(float offset) {
@@ -129,21 +134,27 @@ void main(void)
             newPosition = getRandomVec3(p_seed.y);
         }
 
+        // random angle and angular speed
+        ex_angle.x = mix(u_angleRange.x, u_angleRange.y, random.b);
+        ex_angle.y = mix(u_angularSpeedRange.x, u_angularSpeedRange.y, random.a);
+
+        vec4 random1 = getRandomVec4(p_seed.z);
+
         // random color
-        ex_color = mix(u_color1, u_color2, random.b);
+        ex_color = mix(u_color1, u_color2, random1.r);
 
         // animation frame index
         ex_frameIdx = u_texAnimFrameInfo.x;
         if(u_texAnimFrameInfo.w > 0.5) {
             // support random start index? for effects like fire...
-            ex_frameIdx = mix(u_texAnimFrameInfo.x, u_texAnimFrameInfo.y, random.a);
+            ex_frameIdx = mix(u_texAnimFrameInfo.x, u_texAnimFrameInfo.y, random1.g);
         }
 
         // todo: nose texture?
 
         // generate local direction by the u_emitDir_variation
         newDirection = u_emitDir_variation.xyz + getRandomVec3(p_seed.z) * u_emitDir_variation.w;
-        newDirection *= mix(u_speedRange.x, u_speedRange.y, random.a);
+        newDirection *= mix(u_speedRange.x, u_speedRange.y, random1.b);
 
         // transform them to world space
         newPosition = (u_emitterModelTransform * vec4(newPosition, 1.0)).xyz;
@@ -164,7 +175,9 @@ void main(void)
 
         float ageGradient = newAge / ex_ageLife.y;
 
-        // todo: calc size, color and frameIdx by ageGradient
+        ex_angle.x = p_angle.x + p_angle.y * u_elapsedTime; // cur angle
+        ex_angle.y = p_angle.y;     // angular speed
+
         ex_color = p_color;
         ex_size = p_size;
         ex_frameIdx = p_frameIdx + u_texAnimFrameInfo.z * u_elapsedTime;

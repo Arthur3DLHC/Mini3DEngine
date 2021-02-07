@@ -38,8 +38,8 @@ export const DefaultParticleAttributes = {
     SIZE: 4,
     COLOR: 5,
     FRAME_INDEX: 6,
-    // NOISE_TEXCOORD: 7,
-    // UPDIR: 8,
+    ANGLE_ROTSPEED: 7,
+    // NOISE_TEXCOORD: 8,
 };
 
 /**
@@ -117,6 +117,12 @@ export class GPUParticleSystem extends Object3D {
     // init speed?
     public minSpeed: number = 1;
     public maxSpeed: number = 1;
+
+    public minAngle: number = 0;
+    public maxAngle: number = 0;
+
+    public minAngularSpeed: number = 0;
+    public maxAngularSpeed: number = 0;
 
     public minSize: vec3 = new vec3([1,1,1]);
     public maxSize: vec3 = new vec3([1,1,1]);
@@ -213,8 +219,7 @@ export class GPUParticleSystem extends Object3D {
             // direction: vec3 or [billboard rotation angle, rotate speed]?
             // direciton is also velocity?
             data.push(0, 0, 0);
-            // upDirection: vec3    // current up dir
-            // data.push(0, 1, 0);
+
             // age: number
             data.push(0);   // use a dead particle; emit in update shader
             // life: number // life for every particle is different; generated randomly from life range.
@@ -227,6 +232,8 @@ export class GPUParticleSystem extends Object3D {
             data.push(1, 1, 1, 1);
             // frameIndex: number // texture animation frame index
             data.push(0);
+            // rotate angle and speed: vec2
+            data.push(0, 0);
             // noiseTexcoord
             // data.push(0, 0);
         }
@@ -250,13 +257,12 @@ export class GPUParticleSystem extends Object3D {
             // set divisor to 0 (per vertex) when update
             updateAttribSet.addAttribute("p_position", DefaultParticleAttributes.POSITION, vb, 3, gl.FLOAT, 0);
             updateAttribSet.addAttribute("p_direction", DefaultParticleAttributes.DIRECTION, vb, 3, gl.FLOAT, 0);
-            // updateAttribSet.addAttribute("p_upDir", DefaultParticleAttributes.UPDIR, vb, 3, gl.FLOAT, 0);
-            // put age and life in one vec2?
             updateAttribSet.addAttribute("p_ageLife", DefaultParticleAttributes.AGE_LIFE, vb, 2, gl.FLOAT, 0);
             updateAttribSet.addAttribute("p_seed", DefaultParticleAttributes.SEED, vb, 4, gl.FLOAT, 0);
             updateAttribSet.addAttribute("p_size", DefaultParticleAttributes.SIZE, vb, 3, gl.FLOAT, 0);
             updateAttribSet.addAttribute("p_color", DefaultParticleAttributes.COLOR, vb, 4, gl.FLOAT, 0);
             updateAttribSet.addAttribute("p_frameIdx", DefaultParticleAttributes.FRAME_INDEX, vb, 1, gl.FLOAT, 0);
+            updateAttribSet.addAttribute("p_angle", DefaultParticleAttributes.ANGLE_ROTSPEED, vb, 2, gl.FLOAT, 0);
             // updateAttribSet.addAttribute("p_noiseTexCoord", DefaultParticleAttributes.NOISE_TEXCOORD, vb, 2, gl.FLOAT, 0);
 
             vb.stride = updateAttribSet.curSizeInBytes;
@@ -295,13 +301,12 @@ export class GPUParticleSystem extends Object3D {
             // set divisor to 1 (per instance)
             renderAttribSet.addAttribute("p_position", DefaultParticleAttributes.POSITION + locationOffset, vb, 3, gl.FLOAT, 1);
             renderAttribSet.addAttribute("p_direction", DefaultParticleAttributes.DIRECTION + locationOffset, vb, 3, gl.FLOAT, 1);
-            // renderAttribSet.addAttribute("p_upDir", DefaultParticleAttributes.UPDIR + locationOffset, vb, 3, gl.FLOAT, 1);
-            // put age and life in one vec2?
             renderAttribSet.addAttribute("p_ageLife", DefaultParticleAttributes.AGE_LIFE + locationOffset, vb, 2, gl.FLOAT, 1);
             renderAttribSet.addAttribute("p_seed", DefaultParticleAttributes.SEED + locationOffset, vb, 4, gl.FLOAT, 1);
             renderAttribSet.addAttribute("p_size", DefaultParticleAttributes.SIZE + locationOffset, vb, 3, gl.FLOAT, 1);
             renderAttribSet.addAttribute("p_color", DefaultParticleAttributes.COLOR + locationOffset, vb, 4, gl.FLOAT, 1);
             renderAttribSet.addAttribute("p_frameIdx", DefaultParticleAttributes.FRAME_INDEX + locationOffset, vb, 1, gl.FLOAT, 1);
+            renderAttribSet.addAttribute("p_angle", DefaultParticleAttributes.ANGLE_ROTSPEED + locationOffset, vb, 2, gl.FLOAT, 1);
             // renderAttribSet.addAttribute("p_noiseTexCoord", DefaultParticleAttributes.NOISE_TEXCOORD + locationOffset, vb, 2, gl.FLOAT, 1);
 
             // vertex buffer stride has been setted already.
@@ -435,7 +440,7 @@ export class GPUParticleSystem extends Object3D {
             GLPrograms.useProgram(updateProgram);
 
             // set psys properties to uniforms
-            // too much...
+            // too much... consider use an UBO?
             gl.uniform1f(updateProgram.getUniformLocation("u_elapsedTime"), Clock.instance.elapsedTime);
             gl.uniform3f(updateProgram.getUniformLocation("u_gravity"), this.gravity.x, this.gravity.y, this.gravity.z);
             gl.uniform1f(updateProgram.getUniformLocation("u_curCount"), this._curParticleCount);
@@ -446,6 +451,8 @@ export class GPUParticleSystem extends Object3D {
             gl.uniform4f(updateProgram.getUniformLocation("u_texAnimFrameInfo"), this.texAnimStartFrame, this.texAnimEndFrame, this.texAnimFrameIncreaseSpeed, this.randomAnimStartFrame ? 1 : 0);
             gl.uniform2f(updateProgram.getUniformLocation("u_lifeRange"), this.minLife, this.maxLife);
             gl.uniform2f(updateProgram.getUniformLocation("u_speedRange"), this.minSpeed, this.maxSpeed);
+            gl.uniform2f(updateProgram.getUniformLocation("u_angleRange"), this.minAngle, this.maxAngle);
+            gl.uniform2f(updateProgram.getUniformLocation("u_angularSpeedRange"), this.minAngularSpeed, this.maxAngularSpeed);
             gl.uniform3f(updateProgram.getUniformLocation("u_minSize"), this.minSize.x, this.minSize.y, this.minSize.z);
             gl.uniform3f(updateProgram.getUniformLocation("u_maxSize"), this.maxSize.x, this.maxSize.y, this.maxSize.z);
             gl.uniform1i(updateProgram.getUniformLocation("u_collision"), this.collision ? 1 : 0);
@@ -487,7 +494,9 @@ export class GPUParticleSystem extends Object3D {
     }
 
     public render(startTexUnit: number) {
-        if(this.geometry === null) return;
+        const geometry = this.geometry;
+        if(geometry === null) return;
+
         let mtl = this.material;
         if (mtl === null) {
             mtl = GPUParticleSystem.defaultMaterial;
@@ -511,9 +520,9 @@ export class GPUParticleSystem extends Object3D {
 
             GLPrograms.useProgram(renderProgram);
 
-            // uniforms
+            // todo: uniforms
 
-            // textures
+            // todo: textures
             // some scene textures: irradiance probes;
             // depth, for soft particles;
             // particle own texture (with animation frames?)
@@ -522,10 +531,10 @@ export class GPUParticleSystem extends Object3D {
             GLGeometryBuffers.bindVertexBufferArray(this._renderVAO[this._curSourceIndex]);
 
             // drawinstanced
-            if (this.geometry.indexBuffer !== null) {
-                // gl.drawElementsInstanced(gl.TRIANGLES, Infinity, )
+            if (geometry.indexBuffer !== null) {
+                gl.drawElementsInstanced(geometry.drawMode, geometry.indexBuffer.count, geometry.indexBuffer.componentType, 0, this._curParticleCount );
             } else {
-                // gl.drawArraysInstanced();
+                gl.drawArraysInstanced(geometry.drawMode, 0, geometry.vertexBuffers[0].vertexCount, this._curParticleCount);
             }
 
             // restore render VAO?
@@ -540,7 +549,11 @@ export class GPUParticleSystem extends Object3D {
     }
 
     public provideRenderItem(renderList: RenderList) {
-
+        // provide here, then check if is gpuPsys in renderer?
+        if (this.geometry) {
+            // can only have one primitive; use my material
+            renderList.addRenderItem(this, this.geometry, 0, Infinity, this.material);
+        }
     }
 
     //#endregion

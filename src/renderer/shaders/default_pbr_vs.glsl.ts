@@ -2,7 +2,8 @@
  * todo: implement default pbr shader
  */
 export default /** glsl */`
-// todo: 在 js 中统一指定 version?
+// the version and precision will be specified in js
+
 #include <attrib_locations>
 
 // uniforms
@@ -12,7 +13,6 @@ export default /** glsl */`
 
 
 // vertex attribute
-// 使用<attribs>规定的vertex attribute
 // TODO: tangents
 layout(location = POSITION_LOCATION) in vec3 a_position;
 layout(location = NORMAL_LOCATION) in vec3 a_normal;
