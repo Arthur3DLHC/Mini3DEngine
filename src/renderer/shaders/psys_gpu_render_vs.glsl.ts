@@ -10,6 +10,11 @@ export default /** glsl */`
 
 // psys property uniforms
 
+#define             NOLIMIT         0
+#define             LIMIT_AXIS      1
+#define             LIMIT_DIR       2
+
+
 //                  NOLIMIT                 AXIS                    DIRECTION
 // -------------------------------------------------------------------------------------
 // isBillboard      facing camera           try to facing camera    try to facing camera
@@ -21,7 +26,7 @@ export default /** glsl */`
 uniform int             u_isBillboard;      // still may be plane or mesh; this only indicate facing camera behavior.
                                             // if not a billboard, for now, the particle geometry will always turn towards it's moving direction.
 uniform int             u_rotationLimit;    // billboard rotation limit mode. 0 - no limit, always facing camera; 1 - limit to specified axis; 2 - limit to particle direction
-
+uniform vec3            u_limitAxis;
 uniform float           u_texAnimFrames;    // total texture animation frame count. to calc cur frame texcoord.
                                             // fix me: or should use tex2darray for animation frames?
 
@@ -82,16 +87,26 @@ void main(void)
     // 4th colume is translation?
     matTranslation[3] = vec4(p_position, 1.0);
 
+    mat4 matView = u_view.matView;
+
     if(u_isBillboard > 0) {
-
-        // local rotate matrix toward to camera
-        // use transpose of view matrix?
-
-        // axis limit? use lookat matrix?
-
+        if (u_rotationLimit == NOLIMIT) {
+            // discard rotation part of view matrix
+            matView[0] = vec4(1.0, 0.0, 0.0, 0.0);
+            matView[1] = vec4(0.0, 1.0, 0.0, 0.0);
+            matView[2] = vec4(0.0, 0.0, 1.0, 0.0);
+        } else {
+            // todo: calc a local rotation matrix try to look at camera
+            vec3 limitDir;
+            if (u_rotationLimit == LIMIT_AXIS) {
+                limitDir = u_limitAxis;
+            } else if (u_rotationLimit == LIMIT_DIR) {
+                // todo: divide by zero protect
+                limitDir = normalize(p_direction);
+            }
+        }
     } else {
 
-        // local 2D rotation angle
 
         // axis limit?
         // use lookat matrix?
@@ -101,8 +116,22 @@ void main(void)
     mat4 matWorld = matTranslation * matRot3D * matRot2D * matScale;
 
     vec4 worldPosition = matWorld * localPosition;
-    gl_Position = viewToProj(worldToView(worldPosition));
+    vec4 viewPosition = matView * worldPosition;
+    gl_Position = viewToProj(viewPosition);
+
     ex_color = u_object.color * p_color;
+
+    // texcoord animation
+    ex_texMixAmount = fract(p_frameIdx);
+    float curFrame = floor(p_frameIdx);
+    float nextFrame = curFrame + 1;
+    vec2 curUV = a_texcoord0 + vec2(curFrame, 0.0);
+    vec2 nextUV = a_texcoord0 + vec2(nextFrame, 0.0);
+
+    vec2 uvScale = vec2(1.0, 1.0 / u_texAnimFrames);
+
+    ex_texcoord0 = curUV * uvScale;
+    ex_texcoord1 = nextUV * uvScale;
 }
 
 `;
