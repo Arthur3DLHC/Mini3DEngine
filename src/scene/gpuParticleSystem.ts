@@ -100,6 +100,9 @@ export class GPUParticleSystem extends Object3D {
     /** has framed animation in texture? */
     public hasTextureAnimation: boolean = false;
 
+    /** soft particle. only affect when transparent. */
+    public softParticle: boolean = true;
+
     // todo: animation frames?
     // use one-row texture?
     // can use only part of all frames.

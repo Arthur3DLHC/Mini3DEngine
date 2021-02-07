@@ -22,6 +22,9 @@ uniform int             u_isBillboard;      // still may be plane or mesh; this 
                                             // if not a billboard, for now, the particle geometry will always turn towards it's moving direction.
 uniform int             u_rotationLimit;    // billboard rotation limit mode. 0 - no limit, always facing camera; 1 - limit to specified axis; 2 - limit to particle direction
 
+uniform float           u_texAnimFrames;    // total texture animation frame count. to calc cur frame texcoord.
+                                            // fix me: or should use tex2darray for animation frames?
+
 #include <attrib_locations>
 
 // for instance attributes, add an offset of 8
@@ -57,17 +60,49 @@ layout(location = ANGLE_LOC)            in vec2 p_angle;        // x: current ro
 // vertex output
 // what does the fragment shader need to draw the particle?
 
-out vec4 ex_color;          // if particle is dead, set alpha to zero then discard it in fs
-out vec2 ex_texcoord0;       // for blend between two frames
+out vec4 ex_color;           // if particle is dead, set alpha to zero then discard it in fs
+out vec2 ex_texcoord0;       // for blending between two frames
 out vec2 ex_texcoord1;       //
+out float ex_texMixAmount;
 
 void main(void)
 {
-    vec4 worldPosition = vec4(0.);
     vec4 localPosition = vec4(a_position, 1.0);
-    worldPosition = localToWorld(localPosition);
+
+    // todo: calc world transform from particle instance attribs
+    // 2D rotation angle matrix
+    mat4 matScale = mat4(1.0);
+    matScale[0][0] = p_size.x;
+    matScale[1][1] = p_size.y;
+    matScale[2][2] = p_size.z;
+
+    mat4 matRot2D = mat4(1.0);
+    mat4 matRot3D = mat4(1.0);
+    mat4 matTranslation = mat4(1.0);
+    // 4th colume is translation?
+    matTranslation[3] = vec4(p_position, 1.0);
+
+    if(u_isBillboard > 0) {
+
+        // local rotate matrix toward to camera
+        // use transpose of view matrix?
+
+        // axis limit? use lookat matrix?
+
+    } else {
+
+        // local 2D rotation angle
+
+        // axis limit?
+        // use lookat matrix?
+    }
+
+    // have nothing to do with object world transform.
+    mat4 matWorld = matTranslation * matRot3D * matRot2D * matScale;
+
+    vec4 worldPosition = matWorld * localPosition;
     gl_Position = viewToProj(worldToView(worldPosition));
-    ex_color = u_object.color;
+    ex_color = u_object.color * p_color;
 }
 
 `;
