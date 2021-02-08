@@ -26,7 +26,8 @@ export default /** glsl */`
 uniform int             u_isBillboard;      // still may be plane or mesh; this only indicate facing camera behavior.
                                             // if not a billboard, for now, the particle geometry will always turn towards it's moving direction.
 uniform int             u_rotationLimit;    // billboard rotation limit mode. 0 - no limit, always facing camera; 1 - limit to specified axis; 2 - limit to particle direction
-uniform vec3            u_limitAxis;
+uniform vec3            u_limitAxis;        // limit rotation axis
+uniform vec3            u_refDir;           // when is not billboard and limit rotation axis, this is the 'up' dir when calc lookat rotation matrix
 uniform float           u_texAnimFrames;    // total texture animation frame count. to calc cur frame texcoord.
                                             // fix me: or should use tex2darray for animation frames?
 
@@ -82,12 +83,22 @@ void main(void)
     matScale[2][2] = p_size.z;
 
     mat4 matRot2D = mat4(1.0);
+    // rotation matrix along z axis?
+
     mat4 matRot3D = mat4(1.0);
     mat4 matTranslation = mat4(1.0);
     // 4th colume is translation?
     matTranslation[3] = vec4(p_position, 1.0);
 
     mat4 matView = u_view.matView;
+
+    vec3 limitDir;
+    if (u_rotationLimit == LIMIT_AXIS) {
+        limitDir = u_limitAxis;
+    } else if (u_rotationLimit == LIMIT_DIR) {
+        // todo: divide by zero protect
+        limitDir = normalize(p_direction);
+    }
 
     if(u_isBillboard > 0) {
         if (u_rotationLimit == NOLIMIT) {
@@ -96,20 +107,26 @@ void main(void)
             matView[1] = vec4(0.0, 1.0, 0.0, 0.0);
             matView[2] = vec4(0.0, 0.0, 1.0, 0.0);
         } else {
-            // todo: calc a local rotation matrix try to look at camera
-            vec3 limitDir;
-            if (u_rotationLimit == LIMIT_AXIS) {
-                limitDir = u_limitAxis;
-            } else if (u_rotationLimit == LIMIT_DIR) {
-                // todo: divide by zero protect
-                limitDir = normalize(p_direction);
-            }
+            // calc a local rotation matrix trying to look at camera
+            vec3 frontDir = normalize(u_view.position - p_position);
+            vec3 sideDir = normalize(cross(limitDir, frontDir));
+            frontDir = normalize(cross(sideDir, limitDir));
+            matRot3D[0] = vec4(sideDir, 0.);
+            matRot3D[1] = vec4(limitDir, 0.);
+            matRot3D[2] = vec4(frontDir, 0.);
         }
     } else {
-
-
-        // axis limit?
-        // use lookat matrix?
+        if (u_rotationLimit != NOLIMIT) {
+            // geometry local z axis toward limit dir
+            vec3 frontDir = limitDir;
+            vec3 upDir = u_refDir;
+            vec3 sideDir = normalize(cross(frontDir, upDir));
+            upDir = normalize(cross(sideDir, frontDir))
+            matRot3D[0] = vec4(sideDir, 0.);
+            matRot3D[1] = vec4(upDir, 0.);
+            matRot3D[2] = vec4(frontDir, 0.);
+        }
+        // if no limit, use geometry local transform (keep matRot3D as identity)
     }
 
     // have nothing to do with object world transform.
