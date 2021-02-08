@@ -26,6 +26,12 @@ export enum EmitterShape {
     Box,
 }
 
+export enum RotationLimitMode {
+    NoLimit = 0,
+    Axis = 1,
+    MoveDir = 2
+}
+
 /**
  * default attributes of the update instance vertex buffer
  * note: need to skip geometry attribute locations when creating the render VAO!
@@ -95,7 +101,11 @@ export class GPUParticleSystem extends Object3D {
 
     public isBillboard: boolean = true;
     /** limit billbard rotation along particle direction axis */
-    public limitBillboardRotation: boolean = false;
+    // public limitBillboardRotation: boolean = false;
+
+    public rotationLimit: RotationLimitMode = RotationLimitMode.NoLimit;
+
+    public rotationLimitAxis: vec3 = new vec3([0, 1, 0]);
 
     /** has framed animation in texture? */
     public hasTextureAnimation: boolean = false;
@@ -181,6 +191,9 @@ export class GPUParticleSystem extends Object3D {
 
     /** help generate fake random values in update vertex shader */
     private _randomTexture: Texture2D | null = null;
+
+    private _rotRefDir: vec3 = new vec3();
+
 
     // private static _defaultUpdateProgram: ShaderProgram | null = null;
     // private static _defaultRenderProgram: ShaderProgram | null = null;
@@ -524,6 +537,31 @@ export class GPUParticleSystem extends Object3D {
             GLPrograms.useProgram(renderProgram);
 
             // todo: uniforms
+            gl.uniform1i(renderProgram.getUniformLocation("u_isBillboard"), this.isBillboard ? 1 : 0);
+            gl.uniform1i(renderProgram.getUniformLocation("u_rotationLimit"), this.rotationLimit);
+            gl.uniform3f(renderProgram.getUniformLocation("u_limitAxis"), this.rotationLimitAxis.x, this.rotationLimitAxis.y, this.rotationLimitAxis.z);
+            
+            // todo: calc a ref dir automatically? or add a property?
+            let v = this.rotationLimitAxis;
+            if (this.rotationLimit == RotationLimitMode.Axis) {
+
+            } else if (this.rotationLimit == RotationLimitMode.MoveDir) {
+                v = this.emitDirection;
+            }
+            // fix me: need to transform v to world space?
+            // transform here or transform in vertex shader?
+            // find the smallest component?
+            let rotRefDir = this._rotRefDir;
+            if(Math.abs(v.x) < Math.abs(v.y) && Math.abs(v.x) < Math.abs(v.z)) {
+                rotRefDir.setComponents(1, 0, 0);
+            } else if(Math.abs(v.y) < Math.abs(v.z)) {
+                rotRefDir.setComponents(0, 1, 0);
+            } else {
+                rotRefDir.setComponents(0, 0, 1);
+            }
+        
+            gl.uniform3f(renderProgram.getUniformLocation("u_refDir"), rotRefDir.x, rotRefDir.y, rotRefDir.z);
+            gl.uniform1f(renderProgram.getUniformLocation("u_texAnimFrames"), this.texAnimFrameCount);
 
             // todo: textures
             // some scene textures: irradiance probes;
