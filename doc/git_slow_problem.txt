@@ -12,6 +12,8 @@ git config --global https.proxy https://127.0.0.1:10081
 git config --global --unset http.proxy
 git config --global --unset https.proxy
 
+或者直接修改git代理配置文件："C:\Users\LHC\.gitconfig"
+
 以上方式如果还不能解决，可以再次尝试设置sock5代理：
 
 git config --global http.proxy 'socks5://127.0.0.1:10081'
