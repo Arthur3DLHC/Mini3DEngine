@@ -545,6 +545,7 @@ TODO:       主要类结构
             particle system; sprite;
                 使用 GPU 计算 particle: transform feedback
                     https://gpfault.net/posts/webgl2-particles.txt.html
+                用于测试粒子系统的 Demo
                 粒子物理：可以通过深度图获得场景位置，在 GPU 计算碰撞？https://nullprogram.com/webgl-particles/
                 使用一个默认的粒子系统 shader ？以及对应的粒子系统材质类？
                 粒子光照；sample shadow maps;
