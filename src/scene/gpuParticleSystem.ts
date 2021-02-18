@@ -71,21 +71,7 @@ export class GPUParticleSystem extends Object3D {
     public material: GPUParticleMaterial | null = null;
     public static defaultMaterial: GPUParticleMaterial | null = null;
 
-    // public renderStateSet: RenderStateSet | null = null;
-
-    // /** update shader program (if null, will use a default one) */
-    // public updateProgram: ShaderProgram | null = null;
-
-    // /** render shader program (if null, will use a default one) */
-    // public renderProgram: ShaderProgram | null = null;
-
-    // uniform values for custom shader program?
-    // fix me: how to call different api for different data types?
-    // or use a uniformBuffer object?
-
-    // textures? support texture animation frames?
-
-    // todo: general psys properties
+    // general psys properties
     public emitRate: number = 10;
 
     // emitter shape and range?
@@ -115,8 +101,8 @@ export class GPUParticleSystem extends Object3D {
     /** soft particle. only affect when transparent. */
     public softParticle: boolean = true;
 
-    // todo: animation frames?
-    // use one-row texture?
+    // texture animations
+    // use one-row texture
     // can use only part of all frames.
     public texAnimStartFrame: number = 0;
     public texAnimEndFrame: number = 0;
@@ -175,7 +161,7 @@ export class GPUParticleSystem extends Object3D {
     /** vertex attributes for read and write vertex buffers */
     private _updateAttributes: VertexBufferAttribute[][] = [];
 
-    // todo: use VAOs?
+    // use VAOs
     // ref:
     // https://gpfault.net/posts/webgl2-particles.txt.html
     // https://github.com/WebGLSamples/WebGL2Samples/blob/master/samples/transform_feedback_instanced.html
@@ -259,7 +245,7 @@ export class GPUParticleSystem extends Object3D {
         
         const gl = GLDevice.gl;
 
-        // todo: create vertex buffers
+        // create vertex buffers
         // can use STATIC_DRAW (according to babylon.js)
         // this._vertexBuffer = new VertexBuffer(GLDevice.gl.DYNAMIC_DRAW);
         const floatData = new Float32Array(data);
@@ -549,7 +535,10 @@ export class GPUParticleSystem extends Object3D {
             gl.uniform1i(renderProgram.getUniformLocation("u_rotationLimit"), this.rotationLimit);
             gl.uniform3f(renderProgram.getUniformLocation("u_limitAxis"), rotLimAxisWS.x, rotLimAxisWS.y, rotLimAxisWS.z);
 
+            gl.uniform1i(renderProgram.getUniformLocation("u_softParticle"), this.softParticle ? 1 : 0);
+
             // todo: calc a ref dir automatically? or add a property?
+            // which is better?
             let v = this.rotationLimitAxis;
             if (this.rotationLimit == RotationLimitMode.Axis) {
 

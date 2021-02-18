@@ -61,6 +61,8 @@ export class GPUParticleMaterial extends Material {
     // uniform values?
     // not using uniform buffer object?
 
+    // textures?
+
     // set uniform values for update program?
     public setUpdateProgramUniforms(psys: GPUParticleSystem) {
         // get properties form psys, set them to uniforms

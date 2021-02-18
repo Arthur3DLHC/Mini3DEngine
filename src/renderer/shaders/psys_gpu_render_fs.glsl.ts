@@ -5,6 +5,13 @@
  */
 export default /** glsl */`
 
+// uniforms
+uniform int u_softParticle;
+
+// samplers
+uniform sampler2D s_sceneDepth;
+uniform sampler2D s_texture;    // one-row texture contains animation frames
+
 // varyings
 in vec4     ex_color;           // if particle is dead, set alpha to zero then discard it in fs
 in vec2     ex_texcoord0;       // for blending between two frames
@@ -18,6 +25,9 @@ void main(void)
 {
     FinalOutput o = defaultFinalOutput();
 
+    // todo: texture animation
+
+    // todo: soft particle?
 
     //o_color = vec4(1.0, 1.0, 1.0, 1.0);
     outputFinal(o);
