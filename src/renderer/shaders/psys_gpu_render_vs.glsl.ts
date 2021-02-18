@@ -52,8 +52,8 @@ layout(location = NORMAL_LOCATION)      in vec3 a_normal;
 layout(location = TEXCOORD0_LOCATION)   in vec2 a_texcoord0;
 
 // particle instance attributes
-layout(location = POSITION_LOC)         in vec3 p_position;
-layout(location = DIRECTION_LOC)        in vec3 p_direction;    // unnormaled. actually, 'velocity'
+layout(location = POSITION_LOC)         in vec3 p_position;     // already in world space in update shader
+layout(location = DIRECTION_LOC)        in vec3 p_direction;    // unnormaled. actually, 'velocity'. world space
 layout(location = AGE_LIFE_LOC)         in vec2 p_ageLife;
 layout(location = SEED_LOC)             in vec4 p_seed;
 layout(location = SIZE_LOC)             in vec3 p_size;
@@ -100,7 +100,7 @@ void main(void)
         limitDir = normalize(p_direction);
     }
 
-    if(u_isBillboard > 0) {
+    if(u_isBillboard > 0) { // is billboard
         if (u_rotationLimit == NOLIMIT) {
             // discard rotation part of view matrix
             matView[0] = vec4(1.0, 0.0, 0.0, 0.0);
@@ -115,9 +115,9 @@ void main(void)
             matRot3D[1] = vec4(limitDir, 0.);
             matRot3D[2] = vec4(frontDir, 0.);
         }
-    } else {
+    } else {    // is not billboard
         if (u_rotationLimit != NOLIMIT) {
-            // geometry local z axis toward limit dir
+            // align geometry local z axis toward limit dir
             vec3 frontDir = limitDir;
             vec3 upDir = u_refDir;
             vec3 sideDir = normalize(cross(frontDir, upDir));
