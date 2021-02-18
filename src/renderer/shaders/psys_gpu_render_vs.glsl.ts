@@ -100,7 +100,7 @@ void main(void)
         limitDir = normalize(p_direction);
     }
 
-    if(u_isBillboard > 0) { // is billboard
+    if(u_isBillboard > 0) { // is a billboard
         if (u_rotationLimit == NOLIMIT) {
             // discard rotation part of view matrix
             matView[0] = vec4(1.0, 0.0, 0.0, 0.0);
@@ -115,7 +115,7 @@ void main(void)
             matRot3D[1] = vec4(limitDir, 0.);
             matRot3D[2] = vec4(frontDir, 0.);
         }
-    } else {    // is not billboard
+    } else {    // not a billboard
         if (u_rotationLimit != NOLIMIT) {
             // align geometry local z axis toward limit dir
             vec3 frontDir = limitDir;
