@@ -569,6 +569,7 @@ export class GPUParticleSystem extends Object3D {
             // particle own texture (with animation frames?)
 
             // bind render VAO
+            // (render VAO and update VAO use different particle vertex buffer)
             GLGeometryBuffers.bindVertexBufferArray(this._renderVAO[this._curSourceIndex]);
 
             // drawinstanced
