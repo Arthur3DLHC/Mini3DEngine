@@ -56,6 +56,10 @@ export const DefaultParticleAttributes = {
  * and instancing to render them.
  * this is a simplified version of BabylonJS gpuParticleSystem
  * see https://github.com/BabylonJS/Babylon.js/blob/master/src/Particles/gpuParticleSystem.ts
+ * more references:
+ * (transform feedback with geometry shader)
+ * https://wiki.jikexueyuan.com/project/modern-opengl-tutorial/tutorial28.html
+ * http://ogldev.atspace.co.uk/www/tutorial28/tutorial28.html
  */
 export class GPUParticleSystem extends Object3D {
     public constructor(maxParticleCount: number) {
