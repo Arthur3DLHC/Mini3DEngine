@@ -1050,7 +1050,7 @@ export class ClusteredForwardRenderer {
                 if (GLPrograms.currProgram) {
                     if (item.object instanceof InstancedMesh) {
                         const instMesh = item.object as InstancedMesh;
-                        item.geometry.drawInstaces(item.startIndex, item.count, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
+                        item.geometry.drawInstances(item.startIndex, item.count, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
                     } else {
                         item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
                     }
@@ -1141,7 +1141,7 @@ export class ClusteredForwardRenderer {
                     if (GLPrograms.currProgram) {
                         if (item.object instanceof InstancedMesh) {
                             const instMesh = item.object as InstancedMesh;
-                            item.geometry.drawInstaces(item.startIndex, item.count, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
+                            item.geometry.drawInstances(item.startIndex, item.count, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
                         } else {
                             item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
                         }
@@ -1208,7 +1208,7 @@ export class ClusteredForwardRenderer {
                     // let this._boundingBoxTransform only contains local transform of bounding box
                     this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, item.object.tag, 0, true);
                 
-                    this._occlusionBoxGeom.drawInstaces(0, Infinity, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
+                    this._occlusionBoxGeom.drawInstances(0, Infinity, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
 
                 } else {
                     mat4.product(item.object.worldTransform, this._boundingBoxTransform, this._boundingBoxTransform);
@@ -1281,7 +1281,7 @@ export class ClusteredForwardRenderer {
                     // let this._boundingBoxTransform only contains local transform of bounding box
                     this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, boxColor, item.object.tag, 0, true);
                 
-                    this._boundingBoxWireframeGeom.drawInstaces(0, Infinity, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
+                    this._boundingBoxWireframeGeom.drawInstances(0, Infinity, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
 
                 } else {
                     mat4.product(item.object.worldTransform, this._boundingBoxTransform, this._boundingBoxTransform);
@@ -1376,7 +1376,7 @@ export class ClusteredForwardRenderer {
                         // let this._boundingBoxTransform only contains local transform of bounding sphere
                         this._renderContext.fillUniformBuffersPerObjectByValues(this._boundingBoxTransform, this._boundingBoxTransform, vec4.one, instMesh.tag, 0, true);
 
-                        this._boundingSphereWireframeGeom.drawInstaces(0, Infinity, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
+                        this._boundingSphereWireframeGeom.drawInstances(0, Infinity, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
 
                     } else {
 

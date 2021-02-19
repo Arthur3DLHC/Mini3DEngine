@@ -139,7 +139,7 @@ export class BufferGeometry {
 
     // todo: draw instanced?
     // pass in attributes of instancing data?
-    public drawInstaces(start: number, count: number, attribLocations: Map<string, number>, instanceAttribs: VertexBufferAttribute[], instanceCount: number, mode: GLenum|null = null) {
+    public drawInstances(start: number, count: number, attribLocations: Map<string, number>, instanceAttribs: VertexBufferAttribute[], instanceCount: number, mode: GLenum|null = null) {
         if (this.vertexBuffers.length <= 0 || this.attributes.length <= 0  || instanceAttribs.length <= 0) {
             // todo: log error? or throw exception?
             console.warn("BufferGeometry.draw(): No vertex buffer or attributes found.");
