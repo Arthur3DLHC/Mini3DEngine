@@ -86,6 +86,7 @@ import { SphereWireframeGeometry } from "../geometry/common/sphereWireframeGeome
 import { BoundingRenderModes } from "./boundingRenderModes.js";
 import { DebugRenderer } from "./debugRenderer.js";
 import { ObjectTagRenderer } from "./objectTagRenderer.js";
+import { GPUParticleSystem } from "../scene/gpuParticleSystem.js";
 
 export class ClusteredForwardRenderer {
 
@@ -632,7 +633,12 @@ export class ClusteredForwardRenderer {
                         this._renderContext.addIrradianceProbe(envProbe);
                     }
                 }
-            }
+            }/* else if (object instanceof GPUParticleSystem) {
+                // particle systems are always not static?
+                if (!statics) {
+                    // nothing to do?
+                }
+            }*/
             this._tmpRenderList.clear();
             // 光源等也可能提供 debug 或编辑时用的显示图元
             object.provideRenderItem(this._tmpRenderList);
@@ -998,6 +1004,11 @@ export class ClusteredForwardRenderer {
                     if (!frustum.intersectsSphere(mesh.boundingSphere)) {
                         continue;
                     }
+                } else if (item.object instanceof GPUParticleSystem){
+                    const psys = item.object as GPUParticleSystem;
+                    if (!frustum.intersectsSphere(psys.boundingSphere)) {
+                        continue;
+                    }
                 } else {
                     item.geometry.boundingSphere.transform(item.object.worldTransform, sphere);
                     if (!frustum.intersectsSphere(sphere)) {
@@ -1051,8 +1062,14 @@ export class ClusteredForwardRenderer {
                     if (item.object instanceof InstancedMesh) {
                         const instMesh = item.object as InstancedMesh;
                         item.geometry.drawInstances(item.startIndex, item.count, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
-                    } else {
+                    } else if (item.object instanceof Mesh) {
                         item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
+                    } else if (item.object instanceof GPUParticleSystem) {
+                        if (!ignoreMaterial) {
+                            const psys = item.object as GPUParticleSystem;
+                            // todo: update and render psys here?
+                            // fix me: how to know this is rendering to main FBO?
+                        }
                     }
                 }
                 // restore default renderstates for next item.

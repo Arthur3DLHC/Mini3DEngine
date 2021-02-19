@@ -2,6 +2,7 @@ import mat4 from "../../lib/tsm/mat4.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { BufferGeometry } from "../geometry/bufferGeometry.js";
+import { BoundingSphere } from "../math/boundingSphere.js";
 import { ClusteredForwardRenderContext } from "../renderer/clusteredForwardRenderContext.js";
 import { RenderList } from "../renderer/renderList.js";
 import { RenderStateSet } from "../renderer/renderStateSet.js";
@@ -74,6 +75,14 @@ export class GPUParticleSystem extends Object3D {
     // fix me: how to present material and shader program?
     public material: GPUParticleMaterial | null = null;
     public static defaultMaterial: GPUParticleMaterial | null = null;
+
+    /** max visible distance */
+    public visibleDistance: number = 20;
+
+    /** approximate bounding sphere */
+    public get boundingSphere(): BoundingSphere {
+        return this._boundingSphere;
+    }
 
     // general psys properties
     public emitRate: number = 10;
@@ -183,6 +192,11 @@ export class GPUParticleSystem extends Object3D {
 
     /** help generate fake random values in update vertex shader */
     private _randomTexture: Texture2D | null = null;
+
+    /** approximate largest bounding sphere in local space? */
+    protected _localBoundingSphere: BoundingSphere = new BoundingSphere();
+    /** world space bounding sphere */
+    protected _boundingSphere: BoundingSphere = new BoundingSphere();
 
     private static _rotRefDir: vec3 = new vec3();
 
@@ -348,6 +362,8 @@ export class GPUParticleSystem extends Object3D {
             this._randomTexture.image[i] = Math.random();
         }
         this._randomTexture.upload();
+
+        this.estimateBoundingSphere();
     }
 
     public destroy() {
@@ -410,9 +426,10 @@ export class GPUParticleSystem extends Object3D {
 
     // note: when update, use buffer A as source,
     // and also use buffer A as source when render;
-    // this will prevent waiting for the transform feedback finished
+    // this will prevent waiting for the transform feedback finished?
     // after render, swap the buffer B as source buffer.
     // todo: pass in (last frame?) scene normal and depth texture
+    // call this by renderer before render
     public update(startTexUnit: number) {
 
         // have material?
@@ -432,6 +449,14 @@ export class GPUParticleSystem extends Object3D {
         this._curParticleCount = Math.min(this._curParticleCount, this._maxParticleCount);
         const updateCount = Math.floor(this._curParticleCount);
         if (updateCount > 0) {
+
+            // pingpong the buffers before update
+            // because we don't know how many times the particle system will be rendered.
+            // if have some problem, try init _curSourceIndex as 1
+            this._curSourceIndex++;
+            if (this._curSourceIndex >= 2) {
+                this._curSourceIndex = 0;
+            }
 
             const gl = GLDevice.gl;
 
@@ -502,6 +527,12 @@ export class GPUParticleSystem extends Object3D {
         }
     }
 
+    /**
+     * fix me: may be rendered to different targets in different phase (does particles drop shadow)?
+     * do not know will be rendered how many times
+     * so should swap update and render vertex buffer after last render (or before update?)
+     * @param startTexUnit 
+     */
     public render(startTexUnit: number) {
         const geometry = this.geometry;
         if(geometry === null) return;
@@ -587,10 +618,10 @@ export class GPUParticleSystem extends Object3D {
             GLGeometryBuffers.bindVertexBufferArray(null);
 
             // pingpong the buffers? now?
-            this._curSourceIndex++;
-            if (this._curSourceIndex >= 2) {
-                this._curSourceIndex = 0;
-            }
+            // this._curSourceIndex++;
+            // if (this._curSourceIndex >= 2) {
+            //     this._curSourceIndex = 0;
+            // }
         }
     }
 
@@ -600,6 +631,16 @@ export class GPUParticleSystem extends Object3D {
             // can only have one primitive; use my material
             renderList.addRenderItem(this, this.geometry, 0, Infinity, this.material);
         }
+    }
+
+    protected onWorldTransformUpdated() {
+        this._localBoundingSphere.transform(this.worldTransform, this._boundingSphere);
+    }
+
+    protected estimateBoundingSphere() {
+        // todo:
+        // estimate largest local space bounding sphere?
+        // according to start velocity, gravity, life and geometry bounding sphere?
     }
 
     //#endregion
