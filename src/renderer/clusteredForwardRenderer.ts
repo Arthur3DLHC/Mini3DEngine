@@ -104,6 +104,31 @@ export class ClusteredForwardRenderer {
         this._renderListBoundingSphere = new RenderList();
         this._renderListSprites = new RenderList();
         this._tmpRenderList = new RenderList();
+
+        this._itemFilterDepthPrepass = new RenderItemFilters();
+        this._itemFilterDepthPrepass.ignoreMaterials = true;
+
+        this._itemFilterOpaque = new RenderItemFilters();
+        this._itemFilterOpaque.particles = true;
+
+        this._itemFilterOpaqueOcclusionQuery = new RenderItemFilters();
+        this._itemFilterOpaqueOcclusionQuery.particles = true;
+        this._itemFilterOpaqueOcclusionQuery.checkOcclusionResults = true;
+
+        this._itemFilterTransparent = new RenderItemFilters();
+        this._itemFilterTransparent.particles = true;
+
+        this._itemFilterTransparentOcclusionQuery = new RenderItemFilters();
+        this._itemFilterTransparentOcclusionQuery.particles = true;
+        this._itemFilterTransparentOcclusionQuery.checkOcclusionResults = true;
+
+        this._itemFilterDepthPrepassProbe = new RenderItemFilters();
+        this._itemFilterDepthPrepassProbe.ignoreMaterials = true;
+        this._itemFilterDepthPrepassProbe.dynamics = false;
+
+        this._itemFilterOpaqueProbe = new RenderItemFilters();
+        this._itemFilterOpaqueProbe.dynamics = false;
+
         this._renderContext = new ClusteredForwardRenderContext();
         this._currentScene = null;
         this._currentObject = null;
@@ -366,6 +391,14 @@ export class ClusteredForwardRenderer {
     private _renderListBoundingSphere: RenderList; // objects showing their bouding spheres
     private _renderListSprites: RenderList;
     private _tmpRenderList: RenderList; // object will provide its items to this list first, then dispath to other lists.
+
+    private _itemFilterDepthPrepass: RenderItemFilters;
+    private _itemFilterOpaque: RenderItemFilters;
+    private _itemFilterOpaqueOcclusionQuery: RenderItemFilters;
+    private _itemFilterTransparent: RenderItemFilters;
+    private _itemFilterTransparentOcclusionQuery: RenderItemFilters;
+    private _itemFilterOpaqueProbe: RenderItemFilters;
+    private _itemFilterDepthPrepassProbe: RenderItemFilters;
 
     private _renderContext: ClusteredForwardRenderContext;
     private _currentScene: Scene|null;
@@ -937,13 +970,16 @@ export class ClusteredForwardRenderer {
         this.setRenderStateSet(this._renderStatesDepthPrepass);
         // use program
         GLPrograms.useProgram(this._depthPrepassProgram);
-        this.renderItems(this._renderListDepthPrepass, frustum, true);
+        this.renderItems(this._renderListDepthPrepass, frustum, this._itemFilterDepthPrepass);
+        //this.renderItems(this._renderListDepthPrepass, frustum, true);
     }
+
     private renderOpaque(frustum: Frustum) {
         // non occlusion query objects
         if (this._renderListOpaque.ItemCount > 0) {
             this.setRenderStateSet(this._renderStatesOpaque);
-            this.renderItems(this._renderListOpaque, frustum, false);
+            this.renderItems(this._renderListOpaque, frustum, this._itemFilterOpaque);
+            //this.renderItems(this._renderListOpaque, frustum, false);
         }
 
         // occlusion query objects
@@ -955,7 +991,8 @@ export class ClusteredForwardRenderer {
 
             // render according to last frame query result
             this.setRenderStateSet(this._renderStatesOpaque);
-            this.renderItems(this._renderListOpaqueOcclusionQuery, frustum, false, true);
+            this.renderItems(this._renderListOpaqueOcclusionQuery, frustum, this._itemFilterOpaqueOcclusionQuery);
+            // this.renderItems(this._renderListOpaqueOcclusionQuery, frustum, false, true);
         }
     }
     private renderTransparent(frustum: Frustum) {
@@ -963,7 +1000,8 @@ export class ClusteredForwardRenderer {
         if (this._renderListTransparent.ItemCount > 0) {
             this.setRenderStateSet(this._renderStatesTransparent);
             // 半透明物体和不透明物体使用的 Shader 是统一的！
-            this.renderItems(this._renderListTransparent, frustum);
+            this.renderItems(this._renderListTransparent, frustum, this._itemFilterTransparent);
+            // this.renderItems(this._renderListTransparent, frustum);
         }
 
         // occlusion query objects, query for next frame;
@@ -974,12 +1012,20 @@ export class ClusteredForwardRenderer {
 
             // occlusion query objects, render according to last frame query result
             this.setRenderStateSet(this._renderStatesTransparent);
-            this.renderItems(this._renderListTransparentOcclusionQuery, frustum, false, true);
+            this.renderItems(this._renderListTransparentOcclusionQuery, frustum, this._itemFilterTransparentOcclusionQuery);
+            // this.renderItems(this._renderListTransparentOcclusionQuery, frustum, false, true);
         }
     }
-    private renderItems(renderList: RenderList, frustum: Frustum, ignoreMaterial: boolean = false, checkOcclusionResults: boolean = false, dynamics: boolean = true, statics: boolean = true, particles: boolean = false) {
-        
+
+    // private renderItems(renderList: RenderList, frustum: Frustum, ignoreMaterial: boolean = false, checkOcclusionResults: boolean = false, dynamics: boolean = true, statics: boolean = true, particles: boolean = false) {
+    private renderItems(renderList: RenderList, frustum: Frustum, filters: RenderItemFilters) {
         const sphere = new BoundingSphere();
+
+        const ignoreMaterial = filters.ignoreMaterials;
+        const checkOcclusionResults = filters.checkOcclusionResults;
+        const dynamics = filters.dynamics;
+        const statics = filters.statics;
+        const particles = filters.particles;
 
         for (let i = 0; i < renderList.ItemCount; i++) {
             const item = renderList.getItemAt(i);
@@ -1835,12 +1881,16 @@ export class ClusteredForwardRenderer {
                 // depth prepass, can prevent pixel overdraw？
                 this.setRenderStateSet(this._renderStatesDepthPrepass);
                 GLPrograms.useProgram(this._depthPrepassProgram);
-                this.renderItems(this._renderListDepthPrepass, this._frustum, true, false, false, true);
+                this.renderItems(this._renderListDepthPrepass, this._frustum, this._itemFilterDepthPrepassProbe);
+                // this.renderItems(this._renderListDepthPrepass, this._frustum, true, false, false, true);
 
                 this.setRenderStateSet(this._renderStatesOpaque);
 
-                this.renderItems(this._renderListOpaque, this._frustum, false, false, false, true);
-                this.renderItems(this._renderListOpaqueOcclusionQuery, this._frustum, false, false, false, true);
+                this.renderItems(this._renderListOpaque, this._frustum, this._itemFilterOpaqueProbe);
+                this.renderItems(this._renderListOpaqueOcclusionQuery, this._frustum, this._itemFilterOpaqueProbe);
+
+                // this.renderItems(this._renderListOpaque, this._frustum, false, false, false, true);
+                // this.renderItems(this._renderListOpaqueOcclusionQuery, this._frustum, false, false, false, true);
 
                 // is that necessary to render transparent objects? yes, it is...
                 // but there will not be reflections on these objects yet;
