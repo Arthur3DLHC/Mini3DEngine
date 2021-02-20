@@ -638,9 +638,16 @@ export class GPUParticleSystem extends Object3D {
     }
 
     protected estimateBoundingSphere() {
-        // todo:
         // estimate largest local space bounding sphere?
         // according to start velocity, gravity, life and geometry bounding sphere?
+        const accel = this.gravity.length();
+        let radius = this.maxSpeed * this.maxLife + 0.5 * accel * this.maxLife * this.maxLife;
+
+        if (this.geometry !== null) {
+            radius += this.geometry?.boundingSphere.radius;
+        }
+
+        this._localBoundingSphere.radius = radius;
     }
 
     //#endregion
