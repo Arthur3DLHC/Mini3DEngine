@@ -1,18 +1,15 @@
-import mat4 from "../../lib/tsm/mat4.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { BufferGeometry } from "../geometry/bufferGeometry.js";
 import { BoundingSphere } from "../math/boundingSphere.js";
 import { ClusteredForwardRenderContext } from "../renderer/clusteredForwardRenderContext.js";
 import { RenderList } from "../renderer/renderList.js";
-import { RenderStateSet } from "../renderer/renderStateSet.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { GLGeometryBuffers } from "../WebGLResources/glGeometryBuffers.js";
 import { GLPrograms } from "../WebGLResources/glPrograms.js";
 import { GLRenderStates } from "../WebGLResources/glRenderStates.js";
 import { GLTextures } from "../WebGLResources/glTextures.js";
 import { GLTransformFeedbacks } from "../WebGLResources/glTransformFeedbacks.js";
-import { ShaderProgram } from "../WebGLResources/shaderProgram.js";
 import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { TransformFeedback } from "../WebGLResources/transformFeedback.js";
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
@@ -374,7 +371,6 @@ export class GPUParticleSystem extends Object3D {
         }
         this._transformFeedbacks.length = 0;
 
-        const gl = GLDevice.gl;
         for (const vao of this._updateVAO) {
             vao.release();
         }
@@ -525,6 +521,7 @@ export class GPUParticleSystem extends Object3D {
             GLTransformFeedbacks.bindTransformFeedback(null);
             // GLPrograms.useProgram(null);
         }
+
     }
 
     /**
@@ -533,7 +530,7 @@ export class GPUParticleSystem extends Object3D {
      * so should swap update and render vertex buffer after last render (or before update?)
      * @param startTexUnit 
      */
-    public render(startTexUnit: number) {
+    public render() {
         const geometry = this.geometry;
         if(geometry === null) return;
 
@@ -634,6 +631,9 @@ export class GPUParticleSystem extends Object3D {
     }
 
     protected onWorldTransformUpdated() {
+        // in case the start speed, gravity or life changed.
+        this.estimateBoundingSphere();
+
         this._localBoundingSphere.transform(this.worldTransform, this._boundingSphere);
     }
 
@@ -644,7 +644,7 @@ export class GPUParticleSystem extends Object3D {
         let radius = this.maxSpeed * this.maxLife + 0.5 * accel * this.maxLife * this.maxLife;
 
         if (this.geometry !== null) {
-            radius += this.geometry?.boundingSphere.radius;
+            radius += this.geometry.boundingSphere.radius;
         }
 
         this._localBoundingSphere.radius = radius;

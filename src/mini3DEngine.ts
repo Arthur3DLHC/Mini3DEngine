@@ -76,6 +76,7 @@ export * from "./scene/lights/pointLight.js";
 export * from "./scene/lights/pointLightShadow.js";
 export * from "./scene/lights/spotLight.js";
 export * from "./scene/lights/spotLightShadow.js";
+export * from "./scene/materials/gpuParticleMaterial.js";
 export * from "./scene/materials/material.js";
 export * from "./scene/materials/shaderMaterial.js";
 export * from "./scene/materials/singleColorMaterial.js";
