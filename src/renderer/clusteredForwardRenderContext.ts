@@ -819,6 +819,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
         this._ubObject.update();
     }
 
+    /** only handle stdpbr material now */
     public fillUniformBuffersPerMaterial(material: Material | null) {
         // if pbr material, fill pbr uniform buffer
         if (material) {

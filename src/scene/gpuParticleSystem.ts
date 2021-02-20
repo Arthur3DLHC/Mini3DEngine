@@ -631,6 +631,9 @@ export class GPUParticleSystem extends Object3D {
     }
 
     protected onWorldTransformUpdated() {
+        // fix me: can not access renderer here?
+        // this.update();
+
         // in case the start speed, gravity or life changed.
         this.estimateBoundingSphere();
 

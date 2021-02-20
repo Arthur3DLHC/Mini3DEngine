@@ -700,6 +700,7 @@ export class ClusteredForwardRenderer {
         GLTextures.setTextureAt(this._irradianceProbeArrayUnit, this._irradianceProbesArray);
     }
 
+    /** only handle stdpbr material now */
     private bindTexturesPerMaterial(material: Material | null) {
         // todo: skinning
         let samplerUniforms = this._samplerUniformsStdPBR;
@@ -730,7 +731,7 @@ export class ClusteredForwardRenderer {
                 }
             }        
         } else {
-            throw new Error("Method not implemented.");
+            // throw new Error("Method not implemented.");
         }
     }
 
@@ -976,7 +977,7 @@ export class ClusteredForwardRenderer {
             this.renderItems(this._renderListTransparentOcclusionQuery, frustum, false, true);
         }
     }
-    private renderItems(renderList: RenderList, frustum: Frustum, ignoreMaterial: boolean = false, checkOcclusionResults: boolean = false, dynamics: boolean = true, statics: boolean = true) {
+    private renderItems(renderList: RenderList, frustum: Frustum, ignoreMaterial: boolean = false, checkOcclusionResults: boolean = false, dynamics: boolean = true, statics: boolean = true, particles: boolean = false) {
         
         const sphere = new BoundingSphere();
 
@@ -1005,6 +1006,9 @@ export class ClusteredForwardRenderer {
                         continue;
                     }
                 } else if (item.object instanceof GPUParticleSystem){
+                    if (!particles) {
+                        continue;
+                    }
                     const psys = item.object as GPUParticleSystem;
                     if (!frustum.intersectsSphere(psys.boundingSphere)) {
                         continue;
@@ -1052,26 +1056,33 @@ export class ClusteredForwardRenderer {
                             GLPrograms.useProgram(item.material.program);
                         }
                     }
+                    // if particle system material, will not set up here, but later in psys.render() method.
+
                     this._renderContext.fillUniformBuffersPerMaterial(item.material);
                     this.bindTexturesPerMaterial(item.material);
 
                     // todo: set sampler index for sampler uniform locations of program
                 }
-                // draw item geometry
-                if (GLPrograms.currProgram) {
-                    if (item.object instanceof InstancedMesh) {
-                        const instMesh = item.object as InstancedMesh;
-                        item.geometry.drawInstances(item.startIndex, item.count, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
-                    } else if (item.object instanceof Mesh) {
-                        item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
-                    } else if (item.object instanceof GPUParticleSystem) {
-                        if (!ignoreMaterial) {
-                            const psys = item.object as GPUParticleSystem;
-                            // todo: update and render psys here?
-                            // fix me: how to know this is rendering to main FBO?
+                
+                // psys are special
+                if (item.object instanceof GPUParticleSystem) {
+                    if (!ignoreMaterial) {
+                        const psys = item.object as GPUParticleSystem;
+                        // todo: update and render psys here?
+                        psys.update(this.numReservedTextures);
+                        psys.render();
+                    }
+                } else { // draw item geometry
+                    if (GLPrograms.currProgram) {
+                        if (item.object instanceof InstancedMesh) {
+                            const instMesh = item.object as InstancedMesh;
+                            item.geometry.drawInstances(item.startIndex, item.count, GLPrograms.currProgram.attributes, instMesh.instanceAttributes, instMesh.curInstanceCount);
+                        } else { // general mesh objects
+                            item.geometry.draw(item.startIndex, item.count, GLPrograms.currProgram.attributes);
                         }
                     }
                 }
+
                 // restore default renderstates for next item.
                 if (this._curDefaultRenderStates) {
                     this._curDefaultRenderStates.apply();
@@ -1919,4 +1930,12 @@ export class ClusteredForwardRenderer {
 
         console.log("done.");
     }
+}
+
+class RenderItemFilters {
+    public ignoreMaterials: boolean = false;
+    public checkOcclusionResults: boolean = false;
+    public dynamics: boolean = true;
+    public statics: boolean = true;
+    public particles: boolean = false;
 }
