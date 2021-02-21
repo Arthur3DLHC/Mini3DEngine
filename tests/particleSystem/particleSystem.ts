@@ -166,6 +166,10 @@ window.onload = () => {
     dirLightLookAt.up = new vec3([0, 1, 0]);
 
     scene.attachChild(dirLight01);
+
+    // todo: particle system
+    // geometry: use a plane?
+    
     
     // test environment probes
     SceneHelper.addEnvProbe("envProbe01", 6, new vec3([ 0, 0, 0]), scene, EnvironmentProbeType.Reflection);

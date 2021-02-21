@@ -640,6 +640,7 @@ TODO:       主要类结构
                     Blender 的 Reflection probe 中加一个最远可视距离属性；
                     * 走廊地面和墙壁细节用法线贴图表示，节省一下三角形数量？
                     制作更大范围的场景：车库，二层；
+                    关卡加载和切换；
 
                 Action: 日式城堡，室外+室内，宽阔一些 或横板？夜间；无月光；雾；Local point lights：灯烛，火把；
 
@@ -647,9 +648,6 @@ TODO:       主要类结构
                 ShadowmapSize: 考虑在custom props 由手动输入
                     脚本中判断如果没有这个属性就加个默认值？
                 ShadowBias: 对 blender 中的值使用一个经验缩放比率？
-         
-            放置一些可以Hover和选中交互的物体
-            测试像素级别选中和射击判定
 
             经测试，需要注意：
                 1、blender 中的细节物体必须 apply 所有修改器后再复制，否则无法共享网格数据，导致无法 instancing

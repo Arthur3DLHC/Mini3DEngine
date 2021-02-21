@@ -18,7 +18,7 @@
                         1,
                         1
                     ],
-                    "intensity" : 30,
+                    "intensity" : 10,
                     "type" : "directional",
                     "name" : "Sun.001",
                     "extras" : {
@@ -35,7 +35,7 @@
                         1,
                         1
                     ],
-                    "intensity" : 30,
+                    "intensity" : 10,
                     "type" : "directional",
                     "name" : "Sun.003",
                     "extras" : {

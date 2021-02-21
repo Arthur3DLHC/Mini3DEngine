@@ -120,7 +120,7 @@ window.onload = () => {
 
     // todo: use outdoor sky box
     const imagePromises: (Promise<HTMLImageElement|ImageData>)[] = [];
-    const isHDR = true;
+    const isHDR = false;
     let envmapUrls: string[];
 
     if (isHDR) {
@@ -167,8 +167,8 @@ window.onload = () => {
         skyboxTexture.samplerState = new SamplerState();
         skyboxTexture.upload();
         scene.background = skyboxTexture;
-        scene.backgroundIntensity = 4;
-        scene.irradianceIntensity = 30;
+        scene.backgroundIntensity = 2;
+        scene.irradianceIntensity = 10;
 
         const actionNames = [
             "Idle",
