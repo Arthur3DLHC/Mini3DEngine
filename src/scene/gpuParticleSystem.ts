@@ -313,7 +313,7 @@ export class GPUParticleSystem extends Object3D {
             }
 
             // then add particle instance attributes with offseted location
-            let locationOffset = 8;
+            let locationOffset = 5;
 
             // vertex buffer changed, reset the byte offset.
             renderAttribSet.curSizeInBytes = 0;

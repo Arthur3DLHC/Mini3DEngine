@@ -24,7 +24,7 @@ export class VertexBufferAttributeSet {
      * @param divisor 
      */
     public addAttribute(name: string, location: number, vertexBuffer: VertexBuffer, size: number, componentType: GLenum, divisor?: number) {
-        this.attributes.push(new VertexBufferAttribute(name, location, vertexBuffer, size, componentType, this._curOffset, divisor));
+        this.attributes.push(new VertexBufferAttribute(name, location, vertexBuffer, size, componentType, this._curOffset, 0, divisor));
         this._curOffset += size * COMPONENT_BYTE_SIZES[componentType];
     }
 }
