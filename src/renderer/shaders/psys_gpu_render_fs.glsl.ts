@@ -24,12 +24,13 @@ in float    ex_texMixAmount;
 void main(void)
 {
     FinalOutput o = defaultFinalOutput();
+    o.color = vec4(1.0);
 
     // todo: texture animation
 
     // todo: soft particle?
 
-    //o_color = vec4(1.0, 1.0, 1.0, 1.0);
+    // o_color = vec4(1.0, 1.0, 1.0, 1.0);
     outputFinal(o);
 }
 `;

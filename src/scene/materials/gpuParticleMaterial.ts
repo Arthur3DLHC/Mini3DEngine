@@ -30,7 +30,7 @@ export class GPUParticleMaterial extends Material {
     public loadPrograms(renderContext: ClusteredForwardRenderContext) {
         // load default programs
         // default feedback varyings
-        const varyings: string[] = ["gl_Position",
+        const varyings: string[] = ["ex_position",
             "ex_direction",
             // "ex_upDir",
             "ex_ageLife",

@@ -178,6 +178,7 @@ window.onload = () => {
     // or use control pannel to modify particle system properties?
 
     //#region billboard without rotation limit
+    if(false)
     {
         const billboardsNoRotLimit = new GPUParticleSystem(500);
         billboardsNoRotLimit.name = "billboardNoRotLimit";
@@ -202,6 +203,7 @@ window.onload = () => {
     //#endregion
 
     //#region billboard with rotatoin limit (arbitrary axis)
+    if(false)
     {
         const billboardsLimitRotAxis = new GPUParticleSystem(500);
         billboardsLimitRotAxis.name = "billboardsLimitRotAxis";
@@ -226,6 +228,7 @@ window.onload = () => {
     //#endregion
 
     //#region billboard with rotatoin limit (move dir)
+    if(false)
     {
         const billboardsLimitRotMoveDir = new GPUParticleSystem(500);
         billboardsLimitRotMoveDir.name = "billboardsLimitRotMoveDir";
@@ -249,6 +252,7 @@ window.onload = () => {
     //#endregion
 
     //#region not billboard without rotation limit
+    if(true)
     {
         const planesNoRotLimit = new GPUParticleSystem(500);
         planesNoRotLimit.name = "planesNoRotLimit";
@@ -272,6 +276,7 @@ window.onload = () => {
     //#endregion
 
     //#region not billboard with rotation limit (arbitrary axis)
+    if(false)
     {
         const planesLimitRotAxis = new GPUParticleSystem(500);
         planesLimitRotAxis.name = "planesLimitRotAxis";
@@ -296,6 +301,7 @@ window.onload = () => {
     //#endregion
 
     //#region not billboard with rotation limit (move dir)
+    if(false)
     {
         const planesLimitMoveDir = new GPUParticleSystem(500);
         planesLimitMoveDir.name = "planesLimitMoveDir";

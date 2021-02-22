@@ -80,6 +80,8 @@ layout(location = ANGLE_LOC)        in vec2 p_angle;        // x: current rotate
 
 // vertex output
 // the position will output to gl_Position
+// fix me: position is vec4
+out vec3    ex_position;
 out vec3    ex_direction;    // unnormaled. actually, 'velocity'
 // out vec3    ex_upDir;
 out vec2    ex_ageLife;
@@ -163,12 +165,16 @@ void main(void)
         newDirection = (u_emitterModelTransform * vec4(newDirection, 0.0)).xyz;
 
         gl_Position = vec4(newPosition, 1.0);
+        ex_position = newPosition;
         ex_direction = newDirection;
     } else {
         // update this particle's velocity, position, direction...
         vec3 newDirection = p_direction + u_gravity * u_elapsedTime;
         ex_direction = newDirection;
-        gl_Position = vec4(p_position + newDirection * u_elapsedTime, 1.0);
+        // vec3 newPosition = p_position + newDirection * u_elapsedTime;
+        vec3 newPosition = p_position + vec3(0., 1., 0.) * u_elapsedTime;
+        gl_Position = vec4(newPosition, 1.0);
+        ex_position = newPosition;
 
         ex_ageLife = p_ageLife;
         ex_ageLife.x = newAge;
