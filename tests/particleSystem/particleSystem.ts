@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, GPUParticleSystem, RotationLimitMode } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "../common/behaviors/autoRotateBehavior.js";
 import vec4 from "../../lib/tsm/vec4.js";
@@ -169,8 +169,149 @@ window.onload = () => {
 
     // todo: particle system
     // geometry: use a plane?
+    const particleGeom = new PlaneGeometry(1, 1, 1, 1);
+
+    const gravity: vec3 = new vec3();
+
+    // add different type particles
+    // or use control pannel to change current particle system?
+    // or use control pannel to modify particle system properties?
+
+    //#region billboard without rotation limit
+    {
+        const billboardsNoRotLimit = new GPUParticleSystem(500);
+        billboardsNoRotLimit.name = "billboardNoRotLimit";
+        billboardsNoRotLimit.isBillboard = true;
+        billboardsNoRotLimit.rotationLimit = RotationLimitMode.NoLimit;
+        billboardsNoRotLimit.castShadow = false;
+
+        // location
+        billboardsNoRotLimit.autoUpdateTransform = true;
+        billboardsNoRotLimit.translation = new vec3([0, 0, 0]);
+
+        // emitter and particle properties
     
-    
+        gravity.copyTo(billboardsNoRotLimit.gravity);
+
+        billboardsNoRotLimit.rebuild();
+        billboardsNoRotLimit.start();
+        scene.attachChild(billboardsNoRotLimit);
+    }
+    //#endregion
+
+    //#region billboard with rotatoin limit (arbitrary axis)
+    {
+        const billboardsLimitRotAxis = new GPUParticleSystem(500);
+        billboardsLimitRotAxis.name = "billboardsLimitRotAxis";
+        billboardsLimitRotAxis.isBillboard = true;
+        billboardsLimitRotAxis.rotationLimit = RotationLimitMode.Axis;
+        billboardsLimitRotAxis.rotationLimitAxis = new vec3([0, 1, 0]);
+        billboardsLimitRotAxis.castShadow = false;
+
+        billboardsLimitRotAxis.autoUpdateTransform = true;
+        billboardsLimitRotAxis.translation = new vec3([2, 0, 0]);
+
+        // emitter and particle properties
+
+        gravity.copyTo(billboardsLimitRotAxis.gravity);
+
+        billboardsLimitRotAxis.rebuild();
+        billboardsLimitRotAxis.start();
+        scene.attachChild(billboardsLimitRotAxis);
+    }
+    //#endregion
+
+    //#region billboard with rotatoin limit (move dir)
+    {
+        const billboardsLimitRotMoveDir = new GPUParticleSystem(500);
+        billboardsLimitRotMoveDir.name = "billboardsLimitRotMoveDir";
+        billboardsLimitRotMoveDir.isBillboard = true;
+        billboardsLimitRotMoveDir.rotationLimit = RotationLimitMode.MoveDir;
+        billboardsLimitRotMoveDir.castShadow = false;
+
+        billboardsLimitRotMoveDir.autoUpdateTransform = true;
+        billboardsLimitRotMoveDir.translation = new vec3([4, 0, 0]);
+
+        // emitter and particle properties
+
+        gravity.copyTo(billboardsLimitRotMoveDir.gravity);
+
+        billboardsLimitRotMoveDir.rebuild();
+        billboardsLimitRotMoveDir.start();
+        scene.attachChild(billboardsLimitRotMoveDir);
+    }
+    //#endregion
+
+    //#region not billboard without rotation limit
+    {
+        const planesNoRotLimit = new GPUParticleSystem(500);
+        planesNoRotLimit.name = "planesNoRotLimit";
+        planesNoRotLimit.isBillboard = false;
+        planesNoRotLimit.rotationLimit = RotationLimitMode.NoLimit;
+        planesNoRotLimit.castShadow = false;
+
+        planesNoRotLimit.autoUpdateTransform = true;
+        planesNoRotLimit.translation = new vec3([0, 0, 2]);
+
+        // emitter and particle properties
+
+        gravity.copyTo(planesNoRotLimit.gravity);
+
+        planesNoRotLimit.rebuild();
+        planesNoRotLimit.start();
+        scene.attachChild(planesNoRotLimit);
+    }
+    //#endregion
+
+    //#region not billboard with rotation limit (arbitrary axis)
+    {
+        const planesLimitRotAxis = new GPUParticleSystem(500);
+        planesLimitRotAxis.name = "planesLimitRotAxis";
+        planesLimitRotAxis.isBillboard = false;
+        planesLimitRotAxis.rotationLimit = RotationLimitMode.Axis;
+        planesLimitRotAxis.rotationLimitAxis = new vec3([0, 1, 0]);
+        planesLimitRotAxis.castShadow = false;
+
+        planesLimitRotAxis.autoUpdateTransform = true;
+        planesLimitRotAxis.translation = new vec3([2, 0, 2]);
+
+        // emitter and particle properties
+
+        gravity.copyTo(planesLimitRotAxis.gravity);
+
+        planesLimitRotAxis.rebuild();
+        planesLimitRotAxis.start();
+        scene.attachChild(planesLimitRotAxis);
+    }
+    //#endregion
+
+    //#region not billboard with rotation limit (move dir)
+    {
+        const planesLimitMoveDir = new GPUParticleSystem(500);
+        planesLimitMoveDir.name = "planesLimitMoveDir";
+        planesLimitMoveDir.isBillboard = false;
+        planesLimitMoveDir.rotationLimit = RotationLimitMode.MoveDir;
+        planesLimitMoveDir.castShadow = false;
+
+        planesLimitMoveDir.autoUpdateTransform = true;
+        planesLimitMoveDir.translation = new vec3([4, 0, 2]);
+
+        // emitter and particle properties
+
+        gravity.copyTo(planesLimitMoveDir.gravity);
+
+        planesLimitMoveDir.rebuild();
+        planesLimitMoveDir.start();
+        scene.attachChild(planesLimitMoveDir);
+    }
+    //#endregion
+
+    // todo: particle system material, render states, textures
+    // todo: test texture animation
+
+    // todo: particle system custom materials
+
+
     // test environment probes
     SceneHelper.addEnvProbe("envProbe01", 6, new vec3([ 0, 0, 0]), scene, EnvironmentProbeType.Reflection);
     SceneHelper.addEnvProbe("irrProbe01", 6, new vec3([ 0, 0, 0]), scene, EnvironmentProbeType.Irradiance);
