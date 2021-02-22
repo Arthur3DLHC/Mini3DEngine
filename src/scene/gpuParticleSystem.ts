@@ -626,7 +626,7 @@ export class GPUParticleSystem extends Object3D {
         // provide here, then check if is gpuPsys in renderer?
         if (this.geometry) {
             // can only have one primitive; use my material
-            renderList.addRenderItem(this, this.geometry, 0, Infinity, this.material);
+            renderList.addRenderItem(this, this.geometry, 0, Infinity, this.material !== null ? this.material : GPUParticleSystem.defaultMaterial);
         }
     }
 

@@ -30,15 +30,16 @@ export class GPUParticleMaterial extends Material {
     public loadPrograms(renderContext: ClusteredForwardRenderContext) {
         // load default programs
         // default feedback varyings
-        const varyings: string[] = ["gl_position",
+        const varyings: string[] = ["gl_Position",
             "ex_direction",
-            "ex_upDir",
+            // "ex_upDir",
             "ex_ageLife",
             "ex_seed",
             "ex_size",
             "ex_color",
             "ex_frameIdx",
-            "ex_noiseTexCoord"
+            "ex_angle",
+            // "ex_noiseTexCoord"
         ];
         this.updateProgram = new ShaderProgram();
         this.updateProgram.vertexShaderCode = GLPrograms.processSourceCode(psys_gpu_update_vs);

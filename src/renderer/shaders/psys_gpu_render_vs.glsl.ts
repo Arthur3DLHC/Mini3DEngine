@@ -121,7 +121,7 @@ void main(void)
             vec3 frontDir = limitDir;
             vec3 upDir = u_refDir;
             vec3 sideDir = normalize(cross(frontDir, upDir));
-            upDir = normalize(cross(sideDir, frontDir))
+            upDir = normalize(cross(sideDir, frontDir));
             matRot3D[0] = vec4(sideDir, 0.);
             matRot3D[1] = vec4(upDir, 0.);
             matRot3D[2] = vec4(frontDir, 0.);
@@ -141,7 +141,7 @@ void main(void)
     // texcoord animation
     ex_texMixAmount = fract(p_frameIdx);
     float curFrame = floor(p_frameIdx);
-    float nextFrame = curFrame + 1;
+    float nextFrame = curFrame + 1.0;
     vec2 curUV = a_texcoord0 + vec2(curFrame, 0.0);
     vec2 nextUV = a_texcoord0 + vec2(nextFrame, 0.0);
 

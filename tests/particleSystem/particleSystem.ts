@@ -185,6 +185,8 @@ window.onload = () => {
         billboardsNoRotLimit.rotationLimit = RotationLimitMode.NoLimit;
         billboardsNoRotLimit.castShadow = false;
 
+        billboardsNoRotLimit.geometry = particleGeom;
+
         // location
         billboardsNoRotLimit.autoUpdateTransform = true;
         billboardsNoRotLimit.translation = new vec3([0, 0, 0]);
@@ -208,6 +210,8 @@ window.onload = () => {
         billboardsLimitRotAxis.rotationLimitAxis = new vec3([0, 1, 0]);
         billboardsLimitRotAxis.castShadow = false;
 
+        billboardsLimitRotAxis.geometry = particleGeom;
+
         billboardsLimitRotAxis.autoUpdateTransform = true;
         billboardsLimitRotAxis.translation = new vec3([2, 0, 0]);
 
@@ -229,6 +233,8 @@ window.onload = () => {
         billboardsLimitRotMoveDir.rotationLimit = RotationLimitMode.MoveDir;
         billboardsLimitRotMoveDir.castShadow = false;
 
+        billboardsLimitRotMoveDir.geometry = particleGeom;
+
         billboardsLimitRotMoveDir.autoUpdateTransform = true;
         billboardsLimitRotMoveDir.translation = new vec3([4, 0, 0]);
 
@@ -249,6 +255,8 @@ window.onload = () => {
         planesNoRotLimit.isBillboard = false;
         planesNoRotLimit.rotationLimit = RotationLimitMode.NoLimit;
         planesNoRotLimit.castShadow = false;
+
+        planesNoRotLimit.geometry = particleGeom;
 
         planesNoRotLimit.autoUpdateTransform = true;
         planesNoRotLimit.translation = new vec3([0, 0, 2]);
@@ -272,6 +280,8 @@ window.onload = () => {
         planesLimitRotAxis.rotationLimitAxis = new vec3([0, 1, 0]);
         planesLimitRotAxis.castShadow = false;
 
+        planesLimitRotAxis.geometry = particleGeom;
+
         planesLimitRotAxis.autoUpdateTransform = true;
         planesLimitRotAxis.translation = new vec3([2, 0, 2]);
 
@@ -292,6 +302,8 @@ window.onload = () => {
         planesLimitMoveDir.isBillboard = false;
         planesLimitMoveDir.rotationLimit = RotationLimitMode.MoveDir;
         planesLimitMoveDir.castShadow = false;
+
+        planesLimitMoveDir.geometry = particleGeom;
 
         planesLimitMoveDir.autoUpdateTransform = true;
         planesLimitMoveDir.translation = new vec3([4, 0, 2]);

@@ -79,7 +79,7 @@ layout(location = ANGLE_LOC)        in vec2 p_angle;        // x: current rotate
 // #include <function_transforms>
 
 // vertex output
-// the position will output to gl_position
+// the position will output to gl_Position
 out vec3    ex_direction;    // unnormaled. actually, 'velocity'
 // out vec3    ex_upDir;
 out vec2    ex_ageLife;
@@ -88,16 +88,18 @@ out vec3    ex_size;
 out vec4    ex_color;
 out float   ex_frameIdx;
 out vec2    ex_angle;
+// don't forget add to transform feedback varyings when building update program
+// in gpuParticleMaterial.ts
 // out vec2    ex_noiseTexCoord;
 
 vec3 getRandomVec3(float offset) {
     // babylon.js use two random textures;
     // is one texture OK?
-    return texture(s_randomTexture, vec2(float(gl_vertexID) * offset / u_curCount, 0)).rgb;
+    return texture(s_randomTexture, vec2(float(gl_VertexID) * offset / u_curCount, 0)).rgb;
 }
 
 vec4 getRandomVec4(float offset) {
-    return texture(s_randomTexture, vec2(float(gl_vertexID) * offset / u_curCount, 0));
+    return texture(s_randomTexture, vec2(float(gl_VertexID) * offset / u_curCount, 0));
 }
 
 void main(void)
@@ -160,13 +162,13 @@ void main(void)
         newPosition = (u_emitterModelTransform * vec4(newPosition, 1.0)).xyz;
         newDirection = (u_emitterModelTransform * vec4(newDirection, 0.0)).xyz;
 
-        gl_position = newPosition;
+        gl_Position = vec4(newPosition, 1.0);
         ex_direction = newDirection;
     } else {
         // update this particle's velocity, position, direction...
         vec3 newDirection = p_direction + u_gravity * u_elapsedTime;
         ex_direction = newDirection;
-        gl_position = p_position + newDirection * u_elapsedTime;
+        gl_Position = vec4(p_position + newDirection * u_elapsedTime, 1.0);
 
         ex_ageLife = p_ageLife;
         ex_ageLife.x = newAge;

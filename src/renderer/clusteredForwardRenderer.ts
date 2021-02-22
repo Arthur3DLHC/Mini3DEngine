@@ -380,6 +380,10 @@ export class ClusteredForwardRenderer {
         console.log("clustered forward renderer created.");
 
         this._objectTagRenderer = new ObjectTagRenderer();
+
+        if (GPUParticleSystem.defaultMaterial === null) {
+            GPUParticleSystem.initDefaultMaterial(this._renderContext);
+        }
     }
 
     private _renderListDepthPrepass: RenderList;
