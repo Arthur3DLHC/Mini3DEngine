@@ -22,6 +22,7 @@ uniform float   u_elapsedTime;
 uniform vec3    u_gravity;
 
 uniform float   u_curCount;             // current particle count (including respawned)
+                                        // todo: add a last count?
 
 // particle system params
 // fix me: how to control the emit rate?
@@ -68,7 +69,7 @@ uniform sampler2D s_randomTexture;
 
 layout(location = POSITION_LOC)     in vec3 p_position;
 layout(location = DIRECTION_LOC)    in vec3 p_direction;    // unnormaled. actually, 'velocity'
-layout(location = AGE_LIFE_LOC)     in vec2 p_ageLife;
+layout(location = AGE_LIFE_LOC)     in vec2 p_ageLife;      // todo: add an id?
 layout(location = SEED_LOC)         in vec4 p_seed;
 layout(location = SIZE_LOC)         in vec3 p_size;
 layout(location = COLOR_LOC)        in vec4 p_color;
@@ -112,6 +113,10 @@ void main(void)
 
     // if psys stop emitting, we discard all particles who's age > life when rendering
     // fix me: if emitted multiple particles in one frame, they will at same age and position.
+    // to resolve this, add a id for every particle vertex, then test them against u_curCount and u_lastCount?
+    // to average their emit time?
+    // or simply limit the elapsed time?
+    // use a steady elapsed time for age?
     float newAge = p_ageLife.x + u_elapsedTime;
 
     if (newAge > p_ageLife.y && u_isEmitting > 0) {

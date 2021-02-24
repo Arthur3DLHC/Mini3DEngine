@@ -151,6 +151,8 @@ export class GPUParticleSystem extends Object3D {
 
     public gravity: vec3 = new vec3();
 
+    public updateInterval: number = 1.0 / 60.0;
+
     //#endregion
 
     //#region private fields
@@ -441,7 +443,9 @@ export class GPUParticleSystem extends Object3D {
         // curr particle count
         // note: need to use float value
         if(this._isEmitting) {
-            this._curParticleCount += Clock.instance.elapsedTime * this.emitRate;
+            // use a steady elapsed time to prevent un-even emitting
+            this._curParticleCount += this.updateInterval * this.emitRate;
+            // this._curParticleCount += Clock.instance.elapsedTime * this.emitRate;
         }
         this._curParticleCount = Math.min(this._curParticleCount, this._maxParticleCount);
 
@@ -476,7 +480,10 @@ export class GPUParticleSystem extends Object3D {
 
             // set psys properties to uniforms
             // too much... consider use an UBO?
-            gl.uniform1f(updateProgram.getUniformLocation("u_elapsedTime"), Clock.instance.elapsedTime);
+
+            // use a steady elapsed time to prevent un-even emitting
+            gl.uniform1f(updateProgram.getUniformLocation("u_elapsedTime"), this.updateInterval);
+            // gl.uniform1f(updateProgram.getUniformLocation("u_elapsedTime"), Clock.instance.elapsedTime);
             gl.uniform3f(updateProgram.getUniformLocation("u_gravity"), this.gravity.x, this.gravity.y, this.gravity.z);
             gl.uniform1f(updateProgram.getUniformLocation("u_curCount"), this._curParticleCount);
             gl.uniform1i(updateProgram.getUniformLocation("u_isEmitting"), this._isEmitting ? 1 : 0);
