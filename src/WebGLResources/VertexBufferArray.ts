@@ -33,6 +33,7 @@ export class VertexBufferArray {
             gl.bindBuffer(gl.ARRAY_BUFFER, attr.buffer.glBuffer);
             gl.enableVertexAttribArray(attr.location + attr.locationOffset);
             gl.vertexAttribPointer(attr.location + attr.locationOffset, attr.size, attr.componentType, false, attr.buffer.stride, attr.offset);
+            gl.vertexAttribDivisor(attr.location + attr.locationOffset, attr.divisor);
             gl.bindBuffer(gl.ARRAY_BUFFER, null);
         }
 

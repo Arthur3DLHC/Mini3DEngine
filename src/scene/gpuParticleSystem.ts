@@ -313,6 +313,7 @@ export class GPUParticleSystem extends Object3D {
             }
 
             // then add particle instance attributes with offseted location
+            // NOTE: if modify this, need to modify location macros in psys_gpu_render.vs.glsl.ts
             let locationOffset = 5;
 
             // vertex buffer changed, reset the byte offset.

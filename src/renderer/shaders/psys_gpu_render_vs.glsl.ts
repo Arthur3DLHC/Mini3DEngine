@@ -34,14 +34,14 @@ uniform float           u_texAnimFrames;    // total texture animation frame cou
 #include <attrib_locations>
 
 // for instance attributes, add an offset of 8
-#define POSITION_LOC    8
-#define DIRECTION_LOC   9
-#define AGE_LIFE_LOC    10
-#define SEED_LOC        11
-#define SIZE_LOC        12
-#define COLOR_LOC       13
-#define FRAME_INDEX_LOC 14
-#define ANGLE_LOC       15
+#define POSITION_LOC    5
+#define DIRECTION_LOC   6
+#define AGE_LIFE_LOC    7
+#define SEED_LOC        8
+#define SIZE_LOC        9
+#define COLOR_LOC       10
+#define FRAME_INDEX_LOC 11
+#define ANGLE_LOC       12
 
 // geometry vertex attribute
 // particles can be billboard(plane) or shaped geometries
