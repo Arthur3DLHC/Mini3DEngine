@@ -111,6 +111,7 @@ void main(void)
     // after first emiting, if a particle's age exceed it's life, we can treat it as dead again and emit as a new particle
 
     // if psys stop emitting, we discard all particles who's age > life when rendering
+    // fix me: if emitted multiple particles in one frame, they will at same age and position.
     float newAge = p_ageLife.x + u_elapsedTime;
 
     if (newAge > p_ageLife.y && u_isEmitting > 0) {

@@ -177,6 +177,8 @@ window.onload = () => {
     // or use control pannel to change current particle system?
     // or use control pannel to modify particle system properties?
 
+    // todo: estimate max particle count by life and emit rate
+
     //#region billboard without rotation limit
     if(false)
     {
@@ -263,7 +265,7 @@ window.onload = () => {
         planesNoRotLimit.geometry = particleGeom;
 
         planesNoRotLimit.autoUpdateTransform = true;
-        planesNoRotLimit.translation = new vec3([0, 0, 2]);
+        planesNoRotLimit.translation = new vec3([0, 0, -2]);
 
         // emitter and particle properties
 
@@ -288,7 +290,7 @@ window.onload = () => {
         planesLimitRotAxis.geometry = particleGeom;
 
         planesLimitRotAxis.autoUpdateTransform = true;
-        planesLimitRotAxis.translation = new vec3([2, 0, 2]);
+        planesLimitRotAxis.translation = new vec3([2, 0, -2]);
 
         // emitter and particle properties
 
@@ -312,7 +314,7 @@ window.onload = () => {
         planesLimitMoveDir.geometry = particleGeom;
 
         planesLimitMoveDir.autoUpdateTransform = true;
-        planesLimitMoveDir.translation = new vec3([4, 0, 2]);
+        planesLimitMoveDir.translation = new vec3([4, 0, -2]);
 
         // emitter and particle properties
 

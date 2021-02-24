@@ -25,6 +25,7 @@ export class Clock {
 
     public stop() {
         this._running = false;
+        this._then = -1;
     }
 
     /**

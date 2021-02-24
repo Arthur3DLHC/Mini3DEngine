@@ -444,6 +444,10 @@ export class GPUParticleSystem extends Object3D {
             this._curParticleCount += Clock.instance.elapsedTime * this.emitRate;
         }
         this._curParticleCount = Math.min(this._curParticleCount, this._maxParticleCount);
+
+        // estimate a max alive count by life and emit rate?
+        this._curParticleCount = Math.min(this._curParticleCount, this.maxLife * this.emitRate);
+
         const updateCount = Math.floor(this._curParticleCount);
         if (updateCount > 0) {
 
