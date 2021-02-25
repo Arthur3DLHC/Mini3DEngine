@@ -167,8 +167,7 @@ window.onload = () => {
 
     scene.attachChild(dirLight01);
 
-    // todo: particle system
-    // geometry: use a plane?
+    // geometry: use a plane with z-axis as normal
     const particleGeom = new PlaneGeometry(1, 1, 1, 1, 2);
 
     // todo: test particle materials
@@ -199,6 +198,17 @@ window.onload = () => {
         billboardsNoRotLimit.translation = new vec3([0, 0, 0]);
 
         // emitter and particle properties
+        billboardsNoRotLimit.minSize = new vec3([0.5, 0.5, 0.5]);
+        billboardsNoRotLimit.maxSize = new vec3([1, 1, 1]);
+        billboardsNoRotLimit.emitDirection = new vec3([0, 1, 0]);
+        billboardsNoRotLimit.emitDirectionVariation = 1;
+        billboardsNoRotLimit.minSpeed = 0.5;
+        billboardsNoRotLimit.maxSpeed = 1.5;
+
+        billboardsNoRotLimit.minAngle = 0;
+        billboardsNoRotLimit.maxAngle = Math.PI * 2;
+        billboardsNoRotLimit.minAngularSpeed = -1;
+        billboardsNoRotLimit.maxAngularSpeed = 1;
     
         gravity.copyTo(billboardsNoRotLimit.gravity);
 

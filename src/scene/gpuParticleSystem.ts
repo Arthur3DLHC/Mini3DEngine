@@ -69,6 +69,7 @@ export class GPUParticleSystem extends Object3D {
 
     //#region public properties
 
+    /** generally, should use a plane geometry with normal towards z axis */
     public geometry: BufferGeometry | null = null;
 
     // fix me: how to present material and shader program?
