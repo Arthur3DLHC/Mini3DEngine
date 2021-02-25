@@ -184,7 +184,7 @@ window.onload = () => {
     // todo: estimate max particle count by life and emit rate
 
     //#region billboard without rotation limit
-    if(false)
+    if(true)
     {
         const billboardsNoRotLimit = new GPUParticleSystem(500);
         billboardsNoRotLimit.name = "billboardNoRotLimit";
@@ -258,13 +258,12 @@ window.onload = () => {
     //#endregion
 
     //#region not billboard without rotation limit
-    if(true)
+    if(false)
     {
         const planesNoRotLimit = new GPUParticleSystem(500);
         planesNoRotLimit.name = "planesNoRotLimit";
         planesNoRotLimit.isBillboard = false;
-        planesNoRotLimit.rotationLimit = RotationLimitMode.Axis;
-        planesNoRotLimit.rotationLimitAxis = new vec3([0, 1, 0]);
+        planesNoRotLimit.rotationLimit = RotationLimitMode.NoLimit;
         planesNoRotLimit.castShadow = false;
 
         planesNoRotLimit.geometry = particleGeom;

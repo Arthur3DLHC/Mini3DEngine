@@ -42,15 +42,15 @@ export class PlaneGeometry extends BufferGeometry {
                 const idx = (j * (this._widthSeg + 1) + i) * floats;
                 if (normalAxis === 0) {
                     vertexBuffer.data[idx + 0] = 0;
-                    vertexBuffer.data[idx + 1] = u;
-                    vertexBuffer.data[idx + 2] = v;
+                    vertexBuffer.data[idx + 1] = -v;        // to face +x
+                    vertexBuffer.data[idx + 2] = -u;
                 } else if (normalAxis === 1) {
                     vertexBuffer.data[idx + 0] = u;
                     vertexBuffer.data[idx + 1] = 0;
                     vertexBuffer.data[idx + 2] = v;
                 } else {
                     vertexBuffer.data[idx + 0] = u;
-                    vertexBuffer.data[idx + 1] = v;
+                    vertexBuffer.data[idx + 1] = -v;        // to face +z, for billboards
                     vertexBuffer.data[idx + 2] = 0;
                 }
 
