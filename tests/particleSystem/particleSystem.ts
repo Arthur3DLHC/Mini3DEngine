@@ -16,6 +16,8 @@ window.onload = () => {
 
     GLDevice.initialize(canvas);
 
+    const gl = GLDevice.gl;
+
     const loadingManager = new LoadingManager();
     const imageLoader = new ImageLoader(loadingManager);
     const textureLoader = new TextureLoader(loadingManager);
@@ -172,7 +174,8 @@ window.onload = () => {
 
     // todo: test particle materials
     const particleMtl = new GPUParticleMaterial(renderer.context);
-    particleMtl.cullState = RenderStateCache.instance.getCullState(false, GLDevice.gl.BACK);
+    particleMtl.cullState = RenderStateCache.instance.getCullState(false, gl.BACK);
+    particleMtl.blendState = RenderStateCache.instance.getBlendState(true, gl.FUNC_ADD, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     const gravity: vec3 = new vec3([0, 0, 0]);
 
@@ -209,8 +212,13 @@ window.onload = () => {
         billboardsNoRotLimit.maxAngle = Math.PI * 2;
         billboardsNoRotLimit.minAngularSpeed = -1;
         billboardsNoRotLimit.maxAngularSpeed = 1;
+
+        billboardsNoRotLimit.color1 = new vec4([1, 0, 0, 0.3]);
+        billboardsNoRotLimit.color2 = new vec4([0, 1, 0, 0.7]);
     
         gravity.copyTo(billboardsNoRotLimit.gravity);
+
+        billboardsNoRotLimit.material = particleMtl;
 
         billboardsNoRotLimit.rebuild();
         billboardsNoRotLimit.start();

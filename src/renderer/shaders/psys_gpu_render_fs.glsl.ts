@@ -24,7 +24,8 @@ in float    ex_texMixAmount;
 void main(void)
 {
     FinalOutput o = defaultFinalOutput();
-    o.color = vec4(1.0);
+    // o.color = vec4(1.0);
+    o.color = ex_color;
 
     // todo: texture animation
 
