@@ -175,7 +175,7 @@ window.onload = () => {
     const particleMtl = new GPUParticleMaterial(renderer.context);
     particleMtl.cullState = RenderStateCache.instance.getCullState(false, GLDevice.gl.BACK);
 
-    const gravity: vec3 = new vec3();
+    const gravity: vec3 = new vec3([0, 0, 0]);
 
     // add different type particles
     // or use control pannel to change current particle system?
@@ -263,7 +263,8 @@ window.onload = () => {
         const planesNoRotLimit = new GPUParticleSystem(500);
         planesNoRotLimit.name = "planesNoRotLimit";
         planesNoRotLimit.isBillboard = false;
-        planesNoRotLimit.rotationLimit = RotationLimitMode.NoLimit;
+        planesNoRotLimit.rotationLimit = RotationLimitMode.Axis;
+        planesNoRotLimit.rotationLimitAxis = new vec3([0, 1, 0]);
         planesNoRotLimit.castShadow = false;
 
         planesNoRotLimit.geometry = particleGeom;
@@ -276,7 +277,7 @@ window.onload = () => {
         planesNoRotLimit.minSize = new vec3([0.5, 0.5, 0.5]);
         planesNoRotLimit.maxSize = new vec3([1, 1, 1]);
         planesNoRotLimit.emitDirection = new vec3([0, 1, 0]);
-        // planesNoRotLimit.emitDirectionVariation = 1;
+        planesNoRotLimit.emitDirectionVariation = 1;
         planesNoRotLimit.minSpeed = 0.5;
         planesNoRotLimit.maxSpeed = 1.5;
 
