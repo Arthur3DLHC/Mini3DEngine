@@ -115,6 +115,7 @@ void main(void)
             matView[2] = vec4(0.0, 0.0, 1.0, 0.0);
         } else {
             // calc a local rotation matrix trying to look at camera
+            // align y axis to limit dir?
             vec3 frontDir = normalize(u_view.position - p_position);
             vec3 sideDir = normalize(cross(limitDir, frontDir));
             frontDir = normalize(cross(sideDir, limitDir));

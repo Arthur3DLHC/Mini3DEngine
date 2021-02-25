@@ -30,6 +30,7 @@ export enum EmitterShape {
 export enum RotationLimitMode {
     NoLimit = 0,
     Axis = 1,
+    /** if is billboard, will align y axis to move dir */
     MoveDir = 2
 }
 
@@ -201,13 +202,13 @@ export class GPUParticleSystem extends Object3D {
     /** world space bounding sphere */
     protected _boundingSphere: BoundingSphere = new BoundingSphere();
     /** world space emitter transform */
-    protected _emitterTransform: mat4 = new mat4();
+    // protected _emitterTransform: mat4 = new mat4();
 
     private static _rotRefDir: vec3 = new vec3();
 
     private static _tmpVec3: vec3 = new vec3();
 
-    private static _tmpMat4: mat4 = new mat4();
+    // private static _tmpMat4: mat4 = new mat4();
 
     // private static _defaultUpdateProgram: ShaderProgram | null = null;
     // private static _defaultRenderProgram: ShaderProgram | null = null;
@@ -489,8 +490,8 @@ export class GPUParticleSystem extends Object3D {
 
             // set psys properties to uniforms
             // too much... consider use an UBO?
-            GPUParticleSystem._tmpMat4.fromScaling(this.emitterSize);
-            mat4.product(this.worldTransform, GPUParticleSystem._tmpMat4, this._emitterTransform);
+            // GPUParticleSystem._tmpMat4.fromScaling(this.emitterSize);
+            // mat4.product(this.worldTransform, GPUParticleSystem._tmpMat4, this._emitterTransform);
 
             // use a steady elapsed time to prevent un-even emitting
             gl.uniform1f(updateProgram.getUniformLocation("u_elapsedTime"), this.updateInterval);
@@ -499,7 +500,9 @@ export class GPUParticleSystem extends Object3D {
             gl.uniform2f(updateProgram.getUniformLocation("u_curCount_randCount"), this._curParticleCount, Math.random() * this._curParticleCount);
             gl.uniform1i(updateProgram.getUniformLocation("u_isEmitting"), this._isEmitting ? 1 : 0);
             gl.uniform1i(updateProgram.getUniformLocation("u_emitterShape"), this.emitterShape);
-            gl.uniformMatrix4fv(updateProgram.getUniformLocation("u_emitterModelTransform"), false, this._emitterTransform.values);
+            gl.uniform3f(updateProgram.getUniformLocation("u_emitterSize"), this.emitterSize.x, this.emitterSize.y, this.emitterSize.z);
+            gl.uniformMatrix4fv(updateProgram.getUniformLocation("u_emitterModelTransform"), false, this.worldTransform.values);
+            // gl.uniformMatrix4fv(updateProgram.getUniformLocation("u_emitterModelTransform"), false, this._emitterTransform.values);
             gl.uniform4f(updateProgram.getUniformLocation("u_emitDir_variation"), this.emitDirection.x, this.emitDirection.y, this.emitDirection.z, this.emitDirectionVariation);
             gl.uniform4f(updateProgram.getUniformLocation("u_texAnimFrameInfo"), this.texAnimStartFrame, this.texAnimEndFrame, this.texAnimFrameIncreaseSpeed, this.randomAnimStartFrame ? 1 : 0);
             gl.uniform2f(updateProgram.getUniformLocation("u_lifeRange"), this.minLife, this.maxLife);

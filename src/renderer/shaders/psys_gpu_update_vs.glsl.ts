@@ -29,7 +29,7 @@ uniform vec2    u_curCount_randCount;   // current particle count (including res
 uniform int     u_isEmitting;
 // uniform vec3    u_origin;            // position of emitter?
 uniform int     u_emitterShape;
-// uniform vec3    u_emitterSize;          // local size in x, y, z axis
+uniform vec3    u_emitterSize;          // local size in x, y, z axis
 uniform mat4    u_emitterModelTransform;   // contains rotate, scale, translation already.
 
 uniform vec4    u_emitDir_variation;    // xyz: emit dir (normalized dir)
@@ -132,6 +132,8 @@ void main(void)
         // todo: size; random init size; gradient texture?
         ex_size = mix(u_minSize, u_maxSize, random.g);
 
+        vec3 positionRange = u_emitterSize - 0.5 * u_emitterSize;
+
         // todo: generate position according to the emitter shape and size
         // generate in local unit space, then assign emitter world transform.
         if (u_emitterShape == EMITTER_ELLIPSOID) {
@@ -141,10 +143,10 @@ void main(void)
             newPosition.x = cos(thetaPhiRadius.y) * sin(thetaPhiRadius.x);
             newPosition.y = cos(thetaPhiRadius.x);
             newPosition.z = sin(thetaPhiRadius.y) * sin(thetaPhiRadius.x);
-            newPosition *= thetaPhiRadius.z;
+            newPosition *= thetaPhiRadius.z * positionRange;
         } else if (u_emitterShape == EMITTER_BOX) {
             // random xyz
-            newPosition = getRandomVec3(p_seed.y);
+            newPosition = getRandomVec3(p_seed.y) * positionRange;
         }
 
         // random angle and angular speed

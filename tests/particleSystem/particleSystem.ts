@@ -186,7 +186,7 @@ window.onload = () => {
     // todo: estimate max particle count by life and emit rate
 
     //#region billboard without rotation limit
-    if(true)
+    if(false)
     {
         const billboardsNoRotLimit = new GPUParticleSystem(500);
         billboardsNoRotLimit.name = "billboardNoRotLimit";
@@ -252,7 +252,7 @@ window.onload = () => {
     //#endregion
 
     //#region billboard with rotatoin limit (move dir)
-    if(false)
+    if(true)
     {
         const billboardsLimitRotMoveDir = new GPUParticleSystem(500);
         billboardsLimitRotMoveDir.name = "billboardsLimitRotMoveDir";
@@ -266,8 +266,22 @@ window.onload = () => {
         billboardsLimitRotMoveDir.translation = new vec3([4, 0, 0]);
 
         // emitter and particle properties
+        billboardsLimitRotMoveDir.emitRate = 30;
+        billboardsLimitRotMoveDir.emitterSize = new vec3([0.1, 0.1, 0.1]);
 
-        gravity.copyTo(billboardsLimitRotMoveDir.gravity);
+        billboardsLimitRotMoveDir.emitDirection = new vec3([0, 1, 0]);
+        billboardsLimitRotMoveDir.emitDirectionVariation = 0.5;
+
+        billboardsLimitRotMoveDir.minSize = new vec3([0.04, 0.2, 0.2]);
+        billboardsLimitRotMoveDir.maxSize = new vec3([0.04, 0.2, 0.2]);
+
+        billboardsLimitRotMoveDir.minSpeed = 4;
+        billboardsLimitRotMoveDir.maxSpeed = 5;
+
+        billboardsLimitRotMoveDir.gravity = new vec3([0, -4, 0]);
+
+        billboardsLimitRotMoveDir.color1 = new vec4([3, 2.8, 0.5, 1]);
+        billboardsLimitRotMoveDir.color1 = new vec4([3.5, 3.3, 0.5, 1]);
 
         billboardsLimitRotMoveDir.rebuild();
         billboardsLimitRotMoveDir.start();
@@ -370,8 +384,8 @@ window.onload = () => {
 
 
     // test environment probes
-    SceneHelper.addEnvProbe("envProbe01", 6, new vec3([ 0, 0, 0]), scene, EnvironmentProbeType.Reflection);
-    SceneHelper.addEnvProbe("irrProbe01", 6, new vec3([ 0, 0, 0]), scene, EnvironmentProbeType.Irradiance);
+    SceneHelper.addEnvProbe("envProbe01", 6, new vec3([0, 0, 0]), scene, EnvironmentProbeType.Reflection);
+    SceneHelper.addEnvProbe("irrProbe01", 6, new vec3([0, 0, 0]), scene, EnvironmentProbeType.Irradiance);
 
     const infoPanel: HTMLDivElement = document.getElementById("infoPanel") as HTMLDivElement;
 
