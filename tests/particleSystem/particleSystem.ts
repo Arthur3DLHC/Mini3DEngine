@@ -267,9 +267,12 @@ window.onload = () => {
         planesNoRotLimit.autoUpdateTransform = true;
         planesNoRotLimit.translation = new vec3([0, 0, -2]);
 
-        // emitter and particle properties
+        // test emitter and particle properties
+        planesNoRotLimit.emitterSize = new vec3([2, 2, 2]);
 
         gravity.copyTo(planesNoRotLimit.gravity);
+
+        // todo: psys material
 
         planesNoRotLimit.rebuild();
         planesNoRotLimit.start();

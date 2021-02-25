@@ -1,3 +1,4 @@
+import mat4 from "../../lib/tsm/mat4.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import vec4 from "../../lib/tsm/vec4.js";
 import { BufferGeometry } from "../geometry/bufferGeometry.js";
@@ -10,6 +11,7 @@ import { GLPrograms } from "../WebGLResources/glPrograms.js";
 import { GLRenderStates } from "../WebGLResources/glRenderStates.js";
 import { GLTextures } from "../WebGLResources/glTextures.js";
 import { GLTransformFeedbacks } from "../WebGLResources/glTransformFeedbacks.js";
+import { SamplerState } from "../WebGLResources/renderStates/samplerState.js";
 import { Texture2D } from "../WebGLResources/textures/texture2D.js";
 import { TransformFeedback } from "../WebGLResources/transformFeedback.js";
 import { VertexBuffer } from "../WebGLResources/vertexBuffer.js";
@@ -196,10 +198,14 @@ export class GPUParticleSystem extends Object3D {
     protected _localBoundingSphere: BoundingSphere = new BoundingSphere();
     /** world space bounding sphere */
     protected _boundingSphere: BoundingSphere = new BoundingSphere();
+    /** world space emitter transform */
+    protected _emitterTransform: mat4 = new mat4();
 
     private static _rotRefDir: vec3 = new vec3();
 
     private static _tmpVec3: vec3 = new vec3();
+
+    private static _tmpMat4: mat4 = new mat4();
 
     // private static _defaultUpdateProgram: ShaderProgram | null = null;
     // private static _defaultRenderProgram: ShaderProgram | null = null;
@@ -361,6 +367,7 @@ export class GPUParticleSystem extends Object3D {
         for (let i = 0; i < floats; i++) {
             this._randomTexture.image[i] = Math.random();
         }
+        this._randomTexture.samplerState = new SamplerState(gl.REPEAT, gl.REPEAT, gl.NEAREST, gl.NEAREST);
         this._randomTexture.upload();
 
         this.estimateBoundingSphere();
@@ -480,15 +487,17 @@ export class GPUParticleSystem extends Object3D {
 
             // set psys properties to uniforms
             // too much... consider use an UBO?
+            GPUParticleSystem._tmpMat4.fromScaling(this.emitterSize);
+            mat4.product(this.worldTransform, GPUParticleSystem._tmpMat4, this._emitterTransform);
 
             // use a steady elapsed time to prevent un-even emitting
             gl.uniform1f(updateProgram.getUniformLocation("u_elapsedTime"), this.updateInterval);
             // gl.uniform1f(updateProgram.getUniformLocation("u_elapsedTime"), Clock.instance.elapsedTime);
             gl.uniform3f(updateProgram.getUniformLocation("u_gravity"), this.gravity.x, this.gravity.y, this.gravity.z);
-            gl.uniform1f(updateProgram.getUniformLocation("u_curCount"), this._curParticleCount);
+            gl.uniform2f(updateProgram.getUniformLocation("u_curCount_randCount"), this._curParticleCount, Math.random() * this._curParticleCount);
             gl.uniform1i(updateProgram.getUniformLocation("u_isEmitting"), this._isEmitting ? 1 : 0);
             gl.uniform1i(updateProgram.getUniformLocation("u_emitterShape"), this.emitterShape);
-            gl.uniformMatrix4fv(updateProgram.getUniformLocation("u_emitterModelTransform"), false, this.worldTransform.values);
+            gl.uniformMatrix4fv(updateProgram.getUniformLocation("u_emitterModelTransform"), false, this._emitterTransform.values);
             gl.uniform4f(updateProgram.getUniformLocation("u_emitDir_variation"), this.emitDirection.x, this.emitDirection.y, this.emitDirection.z, this.emitDirectionVariation);
             gl.uniform4f(updateProgram.getUniformLocation("u_texAnimFrameInfo"), this.texAnimStartFrame, this.texAnimEndFrame, this.texAnimFrameIncreaseSpeed, this.randomAnimStartFrame ? 1 : 0);
             gl.uniform2f(updateProgram.getUniformLocation("u_lifeRange"), this.minLife, this.maxLife);
