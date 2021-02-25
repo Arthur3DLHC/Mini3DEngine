@@ -84,6 +84,13 @@ void main(void)
 
     mat4 matRot2D = mat4(1.0);
     // rotation matrix along z axis?
+    float s2d = sin(p_angle.x);
+    float c2d = cos(p_angle.x);
+
+    matRot2D[0][0] = c2d;
+    matRot2D[0][1] = s2d;
+    matRot2D[1][0] = -s2d;
+    matRot2D[1][1] = c2d;
 
     mat4 matRot3D = mat4(1.0);
     mat4 matTranslation = mat4(1.0);

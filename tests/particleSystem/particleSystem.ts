@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, GPUParticleSystem, RotationLimitMode } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, GPUParticleSystem, RotationLimitMode, GPUParticleMaterial, RenderStateCache } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "../common/behaviors/autoRotateBehavior.js";
 import vec4 from "../../lib/tsm/vec4.js";
@@ -169,7 +169,11 @@ window.onload = () => {
 
     // todo: particle system
     // geometry: use a plane?
-    const particleGeom = new PlaneGeometry(1, 1, 1, 1);
+    const particleGeom = new PlaneGeometry(1, 1, 1, 1, 2);
+
+    // todo: test particle materials
+    const particleMtl = new GPUParticleMaterial(renderer.context);
+    particleMtl.cullState = RenderStateCache.instance.getCullState(false, GLDevice.gl.BACK);
 
     const gravity: vec3 = new vec3();
 
@@ -269,10 +273,22 @@ window.onload = () => {
 
         // test emitter and particle properties
         planesNoRotLimit.emitterSize = new vec3([2, 2, 2]);
+        planesNoRotLimit.minSize = new vec3([0.5, 0.5, 0.5]);
+        planesNoRotLimit.maxSize = new vec3([1, 1, 1]);
+        planesNoRotLimit.emitDirection = new vec3([0, 1, 0]);
+        // planesNoRotLimit.emitDirectionVariation = 1;
+        planesNoRotLimit.minSpeed = 0.5;
+        planesNoRotLimit.maxSpeed = 1.5;
+
+        planesNoRotLimit.minAngle = 0;
+        planesNoRotLimit.maxAngle = Math.PI * 2;
+        planesNoRotLimit.minAngularSpeed = -1;
+        planesNoRotLimit.maxAngularSpeed = 1;
 
         gravity.copyTo(planesNoRotLimit.gravity);
 
-        // todo: psys material
+        // todo: psys material; tansparent;
+        planesNoRotLimit.material = particleMtl;
 
         planesNoRotLimit.rebuild();
         planesNoRotLimit.start();

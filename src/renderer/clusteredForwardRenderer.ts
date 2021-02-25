@@ -511,6 +511,8 @@ export class ClusteredForwardRenderer {
     private _debugRenderer: DebugRenderer;
     private _objectTagRenderer: ObjectTagRenderer;
 
+    public get context(): ClusteredForwardRenderContext { return this._renderContext; }
+
     public get postprocessor(): PostProcessor { return this._postprocessor; }
     public get debugRenderer(): DebugRenderer { return this._debugRenderer; }
     public get objectTagRenderer(): ObjectTagRenderer { return this._objectTagRenderer; }

@@ -72,6 +72,7 @@ export class GPUParticleSystem extends Object3D {
     public geometry: BufferGeometry | null = null;
 
     // fix me: how to present material and shader program?
+    /** note: multiple psys object can share same material. so materials need to be released manually */
     public material: GPUParticleMaterial | null = null;
     public static defaultMaterial: GPUParticleMaterial | null = null;
 

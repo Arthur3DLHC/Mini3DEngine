@@ -40,6 +40,11 @@ export class RenderStateCache {
         return newState;
     }
 
+    /**
+     * 
+     * @param enable 
+     * @param mode gl.FRONT or gl.BACK
+     */
     public getCullState(enable: boolean = true, mode: GLenum = GLDevice.gl.BACK): CullState {
         for (const cs of this.cullStates) {
             if (cs.equals(enable, mode)) {

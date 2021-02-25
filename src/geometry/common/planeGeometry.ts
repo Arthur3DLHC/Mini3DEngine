@@ -6,7 +6,15 @@ import { Primitive } from "../primitive.js";
 import { DefaultAttributeLocations, VertexBufferAttribute } from "../../WebGLResources/vertexBufferAttribute.js";
 
 export class PlaneGeometry extends BufferGeometry {
-    public constructor(width: number, height: number, widthSegments: number, heightSegments: number) {
+    /**
+     * 
+     * @param width 
+     * @param height 
+     * @param widthSegments 
+     * @param heightSegments 
+     * @param normalAxis 0 - x, 1 - y, 2 - z
+     */
+    public constructor(width: number, height: number, widthSegments: number, heightSegments: number, normalAxis: number = 1) {
         super();
         this._width = Math.max(0, width);
         this._height = Math.max(0, height);
@@ -27,14 +35,25 @@ export class PlaneGeometry extends BufferGeometry {
 
         for (let j = 0; j < this._heightSeg + 1; j++) {
             const t = j / this._heightSeg;
-            const z = -halfHeight + t * this._height;
+            const v = -halfHeight + t * this._height;
             for(let i = 0; i < this._widthSeg + 1; i++) {
                 const s = i / this._widthSeg;
-                const x = -halfWidth + s * this._width;
+                const u = -halfWidth + s * this._width;
                 const idx = (j * (this._widthSeg + 1) + i) * floats;
-                vertexBuffer.data[idx + 0] = x;
-                vertexBuffer.data[idx + 1] = 0;
-                vertexBuffer.data[idx + 2] = z;
+                if (normalAxis === 0) {
+                    vertexBuffer.data[idx + 0] = 0;
+                    vertexBuffer.data[idx + 1] = u;
+                    vertexBuffer.data[idx + 2] = v;
+                } else if (normalAxis === 1) {
+                    vertexBuffer.data[idx + 0] = u;
+                    vertexBuffer.data[idx + 1] = 0;
+                    vertexBuffer.data[idx + 2] = v;
+                } else {
+                    vertexBuffer.data[idx + 0] = u;
+                    vertexBuffer.data[idx + 1] = v;
+                    vertexBuffer.data[idx + 2] = 0;
+                }
+
                 vertexBuffer.data[idx + 3] = 0;
                 vertexBuffer.data[idx + 4] = 1;
                 vertexBuffer.data[idx + 5] = 0;

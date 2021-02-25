@@ -166,7 +166,7 @@ void main(void)
         // todo: nose texture?
 
         // generate local direction by the u_emitDir_variation
-        newDirection = u_emitDir_variation.xyz + getRandomVec3(p_seed.z) * u_emitDir_variation.w;
+        newDirection = u_emitDir_variation.xyz + (getRandomVec3(p_seed.z) - vec3(0.5)) * u_emitDir_variation.w;
         newDirection *= mix(u_speedRange.x, u_speedRange.y, random1.b);
 
         // transform them to world space
