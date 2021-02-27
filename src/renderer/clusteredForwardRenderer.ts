@@ -1122,7 +1122,7 @@ export class ClusteredForwardRenderer {
                         const psys = item.object as GPUParticleSystem;
                         // todo: update and render psys here?
                         psys.update(this.numReservedTextures);
-                        psys.render();
+                        psys.render(this.numReservedTextures);
                     }
                 } else { // draw item geometry
                     if (GLPrograms.currProgram) {

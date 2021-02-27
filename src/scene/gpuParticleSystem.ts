@@ -531,7 +531,7 @@ export class GPUParticleSystem extends Object3D {
             texUnit++;
 
             // set material specific params
-            mtl.setUpdateProgramUniforms(this);
+            mtl.setUpdateProgramUniforms(this, texUnit);
 
             // begin transform feedback
             GLTransformFeedbacks.beginTransformFeedback(gl.POINTS);
@@ -556,7 +556,7 @@ export class GPUParticleSystem extends Object3D {
      * so should swap update and render vertex buffer after last render (or before update?)
      * @param startTexUnit 
      */
-    public render() {
+    public render(startTexUnit: number) {
         const geometry = this.geometry;
         if(geometry === null) return;
 
@@ -624,10 +624,12 @@ export class GPUParticleSystem extends Object3D {
             // todo: textures
             // some scene textures: irradiance probes;
             // depth, for soft particles;
+            // todo: use constants for these sampler textures
 
             // particle own texture (with animation frames?)
             // let material set them?
             // use SamplerUniforms?
+            mtl.setRenderProgramUniforms(this, startTexUnit);
 
             // bind render VAO
             // (render VAO and update VAO use different particle vertex buffer)

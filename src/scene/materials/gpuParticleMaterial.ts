@@ -68,12 +68,12 @@ export class GPUParticleMaterial extends Material {
     public texture: Texture2D | null = null;
 
     // set uniform values for update program?
-    public setUpdateProgramUniforms(psys: GPUParticleSystem) {
+    public setUpdateProgramUniforms(psys: GPUParticleSystem, startTexUnit: number) {
         // get properties from psys, set them to uniforms
     }
 
     // set uniform values for render program?
-    public setRenderProgramUniforms(psys: GPUParticleSystem) {
+    public setRenderProgramUniforms(psys: GPUParticleSystem, startTexUnit: number) {
         // get properties from psys, set them to uniforms
 
         // set texture and sampler; fix me: use witch sampler?
