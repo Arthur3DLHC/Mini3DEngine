@@ -9,6 +9,7 @@ import { GPUParticleSystem } from "../gpuParticleSystem.js";
 import { Material } from "./material.js";
 import { GLPrograms } from "../../WebGLResources/glPrograms.js";
 import { ClusteredForwardRenderContext } from "../../renderer/clusteredForwardRenderContext.js";
+import { Texture2D } from "../../WebGLResources/textures/texture2D.js";
 
 /**
  * the default material for GPU particle systems.
@@ -63,14 +64,18 @@ export class GPUParticleMaterial extends Material {
     // not using uniform buffer object?
 
     // textures?
+    // texture with animation frames, in one row
+    public texture: Texture2D | null = null;
 
     // set uniform values for update program?
     public setUpdateProgramUniforms(psys: GPUParticleSystem) {
-        // get properties form psys, set them to uniforms
+        // get properties from psys, set them to uniforms
     }
 
     // set uniform values for render program?
     public setRenderProgramUniforms(psys: GPUParticleSystem) {
-        // get properties form psys, set them to uniforms
+        // get properties from psys, set them to uniforms
+
+        // set texture and sampler; fix me: use witch sampler?
     }
 }

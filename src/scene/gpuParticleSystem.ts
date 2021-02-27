@@ -624,7 +624,10 @@ export class GPUParticleSystem extends Object3D {
             // todo: textures
             // some scene textures: irradiance probes;
             // depth, for soft particles;
+
             // particle own texture (with animation frames?)
+            // let material set them?
+            // use SamplerUniforms?
 
             // bind render VAO
             // (render VAO and update VAO use different particle vertex buffer)
