@@ -122,7 +122,7 @@ export class GPUParticleSystem extends Object3D {
     public texAnimStartFrame: number = 0;
     public texAnimEndFrame: number = 0;
     public texAnimFrameIncreaseSpeed: number = 0;
-    /** total frame count */
+    /** total frame count, for calc texcoords when rendering */
     public texAnimFrameCount: number = 1;
 
     public randomAnimStartFrame: boolean = false;

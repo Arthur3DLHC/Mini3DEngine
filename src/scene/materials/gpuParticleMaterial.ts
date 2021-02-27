@@ -10,6 +10,8 @@ import { Material } from "./material.js";
 import { GLPrograms } from "../../WebGLResources/glPrograms.js";
 import { ClusteredForwardRenderContext } from "../../renderer/clusteredForwardRenderContext.js";
 import { Texture2D } from "../../WebGLResources/textures/texture2D.js";
+import { GLDevice } from "../../WebGLResources/glDevice.js";
+import { GLTextures } from "../../WebGLResources/glTextures.js";
 
 /**
  * the default material for GPU particle systems.
@@ -74,8 +76,15 @@ export class GPUParticleMaterial extends Material {
 
     // set uniform values for render program?
     public setRenderProgramUniforms(psys: GPUParticleSystem, startTexUnit: number) {
+        const gl = GLDevice.gl;
         // get properties from psys, set them to uniforms
 
         // set texture and sampler; fix me: use witch sampler?
+        let texUnit = startTexUnit;
+        if (this.texture !== null && this.renderProgram !== null) {
+            GLTextures.setTextureAt(texUnit, this.texture);
+            gl.uniform1i(this.renderProgram.getUniformLocation("s_texture"), texUnit);
+            // texUnit++;
+        }
     }
 }
