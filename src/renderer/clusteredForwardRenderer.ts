@@ -459,7 +459,10 @@ export class ClusteredForwardRenderer {
     private _sceneColorTexture: Texture2D[];      // main color output
     private _sceneNormalTexture: Texture2D;
     private _sceneSpecularRoughnessTexture: Texture2D;
-    private _sceneDepthTexture: Texture2D;             // main depth texture
+    private _sceneDepthTexture: Texture2D;              // main depth texture
+                                                        // todo: use two depth textures and swap between this and last frame,
+                                                        // for objects needs depth when rendering, such as particle systems?
+                                                        // or render particle systems after all opaque objects has been rendered?
 
     private _shadowmapAtlasCache: ShadowmapAtlas;  // static objects only
     private _shadowmapAtlas: ShadowmapAtlas; // dynamic objects only
