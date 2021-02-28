@@ -87,6 +87,7 @@ import { BoundingRenderModes } from "./boundingRenderModes.js";
 import { DebugRenderer } from "./debugRenderer.js";
 import { ObjectTagRenderer } from "./objectTagRenderer.js";
 import { GPUParticleSystem } from "../scene/gpuParticleSystem.js";
+import { SceneTextureUnits } from "./sceneTextureUnits.js";
 
 export class ClusteredForwardRenderer {
 
@@ -199,13 +200,13 @@ export class ClusteredForwardRenderer {
         }
         this._currFrameFBOIdx = 0;
 
-        this._shadowmapAtlasUnit = 1;
-        this._decalAtlasUnit = 2;
-        this._envMapArrayUnit = 3;
-        this._specularDFGUnit = 4;
-        this._irradianceProbeArrayUnit = 5;
+        this._shadowmapAtlasUnit = SceneTextureUnits.shadowmapAtlas;// 1;
+        this._decalAtlasUnit = SceneTextureUnits.decalAtlas;// 2;
+        this._envMapArrayUnit = SceneTextureUnits.envMapArray;// 3;
+        this._specularDFGUnit = SceneTextureUnits.specularDFG;// 4;
+        this._irradianceProbeArrayUnit = SceneTextureUnits.irradianceProbeArray;// 5;
 
-        this._numReservedTextures = 6;
+        this._numReservedTextures = SceneTextureUnits.count;//6;
 
 
         // todo: 静态shadowmap和动态shadowmap需要分开
@@ -741,6 +742,8 @@ export class ClusteredForwardRenderer {
 
     /** only handle stdpbr material now */
     private bindTexturesPerMaterial(material: Material | null) {
+        if(material === null) return;
+
         // todo: skinning
         let samplerUniforms = this._samplerUniformsStdPBR;
         // if (useSkin) {
@@ -771,6 +774,7 @@ export class ClusteredForwardRenderer {
             }        
         } else {
             // throw new Error("Method not implemented.");
+            // if material has scene texture samplers, set them?
         }
     }
 

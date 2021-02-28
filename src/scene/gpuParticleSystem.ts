@@ -5,6 +5,7 @@ import { BufferGeometry } from "../geometry/bufferGeometry.js";
 import { BoundingSphere } from "../math/boundingSphere.js";
 import { ClusteredForwardRenderContext } from "../renderer/clusteredForwardRenderContext.js";
 import { RenderList } from "../renderer/renderList.js";
+import { SceneTextureUnits } from "../renderer/sceneTextureUnits.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { GLGeometryBuffers } from "../WebGLResources/glGeometryBuffers.js";
 import { GLPrograms } from "../WebGLResources/glPrograms.js";
@@ -623,13 +624,20 @@ export class GPUParticleSystem extends Object3D {
 
             // todo: textures
             // some scene textures: irradiance probes;
+            gl.uniform1i(renderProgram.getUniformLocation("s_irrProbeArray"), SceneTextureUnits.irradianceProbeArray);
+
+            // hold cur tex unit here? or use GLTextures class?
+            let texUnit = startTexUnit;
             // depth, for soft particles;
-            // todo: use constants for these sampler textures
+            // fix me: can not use this frame depth texture, because it may being used as render target
+            // use a last frame depth?
+
+            texUnit++;
 
             // particle own texture (with animation frames?)
             // let material set them?
             // use SamplerUniforms?
-            mtl.setRenderProgramUniforms(this, startTexUnit);
+            mtl.setRenderProgramUniforms(this, texUnit);
 
             // bind render VAO
             // (render VAO and update VAO use different particle vertex buffer)
