@@ -182,8 +182,11 @@ window.onload = () => {
     // add different type particles
     // or use control pannel to change current particle system?
     // or use control pannel to modify particle system properties?
+    const particleSystems: GPUParticleSystem[] = [];
 
     // todo: control particle system start and stop
+    let isEmitting = true;
+
     // todo: one-shot particle system?
 
     // todo: estimate max particle count by life and emit rate
@@ -226,6 +229,8 @@ window.onload = () => {
         billboardsNoRotLimit.rebuild();
         billboardsNoRotLimit.start();
         scene.attachChild(billboardsNoRotLimit);
+
+        particleSystems.push(billboardsNoRotLimit);
     }
     //#endregion
 
@@ -251,6 +256,8 @@ window.onload = () => {
         billboardsLimitRotAxis.rebuild();
         billboardsLimitRotAxis.start();
         scene.attachChild(billboardsLimitRotAxis);
+
+        particleSystems.push(billboardsLimitRotAxis);
     }
     //#endregion
 
@@ -289,6 +296,8 @@ window.onload = () => {
         billboardsLimitRotMoveDir.rebuild();
         billboardsLimitRotMoveDir.start();
         scene.attachChild(billboardsLimitRotMoveDir);
+
+        particleSystems.push(billboardsLimitRotMoveDir);
     }
     //#endregion
 
@@ -328,6 +337,8 @@ window.onload = () => {
         planesNoRotLimit.rebuild();
         planesNoRotLimit.start();
         scene.attachChild(planesNoRotLimit);
+
+        particleSystems.push(planesNoRotLimit);
     }
     //#endregion
 
@@ -353,6 +364,8 @@ window.onload = () => {
         planesLimitRotAxis.rebuild();
         planesLimitRotAxis.start();
         scene.attachChild(planesLimitRotAxis);
+
+        particleSystems.push(planesLimitRotAxis);
     }
     //#endregion
 
@@ -377,6 +390,8 @@ window.onload = () => {
         planesLimitMoveDir.rebuild();
         planesLimitMoveDir.start();
         scene.attachChild(planesLimitMoveDir);
+
+        particleSystems.push(planesLimitMoveDir);
     }
     //#endregion
 
@@ -390,11 +405,29 @@ window.onload = () => {
     SceneHelper.addEnvProbe("envProbe01", 6, new vec3([0, 0, 0]), scene, EnvironmentProbeType.Reflection);
     SceneHelper.addEnvProbe("irrProbe01", 6, new vec3([0, 0, 0]), scene, EnvironmentProbeType.Irradiance);
 
+    // UI
+
     const infoPanel: HTMLDivElement = document.getElementById("infoPanel") as HTMLDivElement;
+
+    const btnStartStop: HTMLDivElement = document.getElementById("startStop") as HTMLDivElement;
+    btnStartStop.onclick = (ev : MouseEvent) => {
+        if (isEmitting) {
+            for (const psys of particleSystems) {
+                psys.stop();
+            }
+            isEmitting = false;
+            btnStartStop.innerText = "Start";
+        } else {
+            for (const psys of particleSystems) {
+                psys.start();
+            }
+            isEmitting = true;
+            btnStartStop.innerText = "Stop";
+        }
+    }
 
     let lastUpdateFPSTime = 0;
     let curFPS = 0;
-
 
     function gameLoop(now: number) {
         Clock.instance.update(now);

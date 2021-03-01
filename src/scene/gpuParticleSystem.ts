@@ -165,6 +165,8 @@ export class GPUParticleSystem extends Object3D {
 
     public updateInterval: number = 1.0 / 60.0;
 
+    public get isEmitting(): boolean {return this._isEmitting;}
+
     //#endregion
 
     //#region private fields
