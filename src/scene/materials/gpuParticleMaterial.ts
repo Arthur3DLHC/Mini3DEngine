@@ -69,6 +69,9 @@ export class GPUParticleMaterial extends Material {
     // texture with animation frames, in one row
     public texture: Texture2D | null = null;
 
+    /** total frame count, for calc texcoords when rendering */
+    public texAnimFrameCount: number = 1;
+
     // set uniform values for update program?
     public setUpdateProgramUniforms(psys: GPUParticleSystem, startTexUnit: number) {
         // get properties from psys, set them to uniforms
@@ -76,15 +79,22 @@ export class GPUParticleMaterial extends Material {
 
     // set uniform values for render program?
     public setRenderProgramUniforms(psys: GPUParticleSystem, startTexUnit: number) {
+        if (this.renderProgram === null) {
+            return;
+        }
         const gl = GLDevice.gl;
         // get properties from psys, set them to uniforms
 
         // set texture and sampler; fix me: use witch sampler?
         let texUnit = startTexUnit;
-        if (this.texture !== null && this.renderProgram !== null) {
+        if (this.texture !== null) {
             GLTextures.setTextureAt(texUnit, this.texture);
             gl.uniform1i(this.renderProgram.getUniformLocation("s_texture"), texUnit);
+            gl.uniform1f(this.renderProgram.getUniformLocation("u_texAnimFrames"), this.texAnimFrameCount);
+
             // texUnit++;
+        } else {
+            gl.uniform1i(this.renderProgram.getUniformLocation("u_texAnimFrames"), 0);
         }
     }
 }

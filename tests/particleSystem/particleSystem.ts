@@ -183,6 +183,9 @@ window.onload = () => {
     // or use control pannel to change current particle system?
     // or use control pannel to modify particle system properties?
 
+    // todo: control particle system start and stop
+    // todo: one-shot particle system?
+
     // todo: estimate max particle count by life and emit rate
 
     //#region billboard without rotation limit

@@ -88,7 +88,14 @@ export class GPUParticleSystem extends Object3D {
     }
 
     // general psys properties
+    /**
+     * if oneShot == false, this is the number of particles emitted per second.
+     * if oneShot == true, this is the number of particles emitted for one time.
+     */
     public emitRate: number = 10;
+
+    /** if true, the n particles will emit at same time when calling start() and only emit one time. n = emitRate */
+    public oneShot: boolean = false;
 
     // emitter shape and range?
     // different shape use different shaders?
@@ -123,8 +130,7 @@ export class GPUParticleSystem extends Object3D {
     public texAnimStartFrame: number = 0;
     public texAnimEndFrame: number = 0;
     public texAnimFrameIncreaseSpeed: number = 0;
-    /** total frame count, for calc texcoords when rendering */
-    public texAnimFrameCount: number = 1;
+
 
     public randomAnimStartFrame: boolean = false;
 
@@ -620,7 +626,6 @@ export class GPUParticleSystem extends Object3D {
             this.worldTransform.multiplyVec3Normal(rotRefDir, rotRefDirWS);
         
             gl.uniform3f(renderProgram.getUniformLocation("u_refDir"), rotRefDirWS.x, rotRefDirWS.y, rotRefDirWS.z);
-            gl.uniform1f(renderProgram.getUniformLocation("u_texAnimFrames"), this.texAnimFrameCount);
 
             // todo: textures
             // some scene textures: irradiance probes;
