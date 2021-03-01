@@ -116,68 +116,83 @@ void main(void)
     // use a steady elapsed time for age
     float newAge = p_ageLife.x + u_elapsedTime;
 
-    if (newAge > p_ageLife.y && u_isEmitting > 0) {
-        vec3 newPosition;
-        vec3 newDirection;
+    if (newAge > p_ageLife.y) {
+        if (u_isEmitting <= 0) {
+            // todo: handle dead particles when is not emitting? give them a zero alpha color?
+            // need to output all varyings
+            ex_position = p_position;
+            ex_direction = p_direction;
+            ex_ageLife = p_ageLife;
+            ex_seed = p_seed;
+            ex_size = p_size;
+            ex_color = vec4(0.0);
+            ex_frameIdx = p_frameIdx;
+            ex_angle = p_angle;
+            gl_Position = vec4(p_position, 1.0);
+        } else {
+            vec3 newPosition;
+            vec3 newDirection;
 
-        // todo: get random value from random texture
-        vec4 random = getRandomVec4(p_seed.x);
+            // todo: get random value from random texture
+            vec4 random = getRandomVec4(p_seed.x);
 
-        // age and life
-        ex_ageLife.x = newAge - p_ageLife.y;
-        ex_ageLife.y = mix(u_lifeRange.x, u_lifeRange.y, random.r);
+            // age and life
+            ex_ageLife.x = newAge - p_ageLife.y;
+            ex_ageLife.y = mix(u_lifeRange.x, u_lifeRange.y, random.r);
 
-        ex_seed = p_seed;
+            ex_seed = p_seed;
 
-        // todo: size; random init size; gradient texture?
-        ex_size = mix(u_minSize, u_maxSize, random.g);
+            // todo: size; random init size; gradient texture?
+            ex_size = mix(u_minSize, u_maxSize, random.g);
 
-        vec3 positionRange = u_emitterSize - 0.5 * u_emitterSize;
+            vec3 positionRange = u_emitterSize - 0.5 * u_emitterSize;
 
-        // todo: generate position according to the emitter shape and size
-        // generate in local unit space, then assign emitter world transform.
-        if (u_emitterShape == EMITTER_ELLIPSOID) {
-            // random radius and polar coords?
-            vec3 thetaPhiRadius = getRandomVec3(p_seed.y);
-            thetaPhiRadius.xy *= 2.0 * PI;
-            newPosition.x = cos(thetaPhiRadius.y) * sin(thetaPhiRadius.x);
-            newPosition.y = cos(thetaPhiRadius.x);
-            newPosition.z = sin(thetaPhiRadius.y) * sin(thetaPhiRadius.x);
-            newPosition *= thetaPhiRadius.z * positionRange;
-        } else if (u_emitterShape == EMITTER_BOX) {
-            // random xyz
-            newPosition = getRandomVec3(p_seed.y) * positionRange;
+            // todo: generate position according to the emitter shape and size
+            // generate in local unit space, then assign emitter world transform.
+            if (u_emitterShape == EMITTER_ELLIPSOID) {
+                // random radius and polar coords?
+                vec3 thetaPhiRadius = getRandomVec3(p_seed.y);
+                thetaPhiRadius.xy *= 2.0 * PI;
+                newPosition.x = cos(thetaPhiRadius.y) * sin(thetaPhiRadius.x);
+                newPosition.y = cos(thetaPhiRadius.x);
+                newPosition.z = sin(thetaPhiRadius.y) * sin(thetaPhiRadius.x);
+                newPosition *= thetaPhiRadius.z * positionRange;
+            } else if (u_emitterShape == EMITTER_BOX) {
+                // random xyz
+                newPosition = getRandomVec3(p_seed.y) * positionRange;
+            }
+
+            // random angle and angular speed
+            ex_angle.x = mix(u_angleRange.x, u_angleRange.y, random.b);
+            ex_angle.y = mix(u_angularSpeedRange.x, u_angularSpeedRange.y, random.a);
+
+            vec4 random1 = getRandomVec4(p_seed.z);
+
+            // random color
+            ex_color = mix(u_color1, u_color2, random1.r);
+
+            // animation frame index
+            ex_frameIdx = u_texAnimFrameInfo.x;
+            if(u_texAnimFrameInfo.w > 0.5) {
+                // support random start index? for effects like fire...
+                ex_frameIdx = mix(u_texAnimFrameInfo.x, u_texAnimFrameInfo.y, random1.g);
+            }
+
+            // todo: nose texture?
+
+            // generate local direction by the u_emitDir_variation
+            newDirection = u_emitDir_variation.xyz + (getRandomVec3(p_seed.z) - vec3(0.5)) * u_emitDir_variation.w;
+            newDirection *= mix(u_speedRange.x, u_speedRange.y, random1.b);
+
+            // transform them to world space
+            newPosition = (u_emitterModelTransform * vec4(newPosition, 1.0)).xyz;
+            newDirection = (u_emitterModelTransform * vec4(newDirection, 0.0)).xyz;
+
+            gl_Position = vec4(newPosition, 1.0);
+            ex_position = newPosition;
+            ex_direction = newDirection;
         }
-
-        // random angle and angular speed
-        ex_angle.x = mix(u_angleRange.x, u_angleRange.y, random.b);
-        ex_angle.y = mix(u_angularSpeedRange.x, u_angularSpeedRange.y, random.a);
-
-        vec4 random1 = getRandomVec4(p_seed.z);
-
-        // random color
-        ex_color = mix(u_color1, u_color2, random1.r);
-
-        // animation frame index
-        ex_frameIdx = u_texAnimFrameInfo.x;
-        if(u_texAnimFrameInfo.w > 0.5) {
-            // support random start index? for effects like fire...
-            ex_frameIdx = mix(u_texAnimFrameInfo.x, u_texAnimFrameInfo.y, random1.g);
-        }
-
-        // todo: nose texture?
-
-        // generate local direction by the u_emitDir_variation
-        newDirection = u_emitDir_variation.xyz + (getRandomVec3(p_seed.z) - vec3(0.5)) * u_emitDir_variation.w;
-        newDirection *= mix(u_speedRange.x, u_speedRange.y, random1.b);
-
-        // transform them to world space
-        newPosition = (u_emitterModelTransform * vec4(newPosition, 1.0)).xyz;
-        newDirection = (u_emitterModelTransform * vec4(newDirection, 0.0)).xyz;
-
-        gl_Position = vec4(newPosition, 1.0);
-        ex_position = newPosition;
-        ex_direction = newDirection;
+        
     } else {
         // update this particle's velocity, position, direction...
         vec3 newDirection = p_direction + u_gravity * u_elapsedTime;
