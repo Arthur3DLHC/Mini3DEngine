@@ -27,12 +27,12 @@ void main(void)
         // may be dead particles
         discard;
     }
-    
+
     FinalOutput o = defaultFinalOutput();
     // o.color = vec4(1.0);
     o.color = ex_color;
 
-    // todo: texture animation
+    // todo: sample texture and texture animation
 
     // todo: soft particle?
 

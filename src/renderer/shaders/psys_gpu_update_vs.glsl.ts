@@ -119,6 +119,7 @@ void main(void)
     if (newAge > p_ageLife.y) {
         if (u_isEmitting <= 0) {
             // handle dead particles when is not emitting? give them a zero alpha color?
+            // fix me: how to let them emit one by one when start again?
             // need to output all varyings
             ex_color = vec4(0.0);
 
