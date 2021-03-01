@@ -461,6 +461,10 @@ export class GPUParticleSystem extends Object3D {
 
         // curr particle count
         // note: need to use float value
+
+        // todo; add a curr first particle index (particle queue head)
+        // for the situation that start emitting again after stop. 
+
         if(this._isEmitting) {
             // use a steady elapsed time to prevent un-even emitting
             this._curParticleCount += this.updateInterval * this.emitRate;

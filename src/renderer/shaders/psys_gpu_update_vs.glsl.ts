@@ -23,6 +23,8 @@ uniform vec3    u_gravity;
 
 uniform vec2    u_curCount_randCount;   // current particle count (including respawned)
                                         // todo: add a global random factor?
+                                        // todo: add a current first particle index?
+                                        // for the situation that start emit again after stop
 
 // particle system params
 // fix me: how to control the emit rate?
