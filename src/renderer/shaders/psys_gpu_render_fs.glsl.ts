@@ -23,6 +23,11 @@ in float    ex_texMixAmount;
 
 void main(void)
 {
+    if(ex_color.a < 0.001) {
+        // may be dead particles
+        discard;
+    }
+    
     FinalOutput o = defaultFinalOutput();
     // o.color = vec4(1.0);
     o.color = ex_color;

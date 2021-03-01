@@ -118,14 +118,15 @@ void main(void)
 
     if (newAge > p_ageLife.y) {
         if (u_isEmitting <= 0) {
-            // todo: handle dead particles when is not emitting? give them a zero alpha color?
+            // handle dead particles when is not emitting? give them a zero alpha color?
             // need to output all varyings
+            ex_color = vec4(0.0);
+
             ex_position = p_position;
             ex_direction = p_direction;
             ex_ageLife = p_ageLife;
             ex_seed = p_seed;
             ex_size = p_size;
-            ex_color = vec4(0.0);
             ex_frameIdx = p_frameIdx;
             ex_angle = p_angle;
             gl_Position = vec4(p_position, 1.0);

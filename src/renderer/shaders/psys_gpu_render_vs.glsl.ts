@@ -75,6 +75,8 @@ void main(void)
 {
     vec4 localPosition = vec4(a_position, 1.0);
 
+    // todo: optimize dead particles (a_color.a == 0)
+
     // todo: calc world transform from particle instance attribs
     // 2D rotation angle matrix
     mat4 matScale = mat4(1.0);
