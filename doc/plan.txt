@@ -555,6 +555,7 @@ TODO:       主要类结构
                 用于测试粒子系统的 Demo
                 One-shot 发射
                 粒子纹理和动画
+                    TODO: 从单行改为多行动画贴图
                 颜色、尺寸、速度等的 Gradient texture
                 Noise texture?
                 粒子物理：可以通过深度图获得场景位置，在 GPU 计算碰撞？https://nullprogram.com/webgl-particles/
@@ -715,6 +716,8 @@ TODO:       主要类结构
                     √ 通过 json 定义动画关键帧实现？
                         每个特效是一个单独的 gltf 文件；另附加一个 json 文件，记录该 gltf 中节点材质颜色和 UV 动画关键帧；
                     × 或者能否通过 blender 对象的自定义属性记录？需要支持关键帧数组；
+                火焰或溅血效果
+                    https://realtimevfx.com/t/circular-fire-shader-ue4/3561
 
             运行中创建和移除对象的机制
 
