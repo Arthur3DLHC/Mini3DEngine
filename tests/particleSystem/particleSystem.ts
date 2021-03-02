@@ -207,22 +207,26 @@ window.onload = () => {
         billboardsNoRotLimit.translation = new vec3([0, 0, 0]);
 
         // emitter and particle properties
-        billboardsNoRotLimit.minSize = new vec3([0.5, 0.5, 0.5]);
-        billboardsNoRotLimit.maxSize = new vec3([1, 1, 1]);
+        billboardsNoRotLimit.emitRate = 5;
+        billboardsNoRotLimit.minLife = 1;
+        billboardsNoRotLimit.maxLife = 2;
+        billboardsNoRotLimit.minSize = new vec3([1, 1, 1]);
+        billboardsNoRotLimit.maxSize = new vec3([1.5, 1.5, 1.5]);
         billboardsNoRotLimit.emitDirection = new vec3([0, 1, 0]);
-        billboardsNoRotLimit.emitDirectionVariation = 1;
-        billboardsNoRotLimit.minSpeed = 0.5;
-        billboardsNoRotLimit.maxSpeed = 1.5;
+        billboardsNoRotLimit.emitDirectionVariation = 0.5;
+        billboardsNoRotLimit.minSpeed = 0.1;
+        billboardsNoRotLimit.maxSpeed = 0.2;
 
         billboardsNoRotLimit.minAngle = 0;
         billboardsNoRotLimit.maxAngle = Math.PI * 2;
         billboardsNoRotLimit.minAngularSpeed = -1;
         billboardsNoRotLimit.maxAngularSpeed = 1;
 
-        billboardsNoRotLimit.color1 = new vec4([1, 0, 0, 0.3]);
-        billboardsNoRotLimit.color2 = new vec4([0, 1, 0, 0.7]);
+        billboardsNoRotLimit.color1 = new vec4([1, 1, 1, 1.0]);
+        billboardsNoRotLimit.color2 = new vec4([0.6, 0.6, 0.6, 0.5]);
     
-        gravity.copyTo(billboardsNoRotLimit.gravity);
+        // gravity.copyTo(billboardsNoRotLimit.gravity);
+        billboardsNoRotLimit.gravity = new vec3([0.2, 0.2, 0]);
 
         // use a smoke material
         const smokeMtl: GPUParticleMaterial = new GPUParticleMaterial(renderer.context);
@@ -232,6 +236,9 @@ window.onload = () => {
 
         // todo: texture
         // set texture after image loading completed?
+        textureLoader.load("./textures/particles/smoke_particle_texture.png", (texture: Texture) => {
+            smokeMtl.texture = texture as Texture2D;
+        });
 
         billboardsNoRotLimit.material = smokeMtl;
 
