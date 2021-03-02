@@ -231,6 +231,7 @@ window.onload = () => {
         smokeMtl.depthStencilState = RenderStateCache.instance.getDepthStencilState(true, false);
 
         // todo: texture
+        // set texture after image loading completed?
 
         billboardsNoRotLimit.material = smokeMtl;
 
