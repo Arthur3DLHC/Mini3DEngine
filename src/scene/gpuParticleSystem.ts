@@ -427,6 +427,7 @@ export class GPUParticleSystem extends Object3D {
      */
     public start() {
         this._isEmitting = true;
+        // ensure the particles will emit continuously
         this._curHeadParticle = 0;
     }
 
