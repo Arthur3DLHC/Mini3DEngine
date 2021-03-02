@@ -21,10 +21,7 @@ export default /** glsl */`
 uniform float   u_elapsedTime;
 uniform vec3    u_gravity;
 
-uniform vec2    u_curCount_randCount;   // current particle count (including respawned)
-                                        // todo: add a global random factor?
-                                        // todo: add a current first particle index?
-                                        // for the situation that start emit again after stop
+uniform vec2    u_curHead_randCount;   // current head particle index and a random count factor
 
 // particle system params
 // fix me: how to control the emit rate?
@@ -100,11 +97,11 @@ out vec2    ex_angle;
 vec3 getRandomVec3(float offset) {
     // babylon.js use two random textures;
     // is one texture OK?
-    return texture(s_randomTexture, vec2(float(gl_VertexID) * offset / u_curCount_randCount.y, 0)).rgb;
+    return texture(s_randomTexture, vec2(float(gl_VertexID) * offset / u_curHead_randCount.y, 0)).rgb;
 }
 
 vec4 getRandomVec4(float offset) {
-    return texture(s_randomTexture, vec2(float(gl_VertexID) * offset / u_curCount_randCount.y, 0));
+    return texture(s_randomTexture, vec2(float(gl_VertexID) * offset / u_curHead_randCount.y, 0));
 }
 
 void main(void)
@@ -117,9 +114,10 @@ void main(void)
     // fix me: if emitted multiple particles in one frame, they will at same age and position.
     // use a steady elapsed time for age
     float newAge = p_ageLife.x + u_elapsedTime;
+    float vid = float(gl_VertexID);
 
     if (newAge > p_ageLife.y) {
-        if (u_isEmitting <= 0) {
+        if (u_isEmitting <= 0 || vid > u_curHead_randCount.x) {
             // handle dead particles when is not emitting? give them a zero alpha color?
             // fix me: how to let them emit one by one when start again?
             // need to output all varyings

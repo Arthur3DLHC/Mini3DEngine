@@ -178,6 +178,13 @@ export class GPUParticleSystem extends Object3D {
      * this is only to control how many instances are updated and rendered when drawElementsInstanced
      */
     private _curParticleCount: number = 0;
+    
+    /**
+     * cur head (first) particle index
+     * will start from 0 when reach the max particle count.
+     * this is passed into update shader to control the respawning of dead particles
+     */
+    private _curHeadParticle: number = 0;
 
     /** will be passed in shader to control emitting */
     private _isEmitting = false;
@@ -420,6 +427,7 @@ export class GPUParticleSystem extends Object3D {
      */
     public start() {
         this._isEmitting = true;
+        this._curHeadParticle = 0;
     }
 
     /**
@@ -434,6 +442,7 @@ export class GPUParticleSystem extends Object3D {
      */
     public reset() {
         this._curParticleCount = 0;
+        this._curHeadParticle = 0;
         this._isEmitting = false;
 
         // fix me: need to reset particle vertex data?
@@ -466,14 +475,22 @@ export class GPUParticleSystem extends Object3D {
         // for the situation that start emitting again after stop. 
 
         if(this._isEmitting) {
+            // emit count in this frame
             // use a steady elapsed time to prevent un-even emitting
-            this._curParticleCount += this.updateInterval * this.emitRate;
+            const emitCount = this.updateInterval * this.emitRate;
+            this._curParticleCount += emitCount;
+            this._curHeadParticle += emitCount;
             // this._curParticleCount += Clock.instance.elapsedTime * this.emitRate;
         }
-        this._curParticleCount = Math.min(this._curParticleCount, this._maxParticleCount);
 
         // estimate a max alive count by life and emit rate?
-        this._curParticleCount = Math.min(this._curParticleCount, this.maxLife * this.emitRate);
+        const maxCount = Math.min(this._maxParticleCount, this.maxLife * this.emitRate);
+
+        this._curParticleCount = Math.min(this._curParticleCount, maxCount);
+
+        while (this._curHeadParticle > maxCount) {
+            this._curHeadParticle -= maxCount;
+        }
 
         const updateCount = Math.floor(this._curParticleCount);
         if (updateCount > 0) {
@@ -510,7 +527,8 @@ export class GPUParticleSystem extends Object3D {
             gl.uniform1f(updateProgram.getUniformLocation("u_elapsedTime"), this.updateInterval);
             // gl.uniform1f(updateProgram.getUniformLocation("u_elapsedTime"), Clock.instance.elapsedTime);
             gl.uniform3f(updateProgram.getUniformLocation("u_gravity"), this.gravity.x, this.gravity.y, this.gravity.z);
-            gl.uniform2f(updateProgram.getUniformLocation("u_curCount_randCount"), this._curParticleCount, Math.random() * this._curParticleCount);
+            gl.uniform2f(updateProgram.getUniformLocation("u_curHead_randCount"), this._curHeadParticle, Math.random() * this._curParticleCount);
+            // gl.uniform2f(updateProgram.getUniformLocation("u_curHead_randCount"), this._curParticleCount, Math.random() * this._curParticleCount);
             gl.uniform1i(updateProgram.getUniformLocation("u_isEmitting"), this._isEmitting ? 1 : 0);
             gl.uniform1i(updateProgram.getUniformLocation("u_emitterShape"), this.emitterShape);
             gl.uniform3f(updateProgram.getUniformLocation("u_emitterSize"), this.emitterSize.x, this.emitterSize.y, this.emitterSize.z);
