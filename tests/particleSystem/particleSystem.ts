@@ -192,7 +192,7 @@ window.onload = () => {
     // todo: estimate max particle count by life and emit rate
 
     //#region billboard without rotation limit
-    if(false)
+    if(true)
     {
         const billboardsNoRotLimit = new GPUParticleSystem(500);
         billboardsNoRotLimit.name = "billboardNoRotLimit";
@@ -224,7 +224,15 @@ window.onload = () => {
     
         gravity.copyTo(billboardsNoRotLimit.gravity);
 
-        billboardsNoRotLimit.material = particleMtl;
+        // use a smoke material
+        const smokeMtl: GPUParticleMaterial = new GPUParticleMaterial(renderer.context);
+        smokeMtl.cullState = RenderStateCache.instance.getCullState(false, gl.BACK);
+        smokeMtl.blendState = RenderStateCache.instance.getBlendState(true, gl.FUNC_ADD, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        smokeMtl.depthStencilState = RenderStateCache.instance.getDepthStencilState(true, false);
+
+        // todo: texture
+
+        billboardsNoRotLimit.material = smokeMtl;
 
         billboardsNoRotLimit.rebuild();
         billboardsNoRotLimit.start();
@@ -278,7 +286,7 @@ window.onload = () => {
         // emitter and particle properties
         billboardsLimitRotMoveDir.emitRate = 30;
         billboardsLimitRotMoveDir.emitterSize = new vec3([0.1, 0.1, 0.1]);
-        billboardsLimitRotMoveDir.oneShot = true;
+        // billboardsLimitRotMoveDir.oneShot = true;
 
         billboardsLimitRotMoveDir.emitDirection = new vec3([0, 1, 0]);
         billboardsLimitRotMoveDir.emitDirectionVariation = 0.5;
