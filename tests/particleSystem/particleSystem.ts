@@ -278,9 +278,13 @@ window.onload = () => {
         // emitter and particle properties
         billboardsLimitRotMoveDir.emitRate = 30;
         billboardsLimitRotMoveDir.emitterSize = new vec3([0.1, 0.1, 0.1]);
+        billboardsLimitRotMoveDir.oneShot = true;
 
         billboardsLimitRotMoveDir.emitDirection = new vec3([0, 1, 0]);
         billboardsLimitRotMoveDir.emitDirectionVariation = 0.5;
+
+        billboardsLimitRotMoveDir.minLife = 0.5;
+        billboardsLimitRotMoveDir.maxLife = 1.0;
 
         billboardsLimitRotMoveDir.minSize = new vec3([0.04, 0.2, 0.2]);
         billboardsLimitRotMoveDir.maxSize = new vec3([0.04, 0.2, 0.2]);

@@ -476,12 +476,19 @@ export class GPUParticleSystem extends Object3D {
         // for the situation that start emitting again after stop. 
 
         if(this._isEmitting) {
-            // emit count in this frame
-            // use a steady elapsed time to prevent un-even emitting
-            const emitCount = this.updateInterval * this.emitRate;
-            this._curParticleCount += emitCount;
-            this._curHeadParticle += emitCount;
-            // this._curParticleCount += Clock.instance.elapsedTime * this.emitRate;
+
+            if (this.oneShot) {
+                // use emit rate as count?
+                this._curParticleCount = this.emitRate;
+                this._curHeadParticle = this.emitRate;
+            } else {
+                // emit count in this frame
+                // use a steady elapsed time to prevent un-even emitting
+                const emitCount = this.updateInterval * this.emitRate;
+                this._curParticleCount += emitCount;
+                this._curHeadParticle += emitCount;
+                // this._curParticleCount += Clock.instance.elapsedTime * this.emitRate;
+            }
         }
 
         // estimate a max alive count by life and emit rate?
@@ -579,7 +586,10 @@ export class GPUParticleSystem extends Object3D {
             GLTransformFeedbacks.bindTransformFeedback(null);
             // GLPrograms.useProgram(null);
         }
-
+        // if one shot, stop automatically after shot.
+        if (this.isEmitting && this.oneShot) {
+            this.stop();
+        }
     }
 
     /**
