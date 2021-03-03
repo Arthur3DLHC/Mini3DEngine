@@ -236,13 +236,15 @@ window.onload = () => {
 
         // todo: texture
         // single texture
+        // from http://www.positech.co.uk/content/explosion/explosiongenerator.html
         // textureLoader.load("./textures/particles/smoke_particle_texture.png", (texture: Texture) => {
         //     smokeMtl.texture = texture as Texture2D;
         // });
 
         // todo: animated explosion and smoke textures
-        // from http://www.positech.co.uk/content/explosion/explosiongenerator.html
-        // and https://www.nicepng.com/ourpic/u2e6y3u2w7t4t4q8_free-smoke-texture-png-smoke-particle-texture-sheet/
+        // from https://www.nicepng.com/ourpic/u2e6y3u2w7t4t4q8_free-smoke-texture-png-smoke-particle-texture-sheet/
+        // and https://webstockreview.net/image/smoke-particle-png/2236191.html
+        /*
         textureLoader.load("./textures/particles/NicePng_smoke-texture-png_small.png", (texture: Texture) => {
             smokeMtl.texture = texture as Texture2D;
             smokeMtl.texAnimSheetSize.x = 12;
@@ -251,6 +253,17 @@ window.onload = () => {
             billboardsNoRotLimit.texAnimStartFrame = 0;
             billboardsNoRotLimit.texAnimEndFrame = smokeMtl.texAnimSheetSize.x * smokeMtl.texAnimSheetSize.y - 1;
             billboardsNoRotLimit.texAnimFrameIncreaseSpeed = 20;
+        });
+        */
+
+        textureLoader.load("./textures/particles/smoke-particle-png-14.png", (texture: Texture) => {
+            smokeMtl.texture = texture as Texture2D;
+            smokeMtl.texAnimSheetSize.x = 6;
+            smokeMtl.texAnimSheetSize.y = 5;
+
+            billboardsNoRotLimit.texAnimStartFrame = 0;
+            billboardsNoRotLimit.texAnimEndFrame = smokeMtl.texAnimSheetSize.x * smokeMtl.texAnimSheetSize.y - 1;
+            billboardsNoRotLimit.texAnimFrameIncreaseSpeed = 6;
         });
 
         billboardsNoRotLimit.material = smokeMtl;
