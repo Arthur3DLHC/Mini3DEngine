@@ -240,9 +240,9 @@ window.onload = () => {
             smokeMtl.texture = texture as Texture2D;
         });
 
-        // todo: animated explosion texture
+        // todo: animated explosion and smoke textures
         // from http://www.positech.co.uk/content/explosion/explosiongenerator.html
-
+        // and https://www.nicepng.com/ourpic/u2e6y3u2w7t4t4q8_free-smoke-texture-png-smoke-particle-texture-sheet/
 
         billboardsNoRotLimit.material = smokeMtl;
 
