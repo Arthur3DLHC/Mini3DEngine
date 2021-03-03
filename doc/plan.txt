@@ -555,7 +555,6 @@ TODO:       主要类结构
                 用于测试粒子系统的 Demo
                 One-shot 发射
                 粒子纹理和动画
-                    TODO: 从单行改为多行动画贴图
                 颜色、尺寸、速度等的 Gradient texture
                 Noise texture?
                 粒子物理：可以通过深度图获得场景位置，在 GPU 计算碰撞？https://nullprogram.com/webgl-particles/
