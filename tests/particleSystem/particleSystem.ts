@@ -207,9 +207,9 @@ window.onload = () => {
         billboardsNoRotLimit.translation = new vec3([0, 0, 0]);
 
         // emitter and particle properties
-        billboardsNoRotLimit.emitRate = 5;
-        billboardsNoRotLimit.minLife = 1;
-        billboardsNoRotLimit.maxLife = 2;
+        billboardsNoRotLimit.emitRate = 2;
+        billboardsNoRotLimit.minLife = 5;
+        billboardsNoRotLimit.maxLife = 5;
         billboardsNoRotLimit.minSize = new vec3([1, 1, 1]);
         billboardsNoRotLimit.maxSize = new vec3([1.5, 1.5, 1.5]);
         billboardsNoRotLimit.emitDirection = new vec3([0, 1, 0]);
@@ -219,14 +219,14 @@ window.onload = () => {
 
         billboardsNoRotLimit.minAngle = 0;
         billboardsNoRotLimit.maxAngle = Math.PI * 2;
-        billboardsNoRotLimit.minAngularSpeed = -1;
-        billboardsNoRotLimit.maxAngularSpeed = 1;
+        billboardsNoRotLimit.minAngularSpeed = -0.1;
+        billboardsNoRotLimit.maxAngularSpeed = 0.1;
 
         billboardsNoRotLimit.color1 = new vec4([1, 1, 1, 1.0]);
         billboardsNoRotLimit.color2 = new vec4([0.6, 0.6, 0.6, 0.5]);
     
         // gravity.copyTo(billboardsNoRotLimit.gravity);
-        billboardsNoRotLimit.gravity = new vec3([0.2, 0.2, 0]);
+        billboardsNoRotLimit.gravity = new vec3([0.1, 0.1, 0]);
 
         // use a smoke material
         const smokeMtl: GPUParticleMaterial = new GPUParticleMaterial(renderer.context);
@@ -250,7 +250,7 @@ window.onload = () => {
 
             billboardsNoRotLimit.texAnimStartFrame = 0;
             billboardsNoRotLimit.texAnimEndFrame = smokeMtl.texAnimSheetSize.x * smokeMtl.texAnimSheetSize.y - 1;
-            billboardsNoRotLimit.texAnimFrameIncreaseSpeed = 4;
+            billboardsNoRotLimit.texAnimFrameIncreaseSpeed = 20;
         });
 
         billboardsNoRotLimit.material = smokeMtl;
@@ -291,7 +291,7 @@ window.onload = () => {
     //#endregion
 
     //#region billboard with rotatoin limit (move dir)
-    if(true)
+    if(false)
     {
         const billboardsLimitRotMoveDir = new GPUParticleSystem(500);
         billboardsLimitRotMoveDir.name = "billboardsLimitRotMoveDir";

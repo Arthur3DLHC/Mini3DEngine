@@ -96,7 +96,7 @@ export class GPUParticleMaterial extends Material {
             gl.uniform1i(this.renderProgram.getUniformLocation("s_texture"), texUnit);
             const uScale = 1.0 / this.texAnimSheetSize.x;
             const vScale = 1.0 / this.texAnimSheetSize.y;
-            gl.uniform3f(this.renderProgram.getUniformLocation("u_texAnimSheetInfo"), uScale, vScale, this.texAnimSheetSize.x);
+            gl.uniform3f(this.renderProgram.getUniformLocation("u_texAnimSheetInfo"), uScale, vScale, this.texAnimSheetSize.x - 1);
 
             // texUnit++;
         } else {

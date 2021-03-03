@@ -79,7 +79,7 @@ vec2 calcAnimFrameTexcoord(float frame) {
 
     // the anim sheet is left to right, top to bottom order
     // so inverse the texcoord.y?
-    uv.y = 1.0 - uv.y;
+    // uv.y = 1.0 - uv.y;
     return uv;
 }
 
@@ -165,13 +165,14 @@ void main(void)
     float curFrame = floor(p_frameIdx);
     float nextFrame = curFrame + 1.0;
 
-    // vec2 curUV = a_texcoord0 + vec2(curFrame, 0.0);
-    // vec2 nextUV = a_texcoord0 + vec2(nextFrame, 0.0);
-
-    // vec2 uvScale = vec2(1.0, 1.0 / u_texAnimFrames);
+    // curFrame = 10.0;
+    // nextFrame = 10.0;
 
     ex_texcoord0 = calcAnimFrameTexcoord(curFrame);
     ex_texcoord1 = calcAnimFrameTexcoord(nextFrame);
+
+    // ex_texcoord0 = a_texcoord0 * u_texAnimSheetInfo.xy;
+    // ex_texcoord1 = a_texcoord0 * u_texAnimSheetInfo.xy;
 }
 
 `;

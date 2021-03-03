@@ -37,6 +37,7 @@ void main(void)
     // sample texture and texture animation
     if(u_texAnimSheetInfo.z > 0.0) {
         vec4 texcolor = texture(s_texture, ex_texcoord0);
+
         // xy is cell size, if they < 1, there are multiple cells in anim sheet.
         if(u_texAnimSheetInfo.x < 1.0 || u_texAnimSheetInfo.y < 1.0) {
             vec4 nextFrameColor = texture(s_texture, ex_texcoord1);
