@@ -28,8 +28,7 @@ uniform int             u_isBillboard;      // still may be plane or mesh; this 
 uniform int             u_rotationLimit;    // billboard rotation limit mode. 0 - no limit, always facing camera; 1 - limit to specified axis; 2 - limit to particle direction
 uniform vec3            u_limitAxis;        // limit rotation axis
 uniform vec3            u_refDir;           // when is not billboard and limit rotation axis, this is the 'up' dir when calc lookat rotation matrix
-uniform float           u_texAnimFrames;    // total texture animation frame count. to calc cur frame texcoord.
-                                            // fix me: or should use tex2darray for animation frames?
+uniform vec3            u_texAnimSheetInfo; // xy: uv scale z: num frames per row
 
 #include <attrib_locations>
 
@@ -70,6 +69,19 @@ out vec4 ex_color;           // if particle is dead, set alpha to zero then disc
 out vec2 ex_texcoord0;       // for blending between two frames
 out vec2 ex_texcoord1;       //
 out float ex_texMixAmount;
+
+vec2 calcAnimFrameTexcoord(float frame) {
+    float row = floor(frame / u_texAnimSheetInfo.z);
+    float col = frame - row * u_texAnimSheetInfo.z;
+
+    vec2 uvScale = u_texAnimSheetInfo.xy;
+    vec2 uv = (a_texcoord0 + vec2(col, row)) * uvScale;
+
+    // the anim sheet is left to right, top to bottom order
+    // so inverse the texcoord.y?
+    uv.y = 1.0 - uv.y;
+    return uv;
+}
 
 void main(void)
 {
@@ -152,13 +164,14 @@ void main(void)
     ex_texMixAmount = fract(p_frameIdx);
     float curFrame = floor(p_frameIdx);
     float nextFrame = curFrame + 1.0;
-    vec2 curUV = a_texcoord0 + vec2(curFrame, 0.0);
-    vec2 nextUV = a_texcoord0 + vec2(nextFrame, 0.0);
 
-    vec2 uvScale = vec2(1.0, 1.0 / u_texAnimFrames);
+    // vec2 curUV = a_texcoord0 + vec2(curFrame, 0.0);
+    // vec2 nextUV = a_texcoord0 + vec2(nextFrame, 0.0);
 
-    ex_texcoord0 = curUV * uvScale;
-    ex_texcoord1 = nextUV * uvScale;
+    // vec2 uvScale = vec2(1.0, 1.0 / u_texAnimFrames);
+
+    ex_texcoord0 = calcAnimFrameTexcoord(curFrame);
+    ex_texcoord1 = calcAnimFrameTexcoord(nextFrame);
 }
 
 `;

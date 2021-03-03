@@ -240,6 +240,10 @@ window.onload = () => {
             smokeMtl.texture = texture as Texture2D;
         });
 
+        // todo: animated explosion texture
+        // from http://www.positech.co.uk/content/explosion/explosiongenerator.html
+
+
         billboardsNoRotLimit.material = smokeMtl;
 
         billboardsNoRotLimit.rebuild();

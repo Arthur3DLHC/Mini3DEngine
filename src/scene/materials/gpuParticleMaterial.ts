@@ -12,6 +12,7 @@ import { ClusteredForwardRenderContext } from "../../renderer/clusteredForwardRe
 import { Texture2D } from "../../WebGLResources/textures/texture2D.js";
 import { GLDevice } from "../../WebGLResources/glDevice.js";
 import { GLTextures } from "../../WebGLResources/glTextures.js";
+import vec2 from "../../../lib/tsm/vec2.js";
 
 /**
  * the default material for GPU particle systems.
@@ -69,8 +70,11 @@ export class GPUParticleMaterial extends Material {
     // texture with animation frames, in one row
     public texture: Texture2D | null = null;
 
-    /** total frame count, for calc texcoords when rendering */
-    public texAnimFrameCount: number = 1;
+    /**
+     * num column and rows in texture animation sheet
+     * for calc texcoords when rendering 
+     */
+    public texAnimSheetSize: vec2 = new vec2([1,1]);
 
     // set uniform values for update program?
     public setUpdateProgramUniforms(psys: GPUParticleSystem, startTexUnit: number) {
@@ -90,11 +94,13 @@ export class GPUParticleMaterial extends Material {
         if (this.texture !== null) {
             GLTextures.setTextureAt(texUnit, this.texture);
             gl.uniform1i(this.renderProgram.getUniformLocation("s_texture"), texUnit);
-            gl.uniform1f(this.renderProgram.getUniformLocation("u_texAnimFrames"), this.texAnimFrameCount);
+            const uScale = 1.0 / this.texAnimSheetSize.x;
+            const vScale = 1.0 / this.texAnimSheetSize.y;
+            gl.uniform3f(this.renderProgram.getUniformLocation("u_texAnimSheetInfo"), uScale, vScale, this.texAnimSheetSize.x);
 
             // texUnit++;
         } else {
-            gl.uniform1i(this.renderProgram.getUniformLocation("u_texAnimFrames"), 0);
+            gl.uniform3f(this.renderProgram.getUniformLocation("u_texAnimSheetInfo"), 0, 0, 0);
         }
     }
 }
