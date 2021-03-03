@@ -59,7 +59,7 @@ export class TextureLoader extends BaseLoader {
                 texture.format = GLDevice.gl.RGBA;
             }
             texture.componentType = GLDevice.gl.UNSIGNED_BYTE;
-            texture.samplerState = new SamplerState(GLDevice.gl.REPEAT, GLDevice.gl.REPEAT, GLDevice.gl.LINEAR_MIPMAP_LINEAR, GLDevice.gl.LINEAR_MIPMAP_LINEAR);
+            texture.samplerState = new SamplerState(GLDevice.gl.REPEAT, GLDevice.gl.REPEAT, GLDevice.gl.LINEAR_MIPMAP_LINEAR, GLDevice.gl.LINEAR);
             texture.cached = true;
             // upload to vidmem now? or add a 'needUpdate' flag and upload in render loop?
             texture.upload();

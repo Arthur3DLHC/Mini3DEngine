@@ -242,7 +242,7 @@ export class ClusteredForwardRenderer {
             this._renderContext.envmapSize,
             ClusteredForwardRenderContext.MAX_ENVPROBES * 6, 1024, gl.RGBA, gl.HALF_FLOAT, false);
     
-        this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.LINEAR_MIPMAP_LINEAR, gl.LINEAR_MIPMAP_LINEAR);
+        this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.LINEAR_MIPMAP_LINEAR, gl.LINEAR);
 
 
         // this._envMapDepthTexture = new Texture2D();
@@ -1760,7 +1760,7 @@ export class ClusteredForwardRenderer {
         this._envMapArray.mipLevels = 6;
         this._envMapArray.format = gl.RGBA;
         this._envMapArray.componentType = gl.HALF_FLOAT;
-        this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.LINEAR_MIPMAP_LINEAR, gl.LINEAR_MIPMAP_LINEAR);
+        this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.LINEAR_MIPMAP_LINEAR, gl.LINEAR);
         // this._envMapArray.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.NEAREST_MIPMAP_NEAREST, gl.NEAREST_MIPMAP_NEAREST);
 
         this._envMapArray.create();

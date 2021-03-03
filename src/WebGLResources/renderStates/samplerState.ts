@@ -1,6 +1,14 @@
 import { GLDevice } from "../glDevice.js";
 
 export class SamplerState {
+    /**
+     * 
+     * @param wrapS 
+     * @param wrapT 
+     * @param minFilter 
+     * @param magfilter note: don't use gl.LINEAR_MIPMAP_LINEAR, or OpenGL will report error. because magnify do not need mipmaps.
+     * @param anisotropy 
+     */
     public constructor(wrapS: GLenum = GLDevice.gl.REPEAT, wrapT: GLenum = GLDevice.gl.REPEAT, minFilter = GLDevice.gl.LINEAR, magfilter = GLDevice.gl.LINEAR, anisotropy = 1) {
         this.wrapS = wrapS;
         this.wrapT = wrapT;
