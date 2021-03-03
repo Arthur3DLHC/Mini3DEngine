@@ -235,14 +235,23 @@ window.onload = () => {
         smokeMtl.depthStencilState = RenderStateCache.instance.getDepthStencilState(true, false);
 
         // todo: texture
-        // set texture after image loading completed?
-        textureLoader.load("./textures/particles/smoke_particle_texture.png", (texture: Texture) => {
-            smokeMtl.texture = texture as Texture2D;
-        });
+        // single texture
+        // textureLoader.load("./textures/particles/smoke_particle_texture.png", (texture: Texture) => {
+        //     smokeMtl.texture = texture as Texture2D;
+        // });
 
         // todo: animated explosion and smoke textures
         // from http://www.positech.co.uk/content/explosion/explosiongenerator.html
         // and https://www.nicepng.com/ourpic/u2e6y3u2w7t4t4q8_free-smoke-texture-png-smoke-particle-texture-sheet/
+        textureLoader.load("./textures/particles/NicePng_smoke-texture-png_small.png", (texture: Texture) => {
+            smokeMtl.texture = texture as Texture2D;
+            smokeMtl.texAnimSheetSize.x = 12;
+            smokeMtl.texAnimSheetSize.y = 7;
+
+            billboardsNoRotLimit.texAnimStartFrame = 0;
+            billboardsNoRotLimit.texAnimEndFrame = smokeMtl.texAnimSheetSize.x * smokeMtl.texAnimSheetSize.y - 1;
+            billboardsNoRotLimit.texAnimFrameIncreaseSpeed = 4;
+        });
 
         billboardsNoRotLimit.material = smokeMtl;
 
