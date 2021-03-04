@@ -54,8 +54,12 @@
     物理
         1、只用 Empty 物体中的 box 和 sphere。
         2、注意先设置自定义属性：extType 和 colliderShape 后再复制
+            extType = collider
+            colliderShape = box | sphere | cylinder
         3、通过缩放设置 collider 的尺寸。
         4、由于没有圆柱体的 Empty，只能用 box 代替，设置 colliderShape 属性为 cylinder
+
+    粒子系统
 
 关卡实体码放注意事项
     TBD

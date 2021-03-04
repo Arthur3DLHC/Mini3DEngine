@@ -194,7 +194,7 @@ window.onload = () => {
     //#region billboard without rotation limit
     if(true)
     {
-        const billboardsNoRotLimit = new GPUParticleSystem(500);
+        const billboardsNoRotLimit = new GPUParticleSystem(100);
         billboardsNoRotLimit.name = "billboardNoRotLimit";
         billboardsNoRotLimit.isBillboard = true;
         billboardsNoRotLimit.rotationLimit = RotationLimitMode.NoLimit;
@@ -277,9 +277,9 @@ window.onload = () => {
     //#endregion
 
     //#region billboard with rotatoin limit (arbitrary axis)
-    if(false)
+    if(true)
     {
-        const billboardsLimitRotAxis = new GPUParticleSystem(500);
+        const billboardsLimitRotAxis = new GPUParticleSystem(100);
         billboardsLimitRotAxis.name = "billboardsLimitRotAxis";
         billboardsLimitRotAxis.isBillboard = true;
         billboardsLimitRotAxis.rotationLimit = RotationLimitMode.Axis;
@@ -292,8 +292,21 @@ window.onload = () => {
         billboardsLimitRotAxis.translation = new vec3([2, 0, 0]);
 
         // emitter and particle properties
+        billboardsLimitRotAxis.emitRate = 4;
+        billboardsLimitRotAxis.emitterSize = new vec3([0.5, 0.5, 0.5]);
+        billboardsLimitRotAxis.minLife = 0.8;
+        billboardsLimitRotAxis.maxLife = 1.2;
+        billboardsLimitRotAxis.minSize = new vec3([0.1, 1, 0.1]);
+        billboardsLimitRotAxis.maxSize = new vec3([0.12, 1.2, 0.12]);
+        billboardsLimitRotAxis.emitDirection = new vec3([0, 1, 0]);
+        billboardsLimitRotAxis.emitDirectionVariation = 0;
+        billboardsLimitRotAxis.minSpeed = 0.2;
+        billboardsLimitRotAxis.maxSpeed = 0.4;
 
-        gravity.copyTo(billboardsLimitRotAxis.gravity);
+        billboardsLimitRotAxis.color1 = new vec4([1, 1, 1, 1]);
+        billboardsLimitRotAxis.color2 = new vec4([1, 1, 1, 1]);
+
+        billboardsLimitRotAxis.gravity = new vec3([0, 1, 0]);
 
         billboardsLimitRotAxis.rebuild();
         billboardsLimitRotAxis.start();
@@ -304,9 +317,9 @@ window.onload = () => {
     //#endregion
 
     //#region billboard with rotatoin limit (move dir)
-    if(false)
+    if(true)
     {
-        const billboardsLimitRotMoveDir = new GPUParticleSystem(500);
+        const billboardsLimitRotMoveDir = new GPUParticleSystem(100);
         billboardsLimitRotMoveDir.name = "billboardsLimitRotMoveDir";
         billboardsLimitRotMoveDir.isBillboard = true;
         billboardsLimitRotMoveDir.rotationLimit = RotationLimitMode.MoveDir;

@@ -565,6 +565,9 @@ TODO:       主要类结构
                     https://developer.nvidia.com/gpugems/gpugems3/part-iv-image-effects/chapter-23-high-speed-screen-particles
                     需要 downsample depth buffer
                     需要保存 reveleage 到 RT 的 alpha channel
+                粒子控制器组件
+                在 blender 场景中如何加入粒子系统；如何导出 gltf
+                动态粒子系统 pool？
 
             尝试一下简版次表面效果
                 gltf-Model-Viewer中的方法
