@@ -192,6 +192,7 @@ window.onload = () => {
     // todo: estimate max particle count by life and emit rate
 
     //#region billboard without rotation limit
+    // usage: smokes, explosions
     if(true)
     {
         const billboardsNoRotLimit = new GPUParticleSystem(100);
@@ -244,7 +245,6 @@ window.onload = () => {
         // todo: animated explosion and smoke textures
         // from https://www.nicepng.com/ourpic/u2e6y3u2w7t4t4q8_free-smoke-texture-png-smoke-particle-texture-sheet/
         // and https://webstockreview.net/image/smoke-particle-png/2236191.html
-        /*
         textureLoader.load("./textures/particles/NicePng_smoke-texture-png_small.png", (texture: Texture) => {
             smokeMtl.texture = texture as Texture2D;
             smokeMtl.texAnimSheetSize.x = 12;
@@ -254,8 +254,8 @@ window.onload = () => {
             billboardsNoRotLimit.texAnimEndFrame = smokeMtl.texAnimSheetSize.x * smokeMtl.texAnimSheetSize.y - 1;
             billboardsNoRotLimit.texAnimFrameIncreaseSpeed = 20;
         });
-        */
 
+        /*
         textureLoader.load("./textures/particles/smoke-particle-png-14.png", (texture: Texture) => {
             smokeMtl.texture = texture as Texture2D;
             smokeMtl.texAnimSheetSize.x = 6;
@@ -265,6 +265,7 @@ window.onload = () => {
             billboardsNoRotLimit.texAnimEndFrame = smokeMtl.texAnimSheetSize.x * smokeMtl.texAnimSheetSize.y - 1;
             billboardsNoRotLimit.texAnimFrameIncreaseSpeed = 6;
         });
+        */
 
         billboardsNoRotLimit.material = smokeMtl;
 
@@ -277,6 +278,7 @@ window.onload = () => {
     //#endregion
 
     //#region billboard with rotatoin limit (arbitrary axis)
+    // usage: light beams
     if(true)
     {
         const billboardsLimitRotAxis = new GPUParticleSystem(100);
@@ -317,6 +319,7 @@ window.onload = () => {
     //#endregion
 
     //#region billboard with rotatoin limit (move dir)
+    // usage: sparkles
     if(true)
     {
         const billboardsLimitRotMoveDir = new GPUParticleSystem(100);
@@ -361,6 +364,7 @@ window.onload = () => {
     //#endregion
 
     //#region not billboard without rotation limit
+    // usage: translation portals
     if(false)
     {
         const planesNoRotLimit = new GPUParticleSystem(500);
