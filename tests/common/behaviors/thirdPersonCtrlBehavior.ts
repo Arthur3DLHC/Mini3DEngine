@@ -141,6 +141,7 @@ export class ThirdPersonCtrlBehavior extends Behavior {
 
     private _upVec: vec3 = new vec3([0, 1, 0]);
 
+    private static _tmpVec3: vec3 = new vec3();
     private static _rayFrom: CANNON.Vec3 = new CANNON.Vec3();
     private static _rayTo: CANNON.Vec3 = new CANNON.Vec3();
     private static _ray: CANNON.Vec3 = new CANNON.Vec3();
@@ -357,9 +358,13 @@ export class ThirdPersonCtrlBehavior extends Behavior {
         // 1 frame later than player?
 
         // rotate about origin point [0,0,0], under the foot
-        this._camera.rotation.multiplyVec3(this.cameraHorizontalOffset, this._cameraGlobalOffset);
+        this.cameraHorizontalOffset.copyTo(ThirdPersonCtrlBehavior._tmpVec3);
+        ThirdPersonCtrlBehavior._tmpVec3.x *= this.cameraHorizontalOffsetScale;
+        ThirdPersonCtrlBehavior._tmpVec3.z *= this.cameraHorizontalOffsetScale;
+
+        this._camera.rotation.multiplyVec3(ThirdPersonCtrlBehavior._tmpVec3, this._cameraGlobalOffset);
         
-        this._cameraGlobalOffset.scale(this.cameraHorizontalOffsetScale);
+        // this._cameraGlobalOffset.scale(this.cameraHorizontalOffsetScale);
 
         // move up to shoulder
         this._cameraGlobalOffset.y += this.cameraVerticalOffset;

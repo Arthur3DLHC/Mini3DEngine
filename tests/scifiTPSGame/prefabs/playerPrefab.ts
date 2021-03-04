@@ -98,9 +98,10 @@ export class PlayerPrefab extends BasePrefab {
         // todo: use third person controller
         const tpsBehavior = new TPSPlayerBehavior(gltfSceneFemale, playerBody, this.camera, actionCtrlBehavior);
         gltfSceneFemale.behaviors.push(tpsBehavior);
-        tpsBehavior.cameraVerticalOffset = 1.5;
-        tpsBehavior.cameraHorizontalOffset = new vec3([0.4, 0, 1.5]);
+        tpsBehavior.cameraVerticalOffset = 1.3;
+        tpsBehavior.cameraHorizontalOffset = new vec3([0.45, 0.2, 1.5]);
         tpsBehavior.cameraHorizontalOffsetScale = 0.5;
+        tpsBehavior.cameraHorizontalOffsetScaleAiming = 0.5;
         tpsBehavior.moveSpeed = 2;
         tpsBehavior.aimMoveSpeed = 0.6;
         tpsBehavior.pointerLock = false;
