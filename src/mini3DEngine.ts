@@ -87,7 +87,7 @@ export * from "./scene/object3D.js";
 export * from "./scene/scene.js";
 export * from "./scene/skinMesh.js";
 export * from "./utils/bufferHelper.js";
-export * from "./utils/gradients.js";
+export * from "./utils/gradientsGeneric.js";
 export * from "./WebGLResources/dataArray.js";
 export * from "./WebGLResources/frameBuffer.js";
 export * from "./WebGLResources/glDevice.js";

@@ -1,19 +1,20 @@
-// take from https://github.com/BabylonJS/Babylon.js/blob/master/src/Misc/gradients.ts,
-// with some modifications.
-
-// fix me: is it better to use typescript generic?
-
-import vec4 from "../../lib/tsm/vec4.js";
-
-/** Interface used by value gradients */
-export interface IValueGradient {
-    /** gradient value between 0 and 1 */
-    gradient: number;
-}
-
-export class ColorGradient implements IValueGradient {
-    public constructor( public gradient: number, public color: vec4 ) {
+/**
+ * the generic gradient class
+ * reference: https://github.com/BabylonJS/Babylon.js/blob/master/src/Misc/gradients.ts
+ */
+export class Gradient<T> {
+    /**
+     * 
+     * @param gradient gradient position, between 0 and 1
+     * @param value note: use new object instances
+     */
+    public constructor(gradient: number, value: T) {
+        this.value = value;
     }
+
+    /** must between 0 and 1 */
+    public gradient: number = 0;
+    public value: T;
 }
 
 export class GradientHelper {
@@ -23,7 +24,7 @@ export class GradientHelper {
      * @param gradients 
      * @param updateFunc 
      */
-    public static GetCurrentGradient(ratio: number, gradients: IValueGradient[], updateFunc: (current: IValueGradient, next: IValueGradient, mix: number) => void) {
+    public static GetCurrentGradient<T>(ratio: number, gradients: Gradient<T>[], updateFunc: (current: Gradient<T>, next: Gradient<T>, mix: number) => void) {
         if(ratio < gradients[0].gradient) {
             updateFunc(gradients[0], gradients[0], 1);
             return;

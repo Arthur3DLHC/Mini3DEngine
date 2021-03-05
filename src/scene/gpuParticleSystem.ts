@@ -6,6 +6,7 @@ import { BoundingSphere } from "../math/boundingSphere.js";
 import { ClusteredForwardRenderContext } from "../renderer/clusteredForwardRenderContext.js";
 import { RenderList } from "../renderer/renderList.js";
 import { SceneTextureUnits } from "../renderer/sceneTextureUnits.js";
+import { Gradient } from "../utils/gradientsGeneric.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { GLGeometryBuffers } from "../WebGLResources/glGeometryBuffers.js";
 import { GLPrograms } from "../WebGLResources/glPrograms.js";
@@ -155,6 +156,49 @@ export class GPUParticleSystem extends Object3D {
     public color2: vec4 = new vec4([1,1,1,1]);
 
     // todo: gradient color? generate a color gradient texture?
+    /**
+     * color gradients. will mutiply with particle color.
+     * note: don't use push and other methods to modify the gradient array.
+     * use a new array to replace the entire old gradients.
+     */
+    public get colorGradients(): Gradient<vec4>[] | null { return this._colorGradients; }
+
+    /**
+     * replace entire color gradients array.
+     */
+    public set colorGradients(gradients: Gradient<vec4>[] | null) {
+        this._colorGradients = gradients;
+
+        if (this._colorGradients !== null) {
+            this._colorGradients.sort((a, b) => {
+                return a.gradient - b.gradient;
+            });
+        }
+
+        this._colorGradientTextureDirty = true;
+    }
+
+    /**
+     * size gradients. will multiply with particle size.
+     * note: don't use push and other methods to modify the gradient array.
+     * use a new array to replace the entire old gradients.
+     */
+    public get sizeGradients(): Gradient<vec3>[] | null { return this._sizeGradients; }
+
+    /**
+     * replace entire size gradients array.
+     */
+    public set sizeGradients(gradients: Gradient<vec3>[] | null) {
+        this._sizeGradients = gradients;
+
+        if (this._sizeGradients !== null) {
+            this._sizeGradients.sort((a, b) => {
+                return a.gradient - b.gradient;
+            });
+        }
+
+        this._sizeGradientTextureDirty = true;
+    }
 
     // todo: noise texture?
 
@@ -212,6 +256,15 @@ export class GPUParticleSystem extends Object3D {
 
     /** help generate fake random values in update vertex shader */
     private _randomTexture: Texture2D | null = null;
+
+    private _colorGradients: Gradient<vec4>[] | null = null;
+    private _sizeGradients: Gradient<vec3>[] | null = null;
+
+    private _colorGradientTexture: Texture2D | null = null;
+    private _sizeGradientTexture: Texture2D | null = null;
+
+    private _colorGradientTextureDirty: boolean = false;
+    private _sizeGradientTextureDirty: boolean = false;
 
     /** approximate largest bounding sphere in local space? */
     protected _localBoundingSphere: BoundingSphere = new BoundingSphere();
@@ -612,6 +665,10 @@ export class GPUParticleSystem extends Object3D {
 
         const drawCount = Math.floor(this._curParticleCount);
         if (drawCount > 0) {
+
+            this.updateColorGradientTexture();
+            this.updateSizeGradientTexture();
+
             // set material render states
             // if use collision, do not write depth buffer?
             if(mtl.blendState !== null) GLRenderStates.setBlendState(mtl.blendState);
@@ -730,6 +787,28 @@ export class GPUParticleSystem extends Object3D {
         }
 
         this._localBoundingSphere.radius = radius;
+    }
+
+    protected updateColorGradientTexture() {
+        if (this._colorGradientTextureDirty) {
+            if (this._colorGradients !== null && this._colorGradients.length > 0) {
+                
+            } else {
+
+            }
+            this._colorGradientTextureDirty = false;
+        }
+    }
+
+    protected updateSizeGradientTexture() {
+        if (this._sizeGradientTextureDirty) {
+            if (this._sizeGradients !== null && this._sizeGradients.length > 0) {
+                
+            } else {
+                
+            }
+            this._sizeGradientTextureDirty = false;
+        }
     }
 
     //#endregion
