@@ -298,15 +298,15 @@ window.onload = () => {
         billboardsLimitRotAxis.emitterSize = new vec3([0.5, 0.5, 0.5]);
         billboardsLimitRotAxis.minLife = 0.8;
         billboardsLimitRotAxis.maxLife = 1.2;
-        billboardsLimitRotAxis.minSize = new vec3([0.1, 1, 0.1]);
+        billboardsLimitRotAxis.minSize = new vec3([0.1, 1.0, 0.1]);
         billboardsLimitRotAxis.maxSize = new vec3([0.12, 1.2, 0.12]);
         billboardsLimitRotAxis.emitDirection = new vec3([0, 1, 0]);
         billboardsLimitRotAxis.emitDirectionVariation = 0;
         billboardsLimitRotAxis.minSpeed = 0.2;
         billboardsLimitRotAxis.maxSpeed = 0.4;
 
-        billboardsLimitRotAxis.color1 = new vec4([1, 1, 1, 1]);
-        billboardsLimitRotAxis.color2 = new vec4([1, 1, 1, 1]);
+        billboardsLimitRotAxis.color1 = new vec4([2, 2, 2, 1]);
+        billboardsLimitRotAxis.color2 = new vec4([1.5, 1.5, 1.5, 1]);
 
         billboardsLimitRotAxis.gravity = new vec3([0, 1, 0]);
 
@@ -320,7 +320,7 @@ window.onload = () => {
 
         const sizeGrads: Gradient<vec3>[] = [];
         sizeGrads.push(new Gradient<vec3>(0, new vec3([1, 1, 1])));
-        sizeGrads.push(new Gradient<vec3>(1, new vec3([1, 1.5, 1])));
+        sizeGrads.push(new Gradient<vec3>(1, new vec3([1, 2.5, 1])));
         billboardsLimitRotAxis.sizeGradients = sizeGrads;
 
         // todo: material and texture
