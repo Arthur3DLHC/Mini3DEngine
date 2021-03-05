@@ -837,10 +837,10 @@ export class GPUParticleSystem extends Object3D {
                 const image = new Uint8Array(numPixels * 4);
                 for (let i = 0; i < numPixels; i++) {
                     GradientHelper.GetCurrentGradient(i / numPixels, this._colorGradients, (curr, next, s) => {
-                        image[i * 4 + 0] = (curr.value.r * (1 - s) + next.value.r * s) * 255;
-                        image[i * 4 + 1] = (curr.value.g * (1 - s) + next.value.g * s) * 255;
-                        image[i * 4 + 2] = (curr.value.b * (1 - s) + next.value.b * s) * 255;
-                        image[i * 4 + 3] = (curr.value.a * (1 - s) + next.value.a * s) * 255;
+                        image[i * 4 + 0] = Math.max(0, Math.min((curr.value.r * (1 - s) + next.value.r * s), 1)) * 255;
+                        image[i * 4 + 1] = Math.max(0, Math.min((curr.value.g * (1 - s) + next.value.g * s), 1)) * 255;
+                        image[i * 4 + 2] = Math.max(0, Math.min((curr.value.b * (1 - s) + next.value.b * s), 1)) * 255;
+                        image[i * 4 + 3] = Math.max(0, Math.min((curr.value.a * (1 - s) + next.value.a * s), 1)) * 255;
                     });
                 }
                 this._colorGradientTexture.image = image;

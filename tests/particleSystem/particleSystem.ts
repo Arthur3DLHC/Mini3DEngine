@@ -295,20 +295,20 @@ window.onload = () => {
 
         // emitter and particle properties
         billboardsLimitRotAxis.emitRate = 4;
-        billboardsLimitRotAxis.emitterSize = new vec3([0.5, 0.5, 0.5]);
+        billboardsLimitRotAxis.emitterSize = new vec3([0.3, 0.3, 0.3]);
         billboardsLimitRotAxis.minLife = 0.8;
         billboardsLimitRotAxis.maxLife = 1.2;
-        billboardsLimitRotAxis.minSize = new vec3([0.1, 1.0, 0.1]);
-        billboardsLimitRotAxis.maxSize = new vec3([0.12, 1.2, 0.12]);
+        billboardsLimitRotAxis.minSize = new vec3([0.2, 1.0, 0.2]);
+        billboardsLimitRotAxis.maxSize = new vec3([0.22, 1.2, 0.22]);
         billboardsLimitRotAxis.emitDirection = new vec3([0, 1, 0]);
         billboardsLimitRotAxis.emitDirectionVariation = 0;
-        billboardsLimitRotAxis.minSpeed = 0.2;
-        billboardsLimitRotAxis.maxSpeed = 0.4;
+        billboardsLimitRotAxis.minSpeed = 0.1;
+        billboardsLimitRotAxis.maxSpeed = 0.2;
 
-        billboardsLimitRotAxis.color1 = new vec4([2, 2, 2, 1]);
-        billboardsLimitRotAxis.color2 = new vec4([1.5, 1.5, 1.5, 1]);
+        billboardsLimitRotAxis.color1 = new vec4([4, 4, 4, 1]);
+        billboardsLimitRotAxis.color2 = new vec4([3, 3, 3, 1]);
 
-        billboardsLimitRotAxis.gravity = new vec3([0, 1, 0]);
+        billboardsLimitRotAxis.gravity = new vec3([0, 2, 0]);
 
         // todo: test color and size gradients
         const colorGrads: Gradient<vec4>[] = [];
