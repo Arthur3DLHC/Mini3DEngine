@@ -9,6 +9,7 @@ export class Gradient<T> {
      * @param value note: use new object instances
      */
     public constructor(gradient: number, value: T) {
+        this.gradient = gradient;
         this.value = value;
     }
 

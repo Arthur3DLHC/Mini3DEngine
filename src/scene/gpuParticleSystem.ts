@@ -475,6 +475,16 @@ export class GPUParticleSystem extends Object3D {
             this._randomTexture.release();
             this._randomTexture = null;
         }
+
+        if (this._colorGradientTexture !== null) {
+            this._colorGradientTexture.release();
+            this._colorGradientTexture = null;
+        }
+
+        if (this._sizeGradientTexture !== null) {
+            this._sizeGradientTexture.release();
+            this._sizeGradientTexture = null;
+        }
     }
 
     /**

@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, GPUParticleSystem, RotationLimitMode, GPUParticleMaterial, RenderStateCache } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, GPUParticleSystem, RotationLimitMode, GPUParticleMaterial, RenderStateCache, Gradient } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "../common/behaviors/autoRotateBehavior.js";
 import vec4 from "../../lib/tsm/vec4.js";
@@ -310,6 +310,26 @@ window.onload = () => {
 
         billboardsLimitRotAxis.gravity = new vec3([0, 1, 0]);
 
+        // todo: test color and size gradients
+        const colorGrads: Gradient<vec4>[] = [];
+        colorGrads.push(new Gradient<vec4>(0, new vec4([0, 0, 0, 0])));
+        colorGrads.push(new Gradient<vec4>(0.25, new vec4([0, 0.5, 1, 1])));
+        colorGrads.push(new Gradient<vec4>(0.75, new vec4([0, 0.5, 1, 1])));
+        colorGrads.push(new Gradient<vec4>(1, new vec4([0, 0, 0, 0])));
+        billboardsLimitRotAxis.colorGradients = colorGrads;
+
+        const sizeGrads: Gradient<vec3>[] = [];
+        sizeGrads.push(new Gradient<vec3>(0, new vec3([1, 1, 1])));
+        sizeGrads.push(new Gradient<vec3>(1, new vec3([1, 1.5, 1])));
+        billboardsLimitRotAxis.sizeGradients = sizeGrads;
+
+        // todo: material and texture
+        const lightBeamMtl: GPUParticleMaterial = new GPUParticleMaterial(renderer.context);
+        lightBeamMtl.blendState = RenderStateCache.instance.getBlendState(true, gl.FUNC_ADD, gl.ONE, gl.ONE);
+        lightBeamMtl.depthStencilState = RenderStateCache.instance.getDepthStencilState(true, false, gl.LEQUAL);
+
+        billboardsLimitRotAxis.material = lightBeamMtl;
+
         billboardsLimitRotAxis.rebuild();
         billboardsLimitRotAxis.start();
         scene.attachChild(billboardsLimitRotAxis);
@@ -458,11 +478,8 @@ window.onload = () => {
     }
     //#endregion
 
-    // todo: particle system material, render states, textures
-    // todo: test texture animation
-
     // todo: particle system custom materials
-
+    // blood splat
 
     // test environment probes
     SceneHelper.addEnvProbe("envProbe01", 6, new vec3([0, 0, 0]), scene, EnvironmentProbeType.Reflection);
