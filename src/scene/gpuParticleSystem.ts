@@ -727,11 +727,35 @@ export class GPUParticleSystem extends Object3D {
 
             // hold cur tex unit here? or use GLTextures class?
             let texUnit = startTexUnit;
-            // depth, for soft particles;
+
+            // depth texture, for soft particles;
             // fix me: can not use this frame depth texture, because it may being used as render target
             // use a last frame depth?
 
-            texUnit++;
+            // color gradient texture
+            const colorGradLoc = renderProgram.getUniformLocation("s_colorGradient");
+            if(colorGradLoc !== null) {
+                GLTextures.setTextureAt(texUnit, this._colorGradientTexture);
+                gl.uniform1i(colorGradLoc, texUnit);
+                texUnit++;
+            }
+
+            // size gradient texture
+            const sizeGradLoc = renderProgram.getUniformLocation("s_sizeGradient");
+            if (sizeGradLoc !== null) {
+                GLTextures.setTextureAt(texUnit, this._sizeGradientTexture);
+                gl.uniform1i(sizeGradLoc, texUnit);
+                texUnit++;
+            }
+
+            // flags
+            const useGradLoc = renderProgram.getUniformLocation("u_useGradientTextures");
+            if (useGradLoc !== null) {
+                gl.uniform4i(useGradLoc,
+                    this._colorGradientTexture !== null ? 1 : 0,
+                    this._sizeGradientTexture !== null ? 1 : 0,
+                    0, 0);
+            }
 
             // particle own texture (with animation frames?)
             // let material set them?

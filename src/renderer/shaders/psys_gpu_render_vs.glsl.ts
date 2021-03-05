@@ -30,6 +30,11 @@ uniform vec3            u_limitAxis;        // limit rotation axis
 uniform vec3            u_refDir;           // when is not billboard and limit rotation axis, this is the 'up' dir when calc lookat rotation matrix
 uniform vec3            u_texAnimSheetInfo; // xy: uv scale z: num frames per row
 
+uniform ivec4           u_useGradientTextures;  // x: use color gradient y: use size gradient
+
+uniform sampler2D       s_colorGradient;
+uniform sampler2D       s_sizeGradient;
+
 #include <attrib_locations>
 
 // for instance attributes, add an offset of 8
