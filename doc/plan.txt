@@ -556,10 +556,10 @@ TODO:       主要类结构
                 One-shot 发射
                 粒子纹理和动画
                 颜色、尺寸、速度等的 Gradient texture
+                自定义材质：blood splat
+                粒子光照；sample shadow maps; 法线贴图；
                 Noise texture?
                 粒子物理：可以通过深度图获得场景位置，在 GPU 计算碰撞？https://nullprogram.com/webgl-particles/
-                使用一个默认的粒子系统 shader ？以及对应的粒子系统材质类？
-                粒子光照；sample shadow maps;
                 Soft particles
                 使用降低分辨率的 RT 绘制粒子？
                     https://developer.nvidia.com/gpugems/gpugems3/part-iv-image-effects/chapter-23-high-speed-screen-particles

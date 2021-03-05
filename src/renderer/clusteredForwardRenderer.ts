@@ -900,7 +900,9 @@ export class ClusteredForwardRenderer {
            // gl.colorMask(false, false, false, false);
             //gl.depthFunc(gl.LEQUAL);
             //gl.disable(gl.BLEND);
+
             this.renderDepthPrepass(this._frustum);
+
             //gl.colorMask(true, true, true, true);
 
             // sky box

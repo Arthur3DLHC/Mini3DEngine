@@ -48,6 +48,12 @@ void main(void)
 
     // todo: soft particle?
 
+    // todo: lighting.
+    // punctual lighting and shadowmaps
+
+    // indirect lighting (here or calculate in vertex shader?)
+    // normal map
+
     // o_color = vec4(1.0, 1.0, 1.0, 1.0);
     outputFinal(o);
 }
