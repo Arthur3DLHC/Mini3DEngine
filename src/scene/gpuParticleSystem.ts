@@ -6,7 +6,7 @@ import { BoundingSphere } from "../math/boundingSphere.js";
 import { ClusteredForwardRenderContext } from "../renderer/clusteredForwardRenderContext.js";
 import { RenderList } from "../renderer/renderList.js";
 import { SceneTextureUnits } from "../renderer/sceneTextureUnits.js";
-import { Gradient } from "../utils/gradientsGeneric.js";
+import { Gradient, GradientHelper } from "../utils/gradientsGeneric.js";
 import { GLDevice } from "../WebGLResources/glDevice.js";
 import { GLGeometryBuffers } from "../WebGLResources/glGeometryBuffers.js";
 import { GLPrograms } from "../WebGLResources/glPrograms.js";
@@ -262,6 +262,8 @@ export class GPUParticleSystem extends Object3D {
 
     private _colorGradientTexture: Texture2D | null = null;
     private _sizeGradientTexture: Texture2D | null = null;
+
+    private static readonly _gradientTextureWidth: number = 256;
 
     private _colorGradientTextureDirty: boolean = false;
     private _sizeGradientTextureDirty: boolean = false;
@@ -792,9 +794,29 @@ export class GPUParticleSystem extends Object3D {
     protected updateColorGradientTexture() {
         if (this._colorGradientTextureDirty) {
             if (this._colorGradients !== null && this._colorGradients.length > 0) {
-                
+                const numPixels = GPUParticleSystem._gradientTextureWidth;
+                if (this._colorGradientTexture === null) {
+                    const gl = GLDevice.gl;
+                    this._colorGradientTexture = new Texture2D(numPixels, 1, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, false);
+                    this._colorGradientTexture.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.REPEAT, gl.LINEAR, gl.LINEAR);
+                }
+                const image = new Uint8Array(numPixels * 4);
+                for (let i = 0; i < numPixels; i++) {
+                    GradientHelper.GetCurrentGradient(i / numPixels, this._colorGradients, (curr, next, s) => {
+                        image[i * 4 + 0] = (curr.value.r * (1 - s) + next.value.r * s) * 255;
+                        image[i * 4 + 1] = (curr.value.g * (1 - s) + next.value.g * s) * 255;
+                        image[i * 4 + 2] = (curr.value.b * (1 - s) + next.value.b * s) * 255;
+                        image[i * 4 + 3] = (curr.value.a * (1 - s) + next.value.a * s) * 255;
+                    });
+                }
+                this._colorGradientTexture.image = image;
+                this._colorGradientTexture.upload();
             } else {
-
+                // release the texture?
+                if (this._colorGradientTexture !== null) {
+                    this._colorGradientTexture.release();
+                    this._colorGradientTexture = null;
+                }
             }
             this._colorGradientTextureDirty = false;
         }
@@ -803,9 +825,27 @@ export class GPUParticleSystem extends Object3D {
     protected updateSizeGradientTexture() {
         if (this._sizeGradientTextureDirty) {
             if (this._sizeGradients !== null && this._sizeGradients.length > 0) {
-                
+                const numPixels = GPUParticleSystem._gradientTextureWidth;
+                if (this._sizeGradientTexture === null) {
+                    const gl = GLDevice.gl;
+                    this._sizeGradientTexture = new Texture2D(numPixels, 1, 1, 1, gl.RGB, gl.FLOAT, false);
+                    this._sizeGradientTexture.samplerState = new SamplerState(gl.CLAMP_TO_EDGE, gl.REPEAT, gl.LINEAR, gl.LINEAR);
+                }
+                const image = new Float32Array(numPixels * 3);
+                for (let i = 0; i < numPixels; i++) {
+                    GradientHelper.GetCurrentGradient(i / numPixels, this._sizeGradients, (curr, next, s) => {
+                        image[i * 3 + 0] = curr.value.x * (1 - s) + next.value.x * s;
+                        image[i * 3 + 1] = curr.value.y * (1 - s) + next.value.y * s;
+                        image[i * 3 + 2] = curr.value.z * (1 - s) + next.value.z * s;
+                    });
+                }
+                this._sizeGradientTexture.image = image;
+                this._sizeGradientTexture.upload();
             } else {
-                
+                if (this._sizeGradientTexture !== null) {
+                    this._sizeGradientTexture.release();
+                    this._sizeGradientTexture = null;
+                }
             }
             this._sizeGradientTextureDirty = false;
         }
