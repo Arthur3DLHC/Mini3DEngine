@@ -97,9 +97,17 @@ void main(void)
     // todo: calc world transform from particle instance attribs
     // 2D rotation angle matrix
     mat4 matScale = mat4(1.0);
-    matScale[0][0] = p_size.x;
-    matScale[1][1] = p_size.y;
-    matScale[2][2] = p_size.z;
+
+    vec3 scale = p_size.xyz;
+
+    if (u_useGradientTextures.y > 0) {
+        vec3 sizeGrad = texture(s_sizeGradient, vec2(p_ageLife.x / p_ageLife.y, 0.5)).xyz;
+        scale *= sizeGrad;
+    }
+
+    matScale[0][0] = scale.x;
+    matScale[1][1] = scale.y;
+    matScale[2][2] = scale.z;
 
     mat4 matRot2D = mat4(1.0);
     // rotation matrix along z axis?
@@ -164,6 +172,11 @@ void main(void)
     gl_Position = viewToProj(viewPosition);
 
     ex_color = u_object.color * p_color;
+
+    if (u_useGradientTextures.x > 0) {
+        vec4 colorGrad = texture(s_colorGradient, vec2(p_ageLife.x / p_ageLife.y, 0.5));
+        ex_color *= colorGrad;
+    }
 
     // texcoord animation
     ex_texMixAmount = fract(p_frameIdx);
