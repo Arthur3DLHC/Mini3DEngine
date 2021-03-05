@@ -60,6 +60,7 @@
         4、由于没有圆柱体的 Empty，只能用 box 代替，设置 colliderShape 属性为 cylinder
 
     粒子系统
+        1、参数使用说明（Geometry方向，旋转方向等）
 
 关卡实体码放注意事项
     TBD

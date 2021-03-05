@@ -12,7 +12,7 @@ uniform vec3 u_texAnimSheetInfo; // xy: uv scale z: num frames per row
 
 // samplers
 uniform sampler2D s_sceneDepth;
-uniform sampler2D s_texture;    // one-row texture contains animation frames
+uniform sampler2D s_texture;    // texture contains animation frames
 
 // varyings
 in vec4     ex_color;           // if particle is dead, set alpha to zero then discard it in fs

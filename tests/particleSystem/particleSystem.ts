@@ -328,6 +328,10 @@ window.onload = () => {
         lightBeamMtl.blendState = RenderStateCache.instance.getBlendState(true, gl.FUNC_ADD, gl.ONE, gl.ONE);
         lightBeamMtl.depthStencilState = RenderStateCache.instance.getDepthStencilState(true, false, gl.LEQUAL);
 
+        textureLoader.load("./textures/particles/lightbeam.png", (texture: Texture) => {
+            lightBeamMtl.texture = texture as Texture2D;
+        });
+
         billboardsLimitRotAxis.material = lightBeamMtl;
 
         billboardsLimitRotAxis.rebuild();
