@@ -71,6 +71,15 @@ export class GPUParticleMaterial extends Material {
     public texture: Texture2D | null = null;
 
     /**
+     * whether enable lighting.
+     * for the default particle material, only handle 2 conditions: lighting or no lighting
+     * to keep it simple.
+     */
+    public lighting: boolean = false;
+
+    public normalMap: Texture2D | null = null;
+
+    /**
      * num column and rows in texture animation sheet
      * for calc texcoords when rendering 
      */

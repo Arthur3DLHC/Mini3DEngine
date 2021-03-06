@@ -556,8 +556,8 @@ TODO:       主要类结构
                 One-shot 发射
                 粒子纹理和动画
                 颜色、尺寸、速度等的 Gradient texture
-                自定义材质：blood splat
                 粒子光照；sample shadow maps; 法线贴图；
+                自定义材质：blood splat
                 Noise texture?
                 粒子物理：可以通过深度图获得场景位置，在 GPU 计算碰撞？https://nullprogram.com/webgl-particles/
                 Soft particles
@@ -567,7 +567,8 @@ TODO:       主要类结构
                     需要保存 reveleage 到 RT 的 alpha channel
                 粒子控制器组件
                 在 blender 场景中如何加入粒子系统；如何导出 gltf
-                动态粒子系统 pool？
+                动态添加粒子系统到场景
+                    维护一个粒子系统对象 pool？
 
             尝试一下简版次表面效果
                 gltf-Model-Viewer中的方法
@@ -653,6 +654,8 @@ TODO:       主要类结构
                     * 走廊地面和墙壁细节用法线贴图表示，节省一下三角形数量？
                     制作更大范围的场景：车库，二层；
                     关卡加载和切换；
+                        控制当前显示的场景的尺寸；用门等对象黑屏切换场景；
+                        切换 scene；这样可以触发 renderer 更新光探针和阴影图；
 
                 Action: 日式城堡，室外+室内，宽阔一些 或横板？夜间；无月光；雾；Local point lights：灯烛，火把；
 

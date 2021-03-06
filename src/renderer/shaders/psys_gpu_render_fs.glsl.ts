@@ -9,10 +9,12 @@ export default /** glsl */`
 uniform int u_softParticle;
 uniform vec3 u_texAnimSheetInfo; // xy: uv scale z: num frames per row
 
+uniform ivec2 u_lightingInfo;   // x: enable lighting y: use normal map
 
 // samplers
 uniform sampler2D s_sceneDepth;
 uniform sampler2D s_texture;    // texture contains animation frames
+uniform sampler2D s_normalMap;  // normalmap. must have same animation frames with texture.
 
 // varyings
 in vec4     ex_color;           // if particle is dead, set alpha to zero then discard it in fs
@@ -49,10 +51,18 @@ void main(void)
     // todo: soft particle?
 
     // todo: lighting.
-    // punctual lighting and shadowmaps
+    // fix me: lots of overdraw
+    if (u_lightingInfo.x > 0) {
+        // world space normal
 
-    // indirect lighting (here or calculate in vertex shader?)
-    // normal map
+        // normal map
+        // need to pass in normal tangent binormal from vertex shader?
+        // or calc from mkkt space here?
+
+        // punctual lighting and shadowmaps
+
+        // indirect lighting (here or calculate in vertex shader?)
+    }
 
     // o_color = vec4(1.0, 1.0, 1.0, 1.0);
     outputFinal(o);
