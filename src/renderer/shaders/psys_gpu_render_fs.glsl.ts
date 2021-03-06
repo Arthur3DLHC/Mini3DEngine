@@ -27,6 +27,8 @@ uniform sampler2D   s_texture;    // texture contains animation frames
 uniform sampler2D   s_normalMap;  // normalmap. must have same animation frames with texture.
 
 // varyings
+in vec4     ex_hPosition;
+in vec3     ex_worldPosition;
 in vec3     ex_worldNormal;
 in vec3     ex_worldTangent;
 in vec3     ex_worldBinormal; 
@@ -80,14 +82,60 @@ void main(void)
         vec3 f_diffuse = vec3(0.0);
 
         // find cluster of this pixel
-
+        uint cluster = clusterOfPixel(ex_hPosition);
 
         // indirect lighting (here or calculate in vertex shader?)
+        // calculate here can use normal maps,
+        // calculate in vertex shader is more efficient
+        uint irrStart = 0u;
+        uint irrCount = 0u;
+
+        vec3 iblDiffuse = vec3(0.0);
+        float totalWeight = 0.0;
+
+        getIrrProbeIndicesInCluster(cluster, irrStart, irrCount);
+
+        for (uint i = irrStart; i < irrStart + irrCount; i++) {
+            uint probeIdx = getItemIndexAt(i);
+            IrradianceProbe probe = u_irrProbes.probes[probeIdx];
+
+            // todo: blend by distance to envprobe center position
+            // todo: should also add radius weight: the smaller the probe, the stronger the weight.
+            // https://www.xmswiki.com/wiki/SMS:Inverse_Distance_Weighted_Interpolation
+            // float dist = length(probe.position - ex_worldPosition) + 0.1;
+            // float distxradius = dist * probe.radius;
+            // float weight = 1.0 / (distxradius * distxradius);
+
+            // try to remove the distinct boundary when using clusters
+            float dist = length(probe.position - ex_worldPosition);
+            float distWeight = clamp(1.0 - dist / probe.radius, 0.0, 1.0);
+            // smaller radius still get more weight?
+            float radiusWeight = 1.0 / probe.radius;
+            float weight = distWeight * radiusWeight;
+
+            // debug
+            // weight = 10.0;
+
+            // IBL diffuse part
+            iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, int(probeIdx), normal, o.color.rgb) * weight;
+            
+            totalWeight += weight;
+        }
+        if (totalWeight > 0.0) {
+            // debug output envmap
+            // o.color.rgb += reflection * 0.5 / totalWeight;
+            // f_specular += iblSpecular / totalWeight;
+            // f_diffuse += vec3(0.5);
+
+            // f_diffuse += vec3(totalWeight);
+
+            f_diffuse += iblDiffuse / totalWeight;
+        }
 
         // punctual lighting and shadowmaps
         // do a simple diffuse lighting only? no specular; for default general smoke lighting
 
-        o.color.rgb *= f_diffuse;
+        o.color.rgb = f_diffuse;
     }
 
     // o_color = vec4(1.0, 1.0, 1.0, 1.0);

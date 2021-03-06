@@ -70,7 +70,8 @@ layout(location = ANGLE_LOC)            in vec2 p_angle;        // x: current ro
 
 // vertex output
 // what does the fragment shader need to draw the particle?
-
+out vec4 ex_hPosition;
+out vec3 ex_worldPosition;
 out vec3 ex_worldNormal;
 out vec3 ex_worldTangent;
 out vec3 ex_worldBinormal; 
@@ -176,8 +177,9 @@ void main(void)
 
     vec4 worldPosition = matWorld * localPosition;
     vec4 viewPosition = matView * worldPosition;
-    gl_Position = viewToProj(viewPosition);
+    gl_Position = ex_hPosition = viewToProj(viewPosition);
 
+    ex_worldPosition = worldPosition.xyz;
     // world space normal, tangent, binormal
     ex_worldNormal = (matRot * vec4(a_normal, 0.0)).xyz;
     ex_worldTangent = (matRot * vec4(a_tangent, 0.0)).xyz;
