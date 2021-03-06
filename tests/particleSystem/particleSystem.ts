@@ -170,7 +170,7 @@ window.onload = () => {
     scene.attachChild(dirLight01);
 
     // geometry: use a plane with z-axis as normal
-    const particleGeom = new PlaneGeometry(1, 1, 1, 1, 2);
+    const particleGeom = new PlaneGeometry(1, 1, 1, 1, 2, true);
 
     // todo: test particle materials
     const particleMtl = new GPUParticleMaterial(renderer.context);

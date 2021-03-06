@@ -6,17 +6,20 @@
 export default /** glsl */`
 
 // uniforms
-uniform int u_softParticle;
-uniform vec3 u_texAnimSheetInfo; // xy: uv scale z: num frames per row
+uniform int         u_softParticle;
+uniform vec3        u_texAnimSheetInfo; // xy: uv scale z: num frames per row
 
-uniform ivec2 u_lightingInfo;   // x: enable lighting y: use normal map
+uniform ivec2       u_lightingInfo;   // x: enable lighting y: use normal map
 
 // samplers
-uniform sampler2D s_sceneDepth;
-uniform sampler2D s_texture;    // texture contains animation frames
-uniform sampler2D s_normalMap;  // normalmap. must have same animation frames with texture.
+uniform sampler2D   s_sceneDepth;
+uniform sampler2D   s_texture;    // texture contains animation frames
+uniform sampler2D   s_normalMap;  // normalmap. must have same animation frames with texture.
 
 // varyings
+in vec3     ex_worldNormal;
+in vec3     ex_worldTangent;
+in vec3     ex_worldBinormal; 
 in vec4     ex_color;           // if particle is dead, set alpha to zero then discard it in fs
 in vec2     ex_texcoord0;       // for blending between two frames
 in vec2     ex_texcoord1;       //
@@ -52,14 +55,20 @@ void main(void)
 
     // todo: lighting.
     // fix me: lots of overdraw
+    // todo: encapsulate as function? or add a callback function to let custom shaders to modify the color output?
     if (u_lightingInfo.x > 0) {
         // world space normal
+        vec3 normal = ex_worldNormal;
 
         // normal map
-        // need to pass in normal tangent binormal from vertex shader?
-        // or calc from mkkt space here?
+        if (u_lightingInfo.y > 0) {
+            vec3 normalTex = texture(s_normalMap, ex_texcoord0).rgb * 2.0 - vec3(1.0);
+            mat3 matNormal = mat3(ex_worldTangent, ex_worldBinormal, ex_worldNormal);
+            normal = matNormal * normalTex;
+        }
 
         // punctual lighting and shadowmaps
+
 
         // indirect lighting (here or calculate in vertex shader?)
     }

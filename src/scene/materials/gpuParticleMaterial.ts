@@ -107,9 +107,20 @@ export class GPUParticleMaterial extends Material {
             const vScale = 1.0 / this.texAnimSheetSize.y;
             gl.uniform3f(this.renderProgram.getUniformLocation("u_texAnimSheetInfo"), uScale, vScale, this.texAnimSheetSize.x);
 
-            // texUnit++;
+            texUnit++;
         } else {
             gl.uniform3f(this.renderProgram.getUniformLocation("u_texAnimSheetInfo"), 0, 0, 0);
+        }
+
+        // lighting
+        gl.uniform2i(this.renderProgram.getUniformLocation("u_lightingInfo"), this.lighting? 1 : 0, this.normalMap !== null ? 1 : 0);
+
+        // normal map
+        if (this.normalMap !== null) {
+            GLTextures.setTextureAt(texUnit, this.normalMap);
+            gl.uniform1i(this.renderProgram.getUniformLocation("s_normalMap"), texUnit);
+            
+            texUnit++;
         }
     }
 }

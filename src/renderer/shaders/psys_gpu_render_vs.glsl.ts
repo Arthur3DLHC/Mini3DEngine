@@ -53,6 +53,7 @@ uniform sampler2D       s_sizeGradient;
 // (do lighting per vertex if particles are billborad?)
 layout(location = POSITION_LOCATION)    in vec3 a_position;
 layout(location = NORMAL_LOCATION)      in vec3 a_normal;
+layout(location = TANGENT_LOCATION)     in vec3 a_tangent;
 layout(location = TEXCOORD0_LOCATION)   in vec2 a_texcoord0;
 
 // particle instance attributes
@@ -70,6 +71,9 @@ layout(location = ANGLE_LOC)            in vec2 p_angle;        // x: current ro
 // vertex output
 // what does the fragment shader need to draw the particle?
 
+out vec3 ex_worldNormal;
+out vec3 ex_worldTangent;
+out vec3 ex_worldBinormal; 
 out vec4 ex_color;           // if particle is dead, set alpha to zero then discard it in fs
 out vec2 ex_texcoord0;       // for blending between two frames
 out vec2 ex_texcoord1;       //
@@ -164,12 +168,20 @@ void main(void)
         // if no limit, use geometry local transform (keep matRot3D as identity)
     }
 
+    // also for normal, tangent, binormal
+    mat4 matRot = matRot3D * matRot2D;
+
     // have nothing to do with object world transform.
-    mat4 matWorld = matTranslation * matRot3D * matRot2D * matScale;
+    mat4 matWorld = matTranslation * matRot * matScale;
 
     vec4 worldPosition = matWorld * localPosition;
     vec4 viewPosition = matView * worldPosition;
     gl_Position = viewToProj(viewPosition);
+
+    // world space normal, tangent, binormal
+    ex_worldNormal = (matRot * vec4(a_normal, 0.0)).xyz;
+    ex_worldTangent = (matRot * vec4(a_tangent, 0.0)).xyz;
+    ex_worldBinormal = cross(ex_worldNormal, ex_worldTangent);
 
     ex_color = u_object.color * p_color;
 

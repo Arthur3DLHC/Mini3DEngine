@@ -14,7 +14,7 @@ export class PlaneGeometry extends BufferGeometry {
      * @param heightSegments 
      * @param normalAxis 0 - x, 1 - y, 2 - z
      */
-    public constructor(width: number, height: number, widthSegments: number, heightSegments: number, normalAxis: number = 1) {
+    public constructor(width: number, height: number, widthSegments: number, heightSegments: number, normalAxis: number = 1, tangents: boolean = false) {
         super();
         this._width = Math.max(0, width);
         this._height = Math.max(0, height);
@@ -25,7 +25,11 @@ export class PlaneGeometry extends BufferGeometry {
         this.vertexBuffers.push(vertexBuffer);
         this.indexBuffer = new IndexBuffer(GLDevice.gl.STATIC_DRAW);
 
-        const floats = 8;
+        let floats = 8;
+
+        if (tangents) {
+            floats += 3;
+        }
 
         vertexBuffer.stride = floats * 4;
         vertexBuffer.data = new Float32Array(floats * (this._widthSeg + 1) * (this._heightSeg + 1));
@@ -44,21 +48,49 @@ export class PlaneGeometry extends BufferGeometry {
                     vertexBuffer.data[idx + 0] = 0;
                     vertexBuffer.data[idx + 1] = -v;        // to face +x
                     vertexBuffer.data[idx + 2] = -u;
+
+                    vertexBuffer.data[idx + 3] = 1;
+                    vertexBuffer.data[idx + 4] = 0;
+                    vertexBuffer.data[idx + 5] = 0;
+
                 } else if (normalAxis === 1) {
                     vertexBuffer.data[idx + 0] = u;
                     vertexBuffer.data[idx + 1] = 0;
                     vertexBuffer.data[idx + 2] = v;
+
+                    vertexBuffer.data[idx + 3] = 0;
+                    vertexBuffer.data[idx + 4] = 1;
+                    vertexBuffer.data[idx + 5] = 0;
                 } else {
                     vertexBuffer.data[idx + 0] = u;
                     vertexBuffer.data[idx + 1] = -v;        // to face +z, for billboards
                     vertexBuffer.data[idx + 2] = 0;
+
+                    vertexBuffer.data[idx + 3] = 0;
+                    vertexBuffer.data[idx + 4] = 0;
+                    vertexBuffer.data[idx + 5] = 1;
                 }
 
-                vertexBuffer.data[idx + 3] = 0;
-                vertexBuffer.data[idx + 4] = 1;
-                vertexBuffer.data[idx + 5] = 0;
-                vertexBuffer.data[idx + 6] = s;
-                vertexBuffer.data[idx + 7] = t;
+                if (tangents) {
+                    if (normalAxis === 0) {
+                        vertexBuffer.data[idx + 6] = 0;
+                        vertexBuffer.data[idx + 7] = 0;
+                        vertexBuffer.data[idx + 8] = -1;
+                    } else if (normalAxis === 1) {
+                        vertexBuffer.data[idx + 6] = 1;
+                        vertexBuffer.data[idx + 7] = 0;
+                        vertexBuffer.data[idx + 8] = 0;
+                    } else if (normalAxis === 2) {
+                        vertexBuffer.data[idx + 6] = 1;
+                        vertexBuffer.data[idx + 7] = 0;
+                        vertexBuffer.data[idx + 8] = 0;
+                    }
+                    vertexBuffer.data[idx + 9] = s;
+                    vertexBuffer.data[idx + 10] = t;
+                } else {
+                    vertexBuffer.data[idx + 6] = s;
+                    vertexBuffer.data[idx + 7] = t;
+                }
             }
         }
         vertexBuffer.create();
@@ -85,6 +117,9 @@ export class PlaneGeometry extends BufferGeometry {
         let curOffset = 0;
         curOffset = this.addAttribute(VertexBufferAttribute.defaultNamePosition, DefaultAttributeLocations[VertexBufferAttribute.defaultNamePosition], vertexBuffer, 3, GLDevice.gl.FLOAT, curOffset);
         curOffset = this.addAttribute(VertexBufferAttribute.defaultNameNormal, DefaultAttributeLocations[VertexBufferAttribute.defaultNameNormal], vertexBuffer, 3, GLDevice.gl.FLOAT, curOffset);
+        if (tangents) {
+            curOffset = this.addAttribute(VertexBufferAttribute.defaultNameTangent, DefaultAttributeLocations[VertexBufferAttribute.defaultNameTangent], vertexBuffer, 3, GLDevice.gl.FLOAT, curOffset);
+        }
         curOffset = this.addAttribute(VertexBufferAttribute.defaultNameTexcoord0, DefaultAttributeLocations[VertexBufferAttribute.defaultNameTexcoord0], vertexBuffer, 2, GLDevice.gl.FLOAT, curOffset);
 
         const grp = new Primitive();
