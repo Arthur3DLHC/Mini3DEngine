@@ -5,6 +5,16 @@
  */
 export default /** glsl */`
 
+#include <samplers_scene>
+#include <uniforms_scene>
+#include <uniforms_view>
+#include <function_cluster>
+#include <function_cubemap>
+#include <function_get_items>
+#include <function_punctual_lights>
+#include <function_shadow>
+#include <function_ibl>
+
 // uniforms
 uniform int         u_softParticle;
 uniform vec3        u_texAnimSheetInfo; // xy: uv scale z: num frames per row
@@ -67,10 +77,17 @@ void main(void)
             normal = matNormal * normalTex;
         }
 
-        // punctual lighting and shadowmaps
+        vec3 f_diffuse = vec3(0.0);
+
+        // find cluster of this pixel
 
 
         // indirect lighting (here or calculate in vertex shader?)
+
+        // punctual lighting and shadowmaps
+        // do a simple diffuse lighting only? no specular; for default general smoke lighting
+
+        o.color.rgb *= f_diffuse;
     }
 
     // o_color = vec4(1.0, 1.0, 1.0, 1.0);

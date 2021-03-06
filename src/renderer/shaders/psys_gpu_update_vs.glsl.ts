@@ -200,6 +200,9 @@ void main(void)
         vec3 newDirection = p_direction + u_gravity * u_elapsedTime;
         ex_direction = newDirection;
         vec3 newPosition = p_position + newDirection * u_elapsedTime;
+
+        // todo: collision detecting with scene depth buffer
+
         // debug
         // vec3 newPosition = p_position + vec3(0., 1., 0.) * 0.1;
         gl_Position = vec4(newPosition, 1.0);
