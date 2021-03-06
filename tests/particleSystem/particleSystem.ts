@@ -235,6 +235,9 @@ window.onload = () => {
         smokeMtl.blendState = RenderStateCache.instance.getBlendState(true, gl.FUNC_ADD, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         smokeMtl.depthStencilState = RenderStateCache.instance.getDepthStencilState(true, false);
 
+        // test lighting
+        smokeMtl.lighting = true;
+
         // todo: texture
         // single texture
         // from http://www.positech.co.uk/content/explosion/explosiongenerator.html
