@@ -63,6 +63,11 @@ void main(void)
         o.color = ex_color * texcolor;
     }
 
+    // discard transparent pixels early
+    if (o.color.a < 0.001) {
+        discard;
+    }
+
     // todo: soft particle?
 
     // todo: lighting.
@@ -133,7 +138,65 @@ void main(void)
         }
 
         // punctual lighting and shadowmaps
+        // fix me: lighting calculation is heavy
         // do a simple diffuse lighting only? no specular; for default general smoke lighting
+        // if light is far away, do not use shadow?
+        // what if the light is big?
+        uint lightStart;
+        uint lightCount;
+        getLightIndicesInCluster(cluster, lightStart, lightCount);
+        for (uint i = lightStart; i < lightStart + lightCount; i++) {
+            uint lightIdx = getItemIndexAt(i);
+            Light light = u_lights.lights[lightIdx];
+            uint lightType = getLightType(light);
+            float lightRange = getLightRange(light);
+
+            float rangeAttenuation = 1.0;
+            float spotAttenuation = 1.0;
+            float shadow = 1.0;
+
+            vec3 lightPosition = light.transform[3].xyz;
+            vec3 lightDir = (light.transform * vec4(0.0, 0.0, -1.0, 0.0)).xyz;
+            // vec3 lightDir = vec3(0.0, 0.0, -1.0);
+            vec3 pointToLight = -lightDir;
+
+            // todo: check light type
+            // todo: check NdotL earty?
+            if (lightType == LightType_Directional) {
+                // if dir light radius > 0, block out parts outside the beam
+                if(lightRange > 0.0) {
+                    vec3 ltop = ex_worldPosition - lightPosition;
+                    vec3 perpend = ltop - dot(ltop, lightDir) * lightDir;
+                    if(dot(perpend, perpend) > lightRange * lightRange) {
+                        continue;
+                    }
+                }
+            } else {
+                pointToLight = lightPosition - ex_worldPosition;
+                float lightDistSq = dot(pointToLight, pointToLight);
+                // block out light early
+                if (lightRange > 0.0 && lightDistSq > lightRange * lightRange) {
+                    continue;
+                }
+                rangeAttenuation = getRangeAttenuation(lightRange, lightDistSq);
+                if (lightType == LightType_Spot) {
+                    spotAttenuation = getSpotAttenuation(pointToLight, lightDir, getLightOuterConeCos(light), getLightInnerConeCos(light));
+                    // block out light early
+                    if (spotAttenuation < 0.001) {
+                        continue;
+                    }
+                }
+            }
+            // check NdotL early
+            vec3 l = normalize(pointToLight);   // Direction from surface point to light
+            float NdotL = dot(n, l);
+
+            if (NdotL < 0.0) {
+                continue;
+            }
+
+            NdotL = min(NdotL, 1.0);
+        }
 
         o.color.rgb = f_diffuse;
     }
