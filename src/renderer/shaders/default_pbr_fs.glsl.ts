@@ -230,6 +230,21 @@ void main(void)
         vec3 lightDir = (light.transform * vec4(0.0, 0.0, -1.0, 0.0)).xyz;
         // vec3 lightDir = vec3(0.0, 0.0, -1.0);
         vec3 pointToLight = -lightDir;
+
+        if (lightType != LightType_Directional) pointToLight = lightPosition - ex_worldPosition;
+
+                // todo: check n dot l early? but if is subsurface material...
+        // todo: if use subsurface scattering, give the shadow a bigger bias?
+        // test range attenuation
+        // o.color = vec4(rangeAttenuation, rangeAttenuation, rangeAttenuation, 1.0);
+        vec3 l = normalize(pointToLight);   // Direction from surface point to light
+
+        // do not clamp, because we need to calculate subsurface scattering.
+        // float NdotL = clampedDot(n, l);
+        float NdotL = dot(n, l);
+
+        // lower the limit if material uses subsurface?
+        if (NdotL < 0.0) continue;
         
         // check light type
         if (lightType == LightType_Directional) {
@@ -242,7 +257,7 @@ void main(void)
                 }
             }
         } else {
-            pointToLight = lightPosition - ex_worldPosition;
+            
             float lightDistSq = dot(pointToLight, pointToLight);
             // block out light early
             if (lightRange > 0.0 && lightDistSq > lightRange * lightRange) {
@@ -257,19 +272,6 @@ void main(void)
                 }
             }
         }
-
-        // todo: check n dot l early? but if is subsurface material...
-        // todo: if use subsurface scattering, give the shadow a bigger bias?
-        // test range attenuation
-        // o.color = vec4(rangeAttenuation, rangeAttenuation, rangeAttenuation, 1.0);
-        vec3 l = normalize(pointToLight);   // Direction from surface point to light
-
-        // do not clamp, because we need to calculate subsurface scattering.
-        // float NdotL = clampedDot(n, l);
-        float NdotL = dot(n, l);
-
-        // lower the limit if material uses subsurface?
-        if (NdotL < 0.0) continue;
 
         if (getLightCastShadow(light)) {
             mat4 matShadow = mat4(0.0);
@@ -325,7 +327,7 @@ void main(void)
 
         // float NdotV = clampedDot(n, v);  // 前面已经算过了，与光源无关
         // if (NdotL > 0.0 || NdotV > 0.0)
-        if (NdotL > 0.0)
+        // if (NdotL > 0.0)
         {
             NdotL = clamp(NdotL, 0.0, 1.0);
             // apply shadow while diffuse?
