@@ -189,7 +189,7 @@ void main(void)
             }
             // check NdotL early
             vec3 l = normalize(pointToLight);   // Direction from surface point to light
-            float NdotL = dot(n, l);
+            float NdotL = dot(normal, l);
 
             if (NdotL < 0.0) {
                 continue;

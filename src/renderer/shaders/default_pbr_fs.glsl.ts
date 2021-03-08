@@ -260,6 +260,15 @@ void main(void)
 
         // todo: check n dot l early? but if is subsurface material...
         // todo: if use subsurface scattering, give the shadow a bigger bias?
+        // test range attenuation
+        // o.color = vec4(rangeAttenuation, rangeAttenuation, rangeAttenuation, 1.0);
+        vec3 l = normalize(pointToLight);   // Direction from surface point to light
+
+        // do not clamp, because we need to calculate subsurface scattering.
+        // float NdotL = clampedDot(n, l);
+        float NdotL = dot(n, l);
+
+        if (NdotL < 0.0) continue;
 
         if (getLightCastShadow(light)) {
             mat4 matShadow = mat4(0.0);
@@ -293,14 +302,6 @@ void main(void)
                 continue;
             }
         }
-
-        // test range attenuation
-        // o.color = vec4(rangeAttenuation, rangeAttenuation, rangeAttenuation, 1.0);
-        vec3 l = normalize(pointToLight);   // Direction from surface point to light
-
-        // do not clamp, because we need to calculate subsurface scattering.
-        // float NdotL = clampedDot(n, l);
-        float NdotL = dot(n, l);
 
         vec3 intensity = rangeAttenuation * spotAttenuation * light.color.rgb;// * shadow;
 
