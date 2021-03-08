@@ -5,6 +5,8 @@
  */
 export default /** glsl */`
 
+const float M_PI = 3.141592653589793;
+
 #include <samplers_scene>
 #include <uniforms_scene>
 #include <uniforms_view>
@@ -83,6 +85,7 @@ void main(void)
             mat3 matNormal = mat3(ex_worldTangent, ex_worldBinormal, ex_worldNormal);
             normal = matNormal * normalTex;
         }
+        normal = normalize(normal);
 
         vec3 f_diffuse = vec3(0.0);
 
@@ -128,11 +131,6 @@ void main(void)
         }
         if (totalWeight > 0.0) {
             // debug output envmap
-            // o.color.rgb += reflection * 0.5 / totalWeight;
-            // f_specular += iblSpecular / totalWeight;
-            // f_diffuse += vec3(0.5);
-
-            // f_diffuse += vec3(totalWeight);
 
             f_diffuse += iblDiffuse / totalWeight;
         }
@@ -161,7 +159,7 @@ void main(void)
             vec3 pointToLight = -lightDir;
 
             // todo: check light type
-            // todo: check NdotL earty?
+            // todo: optimize: check NdotL before light range?
             if (lightType == LightType_Directional) {
                 // if dir light radius > 0, block out parts outside the beam
                 if(lightRange > 0.0) {
@@ -196,6 +194,15 @@ void main(void)
             }
 
             NdotL = min(NdotL, 1.0);
+
+            // todo: shadow
+
+            vec3 intensity = rangeAttenuation * spotAttenuation * light.color.rgb * shadow;
+            vec3 illuminance = intensity * NdotL;
+
+            // fix me: use F_Schlick or not?
+            // because we do not add specular for default smoke-like particles, we do not need to apply F_Schlick here
+            f_diffuse += illuminance * o.color.rgb / M_PI;
         }
 
         o.color.rgb = f_diffuse;

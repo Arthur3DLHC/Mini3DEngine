@@ -129,6 +129,8 @@ void main(void)
     // 4th colume is translation?
     matTranslation[3] = vec4(p_position, 1.0);
 
+    mat4 matNormal = mat4(1.0);
+
     mat4 matView = u_view.matView;
 
     vec3 limitDir;
@@ -141,6 +143,7 @@ void main(void)
 
     if(u_isBillboard > 0) { // is a billboard
         if (u_rotationLimit == NOLIMIT) {
+            matNormal = transpose(matView);
             // discard rotation part of view matrix
             matView[0] = vec4(1.0, 0.0, 0.0, 0.0);
             matView[1] = vec4(0.0, 1.0, 0.0, 0.0);
@@ -154,6 +157,8 @@ void main(void)
             matRot3D[0] = vec4(sideDir, 0.);
             matRot3D[1] = vec4(limitDir, 0.);
             matRot3D[2] = vec4(frontDir, 0.);
+
+            matNormal = matRot3D * matRot2D;
         }
     } else {    // not a billboard
         if (u_rotationLimit != NOLIMIT) {
@@ -167,6 +172,8 @@ void main(void)
             matRot3D[2] = vec4(frontDir, 0.);
         }
         // if no limit, use geometry local transform (keep matRot3D as identity)
+
+        matNormal = matRot3D * matRot2D;
     }
 
     // also for normal, tangent, binormal
@@ -181,8 +188,9 @@ void main(void)
 
     ex_worldPosition = worldPosition.xyz;
     // world space normal, tangent, binormal
-    ex_worldNormal = (matRot * vec4(a_normal, 0.0)).xyz;
-    ex_worldTangent = (matRot * vec4(a_tangent, 0.0)).xyz;
+    // fix me: billboards error
+    ex_worldNormal = (matNormal * vec4(a_normal, 0.0)).xyz;
+    ex_worldTangent = (matNormal * vec4(a_tangent, 0.0)).xyz;
     ex_worldBinormal = cross(ex_worldNormal, ex_worldTangent);
 
     ex_color = u_object.color * p_color;

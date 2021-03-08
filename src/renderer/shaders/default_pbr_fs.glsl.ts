@@ -268,6 +268,7 @@ void main(void)
         // float NdotL = clampedDot(n, l);
         float NdotL = dot(n, l);
 
+        // lower the limit if material uses subsurface?
         if (NdotL < 0.0) continue;
 
         if (getLightCastShadow(light)) {

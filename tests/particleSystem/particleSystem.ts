@@ -224,7 +224,7 @@ window.onload = () => {
         billboardsNoRotLimit.maxAngularSpeed = 0.1;
 
         billboardsNoRotLimit.color1 = new vec4([1, 1, 1, 1.0]);
-        billboardsNoRotLimit.color2 = new vec4([0.6, 0.6, 0.6, 0.5]);
+        billboardsNoRotLimit.color2 = new vec4([0.6, 0.6, 0.6, 0.6]);
     
         // gravity.copyTo(billboardsNoRotLimit.gravity);
         billboardsNoRotLimit.gravity = new vec3([0.1, 0.1, 0]);
@@ -257,6 +257,8 @@ window.onload = () => {
             billboardsNoRotLimit.texAnimEndFrame = smokeMtl.texAnimSheetSize.x * smokeMtl.texAnimSheetSize.y - 1;
             billboardsNoRotLimit.texAnimFrameIncreaseSpeed = 20;
         });
+
+        // todo: test normal map
 
         /*
         textureLoader.load("./textures/particles/smoke-particle-png-14.png", (texture: Texture) => {
