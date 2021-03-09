@@ -113,7 +113,7 @@ export class GPUParticleMaterial extends Material {
         }
 
         // lighting
-        gl.uniform2i(this.renderProgram.getUniformLocation("u_lightingInfo"), this.lighting? 1 : 0, this.normalMap !== null ? 1 : 0);
+        gl.uniform3i(this.renderProgram.getUniformLocation("u_lightingInfo"), this.lighting? 1 : 0, this.normalMap !== null ? 1 : 0, psys.receiveShadow ? 1 : 0);
 
         // normal map
         if (this.normalMap !== null) {

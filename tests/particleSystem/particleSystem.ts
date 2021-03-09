@@ -200,6 +200,7 @@ window.onload = () => {
         billboardsNoRotLimit.isBillboard = true;
         billboardsNoRotLimit.rotationLimit = RotationLimitMode.NoLimit;
         billboardsNoRotLimit.castShadow = false;
+        billboardsNoRotLimit.receiveShadow = true;
 
         billboardsNoRotLimit.geometry = particleGeom;
 

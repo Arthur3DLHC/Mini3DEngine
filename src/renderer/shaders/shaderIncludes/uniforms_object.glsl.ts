@@ -12,6 +12,7 @@ export default /** glsl */`
         vec4 props;     // x: tag(objectID) y: numBones z: instanced w: custom flags
         mat4 matBones[MAX_BONES];
         mat4 matBonesPrev[MAX_BONES];
+        // fix me: receive shadow flag?
 
     } u_object;
 

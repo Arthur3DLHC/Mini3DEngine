@@ -733,6 +733,7 @@ export class GPUParticleSystem extends Object3D {
 
             // todo: textures
             // some scene textures: irradiance probes;
+            gl.uniform1i(renderProgram.getUniformLocation("s_shadowAtlas"), SceneTextureUnits.shadowmapAtlas);
             gl.uniform1i(renderProgram.getUniformLocation("s_irrProbeArray"), SceneTextureUnits.irradianceProbeArray);
 
             // hold cur tex unit here? or use GLTextures class?
