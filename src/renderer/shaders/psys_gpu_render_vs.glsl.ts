@@ -143,7 +143,7 @@ void main(void)
 
     if(u_isBillboard > 0) { // is a billboard
         if (u_rotationLimit == NOLIMIT) {
-            matNormal = transpose(matView);
+            matNormal = transpose(matView) * matRot2D;
             // discard rotation part of view matrix
             matView[0] = vec4(1.0, 0.0, 0.0, 0.0);
             matView[1] = vec4(0.0, 1.0, 0.0, 0.0);
