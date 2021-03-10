@@ -49,9 +49,8 @@ void main(void)
         discard;
     }
 
-    FinalOutput o = defaultFinalOutput();
     // o.color = vec4(1.0);
-    o.color = ex_color;
+    vec4 albedo = ex_color;
 
     // sample texture and texture animation
     if(u_texAnimSheetInfo.z > 0.0) {
@@ -62,15 +61,19 @@ void main(void)
             vec4 nextFrameColor = texture(s_texture, ex_texcoord1);
             texcolor = mix(texcolor, nextFrameColor, ex_texMixAmount);
         }
-        o.color = ex_color * texcolor;
+        albedo = ex_color * texcolor;
+        // o.color = ex_color * texcolor;
     }
 
     // discard transparent pixels early
-    if (o.color.a < 0.001) {
+    if (albedo.a < 0.001) {
         discard;
     }
 
     // todo: soft particle?
+
+    FinalOutput o = defaultFinalOutput();
+    o.color = albedo;
 
     // todo: lighting.
     // fix me: lots of overdraw
@@ -125,13 +128,11 @@ void main(void)
             // weight = 10.0;
 
             // IBL diffuse part
-            iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, int(probeIdx), normal, o.color.rgb) * weight;
+            iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, int(probeIdx), normal, albedo.rgb) * weight;
             
             totalWeight += weight;
         }
         if (totalWeight > 0.0) {
-            // debug output envmap
-
             f_diffuse += iblDiffuse / totalWeight;
         }
 
@@ -234,9 +235,8 @@ void main(void)
 
             // fix me: use F_Schlick or not?
             // because we do not add specular for default smoke-like particles, we do not need to apply F_Schlick here
-            f_diffuse += illuminance * o.color.rgb / M_PI;
+            f_diffuse += illuminance * albedo.rgb / M_PI;
         }
-
         o.color.rgb = f_diffuse;
     }
 

@@ -211,6 +211,10 @@ void main(void)
         f_diffuse += iblDiffuse / totalWeight;
     }
 
+    // todo: if transparent, need to add reflection probe here?
+    // because the composite postprocess only add them for opaque objects;
+    
+
     uint lightStart;
     uint lightCount; // = getLightCountInCluster(cluster);
     getLightIndicesInCluster(cluster, lightStart, lightCount);
