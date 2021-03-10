@@ -5,7 +5,7 @@
  */
 export default /** glsl */`
 
-const float M_PI = 3.141592653589793;
+// const float M_PI = 3.141592653589793;
 
 #include <samplers_scene>
 #include <uniforms_scene>
@@ -15,6 +15,7 @@ const float M_PI = 3.141592653589793;
 #include <function_get_items>
 #include <function_punctual_lights>
 #include <function_shadow>
+#include <function_brdf_pbr>
 #include <function_ibl>
 
 // uniforms
@@ -22,6 +23,8 @@ uniform int         u_softParticle;
 uniform vec3        u_texAnimSheetInfo; // xy: uv scale z: num frames per row
 
 uniform ivec3       u_lightingInfo;   // x: enable lighting y: use normal map z: receive shadow
+
+#include <function_particle_lighting>
 
 // samplers
 uniform sampler2D   s_sceneDepth;
@@ -50,7 +53,7 @@ void main(void)
     }
 
     // o.color = vec4(1.0);
-    vec4 albedo = ex_color;
+    vec4 baseColor = ex_color;
 
     // sample texture and texture animation
     if(u_texAnimSheetInfo.z > 0.0) {
@@ -61,19 +64,19 @@ void main(void)
             vec4 nextFrameColor = texture(s_texture, ex_texcoord1);
             texcolor = mix(texcolor, nextFrameColor, ex_texMixAmount);
         }
-        albedo = ex_color * texcolor;
+        baseColor = ex_color * texcolor;
         // o.color = ex_color * texcolor;
     }
 
     // discard transparent pixels early
-    if (albedo.a < 0.001) {
+    if (baseColor.a < 0.001) {
         discard;
     }
 
     // todo: soft particle?
 
     FinalOutput o = defaultFinalOutput();
-    o.color = albedo;
+    o.color = baseColor;
 
     // todo: lighting.
     // fix me: lots of overdraw
@@ -90,8 +93,22 @@ void main(void)
         }
         normal = normalize(normal);
 
-        vec3 f_diffuse = vec3(0.0);
+        // use lighting function
+        ParticleBRDFProperties brdfProps;
+        brdfProps.worldPosition = ex_worldPosition;
+        brdfProps.worldNormal = normal;
+        brdfProps.hPosition = ex_hPosition;
+        brdfProps.baseColor = baseColor;
+        brdfProps.specular = 0.0;
+        brdfProps.metallic = 0.0;
+        brdfProps.roughness = 1.0;
 
+        vec3 f_diffuse = vec3(0.0);
+        vec3 f_specular = vec3(0.0);
+
+        particleLighting(brdfProps, f_diffuse, f_specular);
+
+        /*
         // find cluster of this pixel
         uint cluster = clusterOfPixel(ex_hPosition);
 
@@ -128,7 +145,7 @@ void main(void)
             // weight = 10.0;
 
             // IBL diffuse part
-            iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, int(probeIdx), normal, albedo.rgb) * weight;
+            iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, int(probeIdx), normal, baseColor.rgb) * weight;
             
             totalWeight += weight;
         }
@@ -235,9 +252,10 @@ void main(void)
 
             // fix me: use F_Schlick or not?
             // because we do not add specular for default smoke-like particles, we do not need to apply F_Schlick here
-            f_diffuse += illuminance * albedo.rgb / M_PI;
+            f_diffuse += illuminance * baseColor.rgb / M_PI;
         }
-        o.color.rgb = f_diffuse;
+        */
+        o.color.rgb = f_diffuse + f_specular;
     }
 
     // o_color = vec4(1.0, 1.0, 1.0, 1.0);

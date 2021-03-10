@@ -11,16 +11,18 @@ struct ParticleBRDFProperties {
     float specular;
     float metallic;
     float roughness;
-}
+};
 
 void particleLighting(ParticleBRDFProperties brdfProps, out vec3 f_diffuse, out vec3 f_specular) {
     // todo: control whether calc specular or not
-    // using specluar amount, metallic param?
+    // using specular amount, metallic param?
 
     f_diffuse = vec3(0.0);
     f_specular = vec3(0.0);
 
     vec3 n = brdfProps.worldNormal;
+    vec3 v = normalize(u_view.position - brdfProps.worldPosition);
+    float NdotV = clampedDot(n, v);
 
     // intermediate params
     // simple default f0
@@ -68,7 +70,7 @@ void particleLighting(ParticleBRDFProperties brdfProps, out vec3 f_diffuse, out 
         // weight = 10.0;
 
         // IBL diffuse part
-        iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, int(probeIdx), n, brdfProps.albedo.rgb) * weight;
+        iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, int(probeIdx), n, albedoColor.rgb) * weight;
         
         totalWeight += weight;
     }
@@ -77,6 +79,7 @@ void particleLighting(ParticleBRDFProperties brdfProps, out vec3 f_diffuse, out 
     }
 
     // todo: reflect probes?
+    // todo: set texture and sampler location in js code
     // if is opaque pixel, do not need to calculate reflection, because the composite postprocess will compute it according to scene depth.
     if (brdfProps.baseColor.a < 1.0 && hasSpecular) {
 

@@ -1,4 +1,5 @@
 // shader codes
+import function_particle_lighting from "../../renderer/shaders/shaderIncludes/function_particle_lighting.glsl.js";
 import psys_gpu_update_vs from "../../renderer/shaders/psys_gpu_update_vs.glsl.js";
 import psys_gpu_update_fs from "../../renderer/shaders/psys_gpu_update_fs.glsl.js";
 import psys_gpu_render_vs from "../../renderer/shaders/psys_gpu_render_vs.glsl.js";
@@ -45,6 +46,9 @@ export class GPUParticleMaterial extends Material {
             "ex_angle",
             // "ex_noiseTexCoord"
         ];
+
+        if (GLPrograms.shaderCodes["function_particle_lighting"] === undefined) GLPrograms.shaderCodes["function_particle_lighting"] = function_particle_lighting;
+
         this.updateProgram = new ShaderProgram();
         this.updateProgram.vertexShaderCode = GLPrograms.processSourceCode(psys_gpu_update_vs);
         this.updateProgram.fragmentShaderCode = GLPrograms.processSourceCode(psys_gpu_update_fs);
