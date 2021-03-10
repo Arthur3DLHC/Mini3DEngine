@@ -7,7 +7,7 @@ struct ParticleBRDFProperties {
     vec3 worldPosition;
     vec3 worldNormal;
     vec4 hPosition;
-    vec3 baseColor;
+    vec4 baseColor;
     float specular;
     float metallic;
     float roughness;
@@ -20,6 +20,8 @@ void particleLighting(ParticleBRDFProperties brdfProps, out vec3 f_diffuse, out 
     f_diffuse = vec3(0.0);
     f_specular = vec3(0.0);
 
+    vec3 n = brdfProps.worldNormal;
+
     // intermediate params
     // simple default f0
     vec3 f0 = vec3(0.08) * brdfProps.specular;
@@ -28,6 +30,8 @@ void particleLighting(ParticleBRDFProperties brdfProps, out vec3 f_diffuse, out 
     f0 = mix(f0, brdfProps.baseColor.rgb, brdfProps.metallic);
     vec3 f90 = vec3(1.0);
     float alphaRoughness = brdfProps.roughness * brdfProps.roughness;
+
+    bool hasSpecular = brdfProps.specular > 0.0 && brdfProps.metallic > 0.0;
 
     // find cluster of this pixel
     uint cluster = clusterOfPixel(brdfProps.hPosition);
@@ -64,7 +68,7 @@ void particleLighting(ParticleBRDFProperties brdfProps, out vec3 f_diffuse, out 
         // weight = 10.0;
 
         // IBL diffuse part
-        iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, int(probeIdx), brdfProps.normal, brdfProps.albedo.rgb) * weight;
+        iblDiffuse += getIBLRadianceLambertian(s_irrProbeArray, int(probeIdx), n, brdfProps.albedo.rgb) * weight;
         
         totalWeight += weight;
     }
@@ -74,6 +78,9 @@ void particleLighting(ParticleBRDFProperties brdfProps, out vec3 f_diffuse, out 
 
     // todo: reflect probes?
     // if is opaque pixel, do not need to calculate reflection, because the composite postprocess will compute it according to scene depth.
+    if (brdfProps.baseColor.a < 1.0 && hasSpecular) {
+
+    }
 
     // punctual lights
     //     diffuse lighting
@@ -124,7 +131,7 @@ void particleLighting(ParticleBRDFProperties brdfProps, out vec3 f_diffuse, out 
         }
         // check NdotL early
         vec3 l = normalize(pointToLight);   // Direction from surface point to light
-        float NdotL = dot(brdfProps.normal, l);
+        float NdotL = dot(n, l);
 
         if (NdotL < 0.0) {
             continue;
@@ -171,9 +178,18 @@ void particleLighting(ParticleBRDFProperties brdfProps, out vec3 f_diffuse, out 
 
         // todo: if have specular part, use F_Schlick
         vec3 F = vec3(0.0);
+        if (hasSpecular) {
+            // specular lighting
+            vec3 h = normalize(l + v);          // Direction of the vector between l and v, called halfway vector
+            float NdotH = clampedDot(n, h);
+            float LdotH = clampedDot(l, h);
+            float VdotH = clampedDot(v, h);
+            F = F_Schlick(f0, f90, VdotH);
+
+            f_specular += illuminance * BRDF_specularGGX(F, alphaRoughness, NdotL, NdotV, NdotH);
+        }
 
         f_diffuse += illuminance * BRDF_lambertian(F, albedoColor);
-        // specular lighting
     }
 }
 `;
