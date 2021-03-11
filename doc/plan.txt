@@ -620,6 +620,9 @@ TODO:       主要类结构
                     能否也集成在 tonemapping 里？
                 景深；不着急做
 
+            Hierarchical Z-Bufer
+                用于加速 Screen Space Reflection?
+
             相机动画；
                 从 Blender 导出；
                 能否导出相机的视野属性动画？
@@ -703,6 +706,14 @@ TODO:       主要类结构
                 测试Demo，调试
                     普通mesh的occlusion query
                     instancedMesh的occlusion query
+            
+            调整 Occlusion query 的使用方式
+                所有三角形较多的物体都做 Occlusion query?
+                使用上一帧的 Depth Buffer;
+                给SkinMesh手动指定包围盒
+                    在 Blender 中添加一个 box 空物体，定义包围盒范围？
+                    读取 gltf 时，如果发现此物体，则用其设置文件中所有 Mesh 的包围盒；
+
 
             Clustered 光源、envmap、irradiance volume
                 当视场角等投影参数变化时，更新 Cluster 的逻辑；
