@@ -23,6 +23,7 @@ void particleLighting(ParticleBRDFProperties brdfProps, out vec3 f_diffuse, out 
     vec3 n = brdfProps.worldNormal;
     vec3 v = normalize(u_view.position - brdfProps.worldPosition);
     float NdotV = clampedDot(n, v);
+    vec3 reflV = reflect(-v, n);
 
     // intermediate params
     // simple default f0
@@ -82,7 +83,51 @@ void particleLighting(ParticleBRDFProperties brdfProps, out vec3 f_diffuse, out 
     // todo: set texture and sampler location in js code
     // if is opaque pixel, do not need to calculate reflection, because the composite postprocess will compute it according to scene depth.
     if (brdfProps.baseColor.a < 1.0 && hasSpecular) {
+        // select cubemaps by pixel position
+        uint envmapStart = 0u;
+        uint envmapCount = 0u;
 
+        getEnvProbeIndicesInCluster(cluster, envmapStart, envmapCount);
+
+        vec3 iblSpecular = vec3(0.0);
+        float totalWeight = 0.0;
+
+        for (uint i = envmapStart; i < envmapStart + envmapCount; i++) {
+            uint probeIdx = getItemIndexAt(i);
+            EnvProbe probe = u_envProbes.probes[probeIdx];
+
+            // blend by distance to envprobe center position
+            // should also add radius weight: the smaller the probe, the stronger the weight.
+            // https://www.xmswiki.com/wiki/SMS:Inverse_Distance_Weighted_Interpolation
+            float dist = length(probe.position - brdfProps.worldPosition);
+            if (dist > probe.radius) {
+                continue;
+            }
+
+            float distxradius = dist * probe.radius + 0.01;
+
+            // envprobes has visible distance limit, so fade out to prevent popup artifact
+            float distToCam = length(probe.position - u_view.position);
+            float fade = 1.0 - smoothstep(0.7, 1.0, distToCam / probe.visibleRange.x);
+            
+            // if multiply fade to weight, when there is only one envprobe, it will pop-in/out
+            float weight = (1.0 / (distxradius * distxradius)); // * fade;
+
+            // IBL specular part
+            vec3 ld = textureCubeArrayLod(s_envMapArray, reflV, int(probeIdx), brdfProps.roughness * MAX_SPECULAR_MIP_LEVEL).rgb;
+            vec2 dfg = texture(s_specularDFG, vec2(NdotV, brdfProps.roughness)).rg;
+            iblSpecular += ld * (f0 * dfg.x + dfg.y) * weight * fade;
+            // vec4 envmap = textureCubeArray(s_envMapArray, reflV, int(i - envmapStart));
+            // reflection += envmap.rgb * weight;
+            
+            totalWeight += weight;
+        }
+        if (totalWeight > 0.0) {
+            iblSpecular /= totalWeight;
+            iblSpecular = max(iblSpecular, vec3(0.0));
+
+            f_specular += iblSpecular;
+        }
     }
 
     // punctual lights
