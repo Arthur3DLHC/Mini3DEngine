@@ -735,6 +735,7 @@ export class GPUParticleSystem extends Object3D {
             // some scene textures: irradiance probes;
             gl.uniform1i(renderProgram.getUniformLocation("s_shadowAtlas"), SceneTextureUnits.shadowmapAtlas);
             gl.uniform1i(renderProgram.getUniformLocation("s_irrProbeArray"), SceneTextureUnits.irradianceProbeArray);
+            gl.uniform1i(renderProgram.getUniformLocation("s_envMapArray"), SceneTextureUnits.envMapArray);
 
             // hold cur tex unit here? or use GLTextures class?
             let texUnit = startTexUnit;

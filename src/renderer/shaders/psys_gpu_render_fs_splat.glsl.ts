@@ -1,7 +1,5 @@
 /**
- * default shader for render particles
- * transparent or opaque self-illuminating (animating) textured particle
- * billboard or mesh
+ * liquid splat particle shader
  */
 export default /** glsl */`
 
@@ -51,7 +49,11 @@ void main(void)
     }
 
     // o.color = vec4(1.0);
-    vec4 baseColor = ex_color;
+
+    // the inverse alpha channel in ex_color is clipping reference.
+    float alphaRef = 1.0 - ex_color.a;
+
+    vec4 baseColor = vec4(ex_color.rgb, 1.0);
 
     // sample texture and texture animation
     if(u_texAnimSheetInfo.z > 0.0) {
@@ -62,23 +64,22 @@ void main(void)
             vec4 nextFrameColor = texture(s_texture, ex_texcoord1);
             texcolor = mix(texcolor, nextFrameColor, ex_texMixAmount);
         }
-        baseColor = ex_color * texcolor;
+        baseColor *= texcolor;
         // o.color = ex_color * texcolor;
     }
 
     // discard transparent pixels early
-    if (baseColor.a < 0.001) {
+    if (baseColor.a < alphaRef) {
         discard;
     }
 
-    // todo: soft particle?
+    // is this necessary?
+    baseColor.a = 1.0;
 
     FinalOutput o = defaultFinalOutput();
     o.color = baseColor;
 
-    // todo: lighting.
     // fix me: lots of overdraw
-    // todo: encapsulate as function? or add a callback function to let custom shaders to modify the color output?
     if (u_lightingInfo.x > 0) {
         // world space normal
         vec3 normal = ex_worldNormal;
@@ -97,9 +98,9 @@ void main(void)
         brdfProps.worldNormal = normal;
         brdfProps.hPosition = ex_hPosition;
         brdfProps.baseColor = baseColor;
-        brdfProps.specular = 0.0;
+        brdfProps.specular = 0.5;
         brdfProps.metallic = 0.0;
-        brdfProps.roughness = 1.0;
+        brdfProps.roughness = 0.0;
 
         vec3 f_diffuse = vec3(0.0);
         vec3 f_specular = vec3(0.0);
