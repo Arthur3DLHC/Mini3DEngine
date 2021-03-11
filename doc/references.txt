@@ -60,3 +60,8 @@ Babylon.js
         但是这样应该无法处理材质中有 alpha 镂空纹理的情况；
     节点控制逻辑
         每个节点可以添加一系列 Behavior 对象，类似于实体中的组件对象
+
+GPU-Driven and Vulkan
+    https://vkguide.dev/docs/gpudriven/gpu_driven_engines/
+    https://github.com/vblanco20-1/vulkan-guide/tree/all-chapters
+    https://github.com/vblanco20-1/vulkan-guide/tree/engine
