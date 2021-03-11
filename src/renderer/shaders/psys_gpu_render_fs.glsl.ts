@@ -103,11 +103,16 @@ void main(void)
 
         vec3 f_diffuse = vec3(0.0);
         vec3 f_specular = vec3(0.0);
+        vec3 f0 = vec3(0.0);
 
-        particleLighting(brdfProps, f_diffuse, f_specular);
+        particleLighting(brdfProps, f_diffuse, f_specular, f0);
 
         o.color.rgb = f_diffuse + f_specular;
+        o.normal = normalize((u_view.matView * vec4(normal, 0)).xyz);
+        o.roughness = brdfProps.roughness;
+        o.specular = f0;
     }
+    // o.tag = getObjectTag();
 
     // o_color = vec4(1.0, 1.0, 1.0, 1.0);
     outputFinal(o);

@@ -35,24 +35,24 @@ export class GPUParticleMaterial extends Material {
     public loadPrograms(renderContext: ClusteredForwardRenderContext) {
         // load default programs
         // default feedback varyings
-        const varyings: string[] = ["ex_position",
-            "ex_direction",
-            // "ex_upDir",
-            "ex_ageLife",
-            "ex_seed",
-            "ex_size",
-            "ex_color",
-            "ex_frameIdx",
-            "ex_angle",
-            // "ex_noiseTexCoord"
-        ];
+        // const varyings: string[] = ["ex_position",
+        //     "ex_direction",
+        //     // "ex_upDir",
+        //     "ex_ageLife",
+        //     "ex_seed",
+        //     "ex_size",
+        //     "ex_color",
+        //     "ex_frameIdx",
+        //     "ex_angle",
+        //     // "ex_noiseTexCoord"
+        // ];
 
         if (GLPrograms.shaderCodes["function_particle_lighting"] === undefined) GLPrograms.shaderCodes["function_particle_lighting"] = function_particle_lighting;
 
         this.updateProgram = new ShaderProgram();
         this.updateProgram.vertexShaderCode = GLPrograms.processSourceCode(psys_gpu_update_vs);
         this.updateProgram.fragmentShaderCode = GLPrograms.processSourceCode(psys_gpu_update_fs);
-        this.updateProgram.build(varyings);
+        this.updateProgram.build(GPUParticleMaterial.varyings);
 
         this.renderProgram = new ShaderProgram();
         this.renderProgram.vertexShaderCode = GLPrograms.processSourceCode(psys_gpu_render_vs);
@@ -88,6 +88,18 @@ export class GPUParticleMaterial extends Material {
      * for calc texcoords when rendering 
      */
     public texAnimSheetSize: vec2 = new vec2([1,1]);
+
+    protected static readonly varyings: string[] = ["ex_position",
+        "ex_direction",
+        // "ex_upDir",
+        "ex_ageLife",
+        "ex_seed",
+        "ex_size",
+        "ex_color",
+        "ex_frameIdx",
+        "ex_angle",
+        // "ex_noiseTexCoord"
+    ];
 
     // set uniform values for update program?
     public setUpdateProgramUniforms(psys: GPUParticleSystem, startTexUnit: number) {

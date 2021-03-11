@@ -13,7 +13,7 @@ struct ParticleBRDFProperties {
     float roughness;
 };
 
-void particleLighting(ParticleBRDFProperties brdfProps, out vec3 f_diffuse, out vec3 f_specular) {
+void particleLighting(ParticleBRDFProperties brdfProps, out vec3 f_diffuse, out vec3 f_specular, out vec3 f0) {
     // todo: control whether calc specular or not
     // using specular amount, metallic param?
 
@@ -27,14 +27,14 @@ void particleLighting(ParticleBRDFProperties brdfProps, out vec3 f_diffuse, out 
 
     // intermediate params
     // simple default f0
-    vec3 f0 = vec3(0.08) * brdfProps.specular;
+    f0 = vec3(0.08) * brdfProps.specular;
     // use metallic factor to lerp between default 0.04 and baseColor
     vec3 albedoColor = mix(brdfProps.baseColor.rgb * (vec3(1.0) - f0),  vec3(0), brdfProps.metallic);
     f0 = mix(f0, brdfProps.baseColor.rgb, brdfProps.metallic);
     vec3 f90 = vec3(1.0);
     float alphaRoughness = brdfProps.roughness * brdfProps.roughness;
 
-    bool hasSpecular = brdfProps.specular > 0.0 && brdfProps.metallic > 0.0;
+    bool hasSpecular = brdfProps.specular > 0.0;
 
     // find cluster of this pixel
     uint cluster = clusterOfPixel(brdfProps.hPosition);

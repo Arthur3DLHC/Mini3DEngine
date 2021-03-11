@@ -1,4 +1,4 @@
-import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, GPUParticleSystem, RotationLimitMode, GPUParticleMaterial, RenderStateCache, Gradient } from "../../src/mini3DEngine.js";
+import { GLDevice, ClusteredForwardRenderer, Scene, PerspectiveCamera, Mesh, BoxGeometry, StandardPBRMaterial, Clock, SphereGeometry, CylinderGeometry, PlaneGeometry, PointLight, SpotLight, DirectionalLight, DirectionalLightShadow, EnvironmentProbe, SRTTransform, LoadingManager, TextureLoader, Texture, Texture2D, TextureCube, ImageLoader, SamplerState, EnvironmentProbeType, GPUParticleSystem, RotationLimitMode, GPUParticleMaterial, RenderStateCache, Gradient, GPUParticleSplatMaterial } from "../../src/mini3DEngine.js";
 import vec3 from "../../lib/tsm/vec3.js";
 import { AutoRotateBehavior } from "../common/behaviors/autoRotateBehavior.js";
 import vec4 from "../../lib/tsm/vec4.js";
@@ -192,6 +192,8 @@ window.onload = () => {
     // todo: estimate max particle count by life and emit rate
 
     //#region billboard without rotation limit
+
+
     // usage: smokes, explosions
     if(true)
     {
@@ -300,6 +302,84 @@ window.onload = () => {
 
         particleSystems.push(billboardsNoRotLimit);
     }
+
+    // usage: splat
+    if (true) {
+        const liquidSplats = new GPUParticleSystem(100);
+        liquidSplats.name = "liquidSplats";
+        liquidSplats.isBillboard = true;
+        liquidSplats.rotationLimit = RotationLimitMode.NoLimit;
+        liquidSplats.castShadow = false;
+        liquidSplats.receiveShadow = true;
+
+        liquidSplats.geometry = particleGeom;
+
+        // location
+        liquidSplats.autoUpdateTransform = true;
+        liquidSplats.translation = new vec3([-2, 0, 0]);
+
+        // emitter and particle properties
+        liquidSplats.emitRate = 10;
+        liquidSplats.emitterSize = new vec3([0.1, 0.1, 0.1]);
+        liquidSplats.emitDirection = new vec3([0, 1, 0]);
+        liquidSplats.emitDirectionVariation = 0.5;
+
+        liquidSplats.minLife = 1.3;
+        liquidSplats.maxLife = 1.5;
+        liquidSplats.minSize = new vec3([0.7, 0.7, 0.7]);
+        liquidSplats.maxSize = new vec3([1, 1, 1]);
+
+        liquidSplats.minSpeed = 2.5;
+        liquidSplats.maxSpeed = 3.0;
+
+        liquidSplats.minAngle = 0;
+        liquidSplats.maxAngle = Math.PI * 2;
+
+        liquidSplats.gravity = new vec3([0, -4, 0]);
+
+        liquidSplats.color1 = new vec4([1, 0, 0, 1]);
+        liquidSplats.color2 = new vec4([0.5, 0, 0, 1]);
+
+        // use color gradients to control the alpha clipping
+        const colorGrads: Gradient<vec4>[] = [];
+        colorGrads.push(new Gradient<vec4>(0, new vec4([1, 1, 1, 1])));
+        colorGrads.push(new Gradient<vec4>(1, new vec4([1, 1, 1, 0])));
+        liquidSplats.colorGradients = colorGrads;
+
+        // size gradients
+        const sizeGrads: Gradient<vec3>[] = [];
+        sizeGrads.push(new Gradient<vec3>(0, new vec3([0.5, 0.5, 0.5])));
+        sizeGrads.push(new Gradient<vec3>(1, new vec3([2, 2, 1])));
+        liquidSplats.sizeGradients = sizeGrads;
+
+        // todo: splat material
+        const splatMtl: GPUParticleSplatMaterial = new GPUParticleSplatMaterial(renderer.context);
+        splatMtl.cullState = RenderStateCache.instance.getCullState(false, gl.BACK);
+        splatMtl.blendState = RenderStateCache.instance.getBlendState(false);
+        splatMtl.depthStencilState = RenderStateCache.instance.getDepthStencilState(true, true, gl.LEQUAL);
+
+        // with lighting enabled
+        splatMtl.lighting = true;
+
+        // todo: splat texture
+        textureLoader.load("./textures/particles/splat.png", (texture: Texture) => {
+            splatMtl.texture = texture as Texture2D;
+        });
+
+        textureLoader.load("./textures/particles/splat_normal.png", (texture: Texture) => {
+            splatMtl.normalMap = texture as Texture2D;
+        });
+
+        liquidSplats.material = splatMtl;
+
+        liquidSplats.rebuild();
+        liquidSplats.start();
+
+        scene.attachChild(liquidSplats);
+
+        particleSystems.push(liquidSplats);
+    }
+
     //#endregion
 
     //#region billboard with rotatoin limit (arbitrary axis)
