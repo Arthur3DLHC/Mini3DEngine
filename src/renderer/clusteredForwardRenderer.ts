@@ -1276,9 +1276,11 @@ export class ClusteredForwardRenderer {
             if (item) {
                 if (item.object.occlusionQueryID === null) {
                     item.object.occlusionQueryID = gl.createQuery();
+                    if(item.object.occlusionQueryID !== null) {
+                        gl.beginQuery(gl.ANY_SAMPLES_PASSED, item.object.occlusionQueryID);
+                    }
                 }
-                if (item.object.occlusionQueryID !== null) {
-
+                else {
                     // must wait untill last query is ready
                     if (!gl.getQueryParameter(item.object.occlusionQueryID, gl.QUERY_RESULT_AVAILABLE)) {
                         continue;
