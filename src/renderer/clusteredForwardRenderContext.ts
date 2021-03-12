@@ -835,7 +835,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
                 this._ubMaterialPBR.setFloat("specular", stdPBRMtl.specular);
 
                 this._ubMaterialPBR.setFloat("metallic", stdPBRMtl.metallic);
-                this._ubMaterialPBR.setFloat("roughness", stdPBRMtl.roughness);
+                this._ubMaterialPBR.setFloat("roughness", Math.max(stdPBRMtl.roughness, 0.01)); // if 0, the specular will completely disappear
                 this._ubMaterialPBR.setFloat("colorMapAmount", stdPBRMtl.colorMapAmount);
                 this._ubMaterialPBR.setFloat("metallicMapAmount", stdPBRMtl.metallicMapAmount);
                 

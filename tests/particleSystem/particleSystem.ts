@@ -108,9 +108,9 @@ window.onload = () => {
         sphereMesh.isStatic = true;
         sphereMesh.autoUpdateTransform = false;
         const sphereMtl = new StandardPBRMaterial();
-        sphereMtl.color = new vec4([1.0, 1.0, 1.0, 1.0]);
-        sphereMtl.metallic = 0.05;
-        sphereMtl.roughness = 0.95;
+        sphereMtl.color = new vec4([0.2, 0.2, 0.2, 1.0]);
+        sphereMtl.metallic = 0.0;
+        sphereMtl.roughness = 0.1;
         sphereMesh.materials.push(sphereMtl);
     
         scene.attachChild(sphereMesh);
@@ -150,7 +150,7 @@ window.onload = () => {
     matPlaneRot.setIdentity();
     matPlaneTran.fromTranslation(new vec3([0, -2, 0]));
     
-    addPlane("floor", matPlaneTran, matPlaneRot, new vec4([1.0, 1.0, 1.0, 1.0]), 0.5, 0.5, scene);
+    addPlane("floor", matPlaneTran, matPlaneRot, new vec4([0.0, 1.0, 0.0, 1.0]), 0.0, 0.1, scene);
 
     // TODO: add some lights
     const dirLight01 = new DirectionalLight();

@@ -146,9 +146,9 @@ void main(void)
 
     // simple default f0
     vec3 f0 = vec3(0.08) * getSpecular();
+    f0 = mix(f0, baseColor.rgb, metallic);
     // use metallic factor to lerp between default 0.04 and baseColor
     vec3 albedoColor = mix(baseColor.rgb * (vec3(1.0) - f0),  vec3(0), metallic);
-    f0 = mix(f0, baseColor.rgb, metallic);
     vec3 f90 = vec3(1.0);
     float alphaRoughness = roughness * roughness;
 

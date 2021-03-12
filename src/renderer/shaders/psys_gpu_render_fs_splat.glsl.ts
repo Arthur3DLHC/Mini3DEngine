@@ -98,9 +98,9 @@ void main(void)
         brdfProps.worldNormal = normal;
         brdfProps.hPosition = ex_hPosition;
         brdfProps.baseColor = baseColor;
-        brdfProps.specular = 1.0;
+        brdfProps.specular = 0.5;
         brdfProps.metallic = 0.0;
-        brdfProps.roughness = 0.0;
+        brdfProps.roughness = 0.1;  // roughness must not be zero, or the specular will totally disappear
 
         vec3 f_diffuse = vec3(0.0);
         vec3 f_specular = vec3(0.0);
