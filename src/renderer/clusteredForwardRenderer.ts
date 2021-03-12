@@ -785,12 +785,18 @@ export class ClusteredForwardRenderer {
         // todo: iterate occlusion query objects, get last frame query results by their occlusionID;
         // fix me: query id need to map to camera.
         // throw new Error("Method not implemented.");
+        const gl = GLDevice.gl;
         if (this._renderListOpaqueOcclusionQuery.ItemCount > 0) {
             for(let i = 0; i < this._renderListOpaqueOcclusionQuery.ItemCount; i++) {
                 const item = this._renderListOpaqueOcclusionQuery.getItemAt(i);
                 if (item !== null) {
                     if (item.object.occlusionQueryID !== null) {
-                        item.object.occlusionQueryResult = GLDevice.gl.getQueryParameter(item.object.occlusionQueryID, GLDevice.gl.QUERY_RESULT);
+                        if (gl.getQueryParameter(item.object.occlusionQueryID, gl.QUERY_RESULT_AVAILABLE)) {
+                            const result = gl.getQueryParameter(item.object.occlusionQueryID, gl.QUERY_RESULT);
+                            if (result !== undefined && result !== null) {
+                                item.object.occlusionQueryResult = result;
+                            }
+                        }
                     }
                 }
             }
