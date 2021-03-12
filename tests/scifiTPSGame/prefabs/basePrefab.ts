@@ -1,6 +1,6 @@
 import quat from "../../../lib/tsm/quat.js";
 import vec3 from "../../../lib/tsm/vec3.js";
-import { AnimationAction, AnimationMask, ConstraintProcessor, GltfAsset, GLTFSceneBuilder, Mesh, Object3D, PhysicsWorld, RigidBody, Scene, StandardPBRMaterial, Texture, TextureLoader } from "../../../src/mini3DEngine.js";
+import { AnimationAction, AnimationMask, BoundingRenderModes, ConstraintProcessor, GltfAsset, GLTFSceneBuilder, Mesh, Object3D, PhysicsWorld, RigidBody, Scene, StandardPBRMaterial, Texture, TextureLoader } from "../../../src/mini3DEngine.js";
 
 export abstract class BasePrefab {
     public constructor(assets: Map<string, GltfAsset>, physicsWorld: PhysicsWorld, scene: Scene, ) {
@@ -73,7 +73,12 @@ export abstract class BasePrefab {
         if (gltfNode instanceof Mesh) {
             gltfNode.castShadow = true;
             gltfNode.receiveShadow = true;
+
+            // test use occlusion query?
+            gltfNode.occlusionQuery = true;
+
             // gltfNode.boundingSphereRenderMode = BoundingRenderModes.normal;
+            gltfNode.boundingBoxRenderMode = BoundingRenderModes.normal;
         }
 
         for (const child of gltfNode.children) {

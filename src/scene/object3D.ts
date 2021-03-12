@@ -121,6 +121,8 @@ export class Object3D {
     public occlusionQueryID: WebGLQuery|null;
     public occlusionQueryResult: boolean;
 
+    // todo: bounding box and its worldTransform for occlusion query?
+
     // public showBoundingBox: boolean;
     // public showBoundingSphere: boolean;
     public boundingBoxRenderMode: BoundingRenderModes;

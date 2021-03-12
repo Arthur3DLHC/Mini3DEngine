@@ -53,7 +53,6 @@ export class SkinMesh extends Mesh {
                     this._boundingSphere.enlarge(SkinMesh._tmpGeomWorldSphere);
                 }
             }
-
         }
     }
 
