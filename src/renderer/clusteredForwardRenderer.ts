@@ -1278,6 +1278,12 @@ export class ClusteredForwardRenderer {
                     item.object.occlusionQueryID = gl.createQuery();
                 }
                 if (item.object.occlusionQueryID !== null) {
+
+                    // must wait untill last query is ready
+                    if (!gl.getQueryParameter(item.object.occlusionQueryID, gl.QUERY_RESULT_AVAILABLE)) {
+                        continue;
+                    }
+
                     gl.beginQuery(gl.ANY_SAMPLES_PASSED, item.object.occlusionQueryID);
                 }
                 // todo: draw bounding box
