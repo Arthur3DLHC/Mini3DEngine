@@ -549,7 +549,7 @@ export class ClusteredForwardRenderer {
 
         this._renderStatesOpaqueOcclusion.depthState = RenderStateCache.instance.getDepthStencilState(true, false, gl.LESS);
         this._renderStatesOpaqueOcclusion.blendState = RenderStateCache.instance.getBlendState(false, gl.FUNC_ADD, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-        this._renderStatesOpaqueOcclusion.cullState = RenderStateCache.instance.getCullState(true, gl.BACK);
+        this._renderStatesOpaqueOcclusion.cullState = RenderStateCache.instance.getCullState(false, gl.BACK);
         this._renderStatesOpaqueOcclusion.colorWriteState = RenderStateCache.instance.getColorWriteState(false, false, false, false);
 
         this._renderStatesTransparent.depthState = RenderStateCache.instance.getDepthStencilState(true, false, gl.LESS);
