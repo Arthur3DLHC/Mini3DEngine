@@ -893,8 +893,11 @@ export class GLTFSceneBuilder {
 
                             vb.data = accessorData;
                             if (bufferView.byteStride) {
+                                // according to glTF specification,
+                                // byteStride must be defined, when two or more accessors use the same bufferView.
                                 vb.stride = bufferView.byteStride;
                             } else {
+                                // suppose there is only 1 accessor use this bufferView.
                                 vb.stride = itemBytes;
                             }
                             vb.create();
