@@ -845,6 +845,7 @@ export class GLTFSceneBuilder {
                 geometry.inCache = true;
                 
                 // use bufferview index?
+                // todo: use a whole gltf file domain vertex buffer map?
                 const vertexBuffers: Map<string, VertexBuffer> = new Map<string, VertexBuffer>();
                 const vertexAttributes: VertexBufferAttribute[] = [];
 
