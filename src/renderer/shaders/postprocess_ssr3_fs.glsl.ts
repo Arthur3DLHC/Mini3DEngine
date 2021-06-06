@@ -94,114 +94,76 @@ ReflectionInfo smoothReflectionInfo(vec3 dir, vec3 hitCoord)
 ReflectionInfo raytraceScr(vec3 rayStartScr, vec3 rayEndScr,
                             float jitter)
 {
+
     // inverse Z to enable linear interpolation
     // todo: need not to inverse, because the depth map is not linear viewspace z but device z
-    vec3 rayStartScrInvZ = rayStartScr;
-    vec3 rayEndScrInvZ = rayEndScr;
+    vec3 dirScr = rayEndScr - rayStartScr;
 
-    rayStartScrInvZ.z = 1.0 / rayStartScrInvZ.z;
-    rayEndScrInvZ.z = 1.0 / rayEndScrInvZ.z;
-
-    vec3 dirScrInvZ = rayEndScrInvZ - rayStartScrInvZ;
-
-    float lengthScr = length(dirScrInvZ.xy);
+    float lengthScr = length(dirScr.xy);
 
     lengthScr = max(0.001, lengthScr);
 
-    dirScrInvZ /= lengthScr;
-    rayEndScrInvZ = rayStartScrInvZ + dirScrInvZ;
-    
-    float stepLength = 1.0 / maxSteps;
-    vec3 jitterOffset = dirScrInvZ * stepLength * jitter;
+    dirScr /= lengthScr;
+    rayEndScr = rayStartScr + dirScr;
 
-    rayStartScrInvZ += jitterOffset;
-    rayEndScrInvZ += jitterOffset;
+    float steps = float(maxSteps);
+    
+    float stepLength = 1.0 / steps;
+    vec3 jitterOffset = dirScr * stepLength * jitter;
+
+    rayStartScr += jitterOffset;
+    rayEndScr += jitterOffset;
 
     float rayLastZ = rayStartScr.z;
-	float stepZView = abs(rayEndScr.z - rayStartScr.z) / maxSteps;
+	float stepZView = abs(rayEndScr.z - rayStartScr.z) / steps;
 
-    for(float i = 0.01; i <= maxSteps; i++)
+    for(float i = 0.01; i <= steps; i++)
     {
-        float t = i / maxSteps;
+        float t = i / steps;
 
-        vec3 sampleScrInvZ = rayStartScrInvZ + dirScrInvZ * t;
+        vec3 sampleScr = rayStartScr + dirScr * t;
 
-        vec2 uv = sampleScrInvZ.xy;
+        vec2 uv = sampleScr.xy;
 
-		if (uv.x < 0 || uv.x > 1 || uv.y < 0 || uv.y > 1) break;
+		if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) break;;
 
-		float rayZ = 1.0 / sampleScrInvZ.z;
+		if (sampleScr.z > 1.0) break;
 
-		if (rayZ > u_view.zRange.y) break;;
-
-        float sceneZ = abs(perspectiveDepthToViewZ(texture(s_sceneDepth, projectedCoord.xy).r, u_view.zRange.x, u_view.zRange.y));
+        float sceneZ = texture(s_sceneDepth, uv).r;
     
         // magic number from UE SSRTRayCast.ush
-		float stepZScr = abs(rayZ - rayLastZ);
-		float compTolerance = max(stepZScr, stepZView) * 5;
+		// float stepZScr = abs(rayZ - rayLastZ);
+		// float compTolerance = max(stepZScr, stepZView) * 5;
 
-        if (rayZ > sceneZ && rayZ < sceneZ + compTolerance)
+        if (sampleScr.z > sceneZ)
+        // && rayZ < sceneZ + compTolerance)
         {
             // binary search
-            stepLength *= 0.5
-            sampleScrInvZ -= dirScrInvZ * stepLength
+            stepLength *= 0.5;
+            sampleScr -= dirScr * stepLength;
 
-            for (float j = 0; j < numBinarySearchSteps; j++)
+            for (int j = 0; j < numBinarySearchSteps; j++)
             {
-				rayZ = 1.0 / sampleScrInvZ.z;
-				uv = sampleScrInvZ.xy;
-                sceneZ = abs(perspectiveDepthToViewZ(texture(s_sceneDepth, projectedCoord.xy).r, u_view.zRange.x, u_view.zRange.y));
-
+				uv = sampleScr.xy;
+                sceneZ = texture(s_sceneDepth, uv).r;
+                stepLength *= 0.5;
+                if (sampleScr.z > sceneZ)
+                {
+                    sampleScr -= dirScr * stepLength;
+                }
+                else
+                {
+                    sampleScr += dirScr * stepLength;
+                }
             }
+            ReflectionInfo info;
+            info.color = texture(s_sceneColor, sampleScr.xy).rgb;
+            info.coords = vec4(sampleScr, 0.0);
+            return info;
         }
     }
-}
 
-/**
- * Tests the given world position (hitCoord) according to the given reflection vector (dir)
- * until it finds a collision (means that depth is enough close to say "it's the pixel to sample!").
- */
-ReflectionInfo getReflectionInfo(vec3 dir, vec3 hitCoord)
-{
-    ReflectionInfo info;
-    vec4 projectedCoord;
-    float sampledDepth;
-
-    dir *= step;
-
-    for(int i = 0; i < maxSteps; i++)
-    {
-        hitCoord += dir;
-
-        projectedCoord = u_view.matProj * vec4(hitCoord, 1.0);
-        projectedCoord.xy /= projectedCoord.w;
-	    projectedCoord.xy = 0.5 * projectedCoord.xy + vec2(0.5);
-
-        // view space z
-        sampledDepth = perspectiveDepthToViewZ(texture(s_sceneDepth, projectedCoord.xy).r, u_view.zRange.x, u_view.zRange.y);
-
-        // sampledDepth = (view * texture(positionSampler, projectedCoord.xy)).z;
- 
-        // hitCoord is in view space
-        float depth = hitCoord.z - sampledDepth;
-
-        if(((dir.z - depth) < threshold) && depth <= 0.0)
-        {
-            #ifdef ENABLE_SMOOTH_REFLECTIONS
-                return smoothReflectionInfo(dir, hitCoord);
-            #else
-                info.color = texture(s_sceneColor, projectedCoord.xy).rgb;
-                info.coords = vec4(projectedCoord.xy, sampledDepth, 0.0);
-                return info;
-            #endif
-        }
-    }
-    
-    // not hit? should discard?
     discard;
-    info.color = texture(s_sceneColor, projectedCoord.xy).rgb;
-    info.coords = vec4(projectedCoord.xy, sampledDepth, 0.0);
-    return info;
 }
 
 vec3 hash(vec3 a)
@@ -225,8 +187,8 @@ void main()
     // normal = normalize((u_view.matInvView * vec4(normal, 0.0)).xyz);
     // o_color = vec4(normal * 0.5 + vec3(0.5, 0.5, 0.5), 1.0);
     // return;
-    
-    vec4 projectedPos = vec4(ex_texcoord * 2.0 - 1.0, texture(s_sceneDepth, ex_texcoord).r * 2.0 - 1.0, 1.0);
+    float depth = texture(s_sceneDepth, ex_texcoord).r;
+    vec4 projectedPos = vec4(ex_texcoord * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0);
     vec4 hPos = u_view.matInvProj * projectedPos;
 
     // position in view
@@ -236,16 +198,23 @@ void main()
 
     //o_color = vec4(position.z - sampledDepth, 0.0, 0.0, 1.0);
     //return;
-
     vec3 reflected = normalize(reflect(normalize(position), normalize(normal)));
+
+    vec3 rayEnd = position + reflected;
+
+    vec4 rayEndProj = u_view.matProj * vec4(rayEnd, 1.0);
+
+    vec3 rayStartScr = vec3(ex_texcoord, depth);
+    vec3 rayEndScr = rayEndProj.xyz / rayEndProj.w;
+    rayEndScr = rayEndScr * vec3(0.5, 0.5, 0.5) + vec3(0.5, 0.5, 0.5);
 
     // o_color = vec4(reflected * 2.0 - 1.0, 1.0);
     // return;
 
     vec3 jitt = mix(vec3(0.0), hash(position), roughness) * roughnessFactor;
     
-    // ReflectionInfo info = getReflectionInfo(jitt + reflected, position);
-    ReflectionInfo info = getReflectionInfo(reflected, position); // For debug: no roughness
+    ReflectionInfo info = raytraceScr(rayStartScr, rayEndScr, 0.0);
+    // ReflectionInfo info = getReflectionInfo(reflected, position); // For debug: no roughness
     // o_color = vec4(info.color, 1.0);
     // return;
 
