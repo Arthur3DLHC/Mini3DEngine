@@ -1,5 +1,6 @@
 /*
  * from https://github.com/BabylonJS/Babylon.js/blob/master/src/Shaders/screenSpaceReflection.fragment.fx
+ * uses world space ray march
  * seems simpler than claygl version
  * modified to fit my post process samplers layout
  */
