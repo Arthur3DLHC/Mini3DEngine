@@ -2,8 +2,8 @@ import samplers_postprocess from "./shaders/shaderIncludes/samplers_postprocess.
 import fullscreen_rect_vs from "./shaders/fullscreen_rect_vs.glsl.js";
 import postprocess_ssao_fs from "./shaders/postprocess_ssao_fs.glsl.js";
 import postprocess_ssao_blur_fs from "./shaders/postprocess_ssao_blur_fs.glsl.js";
-import postprocess_ssr_fs from "./shaders/postprocess_ssr_fs.glsl.js";
-import postprocess_ssr2_fs from "./shaders/postprocess_ssr2_fs.glsl.js";
+// import postprocess_ssr_fs from "./shaders/postprocess_ssr_fs.glsl.js";
+import postprocess_ssr3_fs from "./shaders/postprocess_ssr3_fs.glsl.js";
 import postprocess_silhouette_fs from "./shaders/postprocess_silhouette_fs.glsl.js";
 import postprocess_composite_fs from "./shaders/postprocess_composite_fs.glsl.js";
 import postprocess_fog_fs from "./shaders/postprocess_fog_fs.glsl.js";
@@ -61,11 +61,11 @@ export class PostProcessor {
         if (shaderCodes["postprocess_ssao_blur_fs"] === undefined) {
             shaderCodes["postprocess_ssao_blur_fs"] = postprocess_ssao_blur_fs;
         }
-        if (shaderCodes["postprocess_ssr_fs"] === undefined) {
-            shaderCodes["postprocess_ssr_fs"] = postprocess_ssr_fs;
-        }
-        if (shaderCodes["postprocess_ssr2_fs"] === undefined) {
-            shaderCodes["postprocess_ssr2_fs"] = postprocess_ssr2_fs;
+        //if (shaderCodes["postprocess_ssr_fs"] === undefined) {
+        //    shaderCodes["postprocess_ssr_fs"] = postprocess_ssr_fs;
+        //}
+        if (shaderCodes["postprocess_ssr3_fs"] === undefined) {
+            shaderCodes["postprocess_ssr3_fs"] = postprocess_ssr3_fs;
         }
         if (shaderCodes["postprocess_silhouette_fs"] === undefined) {
             shaderCodes["postprocess_silhouette_fs"] = postprocess_silhouette_fs;
@@ -115,15 +115,10 @@ export class PostProcessor {
         this._ssaoBlurProgram.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["postprocess_ssao_blur_fs"]);
         this._ssaoBlurProgram.build();
 
-        this._ssrProgram = new ShaderProgram();
-        this._ssrProgram.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["fullscreen_rect_vs"]);
-        this._ssrProgram.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["postprocess_ssr_fs"]);
-        this._ssrProgram.build();
-
-        this._ssr2Program = new ShaderProgram();
-        this._ssr2Program.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["fullscreen_rect_vs"]);
-        this._ssr2Program.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["postprocess_ssr2_fs"]);
-        this._ssr2Program.build();
+        this._ssr3Program = new ShaderProgram();
+        this._ssr3Program.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["fullscreen_rect_vs"]);
+        this._ssr3Program.fragmentShaderCode = GLPrograms.processSourceCode(shaderCodes["postprocess_ssr3_fs"]);
+        this._ssr3Program.build();
 
         this._silhouetteProgram = new ShaderProgram();
         this._silhouetteProgram.vertexShaderCode = GLPrograms.processSourceCode(shaderCodes["fullscreen_rect_vs"]);
@@ -171,8 +166,7 @@ export class PostProcessor {
 
         context.bindUniformBlocks(this._ssaoProgram);
         context.bindUniformBlocks(this._ssaoBlurProgram);
-        context.bindUniformBlocks(this._ssrProgram);
-        context.bindUniformBlocks(this._ssr2Program);
+        context.bindUniformBlocks(this._ssr3Program);
         context.bindUniformBlocks(this._silhouetteProgram);
         context.bindUniformBlocks(this._fogProgram);
         context.bindUniformBlocks(this._fxaaProgram);
@@ -315,8 +309,7 @@ export class PostProcessor {
     public release() {
         if (this._ssaoProgram) { this._ssaoProgram.release(); }
         if (this._ssaoBlurProgram) { this._ssaoBlurProgram.release(); }
-        if (this._ssrProgram) { this._ssrProgram.release(); }
-        if (this._ssr2Program) { this._ssr2Program.release(); }
+        if (this._ssr3Program) { this._ssr3Program.release(); }
         if (this._silhouetteProgram) {this._silhouetteProgram.release(); }
         if (this._fogProgram) { this._fogProgram.release(); }
         if (this._fxaaProgram) { this._fxaaProgram.release(); }
@@ -364,8 +357,8 @@ export class PostProcessor {
 
     private _ssaoProgram: ShaderProgram;
     private _ssaoBlurProgram: ShaderProgram;
-    private _ssrProgram: ShaderProgram;
-    private _ssr2Program: ShaderProgram;
+    // private _ssrProgram: ShaderProgram;
+    private _ssr3Program: ShaderProgram;
     private _silhouetteProgram: ShaderProgram;
     private _fogProgram: ShaderProgram;
     private _fxaaProgram: ShaderProgram;
@@ -635,6 +628,7 @@ export class PostProcessor {
         GLTextures.setTextureAt(this._customTexStartUnit, null);
     }
 
+    /*
     private generateSSR() {
         const gl = GLDevice.gl;
         
@@ -678,6 +672,7 @@ export class PostProcessor {
 
         // throw new Error("Method not implemented.");
     }
+    */
 
     private generateSSR2() {
         const gl = GLDevice.gl;
@@ -692,7 +687,7 @@ export class PostProcessor {
         // render states
         this._renderStates.apply();
 
-        const prog = this._ssr2Program;
+        const prog = this._ssr3Program;
         GLPrograms.useProgram(prog);
         
         // texture samplers
@@ -714,7 +709,7 @@ export class PostProcessor {
         gl.uniform1f(prog.getUniformLocation("minGlossiness"), ssr2.glossinessThreshold);
         gl.uniform1f(prog.getUniformLocation("reflectionSpecularFalloffExponent"), ssr2.reflectionSpecularFalloffExponent);
 
-        this._rectGeom.draw(0, Infinity, this._ssr2Program.attributes);
+        this._rectGeom.draw(0, Infinity, this._ssr3Program.attributes);
         // clear textures
         GLTextures.setTextureAt(this._sceneColorTexUnit, null);
     }
