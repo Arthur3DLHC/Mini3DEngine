@@ -131,11 +131,13 @@ ReflectionInfo raytraceScr(vec3 rayStartScr, vec3 rayEndScr,
 
         float sceneZ = texture(s_sceneDepth, uv).r;
     
+        // todo: backface reflection removal and compare tolerance
+
         // magic number from UE SSRTRayCast.ush
 		// float stepZScr = abs(rayZ - rayLastZ);
 		// float compTolerance = max(stepZScr, stepZView) * 5;
 
-        if (sampleScr.z > sceneZ)
+        if (sampleScr.z > sceneZ && sampleScr.z < sceneZ + 0.01)
         // && rayZ < sceneZ + compTolerance)
         {
             // binary search
@@ -214,6 +216,12 @@ void main()
     vec3 jitt = mix(vec3(0.0), hash(position), roughness) * roughnessFactor;
     
     ReflectionInfo info = raytraceScr(rayStartScr, rayEndScr, 0.0);
+
+    vec3 hitNormal = getSceneNormal(info.coords.xy);
+    hitNormal.z = -hitNormal.z;
+
+    if (dot(reflected, hitNormal) < 0.0) discard;
+
     // ReflectionInfo info = getReflectionInfo(reflected, position); // For debug: no roughness
     // o_color = vec4(info.color, 1.0);
     // return;
