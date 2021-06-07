@@ -78,7 +78,7 @@ export abstract class BasePrefab {
             gltfNode.occlusionQuery = true;
 
             // gltfNode.boundingSphereRenderMode = BoundingRenderModes.normal;
-            gltfNode.boundingBoxRenderMode = BoundingRenderModes.normal;
+            // gltfNode.boundingBoxRenderMode = BoundingRenderModes.normal;
         }
 
         for (const child of gltfNode.children) {
