@@ -1,5 +1,5 @@
 /**
- * todo: define common pbr outputs
+ * define common pbr outputs
  */
 export default /** glsl */`
     struct PBROutput
@@ -12,7 +12,8 @@ export default /** glsl */`
         float roughness;
         vec3 normal;
     };
-    // todo: function for default output
+    
+    // function for create default output
     PBROutput defaultPBROutput()
     {
         PBROutput o;

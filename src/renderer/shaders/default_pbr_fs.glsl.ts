@@ -161,9 +161,6 @@ void main(void)
     // vec4 ndc = ex_hPosition / ex_hPosition.w;
     uint cluster = clusterOfPixel(ex_hPosition);
 
-     // todo: irradiance probes
-
-    // todo: env maps: image based lighting
     uint irrStart = 0u;
     uint irrCount = 0u;
     // float cubeUVScale = 1.0 / 6.0;

@@ -41,7 +41,7 @@ export default /** glsl */`
         uint start;
         uint lightCount;
         uint decalCount;
-        uint envProbeCount;         // 高 16 位是环境反射探针数量，低 16 位是漫反射探针索引
+        uint envProbeCount;         // 高 16 位是环境反射探针数量，低 16 位是漫反射探针数量
     };
     uniform Clusters
     {
