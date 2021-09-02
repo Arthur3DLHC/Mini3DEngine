@@ -387,7 +387,7 @@ export class ClusteredForwardRenderContext extends RenderContext {
 
                 let matBias = new mat4();
                 matBias.fromTranslation(new vec3([0, 0, light.shadow.bias]));
-                // todo: shadowmap atlas rect as viewport matrix
+                // shadowmap atlas rect as viewport matrix
                 const normRect = mapRects[0].copyTo();
                 normRect.multiply(invSize);
                 const l = normRect.x;
