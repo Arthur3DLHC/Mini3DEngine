@@ -11,8 +11,8 @@ uniform samplerCube s_skybox;
 #define u_isHDR     u_object.props.w
 
 in vec3 ex_worldDir;
-in vec3 ex_normal;
-in vec2 ex_texcoord;
+// in vec3 ex_normal;
+// in vec2 ex_texcoord;
 
 #include <output_final>
 

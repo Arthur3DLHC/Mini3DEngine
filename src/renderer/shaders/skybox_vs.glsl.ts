@@ -16,8 +16,8 @@ layout(location = TEXCOORD0_LOCATION) in vec2 a_texcoord0;
 #include <function_transforms>
 
 out vec3 ex_worldDir;
-out vec3 ex_normal;
-out vec2 ex_texcoord;
+// out vec3 ex_normal;
+// out vec2 ex_texcoord;
 
 void main(void)
 {
@@ -25,7 +25,7 @@ void main(void)
     vec4 worldPosition = localToWorld(vec4(a_position, 1.0));
     gl_Position = viewToProj(worldToView(worldPosition));
 	// gl_Position.z = gl_Position.w; // set z to camera.far (from Three.js, cube_vert.glsl.js)
-    ex_normal = a_normal;
-    ex_texcoord = a_texcoord0;
+    // ex_normal = a_normal;
+    // ex_texcoord = a_texcoord0;
 }
 `;
