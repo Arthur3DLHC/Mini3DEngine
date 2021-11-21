@@ -111,7 +111,7 @@ export class GLTFSceneBuilder {
      * build scene hierarchy from gltf asset. NOTE: don't call this before all binary datas has been loaded.
      * @param gltf the GlTf asset data
      * @param sceneIdx index of scene in gltf
-     * @param animations an array to receive animaitons loaded from gltf, is presidented
+     * @param animations an array to receive animaitons loaded from gltf, if presidented
      * @param instancing use instanced mesh for meshes shared by multiple nodes in gltf. this is usually for optimizing display of large level scenes
      */
     public build(gltf: GltfAsset, sceneIdx: number, animations?: AnimationAction[], instancing: boolean = false): Object3D {
