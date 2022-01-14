@@ -382,7 +382,7 @@ window.onload = () => {
 
     //#endregion
 
-    //#region billboard with rotatoin limit (arbitrary axis)
+    //#region billboard with rotation limit (arbitrary axis)
     // usage: light beams
     if(true)
     {
