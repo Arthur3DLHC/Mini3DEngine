@@ -313,7 +313,6 @@ export class ThirdPersonCtrlBehavior extends Behavior {
 
             // player orientation
             // face to move direction
-            // because model is init facing z axis, so it's 90 degree offset with move yaw angle
             const modelYaw = this._moveYaw;// + Math.PI * 0.5;
 
             if(Math.abs(this._modelYaw - modelYaw) > Math.PI) {
