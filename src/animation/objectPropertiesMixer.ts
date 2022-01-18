@@ -60,6 +60,9 @@ export class Vec3PropertyMixer extends PropertyMixer {
 export class QuatPropertyMixer extends PropertyMixer {
     public originalValue: quat = quat.identity.copyTo();
     public mixedValue: quat = quat.identity.copyTo();
+    // record first value to fix flipped following quaternions.
+    // see https://forum.unity.com/threads/average-quaternions.86898/, Elecman's reply
+    private firstValue: quat = quat.identity.copyTo();
 
     public clear() {
         super.clear();
@@ -67,16 +70,26 @@ export class QuatPropertyMixer extends PropertyMixer {
     }
 
     public mixAdditive(val: quat, weight: number) {
-        this.sumWeight += weight;
-        // todo: check if quaternions are flipped?
-        if( quat.dot(this.mixedValue, val) < 0 )
-        {
-            weight = -weight;
+        if (this.sumWeight <= 0){
+            val.copyTo(this.firstValue);
+            val.copyTo(this.mixedValue);
+            this.mixedValue.x *= weight;
+            this.mixedValue.y *= weight;
+            this.mixedValue.z *= weight;
+            this.mixedValue.w *= weight;
         }
-        this.mixedValue.x += val.x * weight;
-        this.mixedValue.y += val.y * weight;
-        this.mixedValue.z += val.z * weight;
-        this.mixedValue.w += val.w * weight;
+        else {
+            // todo: check if quaternions are flipped?
+            var w = weight;
+            if (quat.dot(this.firstValue, val) < 0) {
+                w = -weight;
+            }
+            this.mixedValue.x += val.x * w;
+            this.mixedValue.y += val.y * w;
+            this.mixedValue.z += val.z * w;
+            this.mixedValue.w += val.w * w;
+        }
+        this.sumWeight += weight;
     }
 
     public mixAddtiveArray(val: number[], weight: number) {
