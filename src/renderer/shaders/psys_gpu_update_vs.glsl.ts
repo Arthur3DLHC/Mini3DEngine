@@ -144,12 +144,12 @@ void main(void)
 
             ex_seed = p_seed;
 
-            // todo: size; random init size; gradient texture?
+            // size; random init size; gradient texture?
             ex_size = mix(u_minSize, u_maxSize, random.g);
 
             vec3 positionRange = u_emitterSize - 0.5 * u_emitterSize;
 
-            // todo: generate position according to the emitter shape and size
+            // generate position according to the emitter shape and size
             // generate in local unit space, then assign emitter world transform.
             if (u_emitterShape == EMITTER_ELLIPSOID) {
                 // random radius and polar coords?
@@ -180,7 +180,7 @@ void main(void)
                 ex_frameIdx = mix(u_texAnimFrameInfo.x, u_texAnimFrameInfo.y, random1.g);
             }
 
-            // todo: nose texture?
+            // todo: noise texture?
 
             // generate local direction by the u_emitDir_variation
             newDirection = u_emitDir_variation.xyz + (getRandomVec3(p_seed.z) - vec3(0.5)) * u_emitDir_variation.w;
